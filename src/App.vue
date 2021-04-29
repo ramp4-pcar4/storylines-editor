@@ -1,6 +1,16 @@
 <template>
     <div id="app">
-        <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
+        <div class="p-32 text-center intro">
+            <h1 class="m-10 font-bold text-7xl">Story RAMP</h1>
+            <p>
+                For a guide and recipes on how to configure / customize this project,<br />
+                check out the
+                <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
+            </p>
+
+            <p class="mt-20 text-8xl">V</p>
+        </div>
+
         <Story />
     </div>
 </template>
@@ -25,5 +35,9 @@ export default class App extends Vue {}
     color: #2c3e50;
 
     background-color: #fff;
+
+    .intro {
+        height: 75vh;
+    }
 }
 </style>
