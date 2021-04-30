@@ -1,17 +1,47 @@
 <template>
-    <div id="app">
-        <div class="p-32 text-center intro">
-            <h1 class="m-10 font-bold text-7xl">Story RAMP</h1>
-            <p>
-                For a guide and recipes on how to configure / customize this project,<br />
-                check out the
-                <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-            </p>
+    <div id="app" class="divide-y">
+        <header class="fixed top-0 left-0 right-0 z-50 px-6 py-3 leading-9">
+            <div>Github</div>
+        </header>
 
-            <p class="mt-20 text-8xl">V</p>
-        </div>
+        <main class="divide-y">
+            <header class="p-32 text-center intro">
+                <svg
+                    class="w-auto h-40 m-auto"
+                    width="27.781"
+                    height="26.811"
+                    version="1.1"
+                    viewBox="0 0 27.781 26.811"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="m19.003 22.189-17.94-12.375c-1.818-1.254-1.2-3.865 1.067-4.479l19.067-5.175a2.7 2.7 0 0 1 3.616 2.492l-1.13 17.549c-0.134 2.083-2.862 3.242-4.68 1.988z"
+                        fill="#ff9f43"
+                    />
+                    <path
+                        d="m13.313 25.244-10.569-20.669a2.883 2.883 0 0 1 3.007-4.161l19.587 3.023a2.883 2.883 0 0 1 2.127 4.162l-9.023 17.646a2.883 2.883 0 0 1-5.129-1e-3z"
+                        fill="#00d2d3"
+                    />
+                    <path
+                        d="m24.765 3.3483-9.764-1.507-11.988 3.255 4.785 9.361 11.205 7.732a2.888 2.888 0 0 0 0.806 0.383l4.256-8.323z"
+                        fill="#001a49"
+                    />
+                </svg>
 
-        <Story />
+                <h1 class="m-10 font-bold text-7xl">Story RAMP</h1>
+                <p>
+                    For a guide and recipes on how to configure / customize this project,<br />
+                    check out the
+                    <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
+                </p>
+
+                <p class="mt-20 text-8xl">V</p>
+            </header>
+
+            <Story />
+        </main>
+
+        <footer class="p-10 text-center">2021 Web-mapping Team</footer>
     </div>
 </template>
 
@@ -39,5 +69,9 @@ export default class App extends Vue {}
     .intro {
         height: 75vh;
     }
+}
+
+body {
+    font-size: 16px;
 }
 </style>
