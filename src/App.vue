@@ -38,7 +38,7 @@
                 <p class="mt-20 text-8xl">V</p>
             </header>
 
-            <Story />
+            <StoryV />
         </main>
 
         <footer class="p-10 text-center">2021 Web-mapping Team</footer>
@@ -47,11 +47,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Story from '@/components/story.vue';
+import StoryV from '@/components/story.vue';
 
 @Component({
     components: {
-        Story
+        StoryV
     }
 })
 export default class App extends Vue {}

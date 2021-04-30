@@ -3,22 +3,27 @@
         id="story"
         @step-enter="
             ({ element, index }) => {
-                currStepTitle = element.dataset.stepTitle;
-                initRamp(index);
+                activeChapterIndex = parseInt(element.dataset.chapterIndex);
+                // initRamp(index);
             }
         "
     >
         <template v-slot:graphic>
             <ul class="menu">
-                <li v-for="(step, index) in steps" :key="index" :class="{ 'is-active': currStepTitle == step.title }">
+                <li
+                    v-for="(chapter, index) in story.chapters"
+                    :key="index"
+                    :class="{ 'is-active': activeChapterIndex === index }"
+                >
                     ●
                 </li>
             </ul>
         </template>
 
-        <div v-for="(step, index) in steps" :key="index" class="step" :data-step-title="step.title">
-            <h2 class="chapter-title">{{ step.title }}</h2>
-            <Chapter :step-title="step.title" :step-index="index" :step-image="step.img" />
+        <div v-for="(chapter, index) in story.chapters" :key="index" class="chapter" :data-chapter-index="index">
+            <h2 class="chapter-title">{{ chapter.title }}</h2>
+
+            <ChapterV :value="chapter" :index="index" />
         </div>
     </Scrollama>
 </template>
@@ -26,45 +31,22 @@
 <script lang="ts">
 import 'intersection-observer';
 import Scrollama from 'vue-scrollama';
-import Chapter from '@/components/chapter.vue';
+import ChapterV from '@/components/chapter.vue';
 
 import { Component, Vue } from 'vue-property-decorator';
+
+import story, { StoryConfig } from '@/story-config';
 
 @Component({
     components: {
         Scrollama,
-        Chapter
+        ChapterV
     }
 })
-export default class Story extends Vue {
-    currStepTitle = null;
+export default class StoryV extends Vue {
+    activeChapterIndex = -1;
 
-    steps = [
-        {
-            title: 'Step 1',
-            text: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, itaque.',
-            img:
-                'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
-        },
-        {
-            title: 'Step 2',
-            text: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, itaque.',
-            img:
-                'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/GettyImages-187242601__1554821467033__w1920.jpg'
-        },
-        {
-            title: 'Step 3',
-            text: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, itaque.',
-            img:
-                'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/slide%206%20-%20mining%20trends__1553275702559__w592.jpg'
-        },
-        {
-            title: 'Step 4',
-            text: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, itaque.',
-            img:
-                'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/NPRIdata__1598884946319__w1589.png'
-        }
-    ];
+    story: StoryConfig = story;
 
     initRamp(index: number): void {
         // new RAMP.Map(document.getElementById(`my-map-${index}`), 'config.json');
@@ -96,7 +78,7 @@ export default class Story extends Vue {
     }
 }
 
-.step {
+.chapter {
     // padding: 2rem;
     padding-top: 5vh;
     padding-bottom: 5vh;
