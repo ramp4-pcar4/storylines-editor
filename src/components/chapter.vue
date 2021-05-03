@@ -76,7 +76,8 @@ export default class Chapter extends Vue {
     > .scrollama-graphic {
         flex: 2;
         // height: 50vh;
-        top: 5vh;
+        top: 4rem; // compensate for sticky header
+
         order: 1;
 
         // border: 1px solid grey;
