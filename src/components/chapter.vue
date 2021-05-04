@@ -70,7 +70,7 @@ export default class Chapter extends Vue {
     display: flex;
 
     > .scrollama-graphic {
-        flex: 2;
+        flex: 3;
         top: 4rem; // compensate for sticky header
 
         order: 1;
@@ -89,7 +89,7 @@ export default class Chapter extends Vue {
     }
 
     > .scrollama-steps {
-        flex: 1;
+        flex: 2;
     }
 }
 

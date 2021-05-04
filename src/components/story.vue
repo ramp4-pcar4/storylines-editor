@@ -31,7 +31,10 @@
                         :key="index"
                         :class="{ 'is-active': activeChapterIndex === index }"
                     >
-                        <a href="#" class="flex items-center px-3 py-1">
+                        <a
+                            :href="`#${chapter.title.toLowerCase().replaceAll(' ', '-')}`"
+                            class="flex items-center px-3 py-1"
+                        >
                             <svg
                                 width="24"
                                 height="24"
@@ -45,9 +48,10 @@
                                     stroke-width=".93974"
                                 />
                             </svg>
-                            <span class="flex-1 mt-px ml-4 leading-none overflow-ellipsis whitespace-nowrap">{{
-                                chapter.title
-                            }}</span>
+                            <span
+                                class="flex-1 mt-px ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap"
+                                >{{ chapter.title }}</span
+                            >
                         </a>
                     </li>
                 </ul>
@@ -60,7 +64,12 @@
             class="pt-24 prose max-w-none"
             :data-chapter-index="index"
         >
-            <h2 class="sticky z-10 px-10 mb-0 chapter-title top-20">{{ chapter.title }}</h2>
+            <h2
+                :id="chapter.title.toLowerCase().replaceAll(' ', '-')"
+                class="sticky z-10 px-10 mb-0 chapter-title top-20"
+            >
+                {{ chapter.title }}
+            </h2>
 
             <ChapterV :value="chapter" :index="index" />
         </div>
@@ -118,7 +127,9 @@ export default class StoryV extends Vue {
         // bg-gray-50
         // background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
         // --tw-bg-opacity: 1;
-        background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
+
+        // background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
+        background: linear-gradient(to right, var(--sr-content-background) 40%, #fff 40%);
 
         border-style: solid none solid solid;
         border-width: 1px 0 1px 1px;
@@ -155,7 +166,8 @@ export default class StoryV extends Vue {
 }
 
 .chapter-title {
-    width: 33.3%;
+    width: 40%; // 33.3%;
+
     &::before {
         position: absolute;
         content: '';
