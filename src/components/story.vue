@@ -54,7 +54,12 @@
             </div>
         </template>
 
-        <div v-for="(chapter, index) in value.chapters" :key="index" class="chapter" :data-chapter-index="index">
+        <div
+            v-for="(chapter, index) in value.chapters"
+            :key="index"
+            class="prose max-w-none chapter"
+            :data-chapter-index="index"
+        >
             <h2 class="chapter-title">{{ chapter.title }}</h2>
 
             <ChapterV :value="chapter" :index="index" />
