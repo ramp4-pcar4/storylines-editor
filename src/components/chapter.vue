@@ -5,30 +5,13 @@
     >
         <template v-slot:graphic>
             <component :is="value.graphic.type" :payload="value.graphic.payload"></component>
-
-            <!-- <div :id="`my-map-${stepIndex}`" class="rv-map" rv-config="config.json"></div> -->
-            <!-- <img :src="stepImage" alt="" srcset="" /> -->
-
-            <!--<div class="graphic-menu">
-
-                 <h3>{{ stepTitle }}</h3>
-                <ul class="menu">
-                    <li
-                        v-for="(step, index) in subSteps"
-                        :key="index"
-                        :class="{ 'is-active': currStepTitle == step.title }"
-                    >
-                        {{ step.title }}
-                    </li>
-                </ul> 
-            </div>-->
         </template>
 
         <div
             v-for="(scene, index) in value.scenes"
             :key="index"
             :data-scene-index="index"
-            class="scene"
+            class="px-10"
             :class="{ 'is-active': activeSceneIndex === index }"
         >
             <h3>{{ scene.title }}</h3>
@@ -59,6 +42,19 @@ export default class Chapter extends Vue {
     md = new MarkdownIt();
 
     activeSceneIndex = -1;
+
+    mounted(): void {
+        const els = this.$el.querySelectorAll('.chapter-title');
+
+        els.forEach((el) => {
+            const observer = new IntersectionObserver(
+                ([e]) => e.target.classList.toggle('is-pinned', e.intersectionRatio < 1),
+                { threshold: [1] }
+            );
+
+            observer.observe(el);
+        });
+    }
 }
 </script>
 
@@ -75,12 +71,9 @@ export default class Chapter extends Vue {
 
     > .scrollama-graphic {
         flex: 2;
-        // height: 50vh;
         top: 4rem; // compensate for sticky header
 
         order: 1;
-
-        // border: 1px solid grey;
 
         align-self: flex-start;
 
@@ -88,7 +81,8 @@ export default class Chapter extends Vue {
         justify-content: center;
 
         img {
-            // max-height: 100%;
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
             max-width: 100%;
             display: block;
         }
@@ -100,25 +94,8 @@ export default class Chapter extends Vue {
 }
 
 .scene {
-    padding: 2rem;
-    padding-top: 5vh;
-    padding-bottom: 5vh;
-    // margin-bottom: 5vh;
-
-    line-height: 1.5em;
-
     &:not(.is-active) {
         color: #b9b9b9;
     }
-}
-
-.menu li {
-    padding: 1rem 0;
-    font-size: 0.8rem;
-}
-
-.menu li.is-active {
-    font-weight: bold;
-    color: tomato;
 }
 </style>

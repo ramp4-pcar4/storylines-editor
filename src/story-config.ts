@@ -44,9 +44,7 @@ const story: StoryConfig = {
                 type: GraphicKind.Image,
                 payload: {
                     src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
-                    class: 'p-10 border-gray-600 border-solid border',
-                    style: ''
+                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
                 }
             },
             scenes: [

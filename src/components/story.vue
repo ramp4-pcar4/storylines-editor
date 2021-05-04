@@ -1,7 +1,7 @@
 <template>
     <Scrollama
         id="story"
-        class="flex"
+        class="flex items-stretch"
         @step-enter="
             ({ element, index }) => {
                 activeChapterIndex = parseInt(element.dataset.chapterIndex);
@@ -11,7 +11,7 @@
     >
         <template v-slot:graphic>
             <div>
-                <a href="#" class="flex items-center px-3 py-1 mt-3 mb-12">
+                <a href="#" class="flex items-center px-3 py-1 mt-4 mb-12">
                     <svg
                         width="24"
                         height="24"
@@ -57,10 +57,10 @@
         <div
             v-for="(chapter, index) in value.chapters"
             :key="index"
-            class="prose max-w-none chapter"
+            class="pt-24 prose max-w-none"
             :data-chapter-index="index"
         >
-            <h2 class="chapter-title">{{ chapter.title }}</h2>
+            <h2 class="sticky z-10 px-10 mb-0 chapter-title top-20">{{ chapter.title }}</h2>
 
             <ChapterV :value="chapter" :index="index" />
         </div>
@@ -99,10 +99,6 @@ export default class StoryV extends Vue {
 #scrollama-container-story {
     > .scrollama-graphic {
         align-self: flex-start;
-        // height: 100vh;
-
-        // width: 100px;
-
         top: 4rem; // compensate for sticky header
 
         // on the rigth; // TODO: need a better way
@@ -121,21 +117,17 @@ export default class StoryV extends Vue {
     > .scrollama-steps {
         // bg-gray-50
         // background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
-        --tw-bg-opacity: 1;
-        background: linear-gradient(to right, rgba(249, 250, 251, var(--tw-bg-opacity)) 33.3%, #fff 33.3%);
+        // --tw-bg-opacity: 1;
+        background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
 
         border-style: solid none solid solid;
         border-width: 1px 0 1px 1px;
 
         // border-gray-200
-        --tw-border-opacity: 1;
-        border-color: rgba(229, 231, 235, var(--tw-border-opacity));
+        border-color: var(--sr-border-colour);
 
-        // shadow-sm
-        // --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        // box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-
-        --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        // ref: shadow-md
+        //--tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
         // above
         &::before {
@@ -163,34 +155,19 @@ export default class StoryV extends Vue {
 }
 
 .chapter-title {
-    padding: 0 2rem;
+    width: 33.3%;
+    &::before {
+        position: absolute;
+        content: '';
+        top: -1rem;
+        bottom: -1em;
+        left: 2rem;
+        right: 2rem;
+        background-color: var(--sr-content-background);
+        z-index: -1;
 
-    position: sticky;
-    top: 2rem;
-}
-
-.chapter {
-    // padding: 2rem;
-    padding-top: 5vh;
-    padding-bottom: 5vh;
-    margin-bottom: 5vh;
-}
-
-.menu {
-    // display: flex;
-    // justify-content: center;
-    // color: white;
-
-    display: flex;
-    flex-direction: column;
-
-    margin: 0;
-    padding: 0;
-
-    height: 100%;
-    // width: 34px;
-
-    // border: 1px solid grey;
+        border-bottom: 1px solid var(--sr-border-colour);
+    }
 }
 
 .menu li.is-active {
