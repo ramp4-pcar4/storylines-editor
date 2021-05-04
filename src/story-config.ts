@@ -1,5 +1,6 @@
 export interface StoryConfig {
     title: string;
+    subTitle: string;
     chapters: ChapterConfig[];
 }
 
@@ -34,7 +35,8 @@ export interface SceneConfig {
 }
 
 const story: StoryConfig = {
-    title: 'Story RAMP',
+    title: 'NPRI Sector Overview: Oil Sands Extraction',
+    subTitle: 'It also summarizes what steps facilities in this sector take to mitigate their environmental impacts',
     chapters: [
         {
             title: 'Step 1',
@@ -79,6 +81,27 @@ Morbi in dui quis est pulvinar ullamcorper. Nulla facilisi. Integer lacinia soll
         },
         {
             title: 'Step 2',
+            graphic: {
+                type: GraphicKind.Image,
+                payload: {
+                    src: 'https://cli.vuejs.org/favicon.png'
+                }
+            },
+            scenes: [
+                {
+                    title: 'Scene A',
+                    text: `
+                    
+First Term - This is the definition of the first term.
+
+Second Term - This is one definition of the second term.
+
+`
+                }
+            ]
+        },
+        {
+            title: 'Step 3',
             graphic: {
                 type: GraphicKind.Image,
                 payload: {

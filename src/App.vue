@@ -2,7 +2,9 @@
     <div id="app">
         <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
             <div class="flex w-full px-6 py-3 mx-auto max-w-8xl">
-                <div class="flex-none font-bold"><span class="text-lg">Story RAMP</span></div>
+                <div class="flex-none font-semibold">
+                    <span class="text-lg">{{ story.title }}</span>
+                </div>
                 <div class="flex justify-end flex-auto space-x-6">
                     <span>Sharepoint</span>
                     <span>Github</span>
@@ -10,9 +12,9 @@
             </div>
         </header>
 
-        <header class="p-32 text-center intro">
+        <header class="py-24 mx-auto text-center max-w-8xl">
             <svg
-                class="w-auto h-40 m-auto"
+                class="w-56 h-auto m-auto"
                 width="27.781"
                 height="26.811"
                 version="1.1"
@@ -33,18 +35,39 @@
                 />
             </svg>
 
-            <h1 class="m-10 font-bold text-7xl">Story RAMP</h1>
-            <p>
-                For a guide and recipes on how to configure / customize this project,<br />
-                check out the
-                <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
+            <h1 class="m-10 text-5xl font-bold text-gray-800">{{ story.title }}</h1>
+            <p class="w-1/2 m-auto text-2xl font-semibold text-gray-500">
+                {{ story.subTitle }}
             </p>
 
-            <p class="mt-20 text-8xl">V</p>
+            <!-- <p class="mt-20 text-8xl">V</p>
+ -->
+            <svg
+                class="w-auto h-24 m-auto mt-10"
+                width="90"
+                height="104.84"
+                viewBox="0 0 90 104.83"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="m89.51 77.659-44.51 25.698-44.51-25.698 3.86e-4 -51.395 44.51-25.698 44.51 25.698z"
+                    fill="#fff"
+                    stroke="#00d2d3"
+                    stroke-dasharray="4.8960465, 4.8960465"
+                    stroke-dashoffset="2.7"
+                    stroke-width=".5"
+                />
+                <path
+                    d="m45 104.27-44.51-25.697v-10.646l44.51 25.697 44.51-25.697v10.646z"
+                    fill="#00d2d3"
+                    stroke="#00d2d3"
+                    stroke-width=".97921"
+                />
+            </svg>
         </header>
 
         <main class="w-full mx-auto max-w-8xl">
-            <StoryV />
+            <StoryV :value="story" />
         </main>
 
         <footer class="p-10 text-center">2021 Web-mapping Team</footer>
@@ -55,26 +78,28 @@
 import { Component, Vue } from 'vue-property-decorator';
 import StoryV from '@/components/story.vue';
 
+import story, { StoryConfig } from '@/story-config';
+
 @Component({
     components: {
         StoryV
     }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+    story: StoryConfig = story;
+}
 </script>
 
 <style lang="scss">
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
 
     background-color: #fff;
 
-    .intro {
-        height: 75vh;
-    }
+    --sr-accent-colour: #00d2d3;
 }
 
 body {

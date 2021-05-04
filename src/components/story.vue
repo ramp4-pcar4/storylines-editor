@@ -10,34 +10,51 @@
         "
     >
         <template v-slot:graphic>
-            <ul class="overflow-hidden shadow-sm menu">
-                <li
-                    v-for="(chapter, index) in story.chapters"
-                    :key="index"
-                    :class="{ 'is-active': activeChapterIndex === index }"
-                >
-                    <a href="#" class="flex">
-                        <svg
-                            width="24"
-                            height="24"
-                            version="1.1"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="m19.325 16.229c-2.4415 1.4096-4.8829 2.8191-7.3244 4.2286-2.4415-1.4096-4.883-2.8192-7.3245-4.2288-3.55e-5 -2.8191-7.1e-5 -5.6383-1.066e-4 -8.4574 2.4415-1.4096 4.8829-2.8191 7.3244-4.2286 2.4415 1.4096 4.883 2.8192 7.3245 4.2288 3.7e-5 2.8191 7.4e-5 5.6383 1.1e-4 8.4574z"
+            <div>
+                <a href="#" class="flex items-center px-3 py-1 mt-3 mb-12">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        stroke="#707070"
+                    >
+                        <path d="m3.5 17h17m-17-5.0001h17m-17-4.9999h17" />
+                    </svg>
+                    <span class="flex-1 mt-px ml-4 leading-none overflow-ellipsis whitespace-nowrap">Chapters</span>
+                </a>
+
+                <ul class="overflow-hidden w-72 menu">
+                    <li
+                        v-for="(chapter, index) in value.chapters"
+                        :key="index"
+                        :class="{ 'is-active': activeChapterIndex === index }"
+                    >
+                        <a href="#" class="flex items-center px-3 py-1">
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
                                 fill="#fff"
                                 stroke="#878787"
-                                stroke-width=".93974"
-                            />
-                        </svg>
-                        <!-- <span>{{ chapter.title }}</span> -->
-                    </a>
-                </li>
-            </ul>
+                            >
+                                <path
+                                    d="m19.325 16.229c-2.4415 1.4096-4.8829 2.8191-7.3244 4.2286-2.4415-1.4096-4.883-2.8192-7.3245-4.2288-3.55e-5 -2.8191-7.1e-5 -5.6383-1.066e-4 -8.4574 2.4415-1.4096 4.8829-2.8191 7.3244-4.2286 2.4415 1.4096 4.883 2.8192 7.3245 4.2288 3.7e-5 2.8191 7.4e-5 5.6383 1.1e-4 8.4574z"
+                                    stroke-width=".93974"
+                                />
+                            </svg>
+                            <span class="flex-1 mt-px ml-4 leading-none overflow-ellipsis whitespace-nowrap">{{
+                                chapter.title
+                            }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </template>
 
-        <div v-for="(chapter, index) in story.chapters" :key="index" class="chapter" :data-chapter-index="index">
+        <div v-for="(chapter, index) in value.chapters" :key="index" class="chapter" :data-chapter-index="index">
             <h2 class="chapter-title">{{ chapter.title }}</h2>
 
             <ChapterV :value="chapter" :index="index" />
@@ -50,9 +67,9 @@ import 'intersection-observer';
 import Scrollama from 'vue-scrollama';
 import ChapterV from '@/components/chapter.vue';
 
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
-import story, { StoryConfig } from '@/story-config';
+import { StoryConfig } from '@/story-config';
 
 @Component({
     components: {
@@ -61,9 +78,9 @@ import story, { StoryConfig } from '@/story-config';
     }
 })
 export default class StoryV extends Vue {
-    activeChapterIndex = -1;
+    @Prop() value!: StoryConfig;
 
-    story: StoryConfig = story;
+    activeChapterIndex = -1;
 
     initRamp(index: number): void {
         // new RAMP.Map(document.getElementById(`my-map-${index}`), 'config.json');
@@ -79,14 +96,28 @@ export default class StoryV extends Vue {
         align-self: flex-start;
         // height: 100vh;
 
+        // width: 100px;
+
         top: 4rem; // compensate for sticky header
+
+        // on the rigth; // TODO: need a better way
+        &::before {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 1px;
+            right: 0;
+            // modified tailwind shadow
+            box-shadow: -4px 0px 6px 0px rgba(0, 0, 0, 0.1), -2px 0 4px 0px rgba(0, 0, 0, 0.06);
+            //box-shadow: 0 -4px 6px grey;
+        }
     }
 
     > .scrollama-steps {
         // bg-gray-50
+        // background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
         --tw-bg-opacity: 1;
         background: linear-gradient(to right, rgba(249, 250, 251, var(--tw-bg-opacity)) 33.3%, #fff 33.3%);
-        // background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
 
         border-style: solid none solid solid;
         border-width: 1px 0 1px 1px;
@@ -98,6 +129,31 @@ export default class StoryV extends Vue {
         // shadow-sm
         // --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         // box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
+        --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+        // above
+        &::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            top: 0;
+            // modified tailwind shadow
+            box-shadow: 0 -4px 6px 0px rgba(0, 0, 0, 0.1), 0 -2px 4px 0px rgba(0, 0, 0, 0.06);
+            //box-shadow: 0 -4px 6px grey;
+        }
+
+        // below
+        &::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            bottom: 0;
+            // box-shadow: 0 4px 6px grey;
+            box-shadow: 0 4px 6px 0px rgba(0, 0, 0, 0.1), 0 2px 4px 0px rgba(0, 0, 0, 0.06);
+        }
     }
 }
 
@@ -116,7 +172,7 @@ export default class StoryV extends Vue {
 }
 
 .menu {
-    display: flex;
+    // display: flex;
     // justify-content: center;
     // color: white;
 
@@ -129,15 +185,17 @@ export default class StoryV extends Vue {
     height: 100%;
     // width: 34px;
 
-    border: 1px solid grey;
-}
-
-.menu li {
+    // border: 1px solid grey;
 }
 
 .menu li.is-active {
-    // color: #fff !important;
-    // font-size: 28px;
-    // text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    svg {
+        fill: var(--sr-accent-colour);
+        stroke: var(--sr-accent-colour);
+    }
+
+    span {
+        font-weight: bold;
+    }
 }
 </style>
