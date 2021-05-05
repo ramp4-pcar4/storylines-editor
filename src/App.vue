@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
-            <div class="flex w-full px-6 py-3 mx-auto max-w-8xl">
+            <div class="flex w-full px-6 py-3 mx-auto max-w-9xl">
                 <div class="flex-none font-semibold">
                     <span class="text-lg">{{ story.title }}</span>
                 </div>
@@ -12,7 +12,7 @@
             </div>
         </header>
 
-        <header class="py-24 mx-auto text-center max-w-8xl">
+        <header class="py-24 mx-auto text-center max-w-9xl">
             <svg
                 class="w-56 h-auto m-auto"
                 width="27.781"
@@ -40,8 +40,6 @@
                 {{ story.subTitle }}
             </p>
 
-            <!-- <p class="mt-20 text-8xl">V</p>
- -->
             <svg
                 class="w-auto h-24 m-auto mt-10"
                 width="90"
@@ -66,7 +64,7 @@
             </svg>
         </header>
 
-        <main class="w-full mx-auto max-w-8xl">
+        <main class="w-full mx-auto max-w-9xl">
             <StoryV :value="story" />
         </main>
 
