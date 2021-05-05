@@ -1,5 +1,10 @@
 <template>
-    <img :src="payload.src" :class="payload.class" :style="payload.style" />
+    <img
+        :src="payload.src"
+        :class="payload.class || 'px-10 my-8'"
+        :style="payload.style"
+        class="block max-w-full story-graphic"
+    />
 </template>
 
 <script lang="ts">

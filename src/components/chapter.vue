@@ -80,12 +80,12 @@ export default class Chapter extends Vue {
         display: flex;
         justify-content: center;
 
-        img {
+        /* img {
             padding-left: 2.5rem;
             padding-right: 2.5rem;
             max-width: 100%;
             display: block;
-        }
+        } */
     }
 
     > .scrollama-steps {
