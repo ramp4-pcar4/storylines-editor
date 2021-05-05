@@ -68,7 +68,9 @@
             <StoryV :value="story" />
         </main>
 
-        <footer class="p-10 text-center">2021 Web-mapping Team</footer>
+        <footer class="p-10 text-center">
+            2021 - Design by <span class="font-semibold text-accent-blue">BeSD UX Team</span>
+        </footer>
     </div>
 </template>
 

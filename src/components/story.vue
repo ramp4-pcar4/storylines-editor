@@ -113,18 +113,6 @@ export default class StoryV extends Vue {
     > .scrollama-graphic {
         align-self: flex-start;
         top: 4rem; // compensate for sticky header
-
-        // on the rigth; // TODO: need a better way
-        &::before {
-            content: '';
-            position: absolute;
-            height: 100%;
-            width: 1px;
-            right: 0;
-            // modified tailwind shadow
-            box-shadow: -4px 0px 6px 0px rgba(0, 0, 0, 0.1), -2px 0 4px 0px rgba(0, 0, 0, 0.06);
-            //box-shadow: 0 -4px 6px grey;
-        }
     }
 
     > .scrollama-steps {
@@ -144,27 +132,39 @@ export default class StoryV extends Vue {
         // ref: shadow-md
         //--tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-        // above
+        // on the left
         &::before {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 1px;
+            left: 0;
+            // modified tailwind shadow
+            box-shadow: -3px 0px 6px 0px rgba(0, 0, 0, 0.1), -2px 0 4px 0px rgba(0, 0, 0, 0.06);
+            //box-shadow: 0 -4px 6px grey;
+        }
+
+        // above
+        > *:first-child::before {
             content: '';
             position: absolute;
             width: 100%;
             height: 1px;
             top: 0;
             // modified tailwind shadow
-            box-shadow: 0 -4px 6px 0px rgba(0, 0, 0, 0.1), 0 -2px 4px 0px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 -3px 6px 0px rgba(0, 0, 0, 0.1), 0 -2px 4px 0px rgba(0, 0, 0, 0.06);
             //box-shadow: 0 -4px 6px grey;
         }
 
         // below
-        &::after {
+        > *:last-child::before {
             content: '';
             position: absolute;
             width: 100%;
             height: 1px;
             bottom: 0;
             // box-shadow: 0 4px 6px grey;
-            box-shadow: 0 4px 6px 0px rgba(0, 0, 0, 0.1), 0 2px 4px 0px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 3px 6px 0px rgba(0, 0, 0, 0.1), 0 2px 4px 0px rgba(0, 0, 0, 0.06);
         }
     }
 }

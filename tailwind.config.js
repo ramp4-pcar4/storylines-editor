@@ -6,6 +6,11 @@ module.exports = {
             maxWidth: {
                 '8xl': '90rem',
                 '9xl': '110rem'
+            },
+            colors: {
+                'accent-blue': '#001A49',
+                'accent-turquoise': '#00D2D3',
+                'accent-orange': '#FF9F43'
             }
         }
     },
