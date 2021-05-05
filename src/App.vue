@@ -7,7 +7,7 @@
                 </div>
                 <div class="flex justify-end flex-auto space-x-6">
                     <span>Sharepoint</span>
-                    <span>Github</span>
+                    <a href="https://github.com/ramp4-pcar4/story-ramp">Github</a>
                 </div>
             </div>
         </header>
@@ -17,7 +17,6 @@
                 class="w-56 h-auto m-auto"
                 width="27.781"
                 height="26.811"
-                version="1.1"
                 viewBox="0 0 27.781 26.811"
                 xmlns="http://www.w3.org/2000/svg"
             >

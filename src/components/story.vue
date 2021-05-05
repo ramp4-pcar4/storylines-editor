@@ -10,7 +10,7 @@
         "
     >
         <template v-slot:graphic>
-            <div :class="isMenuOpen ? 'w-72' : ''" class="w-12 duration-500 ease-in-out transform transition-width">
+            <div :class="isMenuOpen ? 'w-72' : ''" class="w-12 duration-500 ease-in-out transition-width">
                 <div class="flex items-center mt-4 mb-12">
                     <button class="flex-shrink-0 px-2 py-1 mx-1" @click="isMenuOpen = !isMenuOpen">
                         <svg
@@ -21,7 +21,15 @@
                             fill="none"
                             stroke="#707070"
                         >
-                            <path d="m3.5 17h17m-17-5.0001h17m-17-4.9999h17" />
+                            <path
+                                class="transition-all duration-500 ease-in-out"
+                                :d="`m3.5 7h${isMenuOpen ? '17' : '8.5'}`"
+                            />
+                            <path
+                                class="transition-all duration-500 ease-in-out"
+                                :d="`m3.5 12h${isMenuOpen ? '17' : '8.5'}`"
+                            />
+                            <path d="m3.5 17h17" />
                         </svg>
                     </button>
                     <span class="flex-1 mt-px ml-1 leading-none overflow-ellipsis whitespace-nowrap">Chapters</span>
