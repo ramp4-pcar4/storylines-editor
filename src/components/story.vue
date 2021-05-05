@@ -12,7 +12,12 @@
         <template v-slot:graphic>
             <div :class="isMenuOpen ? 'w-72' : ''" class="w-12 duration-500 ease-in-out transition-width">
                 <div class="flex items-center mt-4 mb-12">
-                    <button class="flex-shrink-0 px-2 py-1 mx-1" @click="isMenuOpen = !isMenuOpen">
+                    <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">Chapters</tippy>
+                    <button
+                        name="menu-button-tippy"
+                        class="flex-shrink-0 px-2 py-1 mx-1"
+                        @click="isMenuOpen = !isMenuOpen"
+                    >
                         <svg
                             width="24"
                             height="24"
@@ -41,7 +46,11 @@
                         :key="index"
                         :class="{ 'is-active': activeChapterIndex === index }"
                     >
+                        <tippy :to="`menu-options-tippy-${index}`" delay="200" placement="right" v-if="!isMenuOpen">{{
+                            chapter.title
+                        }}</tippy>
                         <a
+                            :name="`menu-options-tippy-${index}`"
                             :href="`#${chapter.title.toLowerCase().replaceAll(' ', '-')}`"
                             class="flex items-center px-2 py-1 mx-1"
                             v-smooth-scroll

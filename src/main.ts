@@ -2,15 +2,18 @@ import Vue from 'vue';
 import App from './app.vue';
 import './style.css';
 
-import ImageGraphicV from '@/components/image-graphic.vue';
-
 import VueSmoothScroll from 'vue2-smooth-scroll';
-
 Vue.use(VueSmoothScroll);
 
-Vue.config.productionTip = false;
+import VueTippy, { TippyComponent } from 'vue-tippy';
 
+Vue.use(VueTippy);
+Vue.component('tippy', TippyComponent);
+
+import ImageGraphicV from '@/components/image-graphic.vue';
 Vue.component('ImageGraphicV', ImageGraphicV);
+
+Vue.config.productionTip = false;
 
 new Vue({
     render: (h) => h(App)
