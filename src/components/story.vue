@@ -10,22 +10,24 @@
         "
     >
         <template v-slot:graphic>
-            <div>
-                <a href="#" class="flex items-center px-3 py-1 mt-4 mb-12">
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        stroke="#707070"
-                    >
-                        <path d="m3.5 17h17m-17-5.0001h17m-17-4.9999h17" />
-                    </svg>
-                    <span class="flex-1 mt-px ml-4 leading-none overflow-ellipsis whitespace-nowrap">Chapters</span>
-                </a>
+            <div :class="isMenuOpen ? 'w-72' : ''" class="w-12 duration-500 ease-in-out transform transition-width">
+                <div class="flex items-center mt-4 mb-12">
+                    <button class="flex-shrink-0 px-2 py-1 mx-1" @click="isMenuOpen = !isMenuOpen">
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            stroke="#707070"
+                        >
+                            <path d="m3.5 17h17m-17-5.0001h17m-17-4.9999h17" />
+                        </svg>
+                    </button>
+                    <span class="flex-1 mt-px ml-1 leading-none overflow-ellipsis whitespace-nowrap">Chapters</span>
+                </div>
 
-                <ul class="overflow-hidden w-72 menu">
+                <ul class="menu">
                     <li
                         v-for="(chapter, index) in value.chapters"
                         :key="index"
@@ -33,9 +35,10 @@
                     >
                         <a
                             :href="`#${chapter.title.toLowerCase().replaceAll(' ', '-')}`"
-                            class="flex items-center px-3 py-1"
+                            class="flex items-center px-2 py-1 mx-1"
                         >
                             <svg
+                                class="flex-shrink-0"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
@@ -93,6 +96,8 @@ import { StoryConfig } from '@/story-config';
 })
 export default class StoryV extends Vue {
     @Prop() value!: StoryConfig;
+
+    isMenuOpen = false;
 
     activeChapterIndex = -1;
 
