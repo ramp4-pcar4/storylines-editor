@@ -137,8 +137,8 @@ export default class StoryV extends Vue {
         // background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
         // --tw-bg-opacity: 1;
 
-        // background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
-        background: linear-gradient(to right, var(--sr-content-background) 40%, #fff 40%);
+        background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
+        // background: linear-gradient(to right, var(--sr-content-background) 40%, #fff 40%);
 
         border-style: solid none solid solid;
         border-width: 1px 0 1px 1px;
@@ -187,7 +187,8 @@ export default class StoryV extends Vue {
 }
 
 .chapter-title {
-    width: 40%; // 33.3%;
+    // width: 40%;
+    width: 33.3%;
 
     &::before {
         position: absolute;
