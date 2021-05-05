@@ -3,7 +3,7 @@
         :src="payload.src"
         :class="payload.class || 'px-10 my-8'"
         :style="payload.style"
-        class="block max-w-full story-graphic"
+        class="block max-w-full max-h-screen story-graphic"
     />
 </template>
 
