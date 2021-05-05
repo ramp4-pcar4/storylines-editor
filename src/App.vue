@@ -40,35 +40,37 @@
                 {{ story.subTitle }}
             </p>
 
-            <svg
-                class="w-auto h-24 m-auto mt-10"
-                width="90"
-                height="104.84"
-                viewBox="0 0 90 104.83"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="m89.51 77.659-44.51 25.698-44.51-25.698 3.86e-4 -51.395 44.51-25.698 44.51 25.698z"
-                    fill="#fff"
-                    stroke="#00d2d3"
-                    stroke-dasharray="4.8960465, 4.8960465"
-                    stroke-dashoffset="2.7"
-                    stroke-width=".5"
-                />
-                <path
-                    d="m45 104.27-44.51-25.697v-10.646l44.51 25.697 44.51-25.697v10.646z"
-                    fill="#00d2d3"
-                    stroke="#00d2d3"
-                    stroke-width=".97921"
-                />
-            </svg>
+            <a href="#story" class="inline-block mt-10 scroll-arrow" v-smooth-scroll>
+                <svg
+                    class="w-auto h-24 m-auto"
+                    width="90"
+                    height="104.84"
+                    viewBox="0 0 90 104.83"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="m89.51 77.659-44.51 25.698-44.51-25.698 3.86e-4 -51.395 44.51-25.698 44.51 25.698z"
+                        fill="#fff"
+                        stroke="#00d2d3"
+                        stroke-dasharray="4.8960465, 4.8960465"
+                        stroke-dashoffset="2.7"
+                        stroke-width=".5"
+                    />
+                    <path
+                        d="m45 104.27-44.51-25.697v-10.646l44.51 25.697 44.51-25.697v10.646z"
+                        fill="#00d2d3"
+                        stroke="#00d2d3"
+                        stroke-width=".97921"
+                    />
+                </svg>
+            </a>
         </header>
 
-        <main class="w-full mx-auto max-w-9xl">
+        <main class="w-full mx-auto max-w-9xl" id="story">
             <StoryV :value="story" />
         </main>
 
-        <footer class="p-10 text-center">
+        <footer class="p-8 text-center">
             2021 - Design by <span class="font-semibold text-accent-blue">BeSD UX Team</span>
         </footer>
     </div>
@@ -104,6 +106,26 @@ export default class App extends Vue {
 
     // border-gray-200
     --sr-border-colour: rgba(229, 231, 235, 1);
+
+    .scroll-arrow {
+        animation: bounce-light 1s 4.5;
+
+        &:hover {
+            animation-iteration-count: infinite;
+        }
+    }
+
+    @keyframes bounce-light {
+        0%,
+        100% {
+            transform: translateY(-10%);
+            animationtimingfunction: cubic-bezier(0.8, 0, 1, 1);
+        }
+        50% {
+            transform: translateY(0);
+            animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
+        }
+    }
 }
 
 body {

@@ -52,25 +52,6 @@ const story: StoryConfig = {
                     text: `
 **Oil Sands Extraction** is part of the National Pollutant Release Inventory's (NPRI) Sector Overview series. This sector overview explores NPRI substances released, disposed, and transferred by this industry. It also summarizes what steps facilities in this sector take to mitigate their environmental impacts.
 
-- a 
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
-
 Businesses, institutions and other facilities across Canada must report their releases, transfers and disposals of pollutants to air, water and land annually to the Government of Canada's NPRI. The information collected is public, helps governments set environmental priorities and monitor environmental performance, and provides Canadians with an opportunity to learn about pollution in their surroundings.`
                 }
             ]
@@ -89,25 +70,6 @@ Businesses, institutions and other facilities across Canada must report their re
                     text: `
 There are three large oil sands deposits in Canada:
 
-- a 
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
-
 - The Athabasca;
 - Peace River; and
 - Cold Lake.
@@ -115,23 +77,6 @@ There are three large oil sands deposits in Canada:
 All three of the deposits are located in northern Alberta except for a small portion of the Cold Lake deposit, which extends into Saskatchewan. Together, these deposits cover 142,000 square kilometres and are estimated to contain 166.3 billion barrels.
 
 The oil sands extraction sector is a major contributor to Canada’s economy, with more than 528,000 people deriving direct, indirect and induced employment from the oil sands and its supporting sectors. To date, [$243 billion of capital expenditures has been invested in the oil sands industry](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/what-are-oil-sands/18089), and the sector produces [2.9 million barrels of oil per day](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/oil-supply-and-demand/18086).
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
 
 This map shows the three oil sands areas. The actual geological deposits themselves cover larger areas.
 
@@ -155,23 +100,6 @@ This map shows the three oil sands areas. The actual geological deposits themsel
 The oil found in oil sands deposits is primarily bitumen, a very heavy and viscous oil. Bitumen does not flow easily at room temperature and requires unconventional methods to extract. Bitumen is extracted either from surface mining or in-situ using a variety of methods.
 
 The choice between surface mining and thermal in-situ is solely determined by the depth of the oil deposit. Surface mining is used to reach deposits to a maximum depth of 70 meters below the surface; thermal in-situ wells extract bitumen at greater depths.
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
-- a 
-- a
-- a
-- a
-- a
-- a
 
 Surface mining involves digging up large areas with large excavators. The resulting bitumen and sand mixture is mixed with hot water and sodium hydroxide (NaOH) to separate the bitumen. During this process, the bitumen rises to the top of large separation vessels as a froth. This froth bitumen is further processed in a froth treatment unit to extract the bitumen. Most of the material dug up in an oil sands surface mine is clay and sand. The bitumen extracted makes up about 10% of this material.
 `
