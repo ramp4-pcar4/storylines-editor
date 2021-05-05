@@ -66,11 +66,9 @@
             :key="index"
             class="pt-24 prose max-w-none"
             :data-chapter-index="index"
+            :id="chapter.title.toLowerCase().replaceAll(' ', '-')"
         >
-            <h2
-                :id="chapter.title.toLowerCase().replaceAll(' ', '-')"
-                class="sticky z-10 px-10 mb-0 chapter-title top-20"
-            >
+            <h2 class="sticky z-10 px-10 mb-0 chapter-title top-20">
                 {{ chapter.title }}
             </h2>
 
