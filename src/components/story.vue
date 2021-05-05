@@ -36,6 +36,7 @@
                         <a
                             :href="`#${chapter.title.toLowerCase().replaceAll(' ', '-')}`"
                             class="flex items-center px-2 py-1 mx-1"
+                            v-smooth-scroll
                         >
                             <svg
                                 class="flex-shrink-0"

@@ -4,6 +4,10 @@ import './style.css';
 
 import ImageGraphicV from '@/components/image-graphic.vue';
 
+import VueSmoothScroll from 'vue2-smooth-scroll';
+
+Vue.use(VueSmoothScroll);
+
 Vue.config.productionTip = false;
 
 Vue.component('ImageGraphicV', ImageGraphicV);
