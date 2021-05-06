@@ -5,7 +5,7 @@
         @step-enter="
             ({ element, index }) => {
                 activeChapterIndex = parseInt(element.dataset.chapterIndex);
-                // initRamp(index);
+                initRamp(index);
             }
         "
     >
@@ -90,7 +90,7 @@
                 {{ chapter.title }}
             </h2>
 
-            <ChapterV :value="chapter" :index="index" />
+            <ChapterV :value="chapter" :chapter-index="index" />
         </div>
     </Scrollama>
 </template>
@@ -102,7 +102,7 @@ import ChapterV from '@/components/chapter.vue';
 
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
-import { StoryConfig } from '@/story-config';
+import { GraphicKind, StoryConfig } from '@/story-config';
 
 @Component({
     components: {
@@ -118,7 +118,17 @@ export default class StoryV extends Vue {
     activeChapterIndex = -1;
 
     initRamp(index: number): void {
-        // new RAMP.Map(document.getElementById(`my-map-${index}`), 'config.json');
+        const rampId = `ramp-map-${index}`;
+
+        if (this.value.chapters[index].graphic.type !== GraphicKind.Map) {
+            return;
+        }
+
+        if (RAMP.mapById(rampId) !== undefined) {
+            return;
+        }
+
+        new RAMP.Map(this.$el.querySelector(`#${rampId}`), 'config.json');
     }
 }
 </script>

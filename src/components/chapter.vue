@@ -1,10 +1,14 @@
 <template>
     <Scrollama
-        :id="`chapter-${index}`"
+        :id="`chapter-${chapterIndex}`"
         @step-enter="({ element }) => (activeSceneIndex = parseInt(element.dataset.sceneIndex))"
     >
         <template v-slot:graphic>
-            <component :is="value.graphic.type" :payload="value.graphic.payload"></component>
+            <component
+                :is="value.graphic.type"
+                :payload="value.graphic.payload"
+                :chapter-index="chapterIndex"
+            ></component>
         </template>
 
         <div
@@ -37,7 +41,7 @@ import { ChapterConfig } from '@/story-config';
 })
 export default class Chapter extends Vue {
     @Prop() value!: ChapterConfig;
-    @Prop() index!: number;
+    @Prop() chapterIndex!: number;
 
     md = new MarkdownIt();
 
@@ -61,11 +65,6 @@ export default class Chapter extends Vue {
 <style src="vue-scrollama/dist/vue-scrollama.css"></style>
 
 <style scoped lang="scss">
-.rv-map {
-    height: 100%;
-    width: 100%;
-}
-
 .scrollama-container ::v-deep {
     display: flex;
 

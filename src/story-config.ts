@@ -26,7 +26,9 @@ export interface ImageGraphic {
 
 export interface MapGraphic {
     type: GraphicKind.Map;
-    payload: number;
+    payload: {
+        config: string;
+    };
 }
 
 export interface SceneConfig {
@@ -59,10 +61,9 @@ Businesses, institutions and other facilities across Canada must report their re
         {
             title: 'Oil sands deposits',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/8yvdGqF.jpg'
+                    config: 'config.json'
                 }
             },
             scenes: [
@@ -128,10 +129,9 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
         {
             title: 'Where are facilities located?',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/Vsgjfzc.jpg'
+                    config: 'config.json'
                 }
             },
             scenes: [

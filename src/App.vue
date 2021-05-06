@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" class="bg-white">
         <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
             <div class="flex w-full px-6 py-3 mx-auto max-w-9xl">
                 <div class="flex-none font-semibold">
@@ -97,8 +97,6 @@ export default class App extends Vue {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
-
-    background-color: #fff;
 
     --sr-accent-colour: #00d2d3;
     --sr-content-background: rgba(249, 250, 251, 1);
