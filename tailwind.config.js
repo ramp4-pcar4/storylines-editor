@@ -10,6 +10,10 @@ module.exports = {
     darkMode: false, // or 'media' or 'class'
     theme: {
         extend: {
+            height: {
+                // full-screen height minus the sticky top header
+                story: 'calc(100vh - 4rem)'
+            },
             maxWidth: {
                 '8xl': '90rem',
                 '9xl': '110rem'

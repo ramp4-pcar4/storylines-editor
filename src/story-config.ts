@@ -61,7 +61,7 @@ Businesses, institutions and other facilities across Canada must report their re
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/8yvdGqF.jpg'
                 }
             },
@@ -89,7 +89,7 @@ This map shows the three oil sands areas. The actual geological deposits themsel
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story object-cover',
                     src:
                         'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/GettyImages-187242601__1554821467033__w1920.jpg'
                 }
@@ -130,7 +130,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/Vsgjfzc.jpg'
                 }
             },
@@ -156,7 +156,7 @@ Oil sands extraction facilities that report to the NPRI are located exclusively 
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/XB6WRI9.jpg'
                 }
             },
@@ -224,9 +224,7 @@ In 2017, oil sands mining operations reporting to the NPRI reported information 
 Substances disposed of as tailings can be grouped into three broad categories:
 
 1. Metals (28,900 tonnes);
-
 2. Volatile organic compounds (VOCs) (6,800 tonnes); and
-
 3. Others (14,700 tonnes).
 
 While the tailings reported by these mines have large amounts of manganese, ammonia (NH3), and phosphorus, the substances of greater concern are some of the volatile organics, such as benzene (C6H6), toluene (C7H8), ethylbenzene (C8H10), and xylene (C8H10) (labelled as BTEX in the figure), and 19 different polycyclic aromatic hydrocarbons (PAHs).
@@ -239,7 +237,7 @@ While the tailings reported by these mines have large amounts of manganese, ammo
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/E5AHtZZ.png'
                 }
             },
@@ -268,7 +266,7 @@ Satellite imagery as of 2011.
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/ZaqQew1.jpg'
                 }
             },
@@ -306,7 +304,7 @@ Compared to surface mining, thermal in-situ operations are much more energy inte
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/nOPiVL4.jpg'
                 }
             },
@@ -332,7 +330,7 @@ The air releases reported by thermal in-situ facilities is almost entirely (99%)
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story w-full',
                     src: 'https://i.imgur.com/hexogWB.jpg'
                 }
             },
@@ -372,7 +370,7 @@ While thermal in-situ facilities have reported an increase in reported CAC emiss
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    class: 'p-0 m-0',
+                    class: 'p-0 m-0 h-story object-cover',
                     src:
                         'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/GettyImages-516166467__1554821531978__w1920.jpg'
                 }

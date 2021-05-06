@@ -3,7 +3,7 @@
         :src="payload.src"
         :class="payload.class || 'px-10 my-8'"
         :style="payload.style"
-        class="block max-w-full max-h-screen story-graphic"
+        class="block _max-w-full _max-h-screen story-graphic"
     />
 </template>
 
@@ -18,3 +18,5 @@ export default class ImageGraphicV extends Vue {
 </script>
 
 <style lang="sass" scoped></style>
+
+// TODO: calc(max-h-screen - 4rem) to account for the sticky header
