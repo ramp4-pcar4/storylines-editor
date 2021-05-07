@@ -154,10 +154,9 @@ Oil sands extraction facilities that report to the NPRI are located exclusively 
         {
             title: 'NPRI substances reported for oil sands mining facilities',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/XB6WRI9.jpg'
+                    config: 'config.json'
                 }
             },
             scenes: [
@@ -235,10 +234,9 @@ While the tailings reported by these mines have large amounts of manganese, ammo
         {
             title: 'Reported mine tailings from oil sands surface mining facilities',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/E5AHtZZ.png'
+                    config: 'config.json'
                 }
             },
             scenes: [
@@ -264,10 +262,9 @@ Satellite imagery as of 2011.
         {
             title: 'Trends in mine tailings reported from surface mining facilities',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/ZaqQew1.jpg'
+                    config: 'config.json'
                 }
             },
             scenes: [
@@ -302,10 +299,9 @@ Compared to surface mining, thermal in-situ operations are much more energy inte
         {
             title: 'NPRI releases from thermal in-situ facilities',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/nOPiVL4.jpg'
+                    config: 'config.json'
                 }
             },
             scenes: [
@@ -328,10 +324,9 @@ The air releases reported by thermal in-situ facilities is almost entirely (99%)
         {
             title: 'Trends in NPRI substances released from in-situ facilities',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Map,
                 payload: {
-                    class: 'p-0 m-0 h-story w-full',
-                    src: 'https://i.imgur.com/hexogWB.jpg'
+                    config: 'config.json'
                 }
             },
             scenes: [

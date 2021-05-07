@@ -92,6 +92,10 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+body {
+    font-size: 16px;
+}
+
 #app {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -123,9 +127,5 @@ export default class App extends Vue {
             animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
         }
     }
-}
-
-body {
-    font-size: 16px;
 }
 </style>

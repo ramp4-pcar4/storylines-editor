@@ -1,15 +1,12 @@
 <template>
     <Scrollama
+        class="flex-1 prose max-w-none"
         :id="`chapter-${chapterIndex}`"
         @step-enter="({ element }) => (activeSceneIndex = parseInt(element.dataset.sceneIndex))"
     >
-        <template v-slot:graphic>
-            <component
-                :is="value.graphic.type"
-                :payload="value.graphic.payload"
-                :chapter-index="chapterIndex"
-            ></component>
-        </template>
+        <h2 class="sticky z-10 px-10 mb-0 chapter-title top-20">
+            {{ value.title }}
+        </h2>
 
         <div
             v-for="(scene, index) in value.scenes"
@@ -19,6 +16,7 @@
             :class="{ 'is-active': activeSceneIndex === index }"
         >
             <h3>{{ scene.title }}</h3>
+
             <div v-html="md.render(scene.text)"></div>
         </div>
     </Scrollama>
@@ -48,47 +46,33 @@ export default class Chapter extends Vue {
     activeSceneIndex = -1;
 
     mounted(): void {
-        const els = this.$el.querySelectorAll('.chapter-title');
+        /* const els = this.$el.querySelectorAll('.chapter-title');
 
         els.forEach((el) => {
             const observer = new IntersectionObserver(
-                ([e]) => e.target.classList.toggle('is-pinned', e.intersectionRatio < 1),
+                ([e]) => e.target.classList.toggle('is-pinned', e.intersectionRatio > 0),
                 { threshold: [1] }
             );
 
             observer.observe(el);
-        });
+        }); */
     }
 }
 </script>
 
-<style src="vue-scrollama/dist/vue-scrollama.css"></style>
-
 <style scoped lang="scss">
-.scrollama-container ::v-deep {
-    display: flex;
+.chapter-title {
+    &::before {
+        position: absolute;
+        content: '';
+        top: -1rem;
+        bottom: -1em;
+        left: 2rem;
+        right: 2rem;
+        background-color: var(--sr-content-background);
+        z-index: -1;
 
-    > .scrollama-graphic {
-        flex: 2;
-        top: 4rem; // compensate for sticky header
-
-        order: 1;
-
-        align-self: flex-start;
-
-        display: flex;
-        justify-content: center;
-
-        /* img {
-            padding-left: 2.5rem;
-            padding-right: 2.5rem;
-            max-width: 100%;
-            display: block;
-        } */
-    }
-
-    > .scrollama-steps {
-        flex: 1;
+        border-bottom: 1px solid var(--sr-border-colour);
     }
 }
 

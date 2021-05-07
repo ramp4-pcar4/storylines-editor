@@ -1,5 +1,5 @@
 <template>
-    <div :id="`ramp-map-${chapterIndex}`" class="w-full rv-map h-story" :rv-config="payload.config"></div>
+    <div :id="`ramp-map-${chapterIndex}`" class="w-full bg-gray-200 rv-map h-story" :rv-config="payload.config"></div>
 </template>
 
 <script lang="ts">

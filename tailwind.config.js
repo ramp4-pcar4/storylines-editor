@@ -14,6 +14,9 @@ module.exports = {
                 // full-screen height minus the sticky top header
                 story: 'calc(100vh - 4rem)'
             },
+            flex: {
+                2: '2 2 0%'
+            },
             maxWidth: {
                 '8xl': '90rem',
                 '9xl': '110rem'
