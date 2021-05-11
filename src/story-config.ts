@@ -6,7 +6,7 @@ export interface StoryConfig {
 
 export interface ChapterConfig {
     title: string;
-    graphic: ImageGraphic | MapGraphic;
+    graphic?: ImageGraphic | MapGraphic;
     scenes: SceneConfig[];
 }
 
@@ -378,16 +378,28 @@ Oil sands surface mining facilities in Alberta take much of their water from the
         },
         {
             title: 'Pollution in your neighbourhood',
-            graphic: {
-                type: GraphicKind.Image,
-                payload: {
-                    src: './images/NPRIdata__1598884946319__w1589.png'
-                }
-            },
             scenes: [
                 {
                     text: `
 You can identify the facilities and pollutants in your community by entering your postal code in the NPRI online data search. For further analysis, check out [other NPRI maps and datasets](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html).
+`
+                }
+            ]
+        },
+        {
+            title: 'Download NPRI data',
+            scenes: [
+                {
+                    text: `
+These easy-to-use files let you dig deeper into the data in a variety of ways  
+-   [Single year tables](https://open.canada.ca/data/en/dataset/1fb7d8d4-7713-4ec6-b957-4a882a84fed3 "Single Year tables")  
+    -   annual tables of our most popular data fields. One table for each of the last 3 years
+-   [Five year summaries](https://open.canada.ca/data/en/dataset/ea0dc8ae-d93c-4e24-9f61-946f1736a26f "Five year summaries")
+    -   summaries by air, water or land releases grouped by province, industry type or substance
+-   [All years datasets](https://open.canada.ca/data/en/dataset/40e01423-7728-429c-ac9d-2954385ccdfb "All years datasets")
+    -   annual data since 1994 on pollutant quantities, comments and geolocations
+-   [Complete reported datasets](https://open.canada.ca/data/en/dataset/06022cc0-a31e-4b4c-850d-d4dccda5f3ac "Complete reported datasets")
+-   comprehensive datasets going back to 1994
 `
                 }
             ]
