@@ -4,12 +4,21 @@
 
 <script lang="ts">
 import { MapGraphic } from '@/story-config';
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 
 @Component
 export default class MapGraphicV extends Vue {
     @Prop() payload!: MapGraphic['payload'];
     @Prop() chapterIndex!: number;
+    @Prop() isShown!: boolean;
+
+    @Watch('isShown')
+    onIsShownChange(newValue: boolean): void {
+        if (!newValue) {
+            return;
+        }
+        new RAMP.Map(this.$el, 'config.json');
+    }
 }
 </script>
 

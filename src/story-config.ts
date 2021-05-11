@@ -45,8 +45,7 @@ const story: StoryConfig = {
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
+                    src: './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
                 }
             },
             scenes: [
@@ -91,8 +90,7 @@ This map shows the three oil sands areas. The actual geological deposits themsel
                 type: GraphicKind.Image,
                 payload: {
                     class: 'p-0 m-0 h-story object-cover',
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/GettyImages-187242601__1554821467033__w1920.jpg'
+                    src: './images/GettyImages-187242601__1554821467033__w1920.jpg'
                 }
             },
             scenes: [
@@ -112,8 +110,7 @@ Surface mining involves digging up large areas with large excavators. The result
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/SurfaceExtractionEnglish__1563813765181__w791.png'
+                    src: './images/SurfaceExtractionEnglish__1563813765181__w791.png'
                 }
             },
             scenes: [
@@ -192,8 +189,7 @@ Satellite imagery as of 2011.
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/slide%206%20-%20mining%20trends__1553275702559__w592.jpg'
+                    src: './images/slide%206%20-%20mining%20trends__1553275702559__w592.jpg'
                 }
             },
             scenes: [
@@ -209,8 +205,7 @@ Reported Criteria Air Contaminant (CAC) emissions from oil sands surface mining 
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/Slide7%20-%20Tailings__1554486679473__w860.jpg'
+                    src: './images/Slide7%20-%20Tailings__1554486679473__w860.jpg'
                 }
             },
             scenes: [
@@ -280,8 +275,7 @@ Total reported tailings from oil sands surface mining facilities have increased 
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/OilSands___1565005967929__w774.png'
+                    src: './images/OilSands___1565005967929__w774.png'
                 }
             },
             scenes: [
@@ -344,8 +338,7 @@ This change in the number of facilities reporting over time follows changes in t
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg'
+                    src: './images/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg'
                 }
             },
             scenes: [
@@ -366,8 +359,7 @@ While thermal in-situ facilities have reported an increase in reported CAC emiss
                 type: GraphicKind.Image,
                 payload: {
                     class: 'p-0 m-0 h-story object-cover',
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/GettyImages-516166467__1554821531978__w1920.jpg'
+                    src: './images/GettyImages-516166467__1554821531978__w1920.jpg'
                 }
             },
             scenes: [
@@ -389,8 +381,7 @@ Oil sands surface mining facilities in Alberta take much of their water from the
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src:
-                        'https://www.arcgis.com/sharing/rest/content/items/703d9327d99d445eb4c1e94a47c1933e/resources/NPRIdata__1598884946319__w1589.png'
+                    src: './images/NPRIdata__1598884946319__w1589.png'
                 }
             },
             scenes: [

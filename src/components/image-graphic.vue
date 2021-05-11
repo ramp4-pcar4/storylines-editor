@@ -1,17 +1,17 @@
 <template>
-    <!-- <img
-        :src="payload.src"
-        :class="payload.class || 'px-10 my-8'"
-        :style="payload.style"
-        class="block _max-w-full _max-h-screen story-graphic"
-    /> -->
-
-    <progressive-img
+    <img
         :src="payload.src"
         :class="payload.class || 'px-10 my-8'"
         :style="payload.style"
         class="block _max-w-full _max-h-screen story-graphic"
     />
+
+    <!-- <progressive-img
+        :src="payload.src"
+        :class="payload.class || 'px-10 my-8'"
+        :style="payload.style"
+        class="block bg-gray-200 _max-w-full _max-h-screen story-graphic"
+    /> -->
 </template>
 
 <script lang="ts">

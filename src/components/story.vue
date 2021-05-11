@@ -2,7 +2,7 @@
     <div class="flex items-stretch">
         <ChapterMenuV :active-chapter-index="activeChapterIndex" :chapters="value.chapters" />
 
-        <Scrollama class="relative story-scrollama" @step-enter="enterStep">
+        <Scrollama class="relative story-scrollama" @step-enter="stepEnter">
             <div
                 v-for="(chapter, index) in value.chapters"
                 :key="index"
@@ -14,8 +14,8 @@
 
                 <div class="sticky flex self-start justify-center flex-2 top-16">
                     <component
-                        v-if="activatedChapterIndexes.includes(index)"
                         :is="chapter.graphic.type"
+                        :is-shown="shownChapterIndexes[index]"
                         :payload="chapter.graphic.payload"
                         :chapter-index="index"
                     ></component>
@@ -45,34 +45,22 @@ import { GraphicKind, StoryConfig } from '@/story-config';
 export default class StoryV extends Vue {
     @Prop() value!: StoryConfig;
 
-    activatedChapterIndexes: number[] = [];
+    shownChapterIndexes = Array<boolean>(this.value.chapters.length).fill(false);
     activeChapterIndex = -1;
 
     ramps: string[] = [];
 
+    shownTimeoutHandle = -1;
+
     stepEnter({ element, index }: { element: HTMLElement; index: number }): void {
         this.activeChapterIndex = parseInt(element.dataset.chapterIndex || '-1');
-        this.activatedChapterIndexes[activeChapterIndex] = new Set();
-        this.initRamp(index);
-    }
 
-    initRamp(index: number): void {
-        const rampId = `ramp-map-${index}`;
-
-        if (this.value.chapters[index].graphic.type !== GraphicKind.Map) {
-            return;
-        }
-
-        if (this.ramps.includes(rampId)) {
-            return;
-        }
-
-        if (RAMP.mapById(rampId) !== undefined) {
-            return;
-        }
-
-        new RAMP.Map(this.$el.querySelector(`#${rampId}`), 'config.json');
-        this.ramps.push(rampId);
+        // delay shown trigger; helpful not to init maps when quickly scrolling through the page
+        clearTimeout(this.shownTimeoutHandle);
+        this.shownTimeoutHandle = setTimeout(
+            () => Vue.set(this.shownChapterIndexes, this.activeChapterIndex, true),
+            350
+        );
     }
 }
 </script>
