@@ -1,5 +1,12 @@
 <template>
-    <img
+    <!-- <img
+        :src="payload.src"
+        :class="payload.class || 'px-10 my-8'"
+        :style="payload.style"
+        class="block _max-w-full _max-h-screen story-graphic"
+    /> -->
+
+    <progressive-img
         :src="payload.src"
         :class="payload.class || 'px-10 my-8'"
         :style="payload.style"
@@ -18,5 +25,3 @@ export default class ImageGraphicV extends Vue {
 </script>
 
 <style lang="sass" scoped></style>
-
-// TODO: calc(max-h-screen - 4rem) to account for the sticky header

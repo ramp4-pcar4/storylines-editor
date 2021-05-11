@@ -19,5 +19,3 @@ export default class MapGraphicV extends Vue {
     width: 100%;
 }
 </style>
-
-// TODO: calc(max-h-screen - 4rem) to account for the sticky header

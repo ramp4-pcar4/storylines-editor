@@ -16,6 +16,9 @@ Vue.component('ImageGraphicV', ImageGraphicV);
 import MapGraphicV from '@/components/map-graphic.vue';
 Vue.component('MapGraphicV', MapGraphicV);
 
+import VueProgressiveImage from 'vue-progressive-image';
+Vue.use(VueProgressiveImage);
+
 Vue.config.productionTip = false;
 
 new Vue({

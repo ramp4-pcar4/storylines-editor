@@ -2,15 +2,7 @@
     <div class="flex items-stretch">
         <ChapterMenuV :active-chapter-index="activeChapterIndex" :chapters="value.chapters" />
 
-        <Scrollama
-            class="relative story-scrollama"
-            @step-enter="
-                ({ element, index }) => {
-                    activeChapterIndex = parseInt(element.dataset.chapterIndex);
-                    initRamp(index);
-                }
-            "
-        >
+        <Scrollama class="relative story-scrollama" @step-enter="enterStep">
             <div
                 v-for="(chapter, index) in value.chapters"
                 :key="index"
@@ -22,6 +14,7 @@
 
                 <div class="sticky flex self-start justify-center flex-2 top-16">
                     <component
+                        v-if="activatedChapterIndexes.includes(index)"
                         :is="chapter.graphic.type"
                         :payload="chapter.graphic.payload"
                         :chapter-index="index"
@@ -52,9 +45,16 @@ import { GraphicKind, StoryConfig } from '@/story-config';
 export default class StoryV extends Vue {
     @Prop() value!: StoryConfig;
 
+    activatedChapterIndexes: number[] = [];
     activeChapterIndex = -1;
 
     ramps: string[] = [];
+
+    stepEnter({ element, index }: { element: HTMLElement; index: number }): void {
+        this.activeChapterIndex = parseInt(element.dataset.chapterIndex || '-1');
+        this.activatedChapterIndexes[activeChapterIndex] = new Set();
+        this.initRamp(index);
+    }
 
     initRamp(index: number): void {
         const rampId = `ramp-map-${index}`;
