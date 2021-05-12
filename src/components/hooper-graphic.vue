@@ -2,7 +2,7 @@
     <div class="w-full px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <hooper ref="carousel" v-if="width !== -1" class="h-auto">
             <slide v-for="(slide, index) in payload.slides" :key="index" :index="index" class="self-center">
-                <img :src="slide" class="m-auto story-graphic" />
+                <img :src="slide.src" class="m-auto story-graphic" :alt="slide.alt" />
             </slide>
 
             <hooper-navigation slot="hooper-addons"></hooper-navigation>

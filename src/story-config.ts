@@ -20,6 +20,7 @@ export interface ImageGraphic {
     type: GraphicKind.Image;
     payload: {
         src: string;
+        alt: string;
         style?: string;
         class?: string;
     };
@@ -28,7 +29,7 @@ export interface ImageGraphic {
 export interface HooperGraphic {
     type: GraphicKind.Hooper;
     payload: {
-        slides: string[];
+        slides: { src: string; alt: string }[];
         style?: string;
         class?: string;
     };
@@ -50,15 +51,24 @@ const story: StoryConfig = {
     title: 'NPRI Sector Overview: Oil Sands Extraction',
     subTitle: 'It also summarizes what steps facilities in this sector take to mitigate their environmental impacts',
     chapters: [
-        {
+        /* {
             title: 'Hooper',
             graphic: {
                 type: GraphicKind.Hooper,
                 payload: {
                     slides: [
-                        './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
-                        './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
-                        './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
+                        {
+                            src: './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                            alt: '<alt-text-here-1>'
+                        },
+                        {
+                            src: './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                            alt: '<alt-text-here-2>'
+                        },
+                        {
+                            src: './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                            alt: '<alt-text-here-3>'
+                        }
                     ]
                 }
             },
@@ -70,13 +80,14 @@ const story: StoryConfig = {
 Businesses, institutions and other facilities across Canada must report their releases, transfers and disposals of pollutants to air, water and land annually to the Government of Canada's NPRI. The information collected is public, helps governments set environmental priorities and monitor environmental performance, and provides Canadians with an opportunity to learn about pollution in their surroundings.`
                 }
             ]
-        },
+        }, */
         {
             title: 'Overview',
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src: './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
+                    src: './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                    alt: '<alt-text-here-4>'
                 }
             },
             scenes: [
@@ -121,7 +132,8 @@ This map shows the three oil sands areas. The actual geological deposits themsel
                 type: GraphicKind.Image,
                 payload: {
                     class: 'p-0 m-0 h-story object-cover',
-                    src: './images/GettyImages-187242601__1554821467033__w1920.jpg'
+                    src: './images/GettyImages-187242601__1554821467033__w1920.jpg',
+                    alt: '<alt-text-here-5>'
                 }
             },
             scenes: [
@@ -141,7 +153,8 @@ Surface mining involves digging up large areas with large excavators. The result
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src: './images/SurfaceExtractionEnglish__1563813765181__w791.png'
+                    src: './images/SurfaceExtractionEnglish__1563813765181__w791.png',
+                    alt: '<alt-text-here-6>'
                 }
             },
             scenes: [
@@ -220,7 +233,8 @@ Satellite imagery as of 2011.
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src: './images/slide%206%20-%20mining%20trends__1553275702559__w592.jpg'
+                    src: './images/slide%206%20-%20mining%20trends__1553275702559__w592.jpg',
+                    alt: '<alt-text-here-7>'
                 }
             },
             scenes: [
@@ -237,13 +251,13 @@ Reported Criteria Air Contaminant (CAC) emissions from oil sands surface mining 
                 type: GraphicKind.Hooper,
                 payload: {
                     slides: [
-                        './images/09-01-tailings.jpg',
-                        './images/09-02-tailings.jpg',
-                        './images/09-03-tailings.jpg',
-                        './images/09-04-tailings.jpg',
-                        './images/09-05-tailings.jpg',
-                        './images/09-06-tailings.jpg',
-                        './images/09-07-tailings.jpg'
+                        { src: './images/09-01-tailings.jpg', alt: '<alt-text-here-0>' },
+                        { src: './images/09-02-tailings.jpg', alt: '<alt-text-here-8>' },
+                        { src: './images/09-03-tailings.jpg', alt: '<alt-text-here-9>' },
+                        { src: './images/09-04-tailings.jpg', alt: '<alt-text-here-10>' },
+                        { src: './images/09-05-tailings.jpg', alt: '<alt-text-here-11>' },
+                        { src: './images/09-06-tailings.jpg', alt: '<alt-text-here-12>' },
+                        { src: './images/09-07-tailings.jpg', alt: '<alt-text-here-13>' }
                     ]
                 }
             },
@@ -314,7 +328,8 @@ Total reported tailings from oil sands surface mining facilities have increased 
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src: './images/OilSands___1565005967929__w774.png'
+                    src: './images/OilSands___1565005967929__w774.png',
+                    alt: '<alt-text-here-14>'
                 }
             },
             scenes: [
@@ -373,11 +388,12 @@ This change in the number of facilities reporting over time follows changes in t
             ]
         },
         {
-            title: 'NPRI releases from thermal in-situ facilities',
+            title: 'NPRI releases from thermal in-situ facilities - Part 2',
             graphic: {
                 type: GraphicKind.Image,
                 payload: {
-                    src: './images/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg'
+                    src: './images/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg',
+                    alt: '<alt-text-here-15>'
                 }
             },
             scenes: [
@@ -398,7 +414,8 @@ While thermal in-situ facilities have reported an increase in reported CAC emiss
                 type: GraphicKind.Image,
                 payload: {
                     class: 'p-0 m-0 h-story object-cover',
-                    src: './images/GettyImages-516166467__1554821531978__w1920.jpg'
+                    src: './images/GettyImages-516166467__1554821531978__w1920.jpg',
+                    alt: '<alt-text-here-16>'
                 }
             },
             scenes: [

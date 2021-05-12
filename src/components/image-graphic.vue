@@ -3,6 +3,7 @@
         :src="payload.src"
         :class="payload.class || 'px-10 my-8'"
         :style="payload.style"
+        :alt="payload.alt"
         class="block bg-gray-200_ _max-w-full story-graphic"
     />
 </template>

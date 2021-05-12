@@ -12,12 +12,12 @@
             v-for="(scene, index) in value.scenes"
             :key="index"
             :data-scene-index="index"
-            class="px-10"
+            class="px-10 scene"
             :class="{ 'is-active': activeSceneIndex === index }"
         >
-            <h3>{{ scene.title }}</h3>
+            <h3 v-if="scene.title">{{ scene.title }}</h3>
 
-            <div v-html="md.render(scene.text)"></div>
+            <div :class="scene.title ? '' : 'no-h3'" v-html="md.render(scene.text)"></div>
         </div>
     </Scrollama>
 </template>
@@ -64,8 +64,12 @@ export default class Chapter extends Vue {
 }
 
 .scene {
+    .no-h3 {
+        margin-top: 2.25rem;
+    }
+
     &:not(.is-active) {
-        color: #b9b9b9;
+        // color: #b9b9b9;
     }
 }
 </style>

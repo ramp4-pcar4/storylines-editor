@@ -12,7 +12,7 @@
             </div>
         </header>
 
-        <header class="py-24 mx-auto text-center max-w-9xl">
+        <div class="py-24 mx-auto text-center max-w-9xl">
             <svg
                 class="w-56 h-auto m-auto"
                 width="27.781"
@@ -39,7 +39,7 @@
                 {{ story.subTitle }}
             </p>
 
-            <a href="#story" class="inline-block mt-10 scroll-arrow" v-smooth-scroll>
+            <a href="#story" class="inline-block mt-10 scroll-arrow" title="scroll to story" v-smooth-scroll>
                 <svg
                     class="w-auto h-24 m-auto"
                     width="90"
@@ -63,7 +63,7 @@
                     />
                 </svg>
             </a>
-        </header>
+        </div>
 
         <main class="w-full mx-auto max-w-9xl" id="story">
             <StoryV :value="story" />
