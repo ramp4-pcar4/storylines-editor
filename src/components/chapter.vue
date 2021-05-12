@@ -44,19 +44,6 @@ export default class Chapter extends Vue {
     md = new MarkdownIt();
 
     activeSceneIndex = -1;
-
-    mounted(): void {
-        /* const els = this.$el.querySelectorAll('.chapter-title');
-
-        els.forEach((el) => {
-            const observer = new IntersectionObserver(
-                ([e]) => e.target.classList.toggle('is-pinned', e.intersectionRatio > 0),
-                { threshold: [1] }
-            );
-
-            observer.observe(el);
-        }); */
-    }
 }
 </script>
 

@@ -6,19 +6,29 @@ export interface StoryConfig {
 
 export interface ChapterConfig {
     title: string;
-    graphic?: ImageGraphic | MapGraphic;
+    graphic?: ImageGraphic | MapGraphic | HooperGraphic;
     scenes: SceneConfig[];
 }
 
 export enum GraphicKind {
     Image = 'ImageGraphicV',
-    Map = 'MapGraphicV'
+    Map = 'MapGraphicV',
+    Hooper = 'HooperGraphicV'
 }
 
 export interface ImageGraphic {
     type: GraphicKind.Image;
     payload: {
         src: string;
+        style?: string;
+        class?: string;
+    };
+}
+
+export interface HooperGraphic {
+    type: GraphicKind.Hooper;
+    payload: {
+        slides: string[];
         style?: string;
         class?: string;
     };
@@ -40,6 +50,27 @@ const story: StoryConfig = {
     title: 'NPRI Sector Overview: Oil Sands Extraction',
     subTitle: 'It also summarizes what steps facilities in this sector take to mitigate their environmental impacts',
     chapters: [
+        {
+            title: 'Hooper',
+            graphic: {
+                type: GraphicKind.Hooper,
+                payload: {
+                    slides: [
+                        './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                        './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                        './images/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg'
+                    ]
+                }
+            },
+            scenes: [
+                {
+                    text: `
+**Oil Sands Extraction** is part of the National Pollutant Release Inventory's (NPRI) Sector Overview series. This sector overview explores NPRI substances released, disposed, and transferred by this industry. It also summarizes what steps facilities in this sector take to mitigate their environmental impacts.
+
+Businesses, institutions and other facilities across Canada must report their releases, transfers and disposals of pollutants to air, water and land annually to the Government of Canada's NPRI. The information collected is public, helps governments set environmental priorities and monitor environmental performance, and provides Canadians with an opportunity to learn about pollution in their surroundings.`
+                }
+            ]
+        },
         {
             title: 'Overview',
             graphic: {
@@ -203,9 +234,17 @@ Reported Criteria Air Contaminant (CAC) emissions from oil sands surface mining 
         {
             title: 'Mine tailings reported',
             graphic: {
-                type: GraphicKind.Image,
+                type: GraphicKind.Hooper,
                 payload: {
-                    src: './images/Slide7%20-%20Tailings__1554486679473__w860.jpg'
+                    slides: [
+                        './images/09-01-tailings.jpg',
+                        './images/09-02-tailings.jpg',
+                        './images/09-03-tailings.jpg',
+                        './images/09-04-tailings.jpg',
+                        './images/09-05-tailings.jpg',
+                        './images/09-06-tailings.jpg',
+                        './images/09-07-tailings.jpg'
+                    ]
                 }
             },
             scenes: [

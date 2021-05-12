@@ -103,6 +103,7 @@ body {
     color: #2c3e50;
 
     --sr-accent-colour: #00d2d3;
+
     --sr-content-background: rgba(249, 250, 251, 1);
 
     // border-gray-200

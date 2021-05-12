@@ -16,6 +16,9 @@ Vue.component('ImageGraphicV', ImageGraphicV);
 import MapGraphicV from '@/components/map-graphic.vue';
 Vue.component('MapGraphicV', MapGraphicV);
 
+import HooperGraphicV from '@/components/hooper-graphic.vue';
+Vue.component('HooperGraphicV', HooperGraphicV);
+
 import VueProgressiveImage from 'vue-progressive-image';
 Vue.use(VueProgressiveImage);
 

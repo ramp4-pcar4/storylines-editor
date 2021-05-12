@@ -5,8 +5,13 @@
     >
         <div class="flex items-center mt-4 mb-12">
             <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">Chapters</tippy>
-            <button name="menu-button-tippy" class="flex-shrink-0 px-2 py-1 mx-1" @click="isMenuOpen = !isMenuOpen">
+            <button
+                name="menu-button-tippy"
+                class="flex items-center flex-shrink-0 px-2 py-1 mx-1 overflow-hidden"
+                @click="isMenuOpen = !isMenuOpen"
+            >
                 <svg
+                    class="flex-shrink-0"
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
@@ -18,8 +23,11 @@
                     <path class="transition-all duration-500 ease-in-out" :d="`m3.5 12h${isMenuOpen ? '17' : '8.5'}`" />
                     <path d="m3.5 17h17" />
                 </svg>
+                <span
+                    class="flex-1 pl-2 ml-2 overflow-hidden leading-none text-left overflow-ellipsis whitespace-nowrap"
+                    >Chapters</span
+                >
             </button>
-            <span class="flex-1 mt-px ml-1 leading-none overflow-ellipsis whitespace-nowrap">Chapters</span>
         </div>
 
         <ul class="menu">
@@ -51,7 +59,7 @@
                             stroke-width=".93974"
                         />
                     </svg>
-                    <span class="flex-1 mt-px ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap">{{
+                    <span class="flex-1 ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap">{{
                         chapter.title
                     }}</span>
                 </a>
@@ -74,14 +82,20 @@ export default class ChapterMenuV extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.menu li.is-active {
-    svg {
-        fill: var(--sr-accent-colour);
+.menu li {
+    a:hover svg {
         stroke: var(--sr-accent-colour);
     }
 
-    span {
-        font-weight: bold;
+    &.is-active {
+        svg {
+            fill: var(--sr-accent-colour);
+            stroke: var(--sr-accent-colour);
+        }
+
+        span {
+            font-weight: bold;
+        }
     }
 }
 </style>
