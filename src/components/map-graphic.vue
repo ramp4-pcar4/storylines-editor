@@ -1,5 +1,5 @@
 <template>
-    <div :id="`ramp-map-${chapterIndex}`" class="w-full bg-gray-200 rv-map h-story" :rv-config="payload.config">
+    <div :id="`ramp-map-${chapterIndex}`" class="w-full bg-gray-200 rv-map h-story">
         <div class="flex items-center justify-center w-full h-full map-loading">
             <svg class="animate-pulse w-52" viewBox="0 0 100 82.202" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -43,7 +43,7 @@ export default class MapGraphicV extends Vue {
     }
 
     init(): void {
-        new RAMP.Map(this.$el, 'config.json');
+        new RAMP.Map(this.$el, this.payload.config);
     }
 }
 </script>
