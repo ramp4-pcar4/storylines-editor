@@ -104,7 +104,7 @@ Businesses, institutions and other facilities across Canada must report their re
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'config.json'
+                    config: './configs/OilSandsDeposits.json'
                 }
             },
             scenes: [
@@ -172,7 +172,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'configs/OilSandsFacilityLocations2017.json'
+                    config: './configs/OilSandsFacilityLocations2017.json'
                 }
             },
             scenes: [
@@ -197,7 +197,7 @@ Oil sands extraction facilities that report to the NPRI are located exclusively 
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'configs/ReleasesandDisposalsbyMiningFacilitiesin2017(satellite).json'
+                    config: './configs/ReleasesandDisposalsbyMiningFacilitiesin2017(satellite).json'
                 }
             },
             scenes: [
@@ -284,7 +284,7 @@ While the tailings reported by these mines have large amounts of manganese, ammo
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'configs/ReleasesandDisposalsbyMiningFacilitiesin2017(topo).json'
+                    config: './configs/ReleasesandDisposalsbyMiningFacilitiesin2017(topo).json'
                 }
             },
             scenes: [
@@ -312,7 +312,7 @@ Satellite imagery as of 2011.
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'configs/TailingsfromMiningFacilities2009to2017(timeslider).json'
+                    config: './configs/TailingsfromMiningFacilities2009to2017(timeslider).json'
                 }
             },
             scenes: [
@@ -349,7 +349,7 @@ Compared to surface mining, thermal in-situ operations are much more energy inte
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'configs/ReleasestoAirbyInSituFacilitiesforAllSubstancesin2017.json'
+                    config: './configs/ReleasestoAirbyInSituFacilitiesforAllSubstancesin2017.json'
                 }
             },
             scenes: [
@@ -374,7 +374,7 @@ The air releases reported by thermal in-situ facilities is almost entirely (99%)
             graphic: {
                 type: GraphicKind.Map,
                 payload: {
-                    config: 'configs/ReleasestoAirbyInSituFacilitiesforAllSubstances2009to2017(timeslider).json'
+                    config: './configs/ReleasestoAirbyInSituFacilitiesforAllSubstances2009to2017(timeslider).json'
                 }
             },
             scenes: [
