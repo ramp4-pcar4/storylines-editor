@@ -1,8 +1,16 @@
 module.exports = {
-    chainWebpack: (config) => {
-        config.plugin('html').tap((args) => {
-            args[0].title = 'Story RAMP';
-            return args;
-        });
+    pages: {
+        index: {
+            entry: './src/main.ts',
+            template: 'public/index.html',
+            filename: 'index.html',
+            title: 'Story RAMP'
+        } /* ,
+        indexCanadaEn: {
+            entry: './src/main.ts',
+            template: 'public/index-ca-en.html',
+            filename: 'index-ca-en.html',
+            title: 'Story RAMP'
+        } */
     }
 };

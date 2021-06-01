@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta content="width=device-width,initial-scale=1" name="viewport" />
+
+        <title>Story RAMP</title>
+
+        <!-- replace `rn` in the url with a version number ("v4_0_30" for example) if desired -->
+        <script
+            type="text/javascript"
+            src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"
+        ></script>
+        <script
+            type="text/javascript"
+            src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"
+        ></script>
+
+        <!-- top reference links and no-script fallback -->
+        <noscript> <%= require('html-loader!../src/assets/static/cdts/refTop.html') %> </noscript>
+        <script type="text/javascript">
+            document.write(wet.builder.refTop({}));
+        </script>
+    </head>
+    <body>
+        <!-- template top and no-script fallback -->
+        <div id="def-top"><%= require('html-loader!../src/assets/static/cdts/top-en.html') %></div>
+
+        <main role="main" property="mainContentOfPage" class="container">
+            <iframe
+                src="index.html"
+                class="iframe"
+                style="width: 100%; height: 750px"
+                scrolling="yes"
+                frameborder="0"
+            ></iframe>
+        </main>
+
+        <!-- template footer and no-script fallback -->
+        <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
+
+        <script type="text/javascript">
+            var defTop = document.getElementById('def-top');
+            defTop.outerHTML = wet.builder.top({
+                lngLinks: [
+                    {
+                        lang: 'fr',
+                        href: 'index-fr.html',
+                        text: 'Français'
+                    }
+                ]
+            });
+        </script>
+
+        <script>
+            var defFooter = document.getElementById('def-footer');
+            defFooter.outerHTML = wet.builder.footer({});
+        </script>
+
+        <script>
+            document.write(wet.builder.refFooter({}));
+        </script>
+    </body>
+</html>

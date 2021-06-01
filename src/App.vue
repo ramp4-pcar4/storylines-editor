@@ -106,8 +106,8 @@ body {
 
     --sr-content-background: rgba(249, 250, 251, 1);
 
-    // border-gray-200
     --sr-border-colour: rgba(229, 231, 235, 1);
+    // border-gray-200
 
     .scroll-arrow {
         animation: bounce-light 1s 4.5;
