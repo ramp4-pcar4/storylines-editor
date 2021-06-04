@@ -6,7 +6,7 @@
                     <span class="text-lg">{{ story.title }}</span>
                 </div>
                 <div class="flex justify-end flex-auto space-x-6">
-                    <span>Sharepoint</span>
+                    <a href="#">Sharepoint</a>
                     <a href="https://github.com/ramp4-pcar4/story-ramp">Github</a>
                 </div>
             </div>
