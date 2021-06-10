@@ -30,4 +30,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## Future goals
 
-- [ ] create a demo using [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) mapping platform
+- [ ] use [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) mapping platform
