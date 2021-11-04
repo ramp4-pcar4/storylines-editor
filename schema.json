@@ -35,6 +35,10 @@
                     }
                 ]
             },
+            "properties": {
+                "width": "number",
+                "description": "The width of the panel inside the slide (between 0 and 100)."
+            },
             "minItems": 1,
             "maxItems": 2
         },
@@ -315,102 +319,6 @@
                 }
             },
             "required": ["xmin", "ymin", "xmax", "ymax"],
-            "additionalProperties": false
-        },
-
-        "extentSetNode": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "spatialReference": {
-                    "$ref": "#/$defs/spatialReferenceNode",
-                    "description": "The projection for the given extents"
-                },
-                "default": {
-                    "$ref": "#/$defs/extentNode",
-                    "description": "The default (starting) extent."
-                },
-                "full": {
-                    "$ref": "#/$defs/extentNode",
-                    "description": "The full extent (should give good view of the whole map, not necessarily the maximum extent); default will be used if not supplied."
-                },
-                "maximum": {
-                    "$ref": "#/$defs/extentNode",
-                    "description": "The maximum extent; full or default extents will be used if not supplied."
-                }
-            },
-            "required": ["id", "default", "spatialReference"],
-            "additionalProperties": false
-        },
-
-        "spatialReferenceNode": {
-            "type": "object",
-            "properties": {
-                "wkid": {
-                    "type": "number",
-                    "description": "an ESRI well known id denoting a projection"
-                },
-                "vcsWkid": {
-                    "type": "number",
-                    "description": "an ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property."
-                },
-                "latestWkid": {
-                    "type": "number",
-                    "description": "an ESRI well known id denoting a projection"
-                },
-                "latestVcsWkid": {
-                    "type": "number",
-                    "description": "an ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property."
-                },
-                "wkt": {
-                    "type": "string",
-                    "description": "a well known type projection definition"
-                }
-            },
-            "anyOf": [
-                {
-                    "required": ["wkid"]
-                },
-                {
-                    "required": ["vcsWkid"]
-                },
-                {
-                    "required": ["latestWkid"]
-                },
-                {
-                    "required": ["latestVcsWkid"]
-                },
-                {
-                    "required": ["wkt"]
-                }
-            ],
-            "additionalProperties": false
-        },
-
-        "tileSchemaNode": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "A unique id identifying a tile schema (combination of an extent set and a zoom scale)"
-                },
-                "extentSetId": {
-                    "type": "string",
-                    "description": "The extent set to be used for this basemap (should reference map.extentSets.id)"
-                },
-                "lodSetId": {
-                    "type": "string",
-                    "description": "Optional.  The level of details set to be used for this basemap (should reference map.lod.id)"
-                },
-                "hasNorthPole": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Indicates if the map projection includes a north pole.  Defaults to false to avoid errors."
-                }
-            },
-            "required": ["extentSetId", "lodSetId", "id", "name"],
             "additionalProperties": false
         },
 

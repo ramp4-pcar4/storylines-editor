@@ -3,14 +3,14 @@ const config = {
         logo: {
             src: "" // TODO
         },
-        title: "# NPRI Sector Overview: Oil Sands Extraction",
+        title: "NPRI Sector Overview: Oil Sands Extraction",
         subtitle: "It also summarizes what steps facilities in this sector take to mitigate their environmental impacts"
     },
     slides: [
         {
             panel: [
                 {
-                    title: "## Overview",
+                    title: "Overview",
                     content:
 `**Oil Sands Extraction** is part of the National Pollutant Release Inventory's (NPRI) Sector Overview series. This sector overview explores NPRI substances released, disposed, and transferred by this industry. It also summarizes what steps facilities in this sector take to mitigate their environmental impacts.
 
@@ -26,7 +26,7 @@ Businesses, institutions and other facilities across Canada must report their re
         {
             panel: [
                 {
-                    title: "## Oil sands deposits",
+                    title: "Oil sands deposits",
                     content:
 `There are three large oil sands deposits in Canada:
 
@@ -92,7 +92,7 @@ This map shows the three oil sands areas. The actual geological deposits themsel
         {
             panel: [
                 {
-                    title: "## Oil sands extraction",
+                    title: "Oil sands extraction",
                     content:
 `The oil found in oil sands deposits is primarily bitumen, a very heavy and viscous oil. Bitumen does not flow easily at room temperature and requires unconventional methods to extract. Bitumen is extracted either from surface mining or in-situ using a variety of methods.
 
@@ -110,7 +110,7 @@ Surface mining involves digging up large areas with large excavators. The result
         {
             panel: [
                 {
-                    title: "## In-situ extraction",
+                    title: "In-situ extraction",
                     content:
 `In-situ extraction generally involves pumping high-pressure steam deep underground. This heats the bitumen to the point that it flows and can be brought up to the surface. If the bitumen has a low enough viscosity that it can be extracted using conventional methods, the in-situ operations do not need to use thermal methods to promote extraction. This sector overview addresses only those sites using thermal extraction methods, as they are much more energy-intensive.
 
@@ -126,7 +126,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
         {
             panel: [
                 {
-                    title: "## Where are facilities located?",
+                    title: "Where are facilities located?",
                     content:
 
 `Oil sands extraction facilities that report to the NPRI are located exclusively in northern Alberta, particularly around the municipality of Fort McMurray. Of the facilities that reported in 2017, 23 of them are in the Peace River deposit, 5 in the Cold Lake deposit and 35 in the Athabasca deposit. Also included in this map is an upgrader facility in Fort Saskatchewan, Alberta, that upgrades oil from the Canadian Natural Resources’ Muskeg River oil sands surface mining facility. Of the facilities that reported to the NPRI, seven of them are surface mining operations, one was an [upgrader facility](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/upgrading-oil-sands-and-heavy-oil/5875) and the remaining 56 were in-situ facilities. The category “Other” refers to facilities that do not use thermal methods for extraction.
@@ -180,7 +180,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
         {
             panel: [
                 {
-                    title: "## NPRI substances reported for oil sands mining facilities",
+                    title: "NPRI substances reported for oil sands mining facilities",
                     content:
 `Seven oil sands surface mining facilities reported to the NPRI in 2017. These facilities reported information on 72 different substances and substance groups for 2017, representing a total of 285,000 tonnes of pollutants released, disposed of and transferred. Almost 80% of this amount, 227,000 tonnes, is the release of criteria air contaminants (CACs) such as particulate matter (PM), nitrogen oxides (NO), sulphur dioxide (SO2), carbon monoxide (CO) and volatile organic compounds
 
@@ -245,7 +245,7 @@ Satellite imagery as of 2011.`,
         {
             panel: [
                 {
-                    title: "## Criteria air contaminant releases from oil sands mines",
+                    title: "Criteria air contaminant releases from oil sands mines",
                     content:
 `Reported Criteria Air Contaminant (CAC) emissions from oil sands surface mining operations have stayed relatively constant since 2009, ranging between 195,000 tonnes and 227,000 tonnes released per year. At the same time, however, production from these facilities has increased significantly, going from 300 million barrels produced in 2009 to 466 million barrels produced in 2017, an increase of over 50%. As a result, the amount of releases per barrel of oil produced from these operations has gone down steadily and significantly, decreasing 34% between 2009 and 2017.`,
                     type: "text"
@@ -259,7 +259,7 @@ Satellite imagery as of 2011.`,
         {
             panel: [
                 {
-                    title: "## Mine tailings reported",
+                    title: "Mine tailings reported",
                     content:
 `Processing mined oil sands to remove the bitumen leaves behind a mix of water, sand, and clay with trace amounts of metals, polycyclic aromatic hydrocarbons (PAHs) and other volatile organic compounds (VOCs). This left-over mixture, known as mine [tailings](https://www.ec.gc.ca/inrp-npri/default.asp?lang=En&n=FEC85072&offset=1&toc=show), is disposed of in purpose-built, monitored [tailings impoundment areas](https://www.nrcan.gc.ca/mining-materials/publications/13924).
 
@@ -312,7 +312,7 @@ While the tailings reported by these mines have large amounts of manganese, ammo
         {
             panel: [
                 {
-                    title: "## Reported mine tailings from oil sands surface mining facilities",
+                    title: "Reported mine tailings from oil sands surface mining facilities",
                     content:
 `Similar to comparing release and transfer profiles, it is difficult to compare the seven oil sands surface mining facilities in terms of what they dispose of in their tailings impoundment areas. These facilities vary greatly in their size and in how much bitumen processing occurs on-site. Breakdowns of reported tailings for each facility are provided below.
 
@@ -369,7 +369,7 @@ Satellite imagery as of 2011.`,
         {
             panel: [
                 {
-                    title: "## Trends in mine tailings reported from surface mining facilities",
+                    title: "Trends in mine tailings reported from surface mining facilities",
                     content:
 `Total reported tailings from oil sands surface mining facilities have increased by 3% between 2009 and 2017, an increase of 1,700 tonnes. Five of these facilities have been in production and have reported to the NPRI since before 2009. All of these facilities reported increases in their total tailings disposals between 2016 and 2017, with the exception of Syncrude’s Mildred Lake facility.`,
                     type: "text"
@@ -414,7 +414,7 @@ Satellite imagery as of 2011.`,
         {
             panel: [
                 {
-                    title: "## Thermal in situ facilities",
+                    title: "Thermal in situ facilities",
                     content:
 `The other main method used for extracting bitumen from the oil sands is thermal in-situ. Bitumen is usually too heavy and viscous to be pumped out from deep underground using conventional means and must be heated up before extraction. This heat is provided by injecting high pressure steam deep underground to heat up the bitumen so it can be pumped out of the ground.
 
@@ -432,7 +432,7 @@ Compared to surface mining, thermal in-situ operations are much more energy inte
         {
             panel: [
                 {
-                    title: "## NPRI releases from thermal in-situ facilities",
+                    title: "NPRI releases from thermal in-situ facilities",
                     content:
 `There were 32 thermal in-situ facilities that reported to the NPRI in 2017. The primary emission sources from these facilities are the combustion equipment used to generate steam and the compression equipment, which runs on fossil fuel, used to inject the steam underground.
 
@@ -486,7 +486,7 @@ The air releases reported by thermal in-situ facilities is almost entirely (99%)
         {
             panel: [
                 {
-                    title: "## Trends in NPRI substances released from in-situ facilities",
+                    title: "Trends in NPRI substances released from in-situ facilities",
                     content:
 `The number of thermal in-situ facilities reporting to the NPRI has almost doubled over the last nine reporting years, going from 18 in 2009 to 32 in 2017. The number of facilities peaked in 2015 at 38.
 
@@ -533,7 +533,7 @@ This change in the number of facilities reporting over time follows changes in t
         {
             panel: [
                 {
-                    title: "## NPRI releases from thermal in-situ facilities - Part 2",
+                    title: "NPRI releases from thermal in-situ facilities - Part 2",
                     content:
 `Reported CAC emissions from thermal in-situ operations have increased along with the increase in the number of facilities reporting since 2009.
 
@@ -551,7 +551,7 @@ While thermal in-situ facilities have reported an increase in reported CAC emiss
         {
             panel: [
                 {
-                    title: "## Managing environmental impacts",
+                    title: "Managing environmental impacts",
                     content:
 `The Government of Canada’s policy towards oil sands development is that private companies make business decisions given regulations that protect current and future Canadian interests. The provinces have jurisdiction over oil and gas development within their provincial boundaries, and environmental protection is a shared responsibility by the Government of Canada and the provinces. The federal government participates in the environmental assessment process through the Joint Review Panel for proposed surface mine developments, while the Government of Alberta is responsible for the assessment of proposed in-situ developments.
 
@@ -571,13 +571,13 @@ Oil sands surface mining facilities in Alberta take much of their water from the
         {
             panel: [
                 {
-                    title: "## Pollution in your neighbourhood",
+                    title: "Pollution in your neighbourhood",
                     content:
 `You can identify the facilities and pollutants in your community by entering your postal code in the NPRI online data search. For further analysis, check out [other NPRI maps and datasets](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html).`,
                     type: "text"
                 },
                 {
-                    title: "## NPRI data",
+                    title: "NPRI data",
                     content:
 `We have packaged the data in different ways for different uses. You can search the entire database, download subsets of data, or view the data on maps.
 
