@@ -1,0 +1,660 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "StoryRAMP Config Schema",
+    "type": "object",
+    "additionalProperties": false,
+
+    "$defs": {
+        "slide": {
+            "type": "object",
+            "description": "A universal StoryRAMP slide",
+            "properties": {
+                "panel": {
+                    "$ref": "#/$defs/panel"
+                }
+            },
+            "required": ["panel"]
+        },
+
+        "panel": {
+            "type": "array",
+            "description": "A single slide component",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/$defs/textPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/mapPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/multimediaPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/dqvchartPanel"
+                    }
+                ]
+            },
+            "minItems": 1,
+            "maxItems": 2
+        },
+
+        "textPanel": {
+            "type": "object",
+            "description": "A text slide component.",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title for the text slide."
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The main text body."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["text"]
+                }
+            },
+            "required": ["content", "type"]
+        },
+
+        "multimediaPanel": {
+            "type": "object",
+            "description": "A multimedia slide component.",
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/multimediaImage"
+                },
+                {
+                    "$ref": "#/$defs/multimediaVideo"
+                },
+                {
+                    "$ref": "#/$defs/multimediaAudio"
+                },
+                {
+                    "$ref": "#/$defs/multimediaSlideshow"
+                }
+            ],
+            "properties": {
+                "expandable": {
+                    "type": "boolean",
+                    "description": "Determines whether the panel can be expanded.",
+                    "default": false
+                }
+            }
+        },
+
+        "mapPanel": {
+            "type": "object",
+            "description": "A map slide component.",
+            "properties": {
+                "config": {
+                    "$ref": "#/$defs/rampConfig"
+                },
+                "expandable": {
+                    "type": "boolean",
+                    "description": "Determines whether the panel can be expanded.",
+                    "default": false
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["map"]
+                }
+            },
+            "required": ["config", "type"]
+        },
+
+        "rampConfig": {
+            "type": "object",
+            "description": "A simplified RAMP config object",
+            "properties": {
+                "extent": {
+                    "$ref": "#/$defs/extentNode"
+                },
+
+                "basemap": {
+                    "$ref": "#/$defs/baseMapNode"
+                },
+
+                "layers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/layerNode"
+                    },
+                    "minItems": 0,
+                    "description": "Layer list in the order which they should be added to the map."
+                },
+
+                "plugins": {
+                    "type": "array",
+                    "description": "A list of active map plugins.",
+                    "items": {
+                        "type": "string",
+                        "enum": ["time-slider"]
+                    }
+                },
+
+                "toggles": {
+                    "type": "object",
+                    "description": "Toggle on or off specific portions of the RAMP map.",
+                    "properties": {
+                        "basemap": {
+                            "type": "boolean",
+                            "description": "Toggle on or off the basemap.",
+                            "default": true
+                        },
+                        "overview": {
+                            "type": "boolean",
+                            "description": "Toggle on or off the overview map.",
+                            "default": true
+                        },
+                        "export": {
+                            "type": "boolean",
+                            "description": "Toggle on or off export functionality.",
+                            "default": true
+                        },
+                        "geosearch": {
+                            "type": "boolean",
+                            "description": "Toggle on or off geosearch functionality.",
+                            "default": true
+                        },
+                        "legendOpen": {
+                            "type": "boolean",
+                            "description": "Determines whether the legend panel is open and expanded by default.",
+                            "default": true
+                        },
+                        "gridOpen": {
+                            "type": "string",
+                            "description": "Opens the grid for the provided layer id.",
+                            "default": ""
+                        }
+                    }
+                }
+            }
+        },
+
+        "basicLayerNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The id of the layer for referencing within the viewer (does not relate directly to any external service)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The display name of the layer.  If it is not present the viewer will make an attempt to scrape this information."
+                },
+                "url": {
+                    "type": "string",
+                    "description": "The service endpoint of the layer.  It should match the type provided in layerType."
+                },
+                "layerType": {
+                    "type": "string",
+                    "enum": ["esriImage", "esriTile"]
+                },
+                "visible": {
+                    "type": "boolean",
+                    "description": "Determines whether this layer is visible."
+                },
+                "identify": {
+                    "type": "boolean",
+                    "description": "Determines whether identify is enabled for this layer.",
+                    "default": true
+                }
+            },
+            "required": ["id", "layerType", "url"],
+            "additionalProperties": false
+        },
+
+        "featureLayerNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The id of the layer for referencing within the viewer (does not relate directly to any external service)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The display name of the layer.  If it is not present the viewer will make an attempt to scrape this information."
+                },
+                "url": {
+                    "type": "string",
+                    "description": "The service endpoint of the layer.  It should match the type provided in layerType."
+                },
+                "layerType": {
+                    "type": "string",
+                    "enum": ["esriFeature"]
+                }
+            },
+            "required": ["id", "layerType", "url"],
+            "additionalProperties": false
+        },
+
+        "dynamicLayerEntryNode": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "number",
+                    "description": "The index of the layer in the map service."
+                }
+            },
+            "required": ["index"],
+            "additionalProperties": false
+        },
+
+        "dynamicLayerNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The id of the layer for referencing within the viewer (does not relate directly to any external service)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The display name of the layer.  If it is not present the viewer will make an attempt to scrape this information."
+                },
+                "url": {
+                    "type": "string",
+                    "description": "The service endpoint of the layer.  It should match the type provided in layerType."
+                },
+                "layerType": {
+                    "type": "string",
+                    "enum": ["esriDynamic"]
+                },
+                "identify": {
+                    "type": "boolean",
+                    "description": "Determines whether identify is enabled for this layer.",
+                    "default": true
+                },
+                "singleEntryCollapse": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicates that the dynamic layer with a single layer entry should be rendered without the root group."
+                },
+                "layerEntries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/dynamicLayerEntryNode"
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": ["id", "layerType", "layerEntries", "url"],
+            "additionalProperties": false
+        },
+
+        "layerNode": {
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/basicLayerNode"
+                },
+                {
+                    "$ref": "#/$defs/featureLayerNode"
+                },
+                {
+                    "$ref": "#/$defs/dynamicLayerNode"
+                }
+            ]
+        },
+
+        "extentNode": {
+            "type": "object",
+            "properties": {
+                "xmin": {
+                    "type": "number"
+                },
+                "ymin": {
+                    "type": "number"
+                },
+                "xmax": {
+                    "type": "number"
+                },
+                "ymax": {
+                    "type": "number"
+                }
+            },
+            "required": ["xmin", "ymin", "xmax", "ymax"],
+            "additionalProperties": false
+        },
+
+        "extentSetNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "spatialReference": {
+                    "$ref": "#/$defs/spatialReferenceNode",
+                    "description": "The projection for the given extents"
+                },
+                "default": {
+                    "$ref": "#/$defs/extentNode",
+                    "description": "The default (starting) extent."
+                },
+                "full": {
+                    "$ref": "#/$defs/extentNode",
+                    "description": "The full extent (should give good view of the whole map, not necessarily the maximum extent); default will be used if not supplied."
+                },
+                "maximum": {
+                    "$ref": "#/$defs/extentNode",
+                    "description": "The maximum extent; full or default extents will be used if not supplied."
+                }
+            },
+            "required": ["id", "default", "spatialReference"],
+            "additionalProperties": false
+        },
+
+        "spatialReferenceNode": {
+            "type": "object",
+            "properties": {
+                "wkid": {
+                    "type": "number",
+                    "description": "an ESRI well known id denoting a projection"
+                },
+                "vcsWkid": {
+                    "type": "number",
+                    "description": "an ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property."
+                },
+                "latestWkid": {
+                    "type": "number",
+                    "description": "an ESRI well known id denoting a projection"
+                },
+                "latestVcsWkid": {
+                    "type": "number",
+                    "description": "an ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property."
+                },
+                "wkt": {
+                    "type": "string",
+                    "description": "a well known type projection definition"
+                }
+            },
+            "anyOf": [
+                {
+                    "required": ["wkid"]
+                },
+                {
+                    "required": ["vcsWkid"]
+                },
+                {
+                    "required": ["latestWkid"]
+                },
+                {
+                    "required": ["latestVcsWkid"]
+                },
+                {
+                    "required": ["wkt"]
+                }
+            ],
+            "additionalProperties": false
+        },
+
+        "tileSchemaNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "A unique id identifying a tile schema (combination of an extent set and a zoom scale)"
+                },
+                "extentSetId": {
+                    "type": "string",
+                    "description": "The extent set to be used for this basemap (should reference map.extentSets.id)"
+                },
+                "lodSetId": {
+                    "type": "string",
+                    "description": "Optional.  The level of details set to be used for this basemap (should reference map.lod.id)"
+                },
+                "hasNorthPole": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicates if the map projection includes a north pole.  Defaults to false to avoid errors."
+                }
+            },
+            "required": ["extentSetId", "lodSetId", "id", "name"],
+            "additionalProperties": false
+        },
+
+        "baseMapNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "A unique identifier for the basemap"
+                },
+                "tileSchemaId": {
+                    "type": "string",
+                    "description": "The tile schema for this basemap (should reference map.tileSchemas.id)"
+                },
+                "layers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "default": ""
+                            },
+                            "layerType": {
+                                "type": "string",
+                                "default": ""
+                            },
+                            "url": {
+                                "type": "string",
+                                "default": ""
+                            },
+                            "opacity": {
+                                "type": "number",
+                                "default": 1,
+                                "description": "Initial opacity"
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": ["id", "layerType", "url"]
+                    },
+                    "minItems": 1,
+                    "description": "A set of URLs which should be composited to form a basemap entry"
+                }
+            },
+            "required": ["id", "layers", "tileSchemaId"],
+            "additionalProperties": false
+        },
+
+        "dqvchartPanel": {
+            "type": "object",
+            "description": "A dqvchart slide component.",
+            "properties": {
+                "json": {
+                    "type": "object",
+                    "description": "The JSON object defining the dqvchart."
+                },
+                "width": {
+                    "type": "number",
+                    "description": "The width of the chart"
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The height of the chart"
+                },
+                "expandable": {
+                    "type": "boolean",
+                    "description": "Determines whether the panel can be expanded.",
+                    "default": false
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["dqv"]
+                }
+            },
+            "required": ["json", "type"]
+        },
+
+        "multimediaImage": {
+            "type": "object",
+            "description": "A multimedia image component.",
+            "properties": {
+                "width": {
+                    "type": "number",
+                    "description": "The image width."
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The image height."
+                },
+                "src": {
+                    "type": "string",
+                    "description": "The source for the image."
+                },
+                "altText": {
+                    "type": "string",
+                    "description": "The supporting text for the image."
+                },
+                "tooltip": {
+                    "type": "string",
+                    "description": "Tooltip content for the image."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["image"]
+                }
+            },
+            "required": ["src", "type"]
+        },
+
+        "multimediaVideo": {
+            "type": "object",
+            "description": "A multimedia video component.",
+            "properties": {
+                "width": {
+                    "type": "number",
+                    "description": "The image width."
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The image height."
+                },
+                "src": {
+                    "type": "string",
+                    "description": "** TODO: the plan just has 'type' here, how do we want to distinguish mp4 vs youtube, etc?"
+                },
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the video."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["video"]
+                }
+            },
+            "required": ["src", "type"]
+        },
+
+        "multimediaAudio": {
+            "type": "object",
+            "description": "A multimedia audio component.",
+            "properties": {
+                "src": {
+                    "type": "string",
+                    "description": "** TODO: the plan just has 'type' here, how do we want to distinguish mp3, wav, etc?"
+                },
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the audio."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["audio"]
+                }
+            },
+            "required": ["src", "type"]
+        },
+
+        "multimediaSlideshow": {
+            "type": "object",
+            "description": "A multimedia slideshow component.",
+            "properties": {
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/multimediaImage"
+                    },
+                    "description": "An array of images to display in the slideshow.",
+                    "minItems": 1
+                },
+                "loop": {
+                    "type": "boolean",
+                    "description": "Determines whether the slideshow loops back around to the beginning when you reach the end.",
+                    "default": false
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["slideshow"]
+                }
+            },
+            "required": ["images", "type"]
+        }
+    },
+
+    "properties": {
+        "introSlide": {
+            "type": "object",
+            "description": "The introductory slide",
+            "properties": {
+                "logo": {
+                    "type": "object",
+                    "description": "Information about the StoryRAMP logo",
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "description": "An image source that is displayed at the top of the slide"
+                        },
+                        "altText": {
+                            "type": "string",
+                            "description": "Alt text for the logo"
+                        }
+                    },
+                    "required": ["src"]
+                },
+                "title": {
+                    "type": "string",
+                    "description": "The title of the project, displayed under the image"
+                },
+                "subtitle": {
+                    "type": "string",
+                    "description": "An optional subtitle that is displayed under the title."
+                },
+                "blurb": {
+                    "type": "string",
+                    "description": "Any additional information to display on the introductory slide."
+                }
+            },
+            "required": ["logo", "title"]
+        },
+
+        "slides": {
+            "type": "array",
+            "description": "A list of StoryRAMP slides. A minimum of one slide is required.",
+            "items": {
+                "$ref": "#/$defs/slide"
+            },
+            "minItems": 1
+        },
+
+        "contextLink": {
+            "type": "string",
+            "description": "A link pointing to the source information"
+        },
+
+        "contextLabel": {
+            "type": "string",
+            "description": "A description that explains the context link."
+        },
+
+        "lang": {
+            "type": "string",
+            "description": "The language to display in the app",
+            "enum": ["en", "fr"]
+        }
+    },
+
+    "required": ["introSlide", "slides"]
+}
