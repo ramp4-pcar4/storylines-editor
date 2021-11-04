@@ -34,7 +34,9 @@
                 />
             </svg>
 
-            <h1 class="m-10 text-5xl font-bold text-gray-800">{{ story.title }}</h1>
+            <h1 class="m-10 text-5xl font-bold text-gray-800">
+                {{ story.title }}
+            </h1>
             <p class="w-1/2 m-auto text-2xl font-semibold text-gray-500">
                 {{ story.subTitle }}
             </p>
@@ -70,20 +72,27 @@
         </main>
 
         <footer class="p-8 text-center">
-            2021 - Design by <span class="font-semibold text-accent-blue">BeSD UX Team</span>
+            2021 - Design by
+            <span class="font-semibold text-accent-blue">BeSD UX Team</span>
         </footer>
+
+        <div class="w-3/4 pb-10" style="margin: 0 auto">
+            <slide></slide>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import StoryV from '@/components/story.vue';
+import SlideV from '@/components/slide.vue';
 
 import story, { StoryConfig } from '@/story-config';
 
 @Component({
     components: {
-        StoryV
+        StoryV,
+        slide: SlideV
     }
 })
 export default class App extends Vue {
