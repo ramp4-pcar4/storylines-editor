@@ -6,14 +6,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import TextPanelV from './text-panel.vue';
 
-enum panelTypes {
-    'text',
-    'map',
-    'multimedia',
-    'dqvchart'
-}
+import { PanelType, BasePanel } from '@/definitions';
+import TextPanelV from './text-panel.vue';
 
 @Component({
     components: {
@@ -21,17 +16,21 @@ enum panelTypes {
     }
 })
 export default class PanelV extends Vue {
-    @Prop() config!: any; // TODO: replace with a proper TypeScript type
+    @Prop() config!: BasePanel;
 
     /**
      * Returns the corresponding component for this panel.
      */
-    getTemplate() {
+    getTemplate(): string {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const panelTemplates: any = {
-            text: TextPanelV,
-            [panelTypes.map]: undefined,
-            [panelTypes.multimedia]: undefined,
-            [panelTypes.dqvchart]: undefined
+            [PanelType.Text]: TextPanelV,
+            [PanelType.Map]: undefined,
+            [PanelType.Image]: undefined,
+            [PanelType.Audio]: undefined,
+            [PanelType.Video]: undefined,
+            [PanelType.Slideshow]: undefined,
+            [PanelType.Chart]: undefined
         };
 
         return panelTemplates[this.config.type];

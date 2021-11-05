@@ -13,12 +13,7 @@ import Scrollama from 'vue-scrollama';
 import MarkdownIt from 'markdown-it';
 
 import { Component, Prop, Vue } from 'vue-property-decorator';
-
-interface TextPanelConfig {
-    title: string;
-    type: string;
-    content: string; // in md format
-}
+import { TextPanel } from '@/definitions';
 
 @Component({
     components: {
@@ -26,7 +21,7 @@ interface TextPanelConfig {
     }
 })
 export default class TextPanelV extends Vue {
-    @Prop() config!: TextPanelConfig;
+    @Prop() config!: TextPanel;
 
     md = new MarkdownIt();
 }

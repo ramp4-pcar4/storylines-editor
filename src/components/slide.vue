@@ -6,7 +6,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+
 import PanelV from './panels/panel.vue';
+import { Slide } from '@/definitions';
 
 @Component({
     components: {
@@ -14,7 +16,7 @@ import PanelV from './panels/panel.vue';
     }
 })
 export default class SlideV extends Vue {
-    @Prop() config!: any; // TODO: replace with a proper TypeScript type
+    @Prop() config!: Slide;
 
     // TODO: remove this. For demo purposes.
     beforeMount() {
