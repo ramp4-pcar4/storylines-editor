@@ -493,6 +493,10 @@
                     "description": "Determines whether the slideshow loops back around to the beginning when you reach the end.",
                     "default": false
                 },
+                "caption": {
+                    "type": "text",
+                    "description": "A caption to display below the slideshow."
+                },
                 "type": {
                     "type": "string",
                     "enum": ["slideshow"]

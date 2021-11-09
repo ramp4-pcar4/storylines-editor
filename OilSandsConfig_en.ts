@@ -273,34 +273,36 @@ While the tailings reported by these mines have large amounts of manganese, ammo
                 {
                     images: [
                         {
-                            src: './images/09-01-tailings.jpg',
+                            src: 'images/09-01-tailings.jpg',
                             type: 'image'
                         },
                         {
-                            src: './images/09-02-tailings.jpg',
+                            src: 'images/09-02-tailings.jpg',
                             type: 'image'
                         },
                         {
-                            src: './images/09-03-tailings.jpg',
+                            src: 'images/09-03-tailings.jpg',
                             type: 'image'
                         },
                         {
-                            src: './images/09-04-tailings.jpg',
+                            src: 'images/09-04-tailings.jpg',
                             type: 'image'
                         },
                         {
-                            src: './images/09-05-tailings.jpg',
+                            src: 'images/09-05-tailings.jpg',
                             type: 'image'
                         },
                         {
-                            src: './images/09-06-tailings.jpg',
+                            src: 'images/09-06-tailings.jpg',
                             type: 'image'
                         },
                         {
-                            src: './images/09-07-tailings.jpg',
+                            src: 'images/09-07-tailings.jpg',
                             type: 'image'
                         }
                     ],
+                    loop: true,
+                    caption: 'This is example caption text for a slideshow panel.',
                     type: 'slideshow'
                 }
             ]
