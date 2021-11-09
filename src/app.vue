@@ -77,7 +77,7 @@
         </footer>
 
         <div class="w-3/4 pb-10" style="margin: 0 auto">
-            <slide></slide>
+            <slide v-for="(story, idx) in config.slides" :key="idx" :config="story"></slide>
         </div>
     </div>
 </template>
@@ -88,6 +88,8 @@ import StoryV from '@/components/story.vue';
 import SlideV from '@/components/slide.vue';
 
 import story, { StoryConfig } from '@/story-config';
+import config from '../OilSandsConfig_en';
+import { StoryRampConfig } from './definitions';
 
 @Component({
     components: {
@@ -97,6 +99,7 @@ import story, { StoryConfig } from '@/story-config';
 })
 export default class App extends Vue {
     story: StoryConfig = story;
+    config: StoryRampConfig = config;
 }
 </script>
 
