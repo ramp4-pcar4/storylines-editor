@@ -60,7 +60,7 @@
                     "enum": ["text"]
                 }
             },
-            "required": ["content", "type"]
+            "required": ["content", "type", "title"]
         },
 
         "multimediaPanel": {
@@ -415,6 +415,10 @@
                 "altText": {
                     "type": "string",
                     "description": "The supporting text for the image."
+                },
+                "class": {
+                    "type": "string",
+                    "description": "Styling class properties for the image."
                 },
                 "tooltip": {
                     "type": "string",
