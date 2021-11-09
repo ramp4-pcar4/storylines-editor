@@ -72,6 +72,7 @@ export interface AudioPanel extends BasePanel {
 export interface SlideshowPanel extends BasePanel {
     images: ImagePanel[];
     loop?: boolean;
+    caption?: string;
     type: PanelType.Slideshow;
 }
 
