@@ -9,6 +9,12 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 
 import { PanelType, BasePanel } from '@/definitions';
 import TextPanelV from './text-panel.vue';
+import MapPanelV from './map-panel.vue';
+import ImagePanelV from './image-panel.vue';
+import AudioPanelV from './audio-panel.vue';
+import VideoPanelV from './video-panel.vue';
+import SlideshowPanelV from './slideshow-panel.vue';
+import ChartPanelV from './chart-panel.vue';
 
 @Component({
     components: {
@@ -25,13 +31,15 @@ export default class PanelV extends Vue {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const panelTemplates: any = {
             [PanelType.Text]: TextPanelV,
-            [PanelType.Map]: undefined,
-            [PanelType.Image]: undefined,
-            [PanelType.Audio]: undefined,
-            [PanelType.Video]: undefined,
-            [PanelType.Slideshow]: undefined,
-            [PanelType.Chart]: undefined
+            [PanelType.Map]: MapPanelV,
+            [PanelType.Image]: ImagePanelV,
+            [PanelType.Audio]: AudioPanelV,
+            [PanelType.Video]: VideoPanelV,
+            [PanelType.Slideshow]: SlideshowPanelV,
+            [PanelType.Chart]: ChartPanelV
         };
+
+        console.log(this.config.type, panelTemplates[this.config.type]);
 
         return panelTemplates[this.config.type];
     }
