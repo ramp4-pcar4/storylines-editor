@@ -32,6 +32,7 @@ export enum PanelType {
 
 export interface BasePanel {
     type: string;
+    width?: number;
 }
 
 export interface TextPanel extends BasePanel {

@@ -1,6 +1,6 @@
 <template>
-    <div class="text-center inline-block h-full align-middle">
-        <img :src="config.src" :class="config.class" :alt="config.altText" class="block my-8 bg-gray-200 max-w-full" />
+    <div class="justify-center flex h-full align-middle py-5">
+        <img :src="config.src" :class="config.class" :alt="config.altText" class="px-10 my-8 block max-w-full" />
     </div>
 </template>
 
