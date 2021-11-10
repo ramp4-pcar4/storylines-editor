@@ -76,7 +76,7 @@
             <span class="font-semibold text-accent-blue">BeSD UX Team</span>
         </footer>
 
-        <div class="w-3/4 pb-10" style="margin: 0 auto">
+        <div class="w-full pb-10" style="margin: 0 auto">
             <slide v-for="(story, idx) in config.slides" :key="idx" :config="story"></slide>
         </div>
     </div>

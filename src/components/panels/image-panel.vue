@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-gray-100 text-center inline-block h-full align-middle">
-        <h1 class="align-middle">Temporary Image Panel</h1>
+    <div class="justify-center flex h-full align-middle py-5">
+        <img :src="config.src" :class="config.class" :alt="config.altText" class="px-10 my-8 block max-w-full" />
     </div>
 </template>
 

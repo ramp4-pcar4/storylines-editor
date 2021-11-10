@@ -12,7 +12,7 @@ export interface Intro {
         altText?: string;
     };
     title: string;
-    subtitle: string;
+    subtitle?: string;
     blurb?: string;
 }
 
@@ -32,56 +32,58 @@ export enum PanelType {
 
 export interface BasePanel {
     type: string;
+    width?: number;
 }
 
 export interface TextPanel extends BasePanel {
-    title?: string;
     type: PanelType.Text;
+    title: string;
     content: string; // in md format
 }
 
 export interface MapPanel extends BasePanel {
+    type: PanelType.Map;
     config: any; // TODO: replace with proper Typescript type
     expandable?: boolean;
-    type: PanelType.Map;
 }
 
 export interface ImagePanel extends BasePanel {
+    type: PanelType.Image;
+    src: string;
     width?: number;
     height?: number;
-    src: string;
+    class?: string;
     altText?: string;
     tooltip?: string;
-    type: PanelType.Image;
 }
 
 export interface VideoPanel extends BasePanel {
+    type: PanelType.Video;
     width?: number;
     height?: number;
     src: string;
     caption?: string;
-    type: PanelType.Video;
 }
 
 export interface AudioPanel extends BasePanel {
+    type: PanelType.Audio;
     src: string;
     caption?: string;
-    type: PanelType.Audio;
 }
 
 export interface SlideshowPanel extends BasePanel {
+    type: PanelType.Slideshow;
     images: ImagePanel[];
     loop?: boolean;
     caption?: string;
-    type: PanelType.Slideshow;
 }
 
 export interface ChartPanel extends BasePanel {
+    type: PanelType.Chart;
     json: string;
     width?: number;
     height?: number;
     expandable?: boolean;
-    type: PanelType.Chart;
 }
 
 // TODO: add more definitions here as needed
