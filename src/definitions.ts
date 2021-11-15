@@ -17,6 +17,9 @@ export interface Intro {
 }
 
 export interface Slide {
+    title: string;
+    // tuple definition to restrict array size
+    // panel: [BasePanel, BasePanel | undefined];
     panel: BasePanel[];
 }
 

@@ -9,11 +9,15 @@
             "type": "object",
             "description": "A universal StoryRAMP slide",
             "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title for the slide."
+                },
                 "panel": {
                     "$ref": "#/$defs/panel"
                 }
             },
-            "required": ["panel"]
+            "required": ["title", "panel"]
         },
 
         "panel": {
@@ -49,7 +53,7 @@
             "properties": {
                 "title": {
                     "type": "string",
-                    "description": "The title for the text slide."
+                    "description": "The title for the text panel."
                 },
                 "content": {
                     "type": "string",
