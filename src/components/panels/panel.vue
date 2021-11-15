@@ -40,8 +40,6 @@ export default class PanelV extends Vue {
             [PanelType.Chart]: ChartPanelV
         };
 
-        console.log(this.config.type, panelTemplates[this.config.type]);
-
         return panelTemplates[this.config.type];
     }
 }
