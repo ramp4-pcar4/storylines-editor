@@ -6,8 +6,7 @@
                     <span class="text-lg">{{ story.title }}</span>
                 </div>
                 <div class="flex justify-end flex-auto space-x-6">
-                    <a href="#">Sharepoint</a>
-                    <a href="https://github.com/ramp4-pcar4/story-ramp">Github</a>
+                    <!-- Any links we want in the header can go here -->
                 </div>
             </div>
         </header>
@@ -71,9 +70,13 @@
             <StoryV :value="story" />
         </main>
 
-        <footer class="p-8 text-center">
-            2021 - Design by
-            <span class="font-semibold text-accent-blue">BeSD UX Team</span>
+        <footer class="p-8 pt-2 text-right">
+            <a
+                href="https://github.com/ramp4-pcar4/story-ramp"
+                target="_NEW"
+                class="font-semibold text-blue-500 text-sm"
+                >ramp4-pcar4/story-ramp</a
+            >
         </footer>
 
         <div class="w-full pb-10" style="margin: 0 auto">
