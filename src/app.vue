@@ -3,7 +3,7 @@
         <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
             <div class="flex w-full px-6 py-3 mx-auto max-w-9xl">
                 <div class="flex-none font-semibold">
-                    <span class="text-lg">{{ story.title }}</span>
+                    <span class="text-lg">{{ config.introSlide.title }}</span>
                 </div>
                 <div class="flex justify-end flex-auto space-x-6">
                     <!-- Any links we want in the header can go here -->
@@ -34,10 +34,10 @@
             </svg>
 
             <h1 class="m-10 text-5xl font-bold text-gray-800">
-                {{ story.title }}
+                {{ config.introSlide.title }}
             </h1>
             <p class="w-1/2 m-auto text-2xl font-semibold text-gray-500">
-                {{ story.subTitle }}
+                {{ config.introSlide.subtitle }}
             </p>
 
             <a href="#story" class="inline-block mt-10 scroll-arrow" title="scroll to story" v-smooth-scroll>
@@ -66,9 +66,13 @@
             </a>
         </div>
 
-        <main class="w-full mx-auto max-w-9xl" id="story">
+        <!-- <main class="w-full mx-auto max-w-9xl" id="story">
             <StoryV :value="story" />
-        </main>
+        </main> -->
+
+        <div class="w-full mx-auto max-w-9xl pb-10" id="story">
+            <StoryV :config="config" />
+        </div>
 
         <footer class="p-8 pt-2 text-right">
             <a
@@ -78,30 +82,22 @@
                 >ramp4-pcar4/story-ramp</a
             >
         </footer>
-
-        <div class="w-full pb-10" style="margin: 0 auto">
-            <slide v-for="(story, idx) in config.slides" :key="idx" :config="story"></slide>
-        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import StoryV from '@/components/story.vue';
-import SlideV from '@/components/slide.vue';
+import StoryV from '@/components/story/story.vue';
 
-import story, { StoryConfig } from '@/story-config';
 import config from '../OilSandsConfig_en';
-import { StoryRampConfig } from './definitions';
+import { StoryRampConfig } from '@/definitions';
 
 @Component({
     components: {
-        StoryV,
-        slide: SlideV
+        StoryV
     }
 })
 export default class App extends Vue {
-    story: StoryConfig = story;
     config: StoryRampConfig = config;
 }
 </script>

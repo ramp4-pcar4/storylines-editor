@@ -31,17 +31,13 @@
         </div>
 
         <ul class="menu">
-            <li
-                v-for="(chapter, index) in chapters"
-                :key="index"
-                :class="{ 'is-active': activeChapterIndex === index }"
-            >
-                <tippy :to="`menu-options-tippy-${index}`" delay="200" placement="right" v-if="!isMenuOpen">{{
-                    chapter.title
+            <li v-for="(slide, idx) in slides" :key="idx" :class="{ 'is-active': activeChapterIndex === idx }">
+                <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right" v-if="!isMenuOpen">{{
+                    slide.title
                 }}</tippy>
                 <a
-                    :name="`menu-options-tippy-${index}`"
-                    :href="`#${chapter.title.toLowerCase().replaceAll(' ', '-')}`"
+                    :name="`menu-options-tippy-${idx}`"
+                    :href="`#${slide.title.toLowerCase().replaceAll(' ', '-')}`"
                     class="flex items-center px-2 py-1 mx-1"
                     v-smooth-scroll
                 >
@@ -60,7 +56,7 @@
                         />
                     </svg>
                     <span class="flex-1 ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap">{{
-                        chapter.title
+                        slide.title
                     }}</span>
                 </a>
             </li>
@@ -69,12 +65,12 @@
 </template>
 
 <script lang="ts">
-import { ChapterConfig } from '@/story-config';
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Slide } from '@/definitions';
 
 @Component
 export default class ChapterMenuV extends Vue {
-    @Prop() chapters!: ChapterConfig[];
+    @Prop() slides!: Slide[];
     @Prop() activeChapterIndex!: number;
 
     isMenuOpen = false;
