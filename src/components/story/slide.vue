@@ -6,7 +6,7 @@
             :config="panel"
             :index="idx"
             :ratio="defaultRatio"
-            :id="id"
+            :slideIdx="slideIdx"
         ></panel>
     </div>
 </template>
@@ -24,7 +24,7 @@ import { PanelType, Slide } from '@/definitions';
 })
 export default class SlideV extends Vue {
     @Prop() config!: Slide;
-    @Prop() id!: number;
+    @Prop() slideIdx!: number;
 
     defaultRatio = false;
 

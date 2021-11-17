@@ -1,5 +1,5 @@
 <template>
-    <div :id="`ramp-map-${id}`" class="w-full bg-gray-200 rv-map h-story">
+    <div :id="`ramp-map-${slideIdx}`" class="w-full bg-gray-200 rv-map h-story">
         <div class="flex items-center justify-center w-full h-full map-loading">
             <svg class="animate-pulse w-52" viewBox="0 0 100 82.202" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -19,7 +19,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 @Component({})
 export default class MapPanelV extends Vue {
     @Prop() config!: MapPanel;
-    @Prop() id!: number;
+    @Prop() slideIdx!: number;
 
     intersectTimeoutHandle = -1;
 
