@@ -8,6 +8,7 @@ const config = {
     },
     slides: [
         {
+            title: 'Overview',
             panel: [
                 {
                     title: 'Overview',
@@ -23,6 +24,7 @@ Businesses, institutions and other facilities across Canada must report their re
             ]
         },
         {
+            title: 'Oil sands deposits',
             panel: [
                 {
                     title: 'Oil sands deposits',
@@ -90,6 +92,7 @@ This map shows the three oil sands areas. The actual geological deposits themsel
             ]
         },
         {
+            title: 'Oil sands extraction',
             panel: [
                 {
                     title: 'Oil sands extraction',
@@ -107,6 +110,7 @@ Surface mining involves digging up large areas with large excavators. The result
             ]
         },
         {
+            title: 'In-situ extraction',
             panel: [
                 {
                     title: 'In-situ extraction',
@@ -122,6 +126,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
             ]
         },
         {
+            title: 'Where are facilities located?',
             panel: [
                 {
                     title: 'Where are facilities located?',
@@ -176,6 +181,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
             ]
         },
         {
+            title: 'NPRI substances reported for oil sands mining facilities',
             panel: [
                 {
                     title: 'NPRI substances reported for oil sands mining facilities',
@@ -241,6 +247,7 @@ Satellite imagery as of 2011.`,
             ]
         },
         {
+            title: 'Criteria air contaminant releases from oil sands mines',
             panel: [
                 {
                     title: 'Criteria air contaminant releases from oil sands mines',
@@ -254,6 +261,7 @@ Satellite imagery as of 2011.`,
             ]
         },
         {
+            title: 'Mine tailings reported',
             panel: [
                 {
                     title: 'Mine tailings reported',
@@ -308,6 +316,7 @@ While the tailings reported by these mines have large amounts of manganese, ammo
             ]
         },
         {
+            title: 'Reported mine tailings from oil sands surface mining facilities',
             panel: [
                 {
                     title: 'Reported mine tailings from oil sands surface mining facilities',
@@ -366,6 +375,7 @@ Satellite imagery as of 2011.`,
             ]
         },
         {
+            title: 'Trends in mine tailings reported from surface mining facilities',
             panel: [
                 {
                     title: 'Trends in mine tailings reported from surface mining facilities',
@@ -412,6 +422,7 @@ Satellite imagery as of 2011.`,
             ]
         },
         {
+            title: 'Thermal in situ facilities',
             panel: [
                 {
                     title: 'Thermal in situ facilities',
@@ -429,6 +440,7 @@ Compared to surface mining, thermal in-situ operations are much more energy inte
             ]
         },
         {
+            title: 'NPRI releases from thermal in-situ facilities',
             panel: [
                 {
                     title: 'NPRI releases from thermal in-situ facilities',
@@ -484,6 +496,7 @@ The air releases reported by thermal in-situ facilities is almost entirely (99%)
             ]
         },
         {
+            title: 'Trends in NPRI substances released from in-situ facilities',
             panel: [
                 {
                     title: 'Trends in NPRI substances released from in-situ facilities',
@@ -533,6 +546,7 @@ This change in the number of facilities reporting over time follows changes in t
             ]
         },
         {
+            title: 'NPRI releases from thermal in-situ facilities - Part 2',
             panel: [
                 {
                     title: 'NPRI releases from thermal in-situ facilities - Part 2',
@@ -550,6 +564,7 @@ While thermal in-situ facilities have reported an increase in reported CAC emiss
             ]
         },
         {
+            title: 'Managing environmental impacts',
             panel: [
                 {
                     title: 'Managing environmental impacts',
@@ -569,6 +584,7 @@ Oil sands surface mining facilities in Alberta take much of their water from the
             ]
         },
         {
+            title: 'Pollution in your neighbourhood',
             panel: [
                 {
                     title: 'Pollution in your neighbourhood',

@@ -1,26 +1,15 @@
 <template>
     <div class="flex items-stretch">
-        <ChapterMenuV :active-chapter-index="activeChapterIndex" :chapters="value.chapters" />
+        <ChapterMenuV :active-chapter-index="activeChapterIndex" :slides="config.slides" />
 
         <Scrollama class="relative story-scrollama" @step-enter="stepEnter">
             <div
-                v-for="(chapter, index) in value.chapters"
-                :key="index"
+                v-for="(slide, idx) in config.slides"
+                :key="idx"
                 class="flex pt-24"
-                :data-chapter-index="index"
-                :id="chapter.title.toLowerCase().replaceAll(' ', '-')"
+                :id="slide.title.toLowerCase().replaceAll(' ', '-')"
             >
-                <ChapterV :value="chapter" :chapter-index="index" />
-
-                <div class="sticky flex self-start justify-center flex-2 top-16">
-                    <component
-                        v-if="chapter.graphic"
-                        :is="chapter.graphic.type"
-                        :payload="chapter.graphic.payload"
-                        :chapter-index="index"
-                        :active-chapter-index="activeChapterIndex"
-                    ></component>
-                </div>
+                <slide :config="slide"></slide>
             </div>
         </Scrollama>
     </div>
@@ -29,26 +18,25 @@
 <script lang="ts">
 import 'intersection-observer';
 import Scrollama from 'vue-scrollama';
-import ChapterV from '@/components/chapter.vue';
-import ChapterMenuV from '@/components/chapter-menu.vue';
-
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
-import { StoryConfig } from '@/story-config';
+import ChapterMenuV from './chapter-menu.vue';
+import SlideV from './slide.vue';
+import { StoryRampConfig } from '@/definitions';
 
 @Component({
     components: {
         Scrollama,
-        ChapterV,
-        ChapterMenuV
+        ChapterMenuV,
+        slide: SlideV
     }
 })
 export default class StoryV extends Vue {
-    @Prop() value!: StoryConfig;
+    @Prop() config!: StoryRampConfig;
 
     activeChapterIndex = -1;
 
-    stepEnter({ element, index }: { element: HTMLElement; index: number }): void {
+    stepEnter({ element }: { element: HTMLElement }): void {
         this.activeChapterIndex = parseInt(element.dataset.chapterIndex || '-1');
     }
 }
