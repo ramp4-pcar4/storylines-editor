@@ -42,51 +42,7 @@ This map shows the three oil sands areas. The actual geological deposits themsel
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmin: -2036967.8855660555,
-                            ymin: 225988.15031441953,
-                            xmax: -430249.8990248912,
-                            ymax: 1630799.2940631039
-                        },
-                        basemap: {
-                            id: 'baseNrCan',
-                            layers: [
-                                {
-                                    id: 'CBMT',
-                                    layerType: 'esriFeature',
-                                    url:
-                                        'https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978'
-                        },
-                        layers: [
-                            {
-                                id: '0',
-                                layerType: 'esriDynamic',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/oilsands_polys/MapServer',
-                                singleEntryCollapse: true,
-                                layerEntries: [
-                                    {
-                                        index: 0
-                                    },
-                                    {
-                                        index: 1
-                                    },
-                                    {
-                                        index: 2
-                                    }
-                                ]
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            overview: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/OilSandsDeposits.json',
                     type: 'map'
                 }
             ]
@@ -142,40 +98,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmax: -10875269.150822684,
-                            xmin: -16442330.794887159,
-                            ymax: 9124722.042838877,
-                            ymin: 5700343.175663892
-                        },
-                        basemap: {
-                            id: 'baseEsriTopo',
-                            layers: [
-                                {
-                                    id: 'World_Topo_Map',
-                                    layerType: 'esriFeature',
-                                    url:
-                                        'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857'
-                        },
-                        layers: [
-                            {
-                                id: 'OilSandsFacilityLocations2017',
-                                name: 'Oil Sands Facility Locations - 2017',
-                                layerType: 'esriFeature',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/StoryRAMP/MapServer/0'
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            geosearch: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/OilSandsFacilityLocations2017.json',
                     type: 'map'
                 }
             ]
@@ -209,39 +132,7 @@ Satellite imagery as of 2011.`,
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmax: -12272079.405705657,
-                            xmin: -12620020.758459613,
-                            ymax: 7916959.668162176,
-                            ymin: 7702935.9889637865
-                        },
-                        basemap: {
-                            id: 'baseEsriWorld',
-                            layers: [
-                                {
-                                    id: 'World_Imagery',
-                                    layerType: 'esriFeature',
-                                    url: 'http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857'
-                        },
-                        layers: [
-                            {
-                                id: 'ReleasesandDisposalsbyMiningFacilitiesin2017(satellite)',
-                                name: 'Releases and Disposals by Mining Facilities in 2017 (satellite)',
-                                layerType: 'esriFeature',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/StoryRAMP/MapServer/1'
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            geosearch: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/ReleasesandDisposalsbyMiningFacilitiesin2017(satellite).json',
                     type: 'map'
                 }
             ]
@@ -336,40 +227,7 @@ Satellite imagery as of 2011.`,
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmax: -12272079.405705657,
-                            xmin: -12620020.758459613,
-                            ymax: 7916959.668162176,
-                            ymin: 7702935.9889637865
-                        },
-                        basemap: {
-                            id: 'baseEsriTopo',
-                            layers: [
-                                {
-                                    id: 'World_Topo_Map',
-                                    layerType: 'esriFeature',
-                                    url:
-                                        'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857'
-                        },
-                        layers: [
-                            {
-                                id: 'ReleasesandDisposalsbyMiningFacilitiesin2017(topo)',
-                                name: 'Releases and Disposals by Mining Facilities in 2017 (topo)',
-                                layerType: 'esriFeature',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/StoryRAMP/MapServer/1'
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            geosearch: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/ReleasesandDisposalsbyMiningFacilitiesin2017(topo).json',
                     type: 'map'
                 }
             ]
@@ -383,40 +241,7 @@ Satellite imagery as of 2011.`,
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmax: -12272079.405705657,
-                            xmin: -12620020.758459613,
-                            ymax: 7916959.668162176,
-                            ymin: 7702935.9889637865
-                        },
-                        basemap: {
-                            id: 'baseEsriTopo',
-                            layers: [
-                                {
-                                    id: 'World_Topo_Map',
-                                    layerType: 'esriFeature',
-                                    url:
-                                        'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857'
-                        },
-                        layers: [
-                            {
-                                id: 'TailingsfromMiningFacilities2009to2017(timeslider)',
-                                name: 'Tailings from Mining Facilities 2009 to 2017 (time slider)',
-                                layerType: 'esriFeature',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/StoryRAMP/MapServer/3'
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            geosearch: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/TailingsfromMiningFacilities2009to2017(timeslider).json',
                     type: 'map'
                 }
             ]
@@ -457,40 +282,7 @@ The air releases reported by thermal in-situ facilities is almost entirely (99%)
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmax: -11484319.392198805,
-                            xmin: -14267850.214231044,
-                            ymax: 8349344.827914256,
-                            ymin: 6637155.394326762
-                        },
-                        basemap: {
-                            id: 'baseEsriTopo',
-                            layers: [
-                                {
-                                    id: 'World_Topo_Map',
-                                    layerType: 'esriFeature',
-                                    url:
-                                        'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857'
-                        },
-                        layers: [
-                            {
-                                id: 'ReleasestoAirbyInSituFacilitiesforAllSubstancesin2017',
-                                name: 'Releases to Air by In Situ Facilities for All Substances in 2017',
-                                layerType: 'esriFeature',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/StoryRAMP/MapServer/4'
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            geosearch: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/ReleasestoAirbyInSituFacilitiesforAllSubstancesin2017.json',
                     type: 'map'
                 }
             ]
@@ -506,41 +298,7 @@ This change in the number of facilities reporting over time follows changes in t
                     type: 'text'
                 },
                 {
-                    config: {
-                        extent: {
-                            xmax: -11484319.392198805,
-                            xmin: -14267850.214231044,
-                            ymax: 8349344.827914256,
-                            ymin: 6637155.394326762
-                        },
-                        basemap: {
-                            id: 'baseEsriTopo',
-                            layers: [
-                                {
-                                    id: 'World_Topo_Map',
-                                    layerType: 'esriFeature',
-                                    url:
-                                        'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer'
-                                }
-                            ],
-                            tileSchemaId: 'EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857'
-                        },
-                        layers: [
-                            {
-                                id: 'ReleasestoAirbyInSituFacilitiesforAllSubstances2009to2017(timeslider)',
-                                name:
-                                    'Releases to Air by In Situ Facilities for All Substances 2009 to 2017 (time slider)',
-                                layerType: 'esriFeature',
-                                url:
-                                    'https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/StoryRAMP/MapServer/4'
-                            }
-                        ],
-                        toggles: {
-                            basemap: false,
-                            geosearch: false,
-                            legendOpen: false
-                        }
-                    },
+                    config: './configs/ReleasestoAirbyInSituFacilitiesforAllSubstances2009to2017(timeslider).json',
                     type: 'map'
                 }
             ]

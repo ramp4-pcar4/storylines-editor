@@ -1,6 +1,6 @@
 <template>
     <div :class="ratio && config.type !== 'text' ? 'flex-2' : 'flex'" class="flex-col">
-        <component :is="getTemplate()" :config="config"></component>
+        <component :is="getTemplate()" :config="config" :slideIdx="slideIdx"></component>
     </div>
 </template>
 
@@ -24,6 +24,7 @@ import ChartPanelV from './chart-panel.vue';
 export default class PanelV extends Vue {
     @Prop() config!: BasePanel;
     @Prop() ratio!: boolean;
+    @Prop() slideIdx!: number;
 
     /**
      * Returns the corresponding component for this panel.
