@@ -103,6 +103,10 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+.ovwContainer .layerTile {
+    max-width: initial;
+}
+
 body {
     font-size: 16px;
 }

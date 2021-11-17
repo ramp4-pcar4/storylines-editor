@@ -9,7 +9,7 @@
                 class="flex pt-24"
                 :id="slide.title.toLowerCase().replaceAll(' ', '-')"
             >
-                <slide :config="slide"></slide>
+                <slide :config="slide" :id="idx"></slide>
             </div>
         </Scrollama>
     </div>
