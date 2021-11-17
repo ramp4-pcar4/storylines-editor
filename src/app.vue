@@ -3,7 +3,7 @@
         <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
             <div class="flex w-full px-6 py-3 mx-auto max-w-9xl">
                 <div class="flex-none font-semibold">
-                    <span class="text-lg">{{ config.introSlide.title }}</span>
+                    <span class="text-lg">{{ config.title }}</span>
                 </div>
                 <div class="flex justify-end flex-auto space-x-6">
                     <!-- Any links we want in the header can go here -->
@@ -11,7 +11,7 @@
             </div>
         </header>
 
-        <div class="py-24 mx-auto text-center max-w-9xl">
+        <div class="py-24 mx-auto text-center max-w-9xl" id="intro">
             <svg
                 class="w-56 h-auto m-auto"
                 width="27.781"

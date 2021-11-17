@@ -31,6 +31,28 @@
         </div>
 
         <ul class="menu">
+            <li>
+                <tippy delay="200" placement="right" v-if="!isMenuOpen">Return to Top</tippy>
+                <a name="return-to-top" href="#intro" class="flex items-center px-2 py-1 mx-1" v-smooth-scroll>
+                    <svg
+                        class="flex-shrink-0"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="#fff"
+                        stroke="#878787"
+                    >
+                        <path
+                            d="m19.325 16.229c-2.4415 1.4096-4.8829 2.8191-7.3244 4.2286-2.4415-1.4096-4.883-2.8192-7.3245-4.2288-3.55e-5 -2.8191-7.1e-5 -5.6383-1.066e-4 -8.4574 2.4415-1.4096 4.8829-2.8191 7.3244-4.2286 2.4415 1.4096 4.883 2.8192 7.3245 4.2288 3.7e-5 2.8191 7.4e-5 5.6383 1.1e-4 8.4574z"
+                            stroke-width=".93974"
+                        />
+                    </svg>
+                    <span class="flex-1 ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap"
+                        >Return to Top</span
+                    >
+                </a>
+            </li>
             <li v-for="(slide, idx) in slides" :key="idx" :class="{ 'is-active': activeChapterIndex === idx }">
                 <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right" v-if="!isMenuOpen">{{
                     slide.title

@@ -1,4 +1,5 @@
 const config = {
+    title: 'NPRI Sector Overview: Oil Sands Extraction',
     introSlide: {
         logo: {
             src: '' // TODO

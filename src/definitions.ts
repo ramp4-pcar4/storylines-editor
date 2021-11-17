@@ -1,4 +1,5 @@
 export interface StoryRampConfig {
+    title: string;
     lang: string;
     introSlide: Intro;
     slides: Slide[];
