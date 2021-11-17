@@ -74,11 +74,13 @@
             <StoryV :config="config" />
         </div>
 
-        <footer class="p-8 pt-2 text-right">
-            <a
-                href="https://github.com/ramp4-pcar4/story-ramp"
-                target="_NEW"
-                class="font-semibold text-blue-500 text-sm"
+        <footer class="p-8 pt-2 text-right text-sm">
+            Context:
+            <a class="text-blue-500 font-semibold" :href="config.contextLink" target="_NEW">{{
+                config.contextLabel
+            }}</a>
+            |
+            <a href="https://github.com/ramp4-pcar4/story-ramp" target="_NEW" class="font-semibold text-blue-500"
                 >ramp4-pcar4/story-ramp</a
             >
         </footer>
