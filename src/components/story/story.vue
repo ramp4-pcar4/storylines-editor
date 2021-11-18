@@ -5,8 +5,9 @@
         <Scrollama class="relative story-scrollama" @step-enter="stepEnter">
             <div
                 v-for="(slide, idx) in config.slides"
-                :key="idx"
                 class="flex pt-24"
+                :key="idx"
+                :data-chapter-index="idx"
                 :id="slide.title.toLowerCase().replaceAll(' ', '-')"
             >
                 <slide :config="slide" :slideIdx="idx"></slide>
@@ -44,10 +45,6 @@ export default class StoryV extends Vue {
 
 <style lang="scss" scoped>
 .story-scrollama {
-    // bg-gray-50
-    // background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
-    // --tw-bg-opacity: 1;
-
     background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
     // background: linear-gradient(to right, var(--sr-content-background) 40%, #fff 40%);
 
@@ -56,9 +53,6 @@ export default class StoryV extends Vue {
 
     // border-gray-200
     border-color: var(--sr-border-colour);
-
-    // ref: shadow-md
-    //--tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     // on the left
     &::before {
@@ -69,7 +63,6 @@ export default class StoryV extends Vue {
         left: 0;
         // modified tailwind shadow
         box-shadow: -3px 0px 6px 0px rgba(0, 0, 0, 0.1), -2px 0 4px 0px rgba(0, 0, 0, 0.06);
-        //box-shadow: 0 -4px 6px grey;
     }
 
     // above
@@ -81,7 +74,6 @@ export default class StoryV extends Vue {
         top: 0;
         // modified tailwind shadow
         box-shadow: 0 -3px 6px 0px rgba(0, 0, 0, 0.1), 0 -2px 4px 0px rgba(0, 0, 0, 0.06);
-        //box-shadow: 0 -4px 6px grey;
     }
 
     // below
@@ -91,7 +83,6 @@ export default class StoryV extends Vue {
         width: 100%;
         height: 1px;
         bottom: 0;
-        // box-shadow: 0 4px 6px grey;
         box-shadow: 0 3px 6px 0px rgba(0, 0, 0, 0.1), 0 2px 4px 0px rgba(0, 0, 0, 0.06);
     }
 }
