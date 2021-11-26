@@ -374,6 +374,21 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
                     type: 'text'
                 }
             ]
+        },
+        // TODO: remove temporary sample test for chart panels
+        {
+            title: 'DQV Chart',
+            panel: [
+                {
+                    title: 'DQV Chart',
+                    content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris rhoncus, magna in pulvinar tincidunt, magna velit feugiat sem, nec rhoncus lectus tortor quis turpis. Vivamus erat velit, feugiat at nisl lacinia, pulvinar tempus nunc. Nulla suscipit vulputate dapibus. Fusce tincidunt neque nunc, sed porta lacus elementum vitae. Suspendisse imperdiet interdum ipsum, id aliquet lectus aliquet sit amet. Aliquam erat volutpat. Nulla convallis nisl sodales nunc ullamcorper pulvinar. Nulla ornare justo id sapien porta gravida. Cras condimentum, felis id pretium malesuada, lorem lorem viverra nisi, sit amet molestie mi nulla nec velit. Integer semper lorem scelerisque tellus iaculis finibus. Aliquam efficitur sodales elit nec sodales. Sed vitae ipsum quis eros vulputate luctus.`,
+                    type: 'text'
+                },
+                {
+                    src: './charts/chartConfig.json',
+                    type: 'chart'
+                }
+            ]
         }
     ],
     contextLink:

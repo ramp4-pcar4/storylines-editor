@@ -28,7 +28,7 @@ export enum PanelType {
     Text = 'text',
     Image = 'image',
     Map = 'map',
-    Chart = 'dqv',
+    Chart = 'chart',
     Video = 'video',
     Audio = 'audio',
     Slideshow = 'slideshow'
@@ -84,7 +84,7 @@ export interface SlideshowPanel extends BasePanel {
 
 export interface ChartPanel extends BasePanel {
     type: PanelType.Chart;
-    json: string;
+    src: string;
     width?: number;
     height?: number;
     expandable?: boolean;

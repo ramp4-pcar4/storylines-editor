@@ -10,14 +10,8 @@ import VueTippy, { TippyComponent } from 'vue-tippy';
 Vue.use(VueTippy);
 Vue.component('tippy', TippyComponent);
 
-import ImageGraphicV from '@/components/image-graphic.vue';
-Vue.component('ImageGraphicV', ImageGraphicV);
-
-import MapGraphicV from '@/components/map-graphic.vue';
-Vue.component('MapGraphicV', MapGraphicV);
-
-import HooperGraphicV from '@/components/hooper-graphic.vue';
-Vue.component('HooperGraphicV', HooperGraphicV);
+import HighchartsVue from 'highcharts-vue';
+Vue.use(HighchartsVue);
 
 import VueProgressiveImage from 'vue-progressive-image';
 Vue.use(VueProgressiveImage);

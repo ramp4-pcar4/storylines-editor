@@ -33,7 +33,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import StoryV from '@/components/story/story.vue';
-import IntroV from '@/components/panels/introduction.vue';
+import IntroV from '@/components/story/introduction.vue';
 
 import config from '../OilSandsConfig_en';
 import { StoryRampConfig } from '@/definitions';
