@@ -1,0 +1,707 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Map Config Schema",
+    "type": "object",
+    "additionalProperties": false,
+
+    "$defs": {
+        "spatialReferenceNode": {
+            "type": "object",
+            "properties": {
+                "wkid": {
+                    "type": "number",
+                    "description": "an ESRI well known id denoting a projection"
+                },
+                "latestWkid": {
+                    "type": "number",
+                    "description": "an ESRI well known id denoting a projection"
+                }
+            },
+            "anyOf": [
+                {
+                    "required": ["wkid"]
+                },
+                {
+                    "required": ["latestWkid"]
+                }
+            ],
+            "additionalProperties": false
+        },
+        "extentNode": {
+            "type": "object",
+            "properties": {
+                "xmin": {
+                    "type": "number"
+                },
+                "ymin": {
+                    "type": "number"
+                },
+                "xmax": {
+                    "type": "number"
+                },
+                "ymax": {
+                    "type": "number"
+                }
+            },
+            "required": ["xmin", "ymin", "xmax", "ymax"],
+            "additionalProperties": false
+        },
+        "extentSetNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "spatialReference": {
+                    "$ref": "#/$defs/spatialReferenceNode",
+                    "description": "The projection for the given extents."
+                },
+                "default": {
+                    "$ref": "#/$defs/extentNode",
+                    "description": "The default (starting) extent."
+                }
+            },
+            "required": ["id", "default", "spatialReference"],
+            "additionalProperties": false
+        },
+        "lodSetNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "lods": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "level": {
+                                "type": "number"
+                            },
+                            "resolution": {
+                                "type": "number"
+                            },
+                            "scale": {
+                                "type": "number"
+                            }
+                        },
+                        "required": ["level", "resolution", "scale"],
+                        "additionalProperties": false
+                    },
+                    "description": "Level of details for a specific tile schema"
+                }
+            },
+            "required": ["id", "lods"],
+            "additionalProperties": false
+        },
+        "tileSchemaNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "A unique id identifying a tile schema (combination of an extent set and a zoom scale)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name to display in the basemap selector for the set of basemaps referencing this schema."
+                },
+                "extentSetId": {
+                    "type": "string",
+                    "description": "The extent set to be used for this basemap (should reference map.extentSets.id)."
+                },
+                "lodSetId": {
+                    "type": "string",
+                    "description": "Optional.  The level of details set to be used for this basemap (should reference map.lod.id)."
+                },
+                "hasNorthPole": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicates if the map projection includes a north pole.  Defaults to false to avoid errors."
+                }
+            },
+            "required": ["extentSetId", "lodSetId", "id", "name"],
+            "additionalProperties": false
+        },
+        "exportComponent": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string",
+                    "description": "Value to be passed to the generation function of this export component."
+                }
+            },
+            "description": "This is the initial configuration for an export component.",
+            "additionalProperties": false
+        },
+        "legendExportComponent": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string",
+                    "description": "Value to be passed to the generation function of this export component."
+                },
+                "columnWidth": {
+                    "type": "integer",
+                    "default": 350,
+                    "description": "Value in pixels to be used as the column width for the export legend."
+                }
+            },
+            "description": "This is the initial configuration for a legend export component.",
+            "additionalProperties": false
+        },
+        "dynamicLayerEntryNode": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "number",
+                    "description": "The index of the layer in the map service."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "A descriptive name for the layer, can override the name coming from the service."
+                }
+            },
+            "required": ["index"],
+            "additionalProperties": false
+        },
+        "entry": {
+            "type": "object",
+            "description": "",
+            "properties": {
+                "layerId": {
+                    "type": "string",
+                    "description": "Link to a layer defined in the layers section"
+                },
+                "entryIndex": {
+                    "type": "integer",
+                    "description": "Index of the 'sublayer' in the case of an ESRI dynamic layer.  This cannot point to an entry with stateOnly:true ."
+                },
+                "symbologyExpanded": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicates if symbology stack is expand by default"
+                }
+            },
+            "required": ["layerId"],
+            "additionalProperties": false
+        },
+        "entryGroup": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Title of the group"
+                },
+                "expanded": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/entryGroup"
+                            },
+                            {
+                                "$ref": "#/$defs/entry"
+                            }
+                        ]
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": ["name", "children"],
+            "additionalProperties": false
+        },
+        "legendStructured": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": ["structured"]
+                },
+                "root": {
+                    "$ref": "#/$defs/entryGroup"
+                }
+            },
+            "required": ["type", "root"],
+            "additionalProperties": false
+        },
+        "featureLayerNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The id of the layer for referencing within the viewer (does not relate directly to any external service)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The display name of the layer.  If it is not present the viewer will make an attempt to scrape this information."
+                },
+                "url": {
+                    "type": "string",
+                    "description": "The service endpoint of the layer.  It should match the type provided in layerType."
+                },
+                "layerType": {
+                    "type": "string",
+                    "enum": ["esriFeature"]
+                }
+            },
+            "required": ["id", "layerType", "url"],
+            "additionalProperties": false
+        },
+        "dynamicLayerNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The id of the layer for referencing within the viewer (does not relate directly to any external service)"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The display name of the layer.  If it is not present the viewer will make an attempt to scrape this information."
+                },
+                "url": {
+                    "type": "string",
+                    "description": "The service endpoint of the layer.  It should match the type provided in layerType."
+                },
+                "layerType": {
+                    "type": "string",
+                    "enum": ["esriDynamic"]
+                },
+                "singleEntryCollapse": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicates that the dynamic layer with a single layer entry should be rendered without the root group."
+                },
+                "layerEntries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/dynamicLayerEntryNode"
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": ["id", "layerType", "layerEntries", "url"],
+            "additionalProperties": false
+        },
+        "layerNode": {
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/featureLayerNode"
+                },
+                {
+                    "$ref": "#/$defs/dynamicLayerNode"
+                }
+            ]
+        },
+        "layerList": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/layerNode"
+            },
+            "minItems": 0
+        },
+        "baseMapNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "A unique identifier for the basemap."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the basemap used for labeling."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the basemap. Will be visible when basemap selector is expanded.Description of the basemap. Will be visible when basemap selector is expanded."
+                },
+                "altText": {
+                    "type": "string",
+                    "description": "Alt text for the basemap thumbnail image."
+                },
+                "tileSchemaId": {
+                    "type": "string",
+                    "description": "The tile schema for this basemap (should reference map.tileSchemas.id)"
+                },
+                "layers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "default": ""
+                            },
+                            "layerType": {
+                                "type": "string",
+                                "default": ""
+                            },
+                            "url": {
+                                "type": "string",
+                                "default": ""
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": ["id", "layerType", "url"]
+                    },
+                    "minItems": 1,
+                    "description": "A set of URLs which should be composited to form a basemap entry"
+                }
+            },
+            "required": ["id", "name", "description", "layers", "altText", "tileSchemaId"],
+            "additionalProperties": false
+        },
+        "sideMenuNode": {
+            "type": "object",
+            "properties": {
+                "logo": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Indicates if the logo should be shown in the left side menu."
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/sideMenuButtons"
+                    },
+                    "default": [
+                        ["layers", "basemap"],
+                        ["fullscreen", "export", "share", "touch", "help", "about"],
+                        ["language"],
+                        ["plugins"]
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "description": "Specifies which options are available in the left side menu."
+        },
+        "sideMenuButtons": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "layers",
+                    "basemap",
+                    "geoSearch",
+                    "about",
+                    "fullscreen",
+                    "export",
+                    "share",
+                    "touch",
+                    "help",
+                    "language",
+                    "plugins"
+                ]
+            }
+        },
+        "appBarNode": {
+            "type": "object",
+            "properties": {
+                "geoSearch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Shows the geosearch button in the main app toolbar. The button will be hidden if geosearch component is disabled or no search service URLs are provided."
+                },
+                "basemap": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Shows the basemap selector button in the main app toolbar."
+                }
+            },
+            "additionalProperties": false
+        },
+        "navBarNode": {
+            "type": "object",
+            "description": "Provides configuration to the nav bar. If not supplied the default nav bar buttons are shown.",
+            "properties": {
+                "zoom": {
+                    "type": "string",
+                    "enum": ["all", "buttons", "slider"],
+                    "default": "buttons"
+                },
+                "extra": {
+                    "$ref": "#/$defs/navBarButtons",
+                    "default": ["fullscreen", "geoLocator", "home", "help"]
+                }
+            },
+            "required": ["zoom"],
+            "additionalProperties": false
+        },
+        "navBarButtons": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "geoLocator",
+                    "marquee",
+                    "home",
+                    "history",
+                    "basemap",
+                    "help",
+                    "fullscreen",
+                    "geoSearch",
+                    "sideMenu",
+                    "layers"
+                ]
+            }
+        },
+        "mapComponentsNode": {
+            "type": "object",
+            "properties": {
+                "geoSearch": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "showGraphic": {
+                            "type": "boolean"
+                        },
+                        "showInfo": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "mouseInfo": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "spatialReference": {
+                            "$ref": "#/$defs/spatialReferenceNode"
+                        }
+                    }
+                },
+                "northArrow": {
+                    "type": "object",
+                    "enabled": {
+                        "type": "boolean",
+                        "default": true
+                    }
+                },
+                "overviewMap": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "layerType": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "scaleBar": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "basemap": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "legendUI": {
+            "type": "object",
+            "description": "Specifies options for the legend like reordering, importing, etc.",
+            "properties": {
+                "allowImport": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Specifies if the user-added layers are allowed."
+                },
+                "isOpen": {
+                    "type": "object",
+                    "description": "Specifies whether the legend is opened by default on initial loading of the map for small, medium, and large viewports.",
+                    "properties": {
+                        "large": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Whether the legend is opened by default on initial loading of the map for large viewports."
+                        },
+                        "medium": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Whether the legend is opened by default on initial loading of the map for medium viewports."
+                        },
+                        "small": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Whether the legend is opened by default on initial loading of the map for small viewports."
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "help": {
+            "type": "object",
+            "description": "Specifies details for the Help section.",
+            "properties": {
+                "folderName": {
+                    "type": "string",
+                    "description": "Help folder name which contains the help description and images."
+                }
+            },
+            "required": ["folderName"],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "language": {
+            "type": "string",
+            "enum": ["en", "fr"],
+            "description": "ISO 639-1 code indicating the language of strings in the schema file"
+        },
+        "ui": {
+            "description": "A set of service endpoints used by the viewer",
+            "type": "object",
+            "properties": {
+                "fullscreen": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicates viewer takes up entire viewport."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "An optional title to be used in the place of the default viewer title."
+                },
+                "appBar": {
+                    "$ref": "#/$defs/appBarNode",
+                    "default": {
+                        "geoSearch": true,
+                        "basemap": true
+                    },
+                    "description": "Provides configuration to the main app toolbar. If not supplied, the default appbar controls are displayed."
+                },
+                "navBar": {
+                    "$ref": "#/$defs/navBarNode"
+                },
+                "sideMenu": {
+                    "$ref": "#/$defs/sideMenuNode"
+                },
+                "help": {
+                    "$ref": "#/$defs/help"
+                },
+                "legend": {
+                    "$ref": "#/$defs/legendUI"
+                }
+            }
+        },
+        "services": {
+            "description": "A set of service endpoints used by the viewer",
+            "type": "object",
+            "properties": {
+                "proxyUrl": {
+                    "type": "string",
+                    "description": "An optional proxy to be used for dealing with same-origin issues.  URL must either be a relative path on the same server or an absolute path on a server which sets CORS headers."
+                },
+                "exportMapUrl": {
+                    "type": "string",
+                    "description": "An ESRI service endpoint for generating map images.  Should point directly to an endpoint that can be consumed by ESRI PrintTask. NOTE: The PrintTask service has to be asynchronous"
+                },
+                "export": {
+                    "type": "object",
+                    "description": "Export properties",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/$defs/exportComponent",
+                            "description": "Title of the export graphic."
+                        },
+                        "map": {
+                            "$ref": "#/$defs/exportComponent",
+                            "description": "Map component."
+                        },
+                        "mapElements": {
+                            "$ref": "#/$defs/exportComponent",
+                            "description": "North arrow and scalebar component."
+                        },
+                        "legend": {
+                            "$ref": "#/$defs/legendExportComponent",
+                            "description": "Legend component."
+                        },
+                        "footnote": {
+                            "$ref": "#/$defs/exportComponent",
+                            "description": "Foot notice to add to exported map"
+                        },
+                        "timeout": {
+                            "type": "number",
+                            "default": 120000,
+                            "description": "A timeout delay in milliseconds after which the export image generation is considered to have failed. Defaults to 120sec."
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "map": {
+            "type": "object",
+            "description": "Core map properties (extent sets, levels of detail)",
+            "properties": {
+                "extentSets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/extentSetNode"
+                    },
+                    "description": "The default extent of the map."
+                },
+                "lodSets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/lodSetNode"
+                    },
+                    "description": "The levels of detail (zoom scales) available for the map."
+                },
+                "tileSchemas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/tileSchemaNode"
+                    },
+                    "minItems": 1,
+                    "description": "A unique combination of an LoD and an extent set (each basemap must fit into a tile schema)."
+                },
+                "components": {
+                    "type": "object",
+                    "$ref": "#/$defs/mapComponentsNode"
+                },
+                "initialBasemapId": {
+                    "type": "string",
+                    "description": "Initial basemap to load. If not supplied viewer will select any basemap."
+                },
+                "baseMaps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/baseMapNode"
+                    },
+                    "minItems": 1,
+                    "description": "A list of basemaps available."
+                },
+                "layers": {
+                    "$ref": "#/$defs/layerList",
+                    "description": "Layer list in the order which they should be added to the map."
+                },
+                "legend": {
+                    "$ref": "#/$defs/legendStructured",
+                    "description": "A structured legend."
+                }
+            },
+            "required": ["tileSchemas", "baseMaps"]
+        }
+    }
+}
