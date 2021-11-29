@@ -119,17 +119,17 @@
             "type": "object",
             "description": "A dqvchart slide component.",
             "properties": {
-                "json": {
-                    "type": "object",
-                    "description": "The JSON object defining the dqvchart."
+                "src": {
+                    "type": "string",
+                    "description": "The source containing the dqvchart json config."
                 },
                 "width": {
                     "type": "number",
-                    "description": "The width of the chart"
+                    "description": "The width of the chart."
                 },
                 "height": {
                     "type": "number",
-                    "description": "The height of the chart"
+                    "description": "The height of the chart."
                 },
                 "expandable": {
                     "type": "boolean",
@@ -138,10 +138,10 @@
                 },
                 "type": {
                     "type": "string",
-                    "enum": ["dqv"]
+                    "enum": ["chart"]
                 }
             },
-            "required": ["json", "type"]
+            "required": ["src", "type"]
         },
 
         "multimediaImage": {
