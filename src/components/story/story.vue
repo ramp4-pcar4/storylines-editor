@@ -45,7 +45,8 @@ export default class StoryV extends Vue {
 
 <style lang="scss" scoped>
 .story-scrollama {
-    background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
+    background: var(--sr-content-background);
+    // background: linear-gradient(to right, var(--sr-content-background) 33.3%, #fff 33.3%);
     // background: linear-gradient(to right, var(--sr-content-background) 40%, #fff 40%);
 
     border-style: solid none solid solid;

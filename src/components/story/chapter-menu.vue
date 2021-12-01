@@ -32,7 +32,7 @@
 
         <ul class="menu">
             <li>
-                <tippy delay="200" placement="right" v-if="!isMenuOpen">Return to Top</tippy>
+                <tippy delay="200" placement="right">Return to Top</tippy>
                 <a name="return-to-top" href="#intro" class="flex items-center px-2 py-1 mx-1" v-smooth-scroll>
                     <svg
                         class="flex-shrink-0"
@@ -48,15 +48,13 @@
                             stroke-width=".93974"
                         />
                     </svg>
-                    <span class="flex-1 ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap"
+                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap"
                         >Return to Top</span
                     >
                 </a>
             </li>
             <li v-for="(slide, idx) in slides" :key="idx" :class="{ 'is-active': activeChapterIndex === idx }">
-                <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right" v-if="!isMenuOpen">{{
-                    slide.title
-                }}</tippy>
+                <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right">{{ slide.title }}</tippy>
                 <a
                     :name="`menu-options-tippy-${idx}`"
                     :href="`#${slide.title.toLowerCase().replaceAll(' ', '-')}`"
@@ -77,7 +75,7 @@
                             stroke-width=".93974"
                         />
                     </svg>
-                    <span class="flex-1 ml-4 overflow-hidden leading-none overflow-ellipsis whitespace-nowrap">{{
+                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
                         slide.title
                     }}</span>
                 </a>
