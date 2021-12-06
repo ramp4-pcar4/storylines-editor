@@ -1,7 +1,6 @@
 <template>
     <div class="dv-chart justify-center flex h-full align-middle" dv-config="config" id="chart1">
         <div class="dv-chart-container" role="region" aria-hidden="false" :aria-label="title">
-            <!-- TODO: insert a hidden sr element here describing chart for accessibility purposes -->
             <highcharts :options="chartOptions"></highcharts>
         </div>
     </div>
