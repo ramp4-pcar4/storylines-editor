@@ -24,6 +24,10 @@ export default class TextPanelV extends Vue {
     @Prop() config!: TextPanel;
 
     md = new MarkdownIt();
+
+    mounted(): void {
+        document.querySelectorAll('a:not([target])').forEach((el) => (el.target = '_blank'));
+    }
 }
 </script>
 
