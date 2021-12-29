@@ -11,6 +11,7 @@
         "@tailwindcss/typography": "^0.4.0",
         "@types/highcharts": "^7.0.0",
         "core-js": "^3.6.5",
+        "highcharts": "^9.3.2",
         "highcharts-vue": "^1.4.0",
         "hooper": "^0.3.4",
         "intersection-observer": "^0.12.0",

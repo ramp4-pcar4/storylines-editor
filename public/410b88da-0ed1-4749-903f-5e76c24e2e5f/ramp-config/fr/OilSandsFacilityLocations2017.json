@@ -25,7 +25,7 @@
             }
         }
     },
-    "language": "en",
+    "language": "fr",
     "services": {
         "proxyUrl": "http://167.40.64.74/wmsproxy/ws/wmsproxy/executeFromProxy",
         "exportMapUrl": "http://section917.cloudapp.net/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",

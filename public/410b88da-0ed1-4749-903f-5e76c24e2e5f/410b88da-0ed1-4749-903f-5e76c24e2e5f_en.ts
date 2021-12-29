@@ -2,11 +2,11 @@ const config = {
     title: 'NPRI Sector Overview: Oil Sands Extraction',
     introSlide: {
         logo: {
-            src: 'https://i.imgur.com/BDdw5aN.png',
+            src: 'https://raw.githubusercontent.com/ramp4-pcar4/ramp4-pcar4/master/assets/logo.svg',
             altText: 'Logo'
         },
         title: 'NPRI Sector Overview: Oil Sands Extraction',
-        subtitle: 'It also summarizes what steps facilities in this sector take to mitigate their environmental impacts'
+        subtitle: ''
     },
     slides: [
         {

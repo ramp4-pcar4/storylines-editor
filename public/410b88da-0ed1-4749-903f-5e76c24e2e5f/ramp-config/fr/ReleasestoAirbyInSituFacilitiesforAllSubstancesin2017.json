@@ -1,6 +1,6 @@
 {
     "ui": {
-        "title": "Oil Sands Facility Locations - 2017",
+        "title": "Releases to Air by In Situ Facilities for All Substances in 2017",
         "appBar": {
             "geosearch": false,
             "basemap": false
@@ -25,20 +25,20 @@
             }
         }
     },
-    "language": "en",
+    "language": "fr",
     "services": {
         "proxyUrl": "http://167.40.64.74/wmsproxy/ws/wmsproxy/executeFromProxy",
         "exportMapUrl": "http://section917.cloudapp.net/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
         "export": {
             "title": {
-                "value": "Oil Sands Facility Locations - 2017"
+                "value": "Releases to Air by In Situ Facilities for All Substances in 2017"
             },
             "map": {},
             "mapElements": {},
             "legend": {},
             "timeout": 5000,
             "footnote": {
-                "value": "Oil Sands Facility Locations - 2017"
+                "value": "Releases to Air by In Situ Facilities for All Substances in 2017"
             }
         }
     },
@@ -74,27 +74,27 @@
                 "name": "root",
                 "children": [
                     {
-                        "layerId": "OilSandsFacilityLocations2017"
+                        "layerId": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2017"
                     }
                 ]
             }
         },
         "layers": [
             {
-                "id": "OilSandsFacilityLocations2017",
-                "name": "Oil Sands Facility Locations - 2017",
+                "id": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2017",
+                "name": "Releases to Air by In Situ Facilities for All Substances in 2017",
                 "layerType": "esriFeature",
-                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/1"
+                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/5"
             }
         ],
         "extentSets": [
             {
                 "id": "EXT_ESRI_World_AuxMerc_3857",
                 "default": {
-                    "xmax": -10875269.150822684,
-                    "xmin": -16442330.794887159,
-                    "ymax": 9124722.042838877,
-                    "ymin": 5700343.175663892
+                    "xmax": -11484319.392198805,
+                    "xmin": -14267850.214231044,
+                    "ymax": 8349344.827914256,
+                    "ymin": 6637155.394326762
                 },
                 "spatialReference": {
                     "wkid": 102100,

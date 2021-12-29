@@ -35,7 +35,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import StoryV from '@/components/story/story.vue';
 import IntroV from '@/components/story/introduction.vue';
 
-import config from '../public/410b88da-0ed1-4749-903f-5e76c24e2e5f/OilSandsConfig_en';
+import config from '../public/410b88da-0ed1-4749-903f-5e76c24e2e5f/410b88da-0ed1-4749-903f-5e76c24e2e5f_fr';
 import { StoryRampConfig } from '@/definitions';
 
 @Component({

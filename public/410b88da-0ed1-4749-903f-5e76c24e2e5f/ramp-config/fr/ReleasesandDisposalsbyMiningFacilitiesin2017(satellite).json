@@ -1,6 +1,6 @@
 {
     "ui": {
-        "title": "Oil Sands Facility Locations - 2017",
+        "title": "Releases and Disposals by Mining Facilities in 2017 (satellite)",
         "appBar": {
             "geosearch": false,
             "basemap": false
@@ -25,25 +25,25 @@
             }
         }
     },
-    "language": "en",
+    "language": "fr",
     "services": {
         "proxyUrl": "http://167.40.64.74/wmsproxy/ws/wmsproxy/executeFromProxy",
         "exportMapUrl": "http://section917.cloudapp.net/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
         "export": {
             "title": {
-                "value": "Oil Sands Facility Locations - 2017"
+                "value": "Releases and Disposals by Mining Facilities in 2017 (satellite)"
             },
             "map": {},
             "mapElements": {},
             "legend": {},
             "timeout": 5000,
             "footnote": {
-                "value": "Oil Sands Facility Locations - 2017"
+                "value": "Releases and Disposals by Mining Facilities in 2017 (satellite)"
             }
         }
     },
     "map": {
-        "initialBasemapId": "baseEsriTopo",
+        "initialBasemapId": "baseEsriWorld",
         "components": {
             "geoSearch": {
                 "enabled": false
@@ -74,27 +74,27 @@
                 "name": "root",
                 "children": [
                     {
-                        "layerId": "OilSandsFacilityLocations2017"
+                        "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2017(satellite)"
                     }
                 ]
             }
         },
         "layers": [
             {
-                "id": "OilSandsFacilityLocations2017",
-                "name": "Oil Sands Facility Locations - 2017",
+                "id": "ReleasesandDisposalsbyMiningFacilitiesin2017(satellite)",
+                "name": "Releases and Disposals by Mining Facilities in 2017 (satellite)",
                 "layerType": "esriFeature",
-                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/1"
+                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/2"
             }
         ],
         "extentSets": [
             {
                 "id": "EXT_ESRI_World_AuxMerc_3857",
                 "default": {
-                    "xmax": -10875269.150822684,
-                    "xmin": -16442330.794887159,
-                    "ymax": 9124722.042838877,
-                    "ymin": 5700343.175663892
+                    "xmax": -12272079.405705657,
+                    "xmin": -12620020.758459613,
+                    "ymax": 7916959.668162176,
+                    "ymin": 7702935.9889637865
                 },
                 "spatialReference": {
                     "wkid": 102100,
@@ -224,15 +224,15 @@
         ],
         "baseMaps": [
             {
-                "id": "baseEsriTopo",
-                "name": "World Topographic Map",
-                "description": "This map is designed to be used as a basemap by GIS professionals and as a reference map by anyone.",
-                "altText": "altText - World Topographic Map",
+                "id": "baseEsriWorld",
+                "name": "World Imagery",
+                "description": "World Imagery provides one meter or better satellite and aerial imagery in many parts of the world and lower resolution satellite imagery worldwide.",
+                "altText": "altText - World Imagery",
                 "layers": [
                     {
-                        "id": "World_Topo_Map",
+                        "id": "World_Imagery",
                         "layerType": "esriFeature",
-                        "url": "http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
+                        "url": "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
                     }
                 ],
                 "tileSchemaId": "EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857"
