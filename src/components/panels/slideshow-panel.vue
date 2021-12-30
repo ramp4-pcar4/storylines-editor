@@ -15,15 +15,15 @@
             <hooper-pagination slot="hooper-addons"></hooper-pagination>
         </hooper>
 
-        <div v-if="config.caption" class="text-center mt-5 text-sm">
-            {{ config.caption }}
-        </div>
+        <div v-if="config.caption" class="text-center mt-5 text-sm" v-html="md.render(config.caption)"></div>
     </div>
 </template>
 
 <script lang="ts">
 import { Hooper, Slide, Navigation as HooperNavigation, Pagination as HooperPagination } from 'hooper';
 import 'hooper/dist/hooper.css';
+
+import MarkdownIt from 'markdown-it';
 
 import { SlideshowPanel } from '@/definitions';
 import { Component, Vue, Prop } from 'vue-property-decorator';
@@ -40,6 +40,8 @@ export default class SlideshowPanelV extends Vue {
     @Prop() config!: SlideshowPanel;
 
     width = -1;
+
+    md = new MarkdownIt({ html: true });
 
     mounted(): void {
         setTimeout(() => {

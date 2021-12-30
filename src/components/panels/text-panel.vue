@@ -23,7 +23,7 @@ import { TextPanel } from '@/definitions';
 export default class TextPanelV extends Vue {
     @Prop() config!: TextPanel;
 
-    md = new MarkdownIt();
+    md = new MarkdownIt({ html: true });
 
     mounted(): void {
         document.querySelectorAll('a:not([target])').forEach((el) => (el.target = '_blank'));
