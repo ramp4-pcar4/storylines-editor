@@ -31,7 +31,7 @@
         "exportMapUrl": "https://maps-cartes.ec.gc.ca/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
         "export": {
             "title": {
-                "value": "Oil Sands Desposits"
+                "value": "Oil Sands Deposits"
             },
             "map": {},
             "mapElements": {},
@@ -203,13 +203,13 @@
                 "symbologyExpanded": false,
                 "layerEntries": [
                     {
-                        "index": 13
-                    },
-                    {
-                        "index": 14
-                    },
-                    {
-                        "index": 15
+                        "index": 18,
+                        "disabledControls": [
+                            "query"
+                        ],
+                        "state": {
+                            "opacity": 0.5
+                        }                               
                     }
                 ]
             }
