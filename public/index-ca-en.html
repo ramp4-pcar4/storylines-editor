@@ -16,6 +16,7 @@
             type="text/javascript"
             src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"
         ></script>
+        <link rel="stylesheet" href="scripts/multi-ramp/rv-styles.css" />
 
         <!-- top reference links and no-script fallback -->
         <noscript> <%= require('html-loader!../src/assets/static/cdts/refTop.html') %> </noscript>
@@ -25,21 +26,14 @@
     </head>
     <body>
         <!-- template top and no-script fallback -->
-        <div id="def-top"><%= require('html-loader!../src/assets/static/cdts/top-en.html') %></div>
+        <div id="def-top">d<%= require('html-loader!../src/assets/static/cdts/top-en.html') %></div>
 
-        <main role="main" property="mainContentOfPage" class="container">
-            <iframe
-                src="index.html"
-                class="iframe"
-                style="width: 100%; height: 750px"
-                scrolling="yes"
-                frameborder="0"
-            ></iframe>
-        </main>
+        <div id="app"></div>
 
         <!-- template footer and no-script fallback -->
         <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
 
+        <script src="scripts/multi-ramp/rv-main.js"></script>
         <script type="text/javascript">
             var defTop = document.getElementById('def-top');
             defTop.outerHTML = wet.builder.top({
@@ -48,6 +42,12 @@
                         lang: 'fr',
                         href: 'index-fr.html',
                         text: 'Français'
+                    }
+                ],
+                breadcrumbs: [
+                    {
+                        title: 'Environment and natural resources',
+                        href: 'https://www.canada.ca/en/services/environment.html'
                     }
                 ]
             });
@@ -61,5 +61,11 @@
         <script>
             document.write(wet.builder.refFooter({}));
         </script>
+
+        <style>
+            html {
+                font-size: 16px;
+            }
+        </style>
     </body>
 </html>

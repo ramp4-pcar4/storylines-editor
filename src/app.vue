@@ -1,7 +1,7 @@
 <template>
-    <div id="app" class="bg-white">
+    <div id="app" class="storyramp-app bg-white">
         <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
-            <div class="flex w-full px-6 py-3 mx-auto max-w-9xl">
+            <div class="flex w-full px-6 py-3 mx-auto">
                 <div class="flex-none font-semibold">
                     <span class="text-lg">{{ config.title }}</span>
                 </div>
@@ -13,7 +13,7 @@
 
         <introduction :config="config.introSlide"></introduction>
 
-        <div class="w-full mx-auto max-w-9xl pb-10" id="story">
+        <div class="w-full mx-auto pb-10" id="story">
             <StoryV :config="config" />
         </div>
 
@@ -50,6 +50,8 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+$font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 .ovwContainer .layerTile {
     max-width: initial;
 }
@@ -59,7 +61,7 @@ body {
 }
 
 #app {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: $font-list;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
@@ -89,6 +91,25 @@ body {
             transform: translateY(0);
             animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
         }
+    }
+}
+
+.storyramp-app {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .h1,
+    .h2,
+    .h3,
+    .h4,
+    .h5,
+    .h6 {
+        font-family: $font-list;
+        line-height: 1.5;
+        border-bottom: 0px;
     }
 }
 </style>

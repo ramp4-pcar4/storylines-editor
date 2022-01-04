@@ -99,8 +99,22 @@ export default class ChapterMenuV extends Vue {
 
 <style lang="scss" scoped>
 .menu li {
+    a:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    a:focus {
+        text-decoration: none;
+        color: inherit;
+    }
+
     a:hover svg {
         stroke: var(--sr-accent-colour);
+    }
+
+    a:visited {
+        color: inherit;
     }
 
     &.is-active {
