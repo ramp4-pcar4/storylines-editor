@@ -81,8 +81,7 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/Slide 3 - mine vs insitu.jpg',
+                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/Slide 3 - mine vs insitu.jpg',
                     type: 'image'
                 }
             ]
@@ -115,7 +114,7 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
             panel: [
                 {
                     title: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
-                    content: `Sept installations d’exploitation minière à ciel ouvert de sables bitumineux ont fait l’objet d’une déclaration à l’INRP en 2019. Ces installations ont déclaré des renseignements sur 70 substances et groupes de substances différents pour 2019, représentant un total de 319 888 tonnes de polluants rejetés, éliminés et transférés. Près de 76% de cette quantité, soit 242 395 tonnes, provient des principaux contaminants atmosphériques (PCA) tels que les matières particulaires (MP), les oxydes d’azote (NO), le dioxyde de soufre (SO2), le monoxyde de carbone (CO) et les composés organiques volatils (COV). Les PCA sont des précurseurs du smog et contribuent à la mauvaise qualité de l’air.
+                    content: `Sept installations d’exploitation minière à ciel ouvert de sables bitumineux ont fait l’objet d’une déclaration à l’INRP en 2019. Ces installations ont déclaré des renseignements sur 70 substances et groupes de substances différents pour 2019, représentant un total de 319 888 tonnes de polluants rejetés, éliminés et transférés. Près de 76% de cette quantité, soit 242 395 tonnes, provient des principaux contaminants atmosphériques (PCA) tels que les matières particulaires (MP), les oxydes d’azote (NO), le dioxyde de soufre (SO<sub>2</sub>), le monoxyde de carbone (CO) et les composés organiques volatils (COV). Les PCA sont des précurseurs du smog et contribuent à la mauvaise qualité de l’air.
 
 Les sept installations d’exploitation minière à ciel ouvert des sables bitumineux qui ont déclaré à l’INRP sont listées ci-dessous. Cliquez sur le nom des installations pour voir le détail de ce qu’elles ont déclaré.
                     
@@ -124,8 +123,53 @@ Les sept installations d’exploitation minière à ciel ouvert des sables bitum
 - Usine de transformation et mine Kearl d’Imperial Oil;
 - Sables bitumineux de Suncor Energy Inc; et
 - Site de la mine Aurora nord de Syncrude Canada et site de la mine Syncrude Canada Ltd. (anciennement Mildred Lake).
-
-Pour plus d’information sur l’utilisation et l’interprétation des données de l’INRP, veuillez consulter notre [guide](https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/utilisation-interpretation-donnees.html).
+`,
+                    type: 'text'
+                },
+                {
+                    images: [
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/AuroraNorth_RelDisp_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/FortHills_RelDisp_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Horizon_RelDisp_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Kearl_RelDisp_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/MuskegJackpine_RelDisp_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Suncor_RelDisp_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Syncrude_RelDisp_FR.PNG',
+                            type: 'image'
+                        }
+                    ],
+                    loop: true,
+                    caption: 'NPRI substances reported for oil sands mining facilities',
+                    type: 'slideshow'
+                }
+            ]
+        },
+        {
+            title: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
+            panel: [
+                {
+                    title: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
+                    content: `Pour plus d’information sur l’utilisation et l’interprétation des données de l’INRP, veuillez consulter notre [guide](https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/utilisation-interpretation-donnees.html).
 
 Il est à noter que même si la mine de la rivière Muskeg et la mine Jackpine sont des mines autonomes, aux fins des déclarations à l’INRP, Canadian Natural Resources déclare les renseignements les concernant comme une seule installation.
 
@@ -150,17 +194,18 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/slide 6 trends in mining.jpg',
+                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/slide 6 trends in mining.jpg',
                     type: 'image'
                 }
             ]
         },
         {
-            title: 'Résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert des sables bitumineux',
+            title:
+                'Résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert des sables bitumineux',
             panel: [
                 {
-                    title: 'Résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert des sables bitumineux',
+                    title:
+                        'Résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert des sables bitumineux',
                     content: `La transformation de sables bitumineux extraits pour le retrait du bitume laisse dans son sillage un mélange d’eau, de sable et d’argile ainsi que des quantités négligeables de métaux, d’hydrocarbures aromatiques polycycliques (HAP) et d’autres composés organiques volatils (COV). Ce mélange résiduel, connu sous le nom de résidus miniers, est éliminé dans des [dépôts de résidus spécialement aménagés et surveillés](https://www.rncan.gc.ca/mines-materiaux/publications/13928?_ga=2.180273380.1360388065.1562327743-119110847.1558115915).
 
 En 2019, les exploitations minières de sables bitumineux qui produisent des déclarations à l’INRP ont déclaré des renseignements sur 49 substances éliminées dans les dépôts de résidus, qui se chiffrent à 67 940 tonnes.
@@ -181,19 +226,65 @@ Bien que les résidus déclarés par ces mines contiennent de grandes quantités
             ]
         },
         {
-            title: 'Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux',
+            title:
+                'Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux',
             panel: [
                 {
-                    title: 'Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux',
+                    title:
+                        'Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux',
                     content: `Comme pour la comparaison des profils de rejet et de transfert, il est difficile d’établir le parallèle entre les sept installations d’exploitation à ciel ouvert des sables bitumineux en ce qui a trait à ce qu’elles éliminent dans leurs dépôts de résidus miniers. La taille de ces installations et la quantité de bitume transformée sur place varient considérablement. Le détail des résidus déclarés pour chaque installation est présenté ci-dessous :
 
 - Mine de la rivière Muskeg et mine Jackpine, et usine de transformation et mine Horizon (Canadian Natural Resources);
 - Mine de sables bitumineux Fort Hills
 - Usine de transformation et mine Kearl d’Imperial Oil
 - Sables bitumineux de Suncor Energy Inc.
-- Site de la mine Aurora nord de Syncrude Canada et site de la mine Syncrude Canada Ltd.  (anciennement Mildred Lake).
-                    
-Les sites des mines de la rivière Muskeg et Jackpine de Canadian Natural Resources étaient les installations qui comptaient les plus grandes quantités de résidus éliminés en 2019. Ils sont en effet à l’origine de 35% de tous les résidus déclarés par les sept installations d’exploitation minière à ciel ouvert des sables bitumineux. Le manganèse représentait la plus grande quantité de résidus dans le cas de quatre des installations déclarantes.
+- Site de la mine Aurora nord de Syncrude Canada et site de la mine Syncrude Canada Ltd.  (anciennement Mildred Lake).`,
+                    type: 'text'
+                },
+                {
+                    images: [
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/AuroraNorth_Tailings_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/FortHills_Tailings_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Horizon_Tailings_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Kearl_Tailings_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Muskeg_Tailings_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Suncor_Tailings_FR.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Syncrude_Tailings_FR.PNG',
+                            type: 'image'
+                        }
+                    ],
+                    loop: true,
+                    caption:
+                        'Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux',
+                    type: 'slideshow'
+                }
+            ]
+        },
+        {
+            title: `Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux`,
+            panel: [
+                {
+                    title: `Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux`,
+                    content: `Les sites des mines de la rivière Muskeg et Jackpine de Canadian Natural Resources étaient les installations qui comptaient les plus grandes quantités de résidus éliminés en 2019. Ils sont en effet à l’origine de 35% de tous les résidus déclarés par les sept installations d’exploitation minière à ciel ouvert des sables bitumineux. Le manganèse représentait la plus grande quantité de résidus dans le cas de quatre des installations déclarantes.
 
 Explorez chaque installation avec l’imagerie par satellite.`,
                     type: 'text'
@@ -206,10 +297,12 @@ Explorez chaque installation avec l’imagerie par satellite.`,
             ]
         },
         {
-            title: 'Tendances dans les résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert',
+            title:
+                'Tendances dans les résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert',
             panel: [
                 {
-                    title: 'Tendances dans les résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert',
+                    title:
+                        'Tendances dans les résidus miniers déclarés par les installations d’exploitation minière à ciel ouvert',
                     content: `Le total des résidus déclarés par les installations d’exploitation minière à ciel ouvert des sables bitumineux a augmenté de 56% entre 2010 et 2019, soit une augmentation de 24 517 tonnes. Cinq de ces installations mènent des activités d’exploitation et produisent des déclarations à l’INRP depuis avant 2010. Quatre de ces installations ont augmenté leur quantité de résidus miniers déclarée entre 2018 et 2019, alors que les trois autres ont déclaré l’avoir diminué durant cette période.`,
                     type: 'text'
                 },
@@ -313,8 +406,7 @@ Les installations d’exploitation minière à ciel ouvert des sables bitumineux
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/slide%2014%20-%20athabasca.jpg',
+                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/slide%2014%20-%20athabasca.jpg',
                     type: 'image'
                 }
             ]

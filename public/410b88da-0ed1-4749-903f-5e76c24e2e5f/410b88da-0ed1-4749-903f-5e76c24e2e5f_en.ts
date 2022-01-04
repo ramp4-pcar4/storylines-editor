@@ -80,8 +80,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/Slide 3 - mine vs insitu.jpg',
+                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/Slide 3 - mine vs insitu.jpg',
                     type: 'image'
                 }
             ]
@@ -123,8 +122,53 @@ The seven oil sands surface mining facilities that reported to the NPRI are list
 - Imperial Oil Kearl Processing Plant and Mine;
 - Suncor Energy Inc. Oil Sands; and
 - Syncrude Canada Aurora North Mine Site, and Mildred Lake.
-
-For more information on the use and interpretation of NPRI data, please see our [guide](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/using-interpreting-data.html). 
+`,
+                    type: 'text'
+                },
+                {
+                    images: [
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/1_AuroraNorth_RelDisp.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/2_FortHills_RelDisp.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/3_Horizon_RelDisp.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/4_Kearl_RelDisp.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/5_MuskegJackpine_R5_RelDisp.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/6_Suncor_RelDisp.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/7_Syncrude_RelDisp.PNG',
+                            type: 'image'
+                        }
+                    ],
+                    loop: true,
+                    caption: 'NPRI substances reported for oil sands mining facilities',
+                    type: 'slideshow'
+                }
+            ]
+        },
+        {
+            title: 'NPRI substances reported for oil sands mining facilities',
+            panel: [
+                {
+                    title: 'NPRI substances reported for oil sands mining facilities',
+                    content: `For more information on the use and interpretation of NPRI data, please see our [guide](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/using-interpreting-data.html). 
 Note that even though the Muskeg River and Jackpine Mines are stand alone mines, for the purposes of NPRI reporting, Canadian Natural Resources reports information for them as one facility.
  
 It can be challenging to make direct comparisons between these facilities. While all of the facilities are involved in the extraction and processing of bitumen, their operations differ. Some facilities, such as the Kearl and Fort Hills mines, are primarily mines and do not upgrade their bitumen on-site. These facilities generally have particulate matter (PM) as a much larger proportion of their reported releases. Facilities that have upgraders on-site generally report larger amounts of sulphur dioxide (SO<sub>2</sub>) releases.
@@ -148,8 +192,7 @@ You can explore each facility using satellite imagery.`,
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/slide 6 - mining trends.jpg',
+                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/slide 6 - mining trends.jpg',
                     type: 'image'
                 }
             ]
@@ -190,9 +233,52 @@ While the tailings reported by these mines have large amounts of manganese, ammo
 - Fort Hills Oil Sands Mine;
 - Imperial Oil Kearl Processing Plant and Mine;
 - Suncor Energy Inc. Oil Sands; and
-- Syncrude Canada Aurora North Mine Site, and Syncrude Canada Ltd. (formerly Mildred Lake).
-                    
-The facility with the most tailings disposed of in 2019 was Canadian Natural Resources Muskeg River and Jackpine Mine sites accounting for 35% of all tailings reported by the seven oil sands surface mining operations. Manganese made up the largest amount of tailings for four of the reporting facilities.
+- Syncrude Canada Aurora North Mine Site, and Syncrude Canada Ltd. (formerly Mildred Lake).`,
+                    type: 'text'
+                },
+                {
+                    images: [
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/AuroraNorth_Tailings.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/FortHills_Tailings.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Horizon_Tailings.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Kearl_Tailings.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Muskeg_Tailings.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Suncor_Tailings.PNG',
+                            type: 'image'
+                        },
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Syncrude_Tailings.PNG',
+                            type: 'image'
+                        }
+                    ],
+                    loop: true,
+                    caption: 'Reported mine tailings from oil sands surface mining facilities',
+                    type: 'slideshow'
+                }
+            ]
+        },
+        {
+            title: 'Reported mine tailings from oil sands surface mining facilities',
+            panel: [
+                {
+                    title: 'Reported mine tailings from oil sands surface mining facilities',
+                    content: `The facility with the most tailings disposed of in 2019 was Canadian Natural Resources Muskeg River and Jackpine Mine sites accounting for 35% of all tailings reported by the seven oil sands surface mining operations. Manganese made up the largest amount of tailings for four of the reporting facilities.
 
 You can explore each facility using satellite imagery.`,
                     type: 'text'
@@ -326,11 +412,9 @@ Oil sands surface mining facilities in Alberta take much of their water from the
                     content: `You can identify the facilities and pollutants in your community by entering your postal code in the NPRI online data search. For further analysis, check out [other NPRI maps and datasets](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html).`,
                     type: 'text'
                 },
-            // The slide above is the last slide! 
-            // TODO: remove NPRI data slide
-            {
-                title: 'NPRI data',
-                content: `We have packaged the data in different ways for different uses. You can search the entire database, download subsets of data, or view the data on maps.
+                {
+                    title: 'NPRI data',
+                    content: `We have packaged the data in different ways for different uses. You can search the entire database, download subsets of data, or view the data on maps.
 
 ### Search NPRI data
 
@@ -352,7 +436,6 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
                 }
             ]
         },
-        // TODO: remove temporary sample test for chart panels
         {
             title: 'DQV Chart',
             panel: [
