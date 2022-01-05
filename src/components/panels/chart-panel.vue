@@ -1,7 +1,7 @@
 <template>
     <div class="dv-chart justify-center flex h-full align-middle" dv-config="config" id="chart1">
         <div class="dv-chart-container" role="region" aria-hidden="false" :aria-label="title">
-            <highcharts :options="chartOptions"></highcharts>
+            <highcharts :options="chartOptions" ref="chart"></highcharts>
         </div>
     </div>
 </template>
@@ -10,6 +10,10 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
 import { ChartPanel } from '@/definitions';
+import Highcharts from 'highcharts';
+import dataModule from 'highcharts/modules/data';
+
+dataModule(Highcharts);
 
 @Component({
     components: {
@@ -20,21 +24,83 @@ export default class ChartPanelV extends Vue {
     @Prop() config!: ChartPanel;
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
+    $papa: any; // not sure how to fix this in shims
     chartConfig: any = {};
     chartOptions: any = {};
     title = '';
 
-    created(): void {
-        // get json object given by src path
-        fetch(this.config.src)
-            .then((res) => res.json())
-            .then((data) => {
-                this.chartConfig = data;
+    mounted(): void {
+        const extension = this.config.src.split('.').pop();
 
-                // extract and format options to be passed into highcharts (change this depending on config structure)
-                this.chartOptions = this.chartConfig.charts.chart1;
-                this.title = this.chartOptions.title.text;
+        // get input given by src path
+        if (extension === 'json') {
+            fetch(this.config.src).then((data) => {
+                // parse JSON data
+                data.json().then((res) => {
+                    this.chartConfig = res;
+                    // extract and format options to be passed into highcharts (change this depending on config structure)
+                    this.chartOptions = this.chartConfig;
+                    this.title = this.chartOptions.title.text;
+                });
             });
+        } else if (extension === 'csv') {
+            // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
+            this.chartOptions = this.parseCSVFile();
+        }
+    }
+
+    /**
+     * Parse and process CSV file contents and return a properly configured highcharts options object.
+     */
+    parseCSVFile(): any {
+        fetch(this.config.src).then((data) => {
+            // download: true needed for local files which is treated as an URL
+            this.$papa.parse(data.url, {
+                header: true,
+                dynamicTyping: true,
+                download: true,
+                complete: (res: any) => {
+                    // process parsed CSV data (get fields and xaxis categories first)
+                    const fields = res.meta.fields;
+                    const cato = res.meta.fields.shift();
+                    const xAxis = {
+                        title: {
+                            text: 'Report Year'
+                        },
+                        categories: res.data.map((row: any[]) => row[cato])
+                    };
+
+                    // get all series data for each field
+                    let series: any[] = [];
+                    fields.forEach((f: string) => {
+                        const colData = res.data.map((row: any) => row[f]);
+                        // default to line graph (not sure best way to configure this with CSV input)
+                        series.push({
+                            name: f,
+                            data: colData,
+                            type: 'line'
+                        });
+                    });
+
+                    // initializing chartOptions with filtered CSV data + configurable options (TODO)
+                    this.chartOptions = {
+                        series: series,
+                        xAxis: xAxis,
+                        title: {
+                            text: 'Ethlyene Glycol Release Trends by Sector 2010-2019 (Tonnes)'
+                        },
+                        credits: {
+                            enabled: false
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Sector'
+                            }
+                        }
+                    };
+                }
+            });
+        });
     }
 }
 </script>
