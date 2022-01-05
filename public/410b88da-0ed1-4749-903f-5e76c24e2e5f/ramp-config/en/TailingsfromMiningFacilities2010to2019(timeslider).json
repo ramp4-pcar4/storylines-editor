@@ -31,14 +31,14 @@
         "exportMapUrl": "http://section917.cloudapp.net/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
         "export": {
             "title": {
-                "value": "Tailings from Mining Facilities 2009 to 2017 (time slider)"
+                "value": "Tailings from Mining Facilities 2010 to 2019 (time slider)"
             },
             "map": {},
             "mapElements": {},
             "legend": {},
             "timeout": 5000,
             "footnote": {
-                "value": "Tailings from Mining Facilities 2009 to 2017 (time slider)"
+                "value": "Tailings from Mining Facilities 2019 to 2019 (time slider)"
             }
         }
     },
@@ -74,14 +74,14 @@
                 "name": "root",
                 "children": [
                     {
-                        "layerId": "TailingsfromMiningFacilities2009to2017(timeslider)"
+                        "layerId": "TailingsfromMiningFacilities2010to2019(timeslider)"
                     }
                 ]
             }
         },
         "layers": [
             {
-                "id": "TailingsfromMiningFacilities2009to2017(timeslider)",
+                "id": "TailingsfromMiningFacilities2010to2019(timeslider)",
                 "name": "Tailings from Mining Facilities 2010 to 2019 (time slider)",
                 "layerType": "esriFeature",
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/4"

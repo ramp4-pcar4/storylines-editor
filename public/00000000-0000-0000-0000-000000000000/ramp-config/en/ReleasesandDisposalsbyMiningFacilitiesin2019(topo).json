@@ -84,7 +84,7 @@
                 "id": "ReleasesandDisposalsbyMiningFacilitiesin2017(topo)",
                 "name": "Releases and Disposals by Mining Facilities in 2017 (topo)",
                 "layerType": "esriFeature",
-                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/00000000-0000-0000-0000-000000000000/MapServer/2"
+                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/00000000_0000_0000_0000_000000000000/MapServer/2"
             }
         ],
         "extentSets": [
