@@ -1,80 +1,65 @@
 {
-    "data": {
-        "name": "Key Lake Operation",
-        "province": "Saskatchewan",
-        "facilityGHGDetailLink": "https://climate-change.canada.ca/facility-emissions/GHGRP-G10913-2019.html ",
-        "facilityIndClassLink": "http://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=307532&CVD=307548&CST=01012017&CLV=5&MLV=5&CPV=212291",
-        "companyName": "Cameco Corporation",
-        "totalGHGemissions": "17.50",
-        "facilityType": "Uranium ore mining",
-        "address": "Saskatoon, Saskatchewan, S7M 1J3",
-        "description": "The graph shows the total greenhouse gas (GHG) emissions for the selected facility from 2004 to 2019. Large industrial GHG emitters that emit 10 kilotonnes (kt) or more of GHGs are required to submit a report under the Facility Greenhouse Gas Emissions Reporting Program administered by Environment and Climate Change Canada."
+    "credits": {
+        "enabled": false
     },
-    "charts": {
-        "chart1": {
-            "credits": {
-                "enabled": false
-            },
-            "title": {
-                "text": "Greenhouse gas emissions, 2004 to 2019"
-            },
-            "subtitle": {
-                "text": "Key Lake Operation, Cameco Corporation, Saskatchewan"
-            },
-            "yAxis": {
-                "title": {
-                    "text": "Kilotonnes of carbon dioxide equivalent"
-                }
-            },
-            "plotOptions": {
-                "column": {
-                    "pointPadding": 0,
-                    "borderWidth": 0
-                }
-            },
-            "xAxis": {
-                "categories": [
-                    2004,
-                    2005,
-                    2006,
-                    2007,
-                    2008,
-                    2009,
-                    2010,
-                    2011,
-                    2012,
-                    2013,
-                    2014,
-                    2015,
-                    2016,
-                    2017,
-                    2018,
-                    2019
-                ],
-                "title": {
-                    "text": "Year"
-                }
-            },
-            "series": [
-                {
-                    "name": "Facility emissions (kilotonnes of carbon dioxide equivalent)",
-                    "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33.96, 23.08, 17.5],
-                    "type": "column",
-                    "color": "#0f4c6a"
-                },
-                {
-                    "name": "Reporting threshold",
-                    "data": [100, 100, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 10],
-                    "type": "line",
-                    "step": "center",
-                    "color": "#e8ba1f"
-                }
-            ],
-            "exporting": {
-                "menuItemDefinitions": {
-                    "viewData": null
-                }
-            }
+    "title": {
+        "text": "Greenhouse gas emissions, 2004 to 2019"
+    },
+    "subtitle": {
+        "text": "Key Lake Operation, Cameco Corporation, Saskatchewan"
+    },
+    "yAxis": {
+        "title": {
+            "text": "Kilotonnes of carbon dioxide equivalent"
+        }
+    },
+    "plotOptions": {
+        "column": {
+            "pointPadding": 0,
+            "borderWidth": 0
+        }
+    },
+    "xAxis": {
+        "categories": [
+            2004,
+            2005,
+            2006,
+            2007,
+            2008,
+            2009,
+            2010,
+            2011,
+            2012,
+            2013,
+            2014,
+            2015,
+            2016,
+            2017,
+            2018,
+            2019
+        ],
+        "title": {
+            "text": "Year"
+        }
+    },
+    "series": [
+        {
+            "name": "Facility emissions (kilotonnes of carbon dioxide equivalent)",
+            "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33.96, 23.08, 17.5],
+            "type": "column",
+            "color": "#0f4c6a"
+        },
+        {
+            "name": "Reporting threshold",
+            "data": [100, 100, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 10],
+            "type": "line",
+            "step": "center",
+            "color": "#e8ba1f"
+        }
+    ],
+    "exporting": {
+        "menuItemDefinitions": {
+            "viewData": null
         }
     }
 }

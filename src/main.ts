@@ -13,6 +13,9 @@ Vue.component('tippy', TippyComponent);
 import HighchartsVue from 'highcharts-vue';
 Vue.use(HighchartsVue);
 
+import VuePapaParse from 'vue-papa-parse';
+Vue.use(VuePapaParse);
+
 import VueProgressiveImage from 'vue-progressive-image';
 Vue.use(VueProgressiveImage);
 

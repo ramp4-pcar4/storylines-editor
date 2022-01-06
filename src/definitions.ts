@@ -85,8 +85,6 @@ export interface SlideshowPanel extends BasePanel {
 export interface ChartPanel extends BasePanel {
     type: PanelType.Chart;
     src: string;
-    width?: number;
-    height?: number;
     expandable?: boolean;
 }
 

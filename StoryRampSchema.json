@@ -123,14 +123,6 @@
                     "type": "string",
                     "description": "The source containing the dqvchart json config."
                 },
-                "width": {
-                    "type": "number",
-                    "description": "The width of the chart."
-                },
-                "height": {
-                    "type": "number",
-                    "description": "The height of the chart."
-                },
                 "expandable": {
                     "type": "boolean",
                     "description": "Determines whether the panel can be expanded.",
