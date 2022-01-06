@@ -90,7 +90,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
             panel: [
                 {
                     title: 'Where are facilities located?',
-                    content: `Oil sands extraction facilities that report to the NPRI are located exclusively in northern Alberta, particularly around the municipality of Fort McMurray. Of the facilities that reported in 2019, 1 of them are in the Peace River deposit, 5 in the Cold Lake deposit and 30 in the Athabasca deposit. Also included in this map is an upgrader facility in Fort Saskatchewan, Alberta, that upgrades oil from the Canadian Natural Resources’ Muskeg River oil sands surface mining facility. Of the facilities that reported to the NPRI, seven of them are surface mining operations, one was an [upgrader facility](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/upgrading-oil-sands-and-heavy-oil/5875) and the remaining 30 were in-situ facilities.  
+                    content: `Oil sands extraction facilities that report to the NPRI are located exclusively in northern Alberta, particularly around the municipality of Fort McMurray. Of the facilities that reported in 2019, 1 of them are in the Peace River deposit, 5 in the Cold Lake deposit and 30 in the Athabasca deposit. Also included in this map is an upgrader facility in Fort Saskatchewan, Alberta, that upgrades oil from the Canadian Natural Resources’ Muskeg River oil sands surface mining facility. Of the facilities that reported to the NPRI, seven of them are surface mining operations, one was an [upgrader facility](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/upgrading-oil-sands-and-heavy-oil/5875) and the remaining 30 were in-situ facilities.
 #### Oil sands facilities reporting to the NPRI - 2019
 | **Facility location** | **Thermal in-situ** | **Surface mining** | **Upgrader** | **Total** |
 | ----------------------| ------------------- | ------------------ | --------- | --------- |
@@ -115,7 +115,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
                     title: 'NPRI substances reported for oil sands mining facilities',
                     content: `Seven oil sands surface mining facilities reported to the NPRI in 2019. These facilities reported information on 70 different substances and substance groups for 2019, representing a total of 319,888 tonnes of pollutants released, disposed of and transferred. Almost 76% of this amount, 242,395 tonnes, is the release of criteria air contaminants (CACs) such as particulate matter (PM), nitrogen oxides (NOx), sulphur dioxide (SO<sub>2</sub>), carbon monoxide (CO) and volatile organic compounds (VOCs). CACs are precursors to smog and contribute to poor air quality.
 
-The seven oil sands surface mining facilities that reported to the NPRI are listed below. Click on the facility names to see a breakdown of what each facility reported. 
+The seven oil sands surface mining facilities that reported to the NPRI are listed below. Click on the facility names to see a breakdown of what each facility reported.
 
 - Canadian Natural Resources' Muskeg River and Jackpine Mines and Horizon Processing Plant and Mine;
 - Fort Hills Oil Sands Mine;
@@ -168,11 +168,11 @@ The seven oil sands surface mining facilities that reported to the NPRI are list
             panel: [
                 {
                     title: 'NPRI substances reported for oil sands mining facilities',
-                    content: `For more information on the use and interpretation of NPRI data, please see our [guide](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/using-interpreting-data.html). 
+                    content: `For more information on the use and interpretation of NPRI data, please see our [guide](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/using-interpreting-data.html).
 Note that even though the Muskeg River and Jackpine Mines are stand alone mines, for the purposes of NPRI reporting, Canadian Natural Resources reports information for them as one facility.
- 
+
 It can be challenging to make direct comparisons between these facilities. While all of the facilities are involved in the extraction and processing of bitumen, their operations differ. Some facilities, such as the Kearl and Fort Hills mines, are primarily mines and do not upgrade their bitumen on-site. These facilities generally have particulate matter (PM) as a much larger proportion of their reported releases. Facilities that have upgraders on-site generally report larger amounts of sulphur dioxide (SO<sub>2</sub>) releases.
- 
+
 You can explore each facility using satellite imagery.`,
                     type: 'text'
                 },
@@ -209,7 +209,7 @@ In 2019, oil sands mining operations reporting to the NPRI reported information 
 Substances disposed of as tailings can be grouped into four broad categories:
 
 1. Metals (40,257 tonnes);
-2. Volatile organic compounds (VOCs) (8,099 tonnes); 
+2. Volatile organic compounds (VOCs) (8,099 tonnes);
 3. Polycyclic Aromatic Hydrocarbons (PAHs) (360 tonnes); and
 4. Others (16,118 tonnes).
 
@@ -369,10 +369,10 @@ This change in the number of facilities reporting over time follows changes in t
             panel: [
                 {
                     title: 'NPRI releases from in-situ facilities',
-                    content: `Reported CAC emissions from in-situ operations have increased along with the increase in the number of facilities reporting since 2010. 
- 
+                    content: `Reported CAC emissions from in-situ operations have increased along with the increase in the number of facilities reporting since 2010.
+
 The increase in emissions seen in 2017 is likely due to a rebound in the price of oil in that year. Between 2018 and 2019, 18 in situ facilities reporting to the NPRI increased their reported CAC emissions.
-                     
+
 While in-situ facilities have reported an increase in reported CAC emissions, this has been coupled with an even larger and steady increase in bitumen production. Bitumen production from in-situ operations increased over 102% between 2010 and 2019. CAC releases per barrel produced have decreased substantially over this time, almost 21%.`,
                     type: 'text'
                 },
