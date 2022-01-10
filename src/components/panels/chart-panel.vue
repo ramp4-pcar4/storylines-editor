@@ -54,6 +54,8 @@ export default class ChartPanelV extends Vue {
      */
     parseCSVFile(): any {
         fetch(this.config.src).then((data) => {
+            const dqvOptions = this.config.options;
+
             // download: true needed for local files which is treated as an URL
             this.$papa.parse(data.url, {
                 header: true,
@@ -65,7 +67,7 @@ export default class ChartPanelV extends Vue {
                     const cato = res.meta.fields.shift();
                     const xAxis = {
                         title: {
-                            text: 'Report Year'
+                            text: dqvOptions?.xAxisLabel ? dqvOptions?.xAxisLabel : ''
                         },
                         categories: res.data.map((row: any[]) => row[cato])
                     };
@@ -78,7 +80,7 @@ export default class ChartPanelV extends Vue {
                         series.push({
                             name: f,
                             data: colData,
-                            type: 'line'
+                            type: dqvOptions?.type ? dqvOptions?.type : 'line'
                         });
                     });
 
@@ -87,14 +89,17 @@ export default class ChartPanelV extends Vue {
                         series: series,
                         xAxis: xAxis,
                         title: {
-                            text: 'Ethlyene Glycol Release Trends by Sector 2010-2019 (Tonnes)'
+                            text: dqvOptions?.title ? dqvOptions?.title : ''
+                        },
+                        subtitle: {
+                            text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
                         },
                         credits: {
-                            enabled: false
+                            enabled: dqvOptions?.credits ? dqvOptions?.credits : false
                         },
                         yAxis: {
                             title: {
-                                text: 'Sector'
+                                text: dqvOptions?.yAxisLabel ? dqvOptions?.yAxisLabel : ''
                             }
                         }
                     };

@@ -462,7 +462,13 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
                 {
                     src:
                         'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene.glycol.release.trends.by.sector.2010-2019.tonnes.csv',
-                    type: 'chart'
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: 'X Axis Test From Config',
+                        yAxisLabel: 'Y Axis Test From Config',
+                        title: 'Hello World',
+                        subtitle: 'I am a DQVChart and this is from the config file'
+                    }
                 }
             ]
         }
