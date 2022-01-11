@@ -21,6 +21,7 @@
         "vue-papa-parse": "^3.0.4",
         "vue-progressive-image": "^3.2.0",
         "vue-property-decorator": "^9.1.2",
+        "vue-router": "^3.5.3",
         "vue-scrollama": "^2.0.2",
         "vue-tippy": "^4.10.0",
         "vue2-smooth-scroll": "^1.5.0"
