@@ -131,6 +131,9 @@
                 "type": {
                     "type": "string",
                     "enum": ["chart"]
+                },
+                "options": {
+                    "$ref": "#/$defs/dqvchartOptions"
                 }
             },
             "required": ["src", "type"]
@@ -247,7 +250,37 @@
                 }
             },
             "required": ["images", "type"]
-        }
+        },
+        "dqvchartOptions": {
+            "type": "object",
+            "description": "Configuration for a dqvchart.",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title of the chart."
+                },
+                "subtitle": {
+                    "type": "string",
+                    "description": "The subtitle of the chart."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "The type of chart.",
+                    "enum": ["line", "spline", "area", "areaspline", "column", "bar", "pie", "scatter", "gauge", "arearange", "areasplinerange", "columnrange"]
+                },
+                "credits": {
+                    "type": "boolean",
+                    "description": "Specify whether credits are enabled."
+                },
+                "xAxisLabel": {
+                    "type": "string",
+                    "description": "The title of the x-axis."
+                },
+                "yAxisLabel": {
+                    "type": "string",
+                    "description": "The title of the y-axis."
+                }
+            }
     },
 
     "properties": {
