@@ -27,6 +27,48 @@ Businesses, institutions and other facilities across Canada must report their re
             ]
         },
         {
+            title: 'Dynamic Panel Test',
+            panel: [
+                {
+                    title: 'This Slide Is Dynamic!',
+                    type: 'dynamic',
+                    content: `You can click on one of the following links to change the right panel.
+
+- <a panel="panel-1">Text Panel</a>
+- <a panel="panel-2">Image Panel</a>
+- <a panel="panel-3">Map Panel</a>
+
+Fun stuff.`,
+                    children: [
+                        {
+                            id: 'panel-1',
+                            panel: {
+                                title: 'Hello World',
+                                content: `I am a text panel. I am a child of the dynamic panel config.`,
+                                type: 'text'
+                            }
+                        },
+                        {
+                            id: 'panel-2',
+                            panel: {
+                                src:
+                                    '00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg',
+                                type: 'image'
+                            }
+                        },
+                        {
+                            id: 'panel-3',
+                            panel: {
+                                config:
+                                    '00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json',
+                                type: 'map'
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             title: 'Oil sands deposits',
             panel: [
                 {

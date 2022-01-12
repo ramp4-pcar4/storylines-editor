@@ -36,6 +36,9 @@
                     },
                     {
                         "$ref": "#/$defs/dqvchartPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/dynamicPanel"
                     }
                 ]
             },
@@ -65,6 +68,59 @@
                 }
             },
             "required": ["content", "type", "title"]
+        },
+
+        "dynamicPanel": {
+            "type": "object",
+            "description": "A dynamic slide component.",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title for the text panel."
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The main text body."
+                },
+                "children": {
+                    "type": "array",
+                    "description": "The panels to display dynamically.",
+                    "items": {
+                        "$ref": "#/$defs/dynamicChildItem"
+                    },
+                    "minItems": 1
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["dynamic"]
+                }
+            },
+            "required": ["content", "type", "children", "title"]
+        },
+
+        "dynamicChildItem": {
+            "type": "object",
+            "description": "A child screen of a dynamic panel. Contains an ID and a panel config.",
+            "properties": {
+                "id": "string",
+                "panel": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/textPanel"
+                        },
+                        {
+                            "$ref": "#/$defs/mapPanel"
+                        },
+                        {
+                            "$ref": "#/$defs/multimediaPanel"
+                        },
+                        {
+                            "$ref": "#/$defs/dqvchartPanel"
+                        }
+                    ]
+                }
+            },
+            "required": ["id", "panel"]
         },
 
         "multimediaPanel": {

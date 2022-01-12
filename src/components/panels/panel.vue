@@ -15,6 +15,7 @@ import AudioPanelV from './audio-panel.vue';
 import VideoPanelV from './video-panel.vue';
 import SlideshowPanelV from './slideshow-panel.vue';
 import ChartPanelV from './chart-panel.vue';
+import DynamicPanelV from './dynamic-panel.vue';
 
 @Component({
     components: {
@@ -38,7 +39,8 @@ export default class PanelV extends Vue {
             [PanelType.Audio]: AudioPanelV,
             [PanelType.Video]: VideoPanelV,
             [PanelType.Slideshow]: SlideshowPanelV,
-            [PanelType.Chart]: ChartPanelV
+            [PanelType.Chart]: ChartPanelV,
+            [PanelType.Dynamic]: DynamicPanelV
         };
 
         return panelTemplates[this.config.type];
