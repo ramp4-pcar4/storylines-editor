@@ -1,52 +1,14 @@
 <template>
     <div id="app" class="storyramp-app bg-white">
-        <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
-            <div class="flex w-full px-6 py-3 mx-auto">
-                <div class="flex-none font-semibold">
-                    <span class="text-lg">{{ config.title }}</span>
-                </div>
-                <div class="flex justify-end flex-auto space-x-6">
-                    <!-- Any links we want in the header can go here -->
-                </div>
-            </div>
-        </header>
-
-        <introduction :config="config.introSlide"></introduction>
-
-        <div class="w-full mx-auto pb-10" id="story">
-            <StoryV :config="config" />
-        </div>
-
-        <footer class="p-8 pt-2 text-right text-sm">
-            Context:
-            <a class="text-blue-500 font-semibold" :href="config.contextLink" target="_NEW">{{
-                config.contextLabel
-            }}</a>
-            |
-            <a href="https://github.com/ramp4-pcar4/story-ramp" target="_NEW" class="font-semibold text-blue-500"
-                >ramp4-pcar4/story-ramp</a
-            >
-        </footer>
+        <router-view :key="$route.path"></router-view>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import StoryV from '@/components/story/story.vue';
-import IntroV from '@/components/story/introduction.vue';
 
-import config from '../public/00000000-0000-0000-0000-000000000000/00000000-0000-0000-0000-000000000000_en';
-import { StoryRampConfig } from '@/definitions';
-
-@Component({
-    components: {
-        StoryV,
-        introduction: IntroV
-    }
-})
-export default class App extends Vue {
-    config: StoryRampConfig = config;
-}
+@Component({})
+export default class App extends Vue {}
 </script>
 
 <style lang="scss">
@@ -91,25 +53,6 @@ body {
             transform: translateY(0);
             animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
         }
-    }
-}
-
-.storyramp-app {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    .h1,
-    .h2,
-    .h3,
-    .h4,
-    .h5,
-    .h6 {
-        font-family: $font-list;
-        line-height: 1.5;
-        border-bottom: 0px;
     }
 }
 </style>

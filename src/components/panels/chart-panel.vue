@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+
 import { Chart } from 'highcharts-vue';
 import { ChartPanel } from '@/definitions';
 import Highcharts from 'highcharts';
@@ -23,8 +24,7 @@ dataModule(Highcharts);
 export default class ChartPanelV extends Vue {
     @Prop() config!: ChartPanel;
 
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    $papa: any; // not sure how to fix this in shims
+    $papa: any; // TODO: fix this in shims
     chartConfig: any = {};
     chartOptions: any = {};
     title = '';
