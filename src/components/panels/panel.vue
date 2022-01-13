@@ -30,7 +30,6 @@ export default class PanelV extends Vue {
      * Returns the corresponding component for this panel.
      */
     getTemplate(): string {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const panelTemplates: any = {
             [PanelType.Text]: TextPanelV,
             [PanelType.Map]: MapPanelV,

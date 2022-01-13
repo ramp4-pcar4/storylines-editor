@@ -16,6 +16,37 @@ export interface DQVOptions {
     type: string;
 }
 
+export interface SeriesData {
+    name: string;
+    data: number[];
+    type: string;
+    color?: string;
+}
+
+export interface DQVChartConfig {
+    title: {
+        text: string;
+    };
+    credits: {
+        enabled: boolean;
+    };
+    subtitle: {
+        text: string;
+    };
+    yAxis: {
+        title: {
+            text: string;
+        };
+    };
+    xAxis: {
+        title: {
+            text: string;
+        };
+        categories: [];
+    };
+    series: SeriesData[];
+}
+
 export interface Intro {
     logo: {
         src: string;
@@ -56,7 +87,7 @@ export interface TextPanel extends BasePanel {
 
 export interface MapPanel extends BasePanel {
     type: PanelType.Map;
-    config: any; // TODO: replace with proper Typescript type
+    config: string;
     expandable?: boolean;
 }
 
