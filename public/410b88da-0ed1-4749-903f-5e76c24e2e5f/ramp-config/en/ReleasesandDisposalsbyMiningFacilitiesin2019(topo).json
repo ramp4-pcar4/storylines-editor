@@ -11,7 +11,7 @@
         },
         "sideMenu": {
             "logo": true,
-            "items": [["layers"], ["fullscreen", "export", "share", "touch", "help", "about"], ["language"]]
+            "items": [["fullscreen", "export", "touch", "help", "about"]]
         },
         "help": {
             "folderName": "default"
@@ -19,7 +19,7 @@
         "legend": {
             "allowImport": false,
             "isOpen": {
-                "large": false,
+                "large": true,
                 "medium": true,
                 "small": false
             }
@@ -74,16 +74,20 @@
                 "name": "root",
                 "children": [
                     {
-                        "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2017(topo)"
+                        "symbologyExpanded": true,                        
+                        "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2019(topo)"
                     }
                 ]
             }
         },
         "layers": [
             {
-                "id": "ReleasesandDisposalsbyMiningFacilitiesin2017(topo)",
-                "name": "Releases and Disposals by Mining Facilities in 2017 (topo)",
+                "id": "ReleasesandDisposalsbyMiningFacilitiesin2019(topo)",
+                "name": "Releases and Disposals by Mining Facilities in 2019 (topo)",
                 "layerType": "esriFeature",
+                "tolerance": 20,
+                "singleEntryCollapse": true,
+                "symbologyExpanded": true,                
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/2"
             }
         ],

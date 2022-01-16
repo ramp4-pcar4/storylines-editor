@@ -1,6 +1,7 @@
 {
     "ui": {
         "title": "Oil Sands Facility Locations - 2019",
+        "logoUrl": "https://raw.githubusercontent.com/ramp4-pcar4/ramp4-pcar4/master/assets/logo.svg",        
         "appBar": {
             "geosearch": false,
             "basemap": false
@@ -11,7 +12,7 @@
         },
         "sideMenu": {
             "logo": true,
-            "items": [["layers"], ["fullscreen", "export", "share", "touch", "help", "about"], ["language"]]
+            "items": [["fullscreen", "export", "touch", "help", "about"]]
         },
         "help": {
             "folderName": "default"
@@ -19,7 +20,7 @@
         "legend": {
             "allowImport": false,
             "isOpen": {
-                "large": false,
+                "large": true,
                 "medium": true,
                 "small": false
             }
@@ -74,6 +75,7 @@
                 "name": "root",
                 "children": [
                     {
+                        "symbologyExpanded": true,
                         "layerId": "OilSandsFacilityLocations2019"
                     }
                 ]
@@ -84,6 +86,8 @@
                 "id": "OilSandsFacilityLocations2019",
                 "name": "Oil Sands Facility Locations - 2019",
                 "layerType": "esriFeature",
+                "singleEntryCollapse": true,
+                "symbologyExpanded": true,                
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/1"
             }
         ],

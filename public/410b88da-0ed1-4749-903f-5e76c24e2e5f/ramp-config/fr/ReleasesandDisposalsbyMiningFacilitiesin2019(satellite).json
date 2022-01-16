@@ -11,7 +11,7 @@
         },
         "sideMenu": {
             "logo": true,
-            "items": [["layers"], ["fullscreen", "export", "share", "touch", "help", "about"], ["language"]]
+            "items": [["fullscreen", "export", "touch", "help", "about"]]
         },
         "help": {
             "folderName": "default"
@@ -19,7 +19,7 @@
         "legend": {
             "allowImport": false,
             "isOpen": {
-                "large": false,
+                "large": true,
                 "medium": true,
                 "small": false
             }
@@ -74,6 +74,7 @@
                 "name": "root",
                 "children": [
                     {
+                        "symbologyExpanded": true,                        
                         "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)"
                     }
                 ]
@@ -84,6 +85,9 @@
                 "id": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)",
                 "name": "Rejets et éliminations par les installations minières en 2019 (satellite)",
                 "layerType": "esriFeature",
+                "tolerance": 20,
+                "singleEntryCollapse": true,
+                "symbologyExpanded": true,                
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/9"
             }
         ],
@@ -226,8 +230,8 @@
             {
                 "id": "baseEsriWorld",
                 "name": "World Imagery",
-                "description": "World Imagery provides one meter or better satellite and aerial imagery in many parts of the world and lower resolution satellite imagery worldwide.",
-                "altText": "altText - World Imagery",
+                "description": "L'imagerie mondiale fournit une imagerie satellitaire et aérienne dans de nombreuses régions du monde avec une résolution de 1 mètres et moins et des images satellitaires de résolution inférieure dans le monde entier.",
+                "altText": "altText - L'imagerie mondiale",
                 "layers": [
                     {
                         "id": "World_Imagery",

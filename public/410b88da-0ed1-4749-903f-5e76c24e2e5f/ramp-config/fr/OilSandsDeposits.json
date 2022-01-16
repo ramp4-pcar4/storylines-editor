@@ -1,7 +1,6 @@
 {
-    "language": "fr",
     "ui": {
-        "title": "Interactive map",
+        "title": "Carte interactive",
         "fullscreen": true,
         "navBar": {
             "zoom": "buttons",
@@ -26,19 +25,20 @@
             }
         }
     },
+    "language": "fr",    
     "services": {
         "proxyUrl": "http://167.40.64.74/wmsproxy/ws/wmsproxy/executeFromProxy",
         "exportMapUrl": "https://maps-cartes.ec.gc.ca/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
         "export": {
             "title": {
-                "value": "Oil Sands Deposits"
+                "value": "Gisements de sables bitumineux"
             },
             "map": {},
             "mapElements": {},
             "legend": {},
             "timeout": 5000,
             "footnote": {
-                "value": "Oil Sands Deposits"
+                "value": "Gisements de sables bitumineux"
             }
         }
     },
@@ -204,6 +204,7 @@
                 "layerEntries": [
                     {
                         "index": 18,
+                        "name": "Gisements de sables bitumineux",
                         "disabledControls": [
                             "query"
                         ],

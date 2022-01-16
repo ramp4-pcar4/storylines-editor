@@ -11,7 +11,7 @@
         },
         "sideMenu": {
             "logo": true,
-            "items": [["layers"], ["fullscreen", "export", "share", "touch", "help", "about"], ["language"]]
+            "items": [["fullscreen", "export", "touch", "help", "about"]]
         },
         "help": {
             "folderName": "default"
@@ -19,7 +19,7 @@
         "legend": {
             "allowImport": false,
             "isOpen": {
-                "large": false,
+                "large": true,
                 "medium": true,
                 "small": false
             }
@@ -74,6 +74,7 @@
                 "name": "root",
                 "children": [
                     {
+                        "symbologyExpanded": true,      
                         "layerId": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019"
                     }
                 ]
@@ -84,6 +85,9 @@
                 "id": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019",
                 "name": "Rejets à l'air par des installations in situ pour toutes les substances en 2019",
                 "layerType": "esriFeature",
+                "singleEntryCollapse": true,
+                "symbologyExpanded": true,  
+                "tolerance": 20,                
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/12"
             }
         ],
@@ -225,15 +229,15 @@
         "baseMaps": [
             {
                 "id": "baseEsriTopo",
-                "name": "World Topographic Map",
-                "description": "This map is designed to be used as a basemap by GIS professionals and as a reference map by anyone.",
-                "altText": "altText - World Topographic Map",
+                "name": "Monde topographique",
+                "description": "La carte du monde topographique est conçue pour être utilisé comme une carte de base par les professionnels du SIG et comme une carte de référence par quiconque.",
+                "altText": "altText - La carte du monde topographique",
                 "layers": [
-                    {
-                        "id": "World_Topo_Map",
-                        "layerType": "esriFeature",
-                        "url": "http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
-                    }
+                  {
+                    "id": "World_Topo_Map",
+                    "layerType": "esriFeature",
+                    "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
+                  }
                 ],
                 "tileSchemaId": "EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857"
             }

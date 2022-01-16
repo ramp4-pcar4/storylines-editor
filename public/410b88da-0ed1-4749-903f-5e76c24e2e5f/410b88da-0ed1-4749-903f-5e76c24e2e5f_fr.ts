@@ -2,11 +2,11 @@ const config = {
     title: 'Aperçu des secteurs de l’INRP : extraction de sables bitumineux',
     introSlide: {
         logo: {
-            src: 'https://raw.githubusercontent.com/ramp4-pcar4/ramp4-pcar4/master/assets/logo.svg',
-            altText: 'Logo'
+            src: '',
+            altText: ''
         },
         title: 'Aperçu des secteurs de l’INRP : extraction de sables bitumineux',
-        subtitle: 'A Work in Progress by RAD! :)'
+        subtitle: ''
     },
     slides: [
         {
@@ -22,7 +22,9 @@ Les entreprises, les établissements et d’autres entités partout au Canada do
                 {
                     src:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/NPRIpictogramme-2016data-FR__1552505700147__w975.jpg',
-                    type: 'image'
+                    type: 'image',
+                    altText:
+                        '[fr] An image describing the flow from industry of on-site releases to air, water, and land, on-site disposals, off-site disposals, and off-site transfers.'
                 }
             ]
         },
@@ -66,7 +68,8 @@ L’exploitation à ciel ouvert consiste à creuser de grandes surfaces à l’a
                 {
                     src:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/GettyImages-187242601__1554821412825__w1920.jpg',
-                    type: 'image'
+                    type: 'image',
+                    altText: '[fr] An image showing an aerial view of an oil sands extraction facility.'
                 }
             ]
         },
@@ -82,7 +85,9 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
                 },
                 {
                     src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/Slide 3 - mine vs insitu.jpg',
-                    type: 'image'
+                    type: 'image',
+                    altText:
+                        '[fr] A diagram showing the extraction process involving pumping high-pressure steam deep underground.'
                 }
             ]
         },
@@ -130,36 +135,43 @@ Les sept installations d’exploitation minière à ciel ouvert des sables bitum
                     images: [
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/AuroraNorth_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Site de la Mine Aurora Nord de Syncrude Canada 2019 Rejets et Éliminations (Tonnes): Rejets de matière particulaire- 10733,66%; Résidus miniers- 2957,18%; Rejets de composés organiques volatils- 1149,7%; Rejets de monoxyde de carbone- 807,5%; Rejets d'oxydes d'azote- 589,4%; Autres rejets- 27,0%.`
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/FortHills_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Mine de sables bitumineux Fort Hills 2019 Rejets et Éliminations (Tonnes): Rejets de matière particulaire- 14701,57%; Résidus miniers- 8322,32%; Rejets d'oxydes d'azote- 1071,4%; Rejets de composés organiques volatils- 710,3%; Rejets de monoxyde de carbone- 793,3%; Autres rejets- 178,1%; Sulphur Dioxide Releases- 34,0%; Autre éliminations et transferts- 105,0%.`
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Horizon_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Canadian Natural Resources Usine de Transformations et Mine Horizon 2019 Rejets et Éliminations (Tonnes): Rejets de composés organiques volatils- 10815,33%; Rejets de matière particulaire- 6518,20%; Résidus miniers- 5700,18%; Sulphur Dioxide Releases- 2754,8%; Rejets d'oxydes d'azote- 2621,8%; Rejets de monoxyde de carbone- 2576,8%; Autres rejets- 1581,5%.`
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Kearl_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Usine de Transformation e Mine Kearl D'imperial 2019 Rejets et Éliminations (Tonnes): Rejets de matière particulaire- 24564,81%, Rejets de monoxyde de carbone- 2271,8%, Rejets de composés organiques volatils- 2265,7%; Rejets d'oxydes d'azote- 723,2%; Autres rejets- 255,1%; Résidus miniers- 238,1%; Autre éliminations et transferts- 43,0%.`
                         },
                         {
                             src:
                                 '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/MuskegJackpine_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Canadian Natural Upgrading Mine de la Rivière Muskeg et Mine Jackpine 2019 Rejets et Éliminations (Tonnes): Résidus miniers- 23716,65%; Rejets de matière particulaire- 6381,18%; Rejets de composés organiques volatils- 4828,13%; Rejets d'oxydes d'azote- 1014,3%; Autres rejets- 359,1%; Rejets de monoxyde de carbone- 152,0%.`
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Suncor_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Sables bitumineux de Suncor Energy Inc. 2019 Rejets et Éliminations (Tonnes): Rejets de matière particulaire- 36725,39%; Rejets de composés organiques volatils- 14807,16%; Sulphur Dioxide Releases- 13404,14%; Rejets d'oxydes d'azote- 13110,14%; Résidus miniers- 9516,10%; Rejets de monoxyde de carbone- 3216,3%; Autres rejets- 2346,3%; Autre éliminations et transferts- 748,1%.`
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/substances/Syncrude_RelDisp_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Site de la Mine Syncrude Canada Ltd. 2019 Rejets et Éliminations (Tonnes): Sulphur Dioxide Releases- 27763,33%; Résidus miniers- 17490,21%; Rejets d'oxydes d'azote- 13322,16%; Rejets de matière particulaire- 11731,14%; Rejets de composés organiques volatils- 5728,7%; Rejets de monoxyde de carbone- 4609,5%; Autres rejets- 2992,3%; Autre éliminations et transferts- 896,1%.`
                         }
                     ],
                     loop: true,
-                    caption: 'NPRI substances reported for oil sands mining facilities',
+                    caption: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
                     type: 'slideshow'
                 }
             ]
@@ -180,7 +192,7 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                 },
                 {
                     config:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json',
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/fr/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json',
                     type: 'map'
                 }
             ]
@@ -194,8 +206,40 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                     type: 'text'
                 },
                 {
-                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/slide 6 trends in mining.jpg',
-                    type: 'image'
+                    src:
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_1.csv',
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: '',
+                        yAxisLabel: 'Rejets de PCA (tonnes)',
+                        title: 'Rejects de PCA (tonnes) des mines à ciel ouvert des sables bitumineux de 2010 à 2019',
+                        subtitle: '',
+                        type: 'bar'
+                    }
+                },
+                {
+                    src:
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_2.csv',
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: '',
+                        yAxisLabel: 'Nombre de barils par année',
+                        title: `Nombre de barils produits annuellement par les mines à ciel ouvert de l'Alberta de 2010 à 2019`,
+                        subtitle: '',
+                        type: 'bar'
+                    }
+                },
+                {
+                    src:
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_3.csv',
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: '',
+                        yAxisLabel: 'Rejets de PCA par 1000 barils',
+                        title: 'Rejects de PCA (tonnes) par 1000 barils de bitume de 2010 à 2019',
+                        subtitle: '',
+                        type: 'line'
+                    }
                 }
             ]
         },
@@ -220,8 +264,15 @@ Bien que les résidus déclarés par ces mines contiennent de grandes quantités
                     type: 'text'
                 },
                 {
-                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/Top10SubstancesTailings2019.png',
-                    type: 'image'
+                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Mine tailings reported.csv',
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: '',
+                        yAxisLabel: 'Substances',
+                        title: `Les 10 principales substances des résidus miniers des sables bitumineux déclarés a l'INRP en 2019`,
+                        subtitle: '',
+                        type: 'bar'
+                    }
                 }
             ]
         },
@@ -245,31 +296,44 @@ Bien que les résidus déclarés par ces mines contiennent de grandes quantités
                     images: [
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/AuroraNorth_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText:
+                                'Syncrude Canada Ltd., Aurora North Mine Site 2019 Résidus miniers (tonnes): Ammoniac- 412,14%; Manganèse- 1755,60%; HAP- 35,1%; Phénol- 3,0%; Phosphore- 155,5%; Autres substances- 597,20%.'
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/FortHills_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText:
+                                'Mine de sables bitumineux Fort Hills 2019 Résidus miniers (tonnes): Ammoniac- 537,6%; BTEX- 4,0%; Manganèse- 4925,59%; HAP- 0,0%; Phosphore- 1650,20%; Autres substances- 1205,15%.'
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Horizon_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText:
+                                'Canadian Natural Resources usine de transformation et Mine Horizon 2019 Résidus miniers (tonnes): Ammoniac- 273,5%; BTEX- 373,6%; HAP- 104,2%; Autres substances- 4950,87%.'
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Kearl_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText: `Usine de transformation et Mine Kearl D'Imperial Oil 2019 Résidus miniers (tonnes): Ammoniac- 116,49%; BTEX- 0,0%; Manganèse- 38,16%; HAP- 0,0%; n-Hexane- 3,1%; Phosphore- 49,21%; Autres substances- 32,13%.`
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Muskeg_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText:
+                                'Canadian Natural Upgrading Mine de la Rivière Muskeg et Mine Jackpine 2019 Résidus miniers (tonnes): Ammoniac- 193,1%; BTEX- 303,1%; Manganèse- 7735,33%; HAP- 52,0%; n-Hexane- 4370,19%; Phosphore- 5984,25%; Autres substances- 5082,21%.'
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Suncor_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText:
+                                'Sables bitumineux de Suncor Energy Inc. 2019 Résidus miniers (tonnes): Ammoniac- 577,6%; BTEX- 2259,24%; Manganèse- 1794,19%; HAP- 132,1%; Phénol- 72,1%; Phosphore- 2381,25%; Autres substances- 2311,24%.'
                         },
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/tailings/Syncrude_Tailings_FR.PNG',
-                            type: 'image'
+                            type: 'image',
+                            altText:
+                                'Syncrude Canada Ltd., Syncrude Canada Ltd. 2019 Résidus miniers (tonnes): Ammoniac- 713,4%; BTEX- 1237,7%; Manganèse- 9460,54%; HAP- 36,0%; Phénol- 8,0%; Phosphore- 4094,24%; Autres substances- 1942,11%.'
                         }
                     ],
                     loop: true,
@@ -308,7 +372,7 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                 },
                 {
                     config:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/en/TailingsfromMiningFacilities2010to2019(timeslider).json',
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/fr/TailingsfromMiningFacilities2010to2019(timeslider).json',
                     type: 'map'
                 }
             ]
@@ -327,7 +391,9 @@ En comparaison avec l’exploitation minière à ciel ouvert, l’exploitation i
                 },
                 {
                     src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/Slide 10 - SAGD vs CSS.jpg',
-                    type: 'image'
+                    type: 'image',
+                    altText:
+                        '[fr] A diagram demonstrating steam assisted gravity drainage and cyclic steam stimulation processes in oil sands extraction.'
                 }
             ]
         },
@@ -386,8 +452,28 @@ Bien que les installations in situ aient signalé un accroissement des émission
                 },
                 {
                     src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/Slide%2013%20Insitu%20trends%20-%20French__1554407015712__w628.jpg',
-                    type: 'image'
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_1.csv',
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: 'Year',
+                        yAxisLabel: 'Émissions de PCA (tonnes)',
+                        title: `Rejets de PCA des installations in situ déclarés à l'INRP de 2010 à 2019`,
+                        subtitle: '',
+                        type: 'bar'
+                    }
+                },
+                {
+                    src:
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_2.csv',
+                    type: 'chart',
+                    options: {
+                        xAxisLabel: 'Year',
+                        yAxisLabel: 'Nombre de barils par année',
+                        title:
+                            'Production de bitume des sables bitumineux in situ de 2010 à 2019 (nombre de barils par année)',
+                        subtitle: '',
+                        type: 'line'
+                    }
                 }
             ]
         },
@@ -407,7 +493,8 @@ Les installations d’exploitation minière à ciel ouvert des sables bitumineux
                 },
                 {
                     src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/slide%2014%20-%20athabasca.jpg',
-                    type: 'image'
+                    type: 'image',
+                    altText: '[fr] An aerial view of the Athabasca River.'
                 }
             ]
         }
