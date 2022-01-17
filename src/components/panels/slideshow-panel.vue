@@ -6,7 +6,7 @@
                     :src="image.src"
                     :height="image.height"
                     :width="image.width"
-                    :alt="image.alt"
+                    :alt="image.altText"
                     class="m-auto story-graphic"
                 />
             </slide>
