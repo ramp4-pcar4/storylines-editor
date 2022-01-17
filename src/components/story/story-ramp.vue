@@ -47,7 +47,6 @@ import { StoryRampConfig } from '@/definitions';
 })
 export default class StoryRampV extends Vue {
     config: StoryRampConfig = config;
-    $route: any; // TODO: fix this in shims
 
     created(): void {
         const uid = this.$route.params.uid;
@@ -73,6 +72,7 @@ export default class StoryRampV extends Vue {
                 this.config = res.default;
             })
             .catch((err) => {
+                console.error(`There exists no config given by the URL params: ${err}`);
                 // redirect to canada.ca 404 page on invalid URL params
                 window.location.href = 'https://www.canada.ca/errors/404.html';
             });

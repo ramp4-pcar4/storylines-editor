@@ -3,13 +3,6 @@ declare module '*.vue' {
     export default Vue;
 }
 
-declare module 'vue/types/vue' {
-    import { VuePapaParse } from 'vue-papa-parse';
-    interface Vue {
-        $papa: VuePapaParse;
-    }
-}
-
 declare module 'vue-scrollama';
 declare module 'vue-tippy';
 declare module 'vue-progressive-image';

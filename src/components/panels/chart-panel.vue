@@ -10,7 +10,7 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
 import { Chart } from 'highcharts-vue';
-import { ChartPanel } from '@/definitions';
+import { ChartPanel, DQVChartConfig, SeriesData } from '@/definitions';
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
 
@@ -24,9 +24,7 @@ dataModule(Highcharts);
 export default class ChartPanelV extends Vue {
     @Prop() config!: ChartPanel;
 
-    $papa: any; // TODO: fix this in shims
-    chartConfig: any = {};
-    chartOptions: any = {};
+    chartOptions: DQVChartConfig = {} as DQVChartConfig;
     title = '';
 
     mounted(): void {
@@ -36,23 +34,21 @@ export default class ChartPanelV extends Vue {
         if (extension === 'json') {
             fetch(this.config.src).then((data) => {
                 // parse JSON data
-                data.json().then((res) => {
-                    this.chartConfig = res;
-                    // extract and format options to be passed into highcharts (change this depending on config structure)
-                    this.chartOptions = this.chartConfig;
+                data.json().then((res: DQVChartConfig) => {
+                    this.chartOptions = res;
                     this.title = this.chartOptions.title.text;
                 });
             });
         } else if (extension === 'csv') {
             // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
-            this.chartOptions = this.parseCSVFile();
+            this.parseCSVFile();
         }
     }
 
     /**
      * Parse and process CSV file contents and return a properly configured highcharts options object.
      */
-    parseCSVFile(): any {
+    parseCSVFile(): void {
         fetch(this.config.src).then((data) => {
             const dqvOptions = this.config.options;
 
@@ -73,7 +69,7 @@ export default class ChartPanelV extends Vue {
                     };
 
                     // get all series data for each field
-                    let series: any[] = [];
+                    let series: SeriesData[] = [];
                     fields.forEach((f: string) => {
                         const colData = res.data.map((row: any) => row[f]);
                         // default to line graph (not sure best way to configure this with CSV input)
