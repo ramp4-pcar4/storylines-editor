@@ -90,8 +90,8 @@
       {
         "id": "EXT_NRCAN_Lambert_3978",
         "default": {
-          "xmax": 4549492,
-          "xmin": -3681457,
+          "xmax": 2849492,
+          "xmin": -5281457,
           "ymax": 4482193,
           "ymin": -983440
         },
@@ -327,6 +327,7 @@
           "children": [
             {
                 "layerId": "Releases",
+                "description": "Total releases and disposals of pulp and paper facilities that reported to the NPRI from 2010 to 2019 (tonnes)",                
                 "symbologyExpanded": true
             }
         ]
@@ -335,7 +336,6 @@
     "layers": [
       {
           "id": "Releases",
-          "name": "Total releases and disposals of pulp and paper facilities that reported to the NPRI from 2010 to 2019",
           "layerType": "esriDynamic",
           "tolerance": 20,
           "singleEntryCollapse": true,
@@ -343,7 +343,8 @@
           "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer",
           "layerEntries": [
             {
-              "index": 2
+              "index": 2,
+              "name": "Total releases and disposals"              
             }
           ]  
       }

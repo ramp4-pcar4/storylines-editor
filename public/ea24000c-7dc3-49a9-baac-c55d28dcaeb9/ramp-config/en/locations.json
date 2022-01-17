@@ -6,17 +6,29 @@
     "fullscreen": true,
     "navBar": {
       "zoom": "buttons",
-      "extra": [ "fullscreen", "geoLocator", "home", "help" ]
+      "extra": [
+        "fullscreen",
+        "geoLocator",
+        "home",
+        "help"
+      ]
     },
     "appBar": {
       "basemap": true
-
     },
     "help": {
       "folderName": "default"
     },
     "sideMenu": {
-      "items": [ [ "fullscreen", "export", "touch", "help", "about" ] ],
+      "items": [
+        [
+          "fullscreen",
+          "export",
+          "touch",
+          "help",
+          "about"
+        ]
+      ],
       "logo": false
     },
     "legend": {
@@ -44,11 +56,39 @@
     },
     "search": {
       "settings": {
-        "categories": [ "CITY", "HAM", "IR", "LTM", "MUN1", "MUN2", "PROV", "STM", "TERR", "TOWN", "UTM", "VILG", "UNP" ],
-        "sortOrder": [ "CITY", "HAM", "IR", "LTM", "MUN1", "MUN2", "PROV", "STM", "TERR", "TOWN", "UTM", "VILG", "UNP" ],
+        "categories": [
+          "CITY",
+          "HAM",
+          "IR",
+          "LTM",
+          "MUN1",
+          "MUN2",
+          "PROV",
+          "STM",
+          "TERR",
+          "TOWN",
+          "UTM",
+          "VILG",
+          "UNP"
+        ],
+        "sortOrder": [
+          "CITY",
+          "HAM",
+          "IR",
+          "LTM",
+          "MUN1",
+          "MUN2",
+          "PROV",
+          "STM",
+          "TERR",
+          "TOWN",
+          "UTM",
+          "VILG",
+          "UNP"
+        ],
         "maxResults": 1000,
         "officialOnly": true
-      },	
+      },
       "serviceUrls": {
         "geoNames": "https://geogratis.gc.ca/services/geoname/en/geonames.json",
         "geoLocation": "https://geogratis.gc.ca/services/geolocation/en/locate?q=",
@@ -90,8 +130,8 @@
       {
         "id": "EXT_NRCAN_Lambert_3978",
         "default": {
-          "xmax": 4549492,
-          "xmin": -3681457,
+          "xmax": 2849492,
+          "xmin": -5281457,
           "ymax": 4482193,
           "ymin": -983440
         },
@@ -323,23 +363,24 @@
     "legend": {
       "type": "structured",
       "root": {
-          "name": "root",
-          "children": [
-            {
-                "layerId": "Locations",
-                "symbologyExpanded": true
-            }
+        "name": "root",
+        "children": [
+          {
+            "layerId": "Locations",
+            "description": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector",
+            "symbologyExpanded": true
+          }
         ]
       }
-  },
+    },
     "layers": [
       {
-          "id": "Locations",
-          "name": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector",
-          "layerType": "esriFeature",
-          "singleEntryCollapse": true,
-          "symbologyExpanded": true,            
-          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/ea24000c_7dc3_49a9_baac_c55d28dcaeb9/MapServer/3"
+        "id": "Locations",
+        "name": "Location of NPRI facilities",
+        "layerType": "esriFeature",
+        "singleEntryCollapse": true,
+        "symbologyExpanded": true,
+        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/ea24000c_7dc3_49a9_baac_c55d28dcaeb9/MapServer/3"
       }
     ],
     "tileSchemas": [

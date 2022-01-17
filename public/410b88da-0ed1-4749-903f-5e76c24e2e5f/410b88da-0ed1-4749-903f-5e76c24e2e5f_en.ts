@@ -221,7 +221,12 @@ You can explore each facility using satellite imagery.`,
                         subtitle: '',
                         type: 'bar'
                     }
-                },
+                }
+            ]
+        },
+        {
+            title: 'Criteria air contaminant releases from oil sands mines',
+            panel: [
                 {
                     src:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_2.csv',

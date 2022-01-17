@@ -90,8 +90,8 @@
       {
         "id": "EXT_NRCAN_Lambert_3978",
         "default": {
-          "xmax": 4549492,
-          "xmin": -3681457,
+          "xmax": 2849492,
+          "xmin": -5281457,
           "ymax": 4482193,
           "ymin": -983440
         },
@@ -327,7 +327,7 @@
           "children": [
             {
                 "layerId": "Criteria",
-                "description": "Total disposals and transfers (tonnes)",
+                "description": "Total disposals and transfers of pulp and paper facilities that reported to the NPRI from 2010 to 2019 (tonnes)",
                 "symbologyExpanded": true
             }
         ]
@@ -336,12 +336,18 @@
     "layers": [
       {
           "id": "Criteria",
-          "name": "Total disposals and transfers of pulp and paper facilities that reported to the NPRI from 2010 to 2019",
-          "layerType": "esriFeature",
+          
+          "layerType": "esriDynamic",
           "tolerance": 20,
           "singleEntryCollapse": true,
           "symbologyExpanded": true,
-          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/7"
+          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer",
+          "layerEntries": [
+            {
+              "index": 7,
+              "name": "Total disposals and transfers"
+            }
+          ]            
       }
     ],
     "tileSchemas": [

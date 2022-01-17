@@ -90,8 +90,8 @@
       {
         "id": "EXT_NRCAN_Lambert_3978",
         "default": {
-          "xmax": 4549492,
-          "xmin": -3681457,
+          "xmax": 2849492,
+          "xmin": -5281457,
           "ymax": 4482193,
           "ymin": -983440
         },
@@ -327,6 +327,7 @@
           "children": [
             {
                 "layerId": "Sulphur",
+                "description": "Total reduced sulphur released by pulp and paper facilities that reported to the NPRI from 2010 to 2019 (tonnes)",                
                 "symbologyExpanded": true
             }
         ]
@@ -335,7 +336,7 @@
     "layers": [
       {
           "id": "Sulphur",
-          "name": "Total reduced sulphur released by pulp and paper facilities that reported to the NPRI from 2010 to 2019",
+          "name": "Total reduced sulphur released",
           "layerType": "esriFeature",
           "tolerance": 20,
           "singleEntryCollapse": true,

@@ -90,8 +90,8 @@
       {
         "id": "EXT_NRCAN_Lambert_3978",
         "default": {
-          "xmax": 4549492,
-          "xmin": -3681457,
+          "xmax": 2849492,
+          "xmin": -5281457,
           "ymax": 4482193,
           "ymin": -983440
         },
@@ -327,6 +327,7 @@
           "children": [
             {
                 "layerId": "PPA",
+                "description": "Pollution prevention activities of pulp and paper facilities that reported to the NPRI in 2019",                
                 "symbologyExpanded": true
             }
         ]
@@ -335,7 +336,7 @@
     "layers": [
       {
           "id": "PPA",
-          "name": "Pollution prevention activities of pulp and paper facilities that reported to the NPRI in 2019",
+          "name": "Pollution prevention activities",
           "layerType": "esriFeature",
           "singleEntryCollapse": true,
           "symbologyExpanded": true,

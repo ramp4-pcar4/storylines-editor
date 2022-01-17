@@ -74,7 +74,8 @@
                 "name": "root",
                 "children": [
                     {
-                        "symbologyExpanded": true,                        
+                        "symbologyExpanded": true,
+                        "description": "Rejets et éliminations par les installations minières en 2019 (tonnes)",
                         "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)"
                     }
                 ]
@@ -83,7 +84,7 @@
         "layers": [
             {
                 "id": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)",
-                "name": "Rejets et éliminations par les installations minières en 2019 (satellite)",
+                "name": "Rejets et éliminations",
                 "layerType": "esriFeature",
                 "tolerance": 20,
                 "singleEntryCollapse": true,

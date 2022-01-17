@@ -74,7 +74,8 @@
                 "name": "root",
                 "children": [
                     {
-                        "symbologyExpanded": true,                        
+                        "symbologyExpanded": true,
+                        "description": "Résidus miniers des installations minières 2010 à 2019 (tonnes)",
                         "layerId": "TailingsfromMiningFacilities2019"
                     }
                 ]
@@ -83,7 +84,7 @@
         "layers": [
             {
                 "id": "TailingsfromMiningFacilities2019",
-                "name": "Résidus des installations minières en 2019",
+                "name": "Résidus miniers des installations minières",
                 "layerType": "esriFeature",
                 "singleEntryCollapse": true,
                 "symbologyExpanded": true,  

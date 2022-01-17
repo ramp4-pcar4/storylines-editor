@@ -74,7 +74,8 @@
                 "name": "root",
                 "children": [
                     {
-                        "symbologyExpanded": true,                        
+                        "symbologyExpanded": true,     
+                        "description": "Tailings from Mining Facilities 2010 to 2019 (tonnes)",                                           
                         "layerId": "TailingsfromMiningFacilities2010to2019(timeslider)"
                     }
                 ]
@@ -83,7 +84,7 @@
         "layers": [
             {
                 "id": "TailingsfromMiningFacilities2010to2019(timeslider)",
-                "name": "Tailings from Mining Facilities 2010 to 2019 (time slider)",
+                "name": "Tailings from Mining Facilities",
                 "layerType": "esriFeature",
                 "singleEntryCollapse": true,
                 "symbologyExpanded": true,  

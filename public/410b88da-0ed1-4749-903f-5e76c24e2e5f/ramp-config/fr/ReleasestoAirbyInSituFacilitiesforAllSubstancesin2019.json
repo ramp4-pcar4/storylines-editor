@@ -74,7 +74,8 @@
                 "name": "root",
                 "children": [
                     {
-                        "symbologyExpanded": true,      
+                        "symbologyExpanded": true,
+                        "description": "Rejets à l'air par des installations in situ pour toutes les substances en 2019 (tonnes)",                        
                         "layerId": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019"
                     }
                 ]
@@ -83,7 +84,7 @@
         "layers": [
             {
                 "id": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019",
-                "name": "Rejets à l'air par des installations in situ pour toutes les substances en 2019",
+                "name": "Rejets à l'air",
                 "layerType": "esriFeature",
                 "singleEntryCollapse": true,
                 "symbologyExpanded": true,  

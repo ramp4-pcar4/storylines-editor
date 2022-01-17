@@ -75,6 +75,7 @@
                 "children": [
                     {
                         "symbologyExpanded": true,
+                        "description": "Releases to Air by In Situ Facilities for All Substances 2010 to 2019 (tonnes)",
                         "layerId": "ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019(timeslider)"
                     }
                 ]
@@ -83,7 +84,7 @@
         "layers": [
             {
                 "id": "ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019(timeslider)",
-                "name": "Releases to Air by In Situ Facilities for All Substances 2010 to 2019 (time slider)",
+                "name": "Releases to Air",
                 "layerType": "esriFeature",
                 "singleEntryCollapse": true,
                 "symbologyExpanded": true,  

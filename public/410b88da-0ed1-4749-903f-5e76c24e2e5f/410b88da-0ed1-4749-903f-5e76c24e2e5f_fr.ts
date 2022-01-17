@@ -216,7 +216,12 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                         subtitle: '',
                         type: 'bar'
                     }
-                },
+                }
+            ]
+        },
+        {
+            title: 'Rejets de principaux contaminants atmosphériques de mines de sables bitumineux',
+            panel: [
                 {
                     src:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_2.csv',

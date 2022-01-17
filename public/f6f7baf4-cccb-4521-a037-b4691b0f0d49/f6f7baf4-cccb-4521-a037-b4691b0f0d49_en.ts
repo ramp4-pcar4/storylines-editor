@@ -27,7 +27,8 @@ const config = {
 - Pollution prevention
 - Future of pulp and paper production
 - Pollution in your neighbourhood
-- Pulp and paper sector`,
+- Pulp and paper sector
+[[TODO: These should all be links!]]`,
                     type: 'text'
                 },
                 {
@@ -264,20 +265,24 @@ TRS is generally neither manufactured nor processed in high quantity. However, t
                     title: 'Criteria air contaminants',
                     content: `The **graph below** illustrates the trend in TRS releases since 2010, together with the number of reporting facilities.
                     
-[[TODO: This is a mix of bar and line graph, with a secondary y axis on the right for NPRI facilities]]`,
+| Year | TRS releases (tonnes) | Number of reporting facilities |
+| ---- | --------------------- | ------------------------------ |
+| 2010 | 2761                  | 131                            |
+| 2011 | 2983                  | 117                            |
+| 2012 | 2599                  | 111                            |
+| 2013 | 2719                  | 108                            |
+| 2014 | 2425                  | 108                            |
+| 2015 | 2497                  | 104                            |
+| 2016 | 2612                  | 101                            |
+| 2017 | 2497                  | 96                             |
+| 2018 | 2587                  | 100                            |
+| 2019 | 2793                  | 101                            |`,
                     type: 'text'
                 },
                 {
-                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/en/TRS_en.csv',
-                    type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: '',
-                        title:
-                            'Total reduced sulphur releases in relation to the number of pulp and paper facilities reporting to the NPRI each year ',
-                        subtitle: '',
-                        type: 'bar'
-                    }
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/en/trs_en.png',
+                    type: 'image',
+                    altText: 'A graphical pie chart representation of the data table in the previous slide.'
                 }
             ]
         },
@@ -324,19 +329,14 @@ Pulp and paper facilities are required to conduct Environmental Effects Monitori
             panel: [
                 {
                     title: 'Recycling, treatment and disposal',
-                    content: `As shown in the chart below, of all pollutants reported by paper mills, most of it is  directly released into the environment. NPRI data indicate that 4% of substances are recovered. Of these, manganese and phosphorus are the two substances recovered in the greatest quantities (over 2,000 tonnes). The data show that metals are most often subjected to recovery processes. For example, at least 88% of reported aluminium, lead and zinc quantities are disposed of, treated or recycled.
-                    
-[[TODO: The clients have a complex pie chart within a pie chart that might not be achievable. May need to use the image for the first release.]]`,
+                    content: `As shown in the chart below, of all pollutants reported by paper mills, most of it is  directly released into the environment. NPRI data indicate that 4% of substances are recovered. Of these, manganese and phosphorus are the two substances recovered in the greatest quantities (over 2,000 tonnes). The data show that metals are most often subjected to recovery processes. For example, at least 88% of reported aluminium, lead and zinc quantities are disposed of, treated or recycled.`,
                     type: 'text'
                 },
                 {
-                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/en/DnT_en.csv',
-                    type: 'chart',
-                    options: {
-                        title: 'Substances recovered as a proportion of total substances reported to the NPRI',
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/en/substances_recovered_en.png',
+                    altText:
+                        'Pie chart 1. Proportion of substances directly released in the environment and recovered substances: Proportion of substances directly released in the environment- 96%, Proportion of recovered substances- 4%; Pie chart 2. Proportion of substances subject to a recovery process: Off-site disposal- 36%, On-site disposal- 44%, Recycling- 17%, Treatment- 3%.',
+                    type: 'image'
                 }
             ]
         },

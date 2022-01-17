@@ -22,7 +22,8 @@ const config = {
 - Disposals and recycling of Ethylene Glycol reported to the NPRI 
 - Government actions on the regulation of Ethylene Glycol 
 - Pollution prevention activities 
-- Pollution in your neighborhood (*These should all be links!*)
+- Pollution in your neighborhood 
+[[TODO: These should all be links!]]
                     
 Every year, facilities across Canada must report the pollutants they release into the air, water and land, as well as pollutants disposed and transferred, to the National Pollutant Release Inventory (NPRI), if they meet certain requirements. The information collected is publicly available, and can help Governments set environmental priorities and monitor environmental performance. Canadians can also use this information to learn about pollution in their environment.  
 

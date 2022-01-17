@@ -75,6 +75,7 @@
                 "children": [
                     {
                         "symbologyExpanded": true,
+                        "description": "Releases and Disposals by Mining Facilities in 2019 (tonnes)",                        
                         "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)"
                     }
                 ]
@@ -83,7 +84,7 @@
         "layers": [
             {
                 "id": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)",
-                "name": "Releases and Disposals by Mining Facilities in 2019 (satellite)",
+                "name": "Releases and Disposals",
                 "layerType": "esriFeature",
                 "tolerance": 20,
                 "singleEntryCollapse": true,
