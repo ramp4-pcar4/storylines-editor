@@ -57,7 +57,7 @@
                 <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right">{{ slide.title }}</tippy>
                 <a
                     :name="`menu-options-tippy-${idx}`"
-                    :href="`#${slide.title.toLowerCase().replaceAll(' ', '-')}`"
+                    :href="`#${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
                     class="flex items-center px-2 py-1 mx-1"
                     v-smooth-scroll
                 >
