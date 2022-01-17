@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fr" dir="ltr">
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -14,7 +14,7 @@
         ></script>
         <script
             type="text/javascript"
-            src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"
+            src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-fr.js"
         ></script>
         <link rel="stylesheet" href="scripts/multi-ramp/rv-styles.css" />
 
@@ -26,12 +26,12 @@
     </head>
     <body>
         <!-- template top and no-script fallback -->
-        <div id="def-top">d<%= require('html-loader!../src/assets/static/cdts/top-en.html') %></div>
+        <div id="def-top">d<%= require('html-loader!../src/assets/static/cdts/top-fr.html') %></div>
 
         <div id="app"></div>
 
         <!-- template footer and no-script fallback -->
-        <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
+        <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-fr.html') %></div>
 
         <script src="scripts/multi-ramp/rv-main.js"></script>
         <script type="text/javascript">
@@ -42,15 +42,15 @@
             defTop.outerHTML = wet.builder.top({
                 lngLinks: [
                     {
-                        lang: 'fr',
-                        href: 'index-ca-fr.html#/fr/' + hashParams.pop(),
-                        text: 'Français'
+                        lang: 'en',
+                        href: 'index-ca-en.html#/en/' + hashParams.pop(),
+                        text: 'Anglais'
                     }
                 ],
                 breadcrumbs: [
                     {
-                        title: 'Environment and natural resources',
-                        href: 'https://www.canada.ca/en/services/environment.html'
+                        title: 'Environnement et ressources naturelles',
+                        href: 'https://www.canada.ca/fr/services/environnement/meteo.html'
                     }
                 ]
             });
