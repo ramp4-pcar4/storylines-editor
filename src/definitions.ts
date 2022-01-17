@@ -40,7 +40,8 @@ export enum PanelType {
     Chart = 'chart',
     Video = 'video',
     Audio = 'audio',
-    Slideshow = 'slideshow'
+    Slideshow = 'slideshow',
+    Dynamic = 'dynamic'
 }
 
 export interface BasePanel {
@@ -58,6 +59,18 @@ export interface MapPanel extends BasePanel {
     type: PanelType.Map;
     config: any; // TODO: replace with proper Typescript type
     expandable?: boolean;
+}
+
+export interface DynamicPanel extends BasePanel {
+    type: PanelType.Dynamic;
+    title: string;
+    content: string;
+    children: DynamicChildItem[];
+}
+
+export interface DynamicChildItem {
+    id: string;
+    panel: BasePanel;
 }
 
 export interface ImagePanel extends BasePanel {
