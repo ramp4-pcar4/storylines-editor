@@ -33,13 +33,13 @@
     "exportMapUrl": "https://maps-cartes.dev.ec.gc.ca/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
     "export": {
       "title": {
-        "value": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector "
+        "value": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector"
       },
       "map": {},
       "mapElements": {},
       "legend": {},
       "footnote": {
-        "value": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector "
+        "value": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector"
       }
     },
     "search": {
@@ -327,7 +327,6 @@
           "children": [
             {
                 "layerId": "Locations",
-
                 "symbologyExpanded": true
             }
         ]
@@ -338,6 +337,8 @@
           "id": "Locations",
           "name": "Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector",
           "layerType": "esriFeature",
+          "singleEntryCollapse": true,
+          "symbologyExpanded": true,            
           "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/ea24000c_7dc3_49a9_baac_c55d28dcaeb9/MapServer/3"
       }
     ],

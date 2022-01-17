@@ -2,11 +2,11 @@ const config = {
     title: 'National Pollutant Releases Inventory Substance Overview: Ethylene Glycol',
     introSlide: {
         logo: {
-            src: 'https://raw.githubusercontent.com/ramp4-pcar4/ramp4-pcar4/master/assets/logo.svg',
-            altText: 'Logo'
+            src: '',
+            altText: ''
         },
         title: 'National Pollutant Releases Inventory Substance Overview: Ethylene Glycol',
-        subtitle: 'A Work in Progress by RAD! :)'
+        subtitle: ''
     },
     slides: [
         {
@@ -22,7 +22,7 @@ const config = {
 - Disposals and recycling of Ethylene Glycol reported to the NPRI 
 - Government actions on the regulation of Ethylene Glycol 
 - Pollution prevention activities 
-- Pollution in your neighborhood 
+- Pollution in your neighborhood (*These should all be links!*)
                     
 Every year, facilities across Canada must report the pollutants they release into the air, water and land, as well as pollutants disposed and transferred, to the National Pollutant Release Inventory (NPRI), if they meet certain requirements. The information collected is publicly available, and can help Governments set environmental priorities and monitor environmental performance. Canadians can also use this information to learn about pollution in their environment.  
 
@@ -38,7 +38,8 @@ This substance overview explores the total quantities of Ethylene Glycol reporte
                     images: [
                         {
                             src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/assets/en/1-Plane deiced.jpg',
-                            type: 'image'
+                            type: 'image',
+                            altText: 'A passenger plane being deiced prior a takeoff'
                         }
                     ]
                 }
@@ -54,12 +55,7 @@ This substance overview explores the total quantities of Ethylene Glycol reporte
 - In the manufacture of plastics (i.e., polyethylene terephthalate or PET), which can then be converted into numerous products, such as bottles and textiles. 
 You can read more on [Ethylene Glycol here](https://www.canada.ca/en/health-canada/services/chemical-substances/fact-sheets/chemicals-glance/ethylene-glycol.html).`,
                     type: 'text'
-                }
-            ]
-        },
-        {
-            title: 'Effects of Ethylene Glycol – Human Health',
-            panel: [
+                },
                 {
                     title: 'Effects of Ethylene Glycol – Human Health',
                     content: `Canadians may be exposed to ethylene glycol through the environment (e.g., air, food) and/or from use of consumer products that contain this substance (e.g., paints, automotive anti-freeze). However, based on estimated exposure levels for 2010, the Government of Canada concluded that ethylene glycol was not harmful to the health of the general population ([reference final assessment](https://www.canada.ca/en/environment-climate-change/services/canadian-environmental-protection-act-registry/publications/ethylene-glycol-final-content.html) and [state of the science report](https://www.canada.ca/en/health-canada/services/environmental-workplace-health/reports-publications/environmental-contaminants/canadian-environmental-protection-act-1999-priority-substances-list-assessment-report-ethylene-glycol.html)).
@@ -81,17 +77,21 @@ The substance only causes adverse effects in organisms at high doses or concentr
 
 The rapid degradation, low concentrations in terms of toxicity, seasonality of releases and the fact that it does not accumulate in the environment or in organisms makes this substance unlikely to pose significant risk to the environment at the current levels in Canada.`,
                     type: 'text'
+                },
+                {
+                    title: 'Facilities that report Ethylene Glycol to the NPRI',
+                    content: `In 2019, 284 facilities reported uses of ethylene glycol to the NPRI. Several different industrial sectors reported releases to the environment, disposal or transfers for recycling of ethylene glycol to the NPRI. Most notably, oil and gas (74 facilities), chemical manufacturing (62 facilities), airport and support to air transportation (56 facilities), and waste treatment and disposals (38 facilities) facilities were the main sectors to report uses of ethylene glycol to the NPRI. A wide array of other industrial sectors also reported small amounts of this substance and were grouped together in the “all other sectors” (54 facilities) category. 
+                    The province with the largest number of facilities reporting ethylene glycol to the NPRI in 2019 was Alberta (111), followed by Ontario (60), Québec (34) and British Colombia (28).  The most common reporting sectors for Alberta and British Columbia were oil and gas facilities (56 and 7 facilities respectively), while “All other sectors” was most common for Ontario (18) and Québec (18). `,
+                    type: 'text'
                 }
             ]
         },
         {
-            title: 'Facilities that report Ethylene Glycol to the NPRI',
+            title: 'Effects of Ethylene Glycol – Human Health',
             panel: [
                 {
-                    title: 'Facilities that report Ethylene Glycol to the NPRI',
-                    content: `In 2019, 284 facilities reported uses of ethylene glycol to the NPRI. Several different industrial sectors reported releases to the environment, disposal or transfers for recycling of ethylene glycol to the NPRI. Most notably, oil and gas (74 facilities), chemical manufacturing (62 facilities), airport and support to air transportation (56 facilities), and waste treatment and disposals (38 facilities) facilities were the main sectors to report uses of ethylene glycol to the NPRI. A wide array of other industrial sectors also reported small amounts of this substance and were grouped together in the “all other sectors” (54 facilities) category. 
-                    The province with the largest number of facilities reporting ethylene glycol to the NPRI in 2019 was Alberta (111), followed by Ontario (60), Québec (34) and British Colombia (28).  The most common reporting sectors for Alberta and British Columbia were oil and gas facilities (56 and 7 facilities respectively), while “All other sectors” was most common for Ontario (18) and Québec (18). 
-                    
+                    title: 'Effects of Ethylene Glycol – Human Health',
+                    content: `                   
 #### Breakdown of facilities reporting ethylene glycol to the NPRI for 2019 by sectors and province
 | **Sectors**                   | **Airports and Services to Airports** | **All Other Sectors** | **Chemical Manufacturing** | **Oil and Gas (Conventional and Non-Conventional)** | **Waste Treatment and Disposal** | **TOTAL** |
 | ----------------------------- | ------------------------------------- | --------------------- | -------------------------- | --------------------------------------------------- | -------------------------------- | --------- |
@@ -133,12 +133,38 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
             panel: [
                 {
                     title: 'Releases of Ethylene Glycol reported to the NPRI',
-                    content: `In 2019, facilities reported a total of 16 072, 920 tonnes of ethylene glycol released into air, water and land combined. The airports and services to air transportation sector is by far the largest contributor in terms of quantities, with nearly all of the reported releases to air, water and land combined (94% or 15 099 tonnes) for 2019. Of those releases, 99% were land releases from de-icing operations. The pie chart (figure 1) below shows the breakdown of total releases by selected sector.
-                    
-[A pie chart goes here??]
-                    
-Ontario was the province with the largest reported releases (air, water and land) of ethylene glycol with 67% (10 828 tonnes) in 2019, followed by Alberta, with 19% (3 073 tonnes) of the releases. The figure 2 below shows the breakdown of total reported releases by province, for 2019.`,
+                    content: `In 2019, facilities reported a total of 16 072, 920 tonnes of ethylene glycol released into air, water and land combined. The airports and services to air transportation sector is by far the largest contributor in terms of quantities, with nearly all of the reported releases to air, water and land combined (94% or 15 099 tonnes) for 2019. Of those releases, 99% were land releases from de-icing operations. The pie chart (figure 1) below shows the breakdown of total releases by selected sector.`,
                     type: 'text'
+                },
+                {
+                    src:
+                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
+                    type: 'chart',
+                    options: {
+                        title: 'Figure 1: Percentage of total ethlyene glycol releases for 2019, by sector',
+                        subtitle: '',
+                        type: 'pie'
+                    }
+                }
+            ]
+        },
+        {
+            title: 'Releases of Ethylene Glycol reported to the NPRI',
+            panel: [
+                {
+                    title: 'Releases of Ethylene Glycol reported to the NPRI',
+                    content: `Ontario was the province with the largest reported releases (air, water and land) of ethylene glycol with 67% (10 828 tonnes) in 2019, followed by Alberta, with 19% (3 073 tonnes) of the releases. The figure 2 below shows the breakdown of total reported releases by province, for 2019.`,
+                    type: 'text'
+                },
+                {
+                    src:
+                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Total releases of ethylene glycol for 2019, by province_en.csv',
+                    type: 'chart',
+                    options: {
+                        title: 'Figure 2: Total releases of ethylene glycol for 2019, by province',
+                        subtitle: '',
+                        type: 'bar'
+                    }
                 }
             ]
         },
@@ -149,18 +175,34 @@ Ontario was the province with the largest reported releases (air, water and land
                     title: 'Total releases of ethylene glycol per facility for 2019',
                     content: `In the map to the right, you can view the total releases of ethylene glycol per facility for 2019. The top ten facilities, in terms of total releases, were airports or facilities providing services to airports.
 
-Overall, total releases of ethylene glycol have increased between 2010 and 2019, with some annual variability, as shown in figure 3 below. With the airport and services to airport sector accounting for nearly all the releases, the annual variability can be explained by variations in winter temperatures, as colder winters would call for more de-icing operations. The general upward trend can be explained by increases in air transportation through time. In 2017, Canadian air carriers reported an increase in passengers (7.6%) and fuel consumption (4%) from 2016, which correlates with the upward trend of ethylene glycol reported to the NPRI.
- 
-[A chart goes here??]
-                    
-Although air releases only account for a very small fraction of reported releases of ethylene glycol through time (less than 1% for 2019), the chemicals sector shows a significant increase (130 tonnes, or 531% increase) from 2015 to 2016, and has remained constant since then. However, in 2019 there is a significant decrease for the chemicals sector.  Compared to the overall amount of ethylene glycol releases in Canada, the total amount of ethylene glycol released to the air by the chemicals sector remains low.
-
-As for water releases, we are seeing an overall decreasing trend, driven by decreases in reported releases by the oil and gas sector from offshore oil platforms.`,
+Overall, total releases of ethylene glycol have increased between 2010 and 2019, with some annual variability, as shown in figure 3 below. With the airport and services to airport sector accounting for nearly all the releases, the annual variability can be explained by variations in winter temperatures, as colder winters would call for more de-icing operations. The general upward trend can be explained by increases in air transportation through time. In 2017, Canadian air carriers reported an increase in passengers (7.6%) and fuel consumption (4%) from 2016, which correlates with the upward trend of ethylene glycol reported to the NPRI.`,
                     type: 'text'
                 },
                 {
                     config: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/ramp-config/en/total_releases2019.json',
                     type: 'map'
+                }
+            ]
+        },
+        {
+            title: 'Total releases of ethylene glycol per facility for 2019',
+            panel: [
+                {
+                    title: 'Total releases of ethylene glycol per facility for 2019',
+                    content: `Although air releases only account for a very small fraction of reported releases of ethylene glycol through time (less than 1% for 2019), the chemicals sector shows a significant increase (130 tonnes, or 531% increase) from 2015 to 2016, and has remained constant since then. However, in 2019 there is a significant decrease for the chemicals sector.  Compared to the overall amount of ethylene glycol releases in Canada, the total amount of ethylene glycol released to the air by the chemicals sector remains low.
+
+As for water releases, we are seeing an overall decreasing trend, driven by decreases in reported releases by the oil and gas sector from offshore oil platforms.`,
+                    type: 'text'
+                },
+                {
+                    src:
+                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol release trends, by sector 2010-2019 (tonnes)_en.csv',
+                    type: 'chart',
+                    options: {
+                        title: 'Figure 3: Ethlyene glycol release trends, by sector 2010-2019 (tonnes)',
+                        subtitle: '',
+                        type: 'line'
+                    }
                 }
             ]
         },
@@ -186,7 +228,7 @@ The map on the right shows the total quantities of ethylene glycol disposed and 
             title: '',
             panel: [
                 {
-                    title: '',
+                    title: 'Ethlyene glycol disposal and recycling trends',
                     content: `Figure 5 shows that total quantities of ethylene glycol disposed or recycled overtime tend to remain constant for most sectors. The sector showing the most variability is the waste management sector as these facilities typically experience a lot of variation depending of type of material that they receive, which may change from year to year (as shown by the orange line in figure 5).
 
 When examining disposals and recycling separately, we can see that disposals have remained fairly constant while recycling has slightly increased over time. In the mid-1990’s, new guidelines for releases concentrations of ethylene glycol in water were established by Transport Canada and Fisheries and Ocean Canada. All Canadian airports put in place new operational procedures to implement remediation work. The increase in recycling and treatment indicates a positive change, as it significantly reduce the amount of substance that would otherwise end up in landfills and environments. 
@@ -195,14 +237,14 @@ You can read more on [Air Transportation](https://tc.canada.ca/en/corporate-serv
                     type: 'text'
                 },
                 {
-                    caption: 'Figure 5: A chart is supposed to go here!',
-                    type: 'slideshow',
-                    images: [
-                        {
-                            src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/assets/en/1-Plane deiced.jpg',
-                            type: 'image'
-                        }
-                    ]
+                    src:
+                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)_en.csv',
+                    type: 'chart',
+                    options: {
+                        title: 'Figure 5: Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)',
+                        subtitle: '',
+                        type: 'line'
+                    }
                 }
             ]
         },
@@ -219,12 +261,7 @@ In the report, the Government concluded that:
                     
 Therefore, no further action, under CEPA 1999, will be taken on ethylene glycol at this time.`,
                     type: 'text'
-                }
-            ]
-        },
-        {
-            title: 'Pollution prevention activities',
-            panel: [
+                },
                 {
                     title: 'Pollution prevention activities',
                     content: `Although not mandatory, several facilities in Canada chose to adopt pollution prevention plans and implement a number of activities to prevent pollution and waste at the source.  

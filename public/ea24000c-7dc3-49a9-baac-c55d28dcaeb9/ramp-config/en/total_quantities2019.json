@@ -327,7 +327,6 @@
           "children": [
             {
                 "layerId": "Total_Quantities2019",
-
                 "symbologyExpanded": true
             }
         ]
@@ -338,6 +337,9 @@
           "id": "Total_Quantities2019",
           "name": "Total quantities of ethylene glycol disposed and recycled by facilities in 2019",
           "layerType": "esriFeature",
+          "singleEntryCollapse": true,
+          "symbologyExpanded": true,
+          "tolerance": 20,
           "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/ea24000c_7dc3_49a9_baac_c55d28dcaeb9/MapServer/2"
       }
     ],
