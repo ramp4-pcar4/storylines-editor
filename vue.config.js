@@ -11,6 +11,12 @@ module.exports = {
             template: 'public/index-ca-en.html',
             filename: 'index-ca-en.html',
             title: 'Story RAMP'
+        },
+        indexCanadaFr: {
+            entry: './src/main.ts',
+            template: 'public/index-ca-fr.html',
+            filename: 'index-ca-fr.html',
+            title: 'Story RAMP' // TODO: add French translation
         }
     }
 };
