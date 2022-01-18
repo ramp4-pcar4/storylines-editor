@@ -186,10 +186,10 @@ Overall, total releases of ethylene glycol have increased between 2010 and 2019,
             ]
         },
         {
-            title: 'Total releases of ethylene glycol per facility for 2019',
+            title: 'Ethlyene glycol release trends',
             panel: [
                 {
-                    title: 'Total releases of ethylene glycol per facility for 2019',
+                    title: 'Ethlyene glycol release trends',
                     content: `Although air releases only account for a very small fraction of reported releases of ethylene glycol through time (less than 1% for 2019), the chemicals sector shows a significant increase (130 tonnes, or 531% increase) from 2015 to 2016, and has remained constant since then. However, in 2019 there is a significant decrease for the chemicals sector.  Compared to the overall amount of ethylene glycol releases in Canada, the total amount of ethylene glycol released to the air by the chemicals sector remains low.
 
 As for water releases, we are seeing an overall decreasing trend, driven by decreases in reported releases by the oil and gas sector from offshore oil platforms.`,
@@ -212,11 +212,27 @@ As for water releases, we are seeing an overall decreasing trend, driven by decr
             panel: [
                 {
                     title: 'Disposals and recycling of Ethylene Glycol reported to the NPRI',
-                    content: `In 2019, 18,206 tonnes of ethylene glycol were reported as disposed or recycled to the NPRI. The majority of the quantities disposed or recycled (10,429 tonnes, 57%) were from the airport and services to airport sector, followed by waste treatment and disposals (4,068 tonnes, 22%) and the oil and gas sector (2,737 tonnes, 15%). Figure 4 below shows the breakdown of total disposals and recycling by selected sectors for 2019.
-                    
-[A chart goes here somehow!]
-
-The map on the right shows the total quantities of ethylene glycol disposed and recycled by facilities in 2019, and the sector that they belong to. It shows that the majority of disposals occur in Alberta, Ontario and Québec.`,
+                    content: `In 2019, 18,206 tonnes of ethylene glycol were reported as disposed or recycled to the NPRI. The majority of the quantities disposed or recycled (10,429 tonnes, 57%) were from the airport and services to airport sector, followed by waste treatment and disposals (4,068 tonnes, 22%) and the oil and gas sector (2,737 tonnes, 15%). Figure 4 below shows the breakdown of total disposals and recycling by selected sectors for 2019.`,
+                    type: 'text'
+                },
+                {
+                    src:
+                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
+                    type: 'chart',
+                    options: {
+                        title: `Figure 4: Percentage of ethylene glycol disposal and recycling, by sector (2019)`,
+                        subtitle: '',
+                        type: 'pie'
+                    }
+                }
+            ]
+        },
+        {
+            title: 'Disposals and recycling of Ethylene Glycol reported to the NPRI',
+            panel: [
+                {
+                    title: 'Disposals and recycling of Ethylene Glycol reported to the NPRI',
+                    content: `The map on the right shows the total quantities of ethylene glycol disposed and recycled by facilities in 2019, and the sector that they belong to. It shows that the majority of disposals occur in Alberta, Ontario and Québec.`,
                     type: 'text'
                 },
                 {
