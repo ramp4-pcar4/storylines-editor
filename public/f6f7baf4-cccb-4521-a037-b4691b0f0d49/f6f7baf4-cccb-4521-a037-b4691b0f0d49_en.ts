@@ -36,6 +36,7 @@ const config = {
                     content: `The pulp and paper industry is among the key sectors that are required to report annually to the National Pollutant Release Inventory ([NPRI](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory.html)). Since 1993, businesses, institutions and other facilities across Canada have been reporting to the NPRI their releases of pollutants to air, water and land and the pollutants they transfer off-site for disposal and recycling. All of the information collected is publicly available on the [NPRI website](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory.html). Different levels of government use this data to set priorities for environmental management and public health, as well as to provide information to Canadians about pollutant releases.
 
 This sector overview covers substances reported to the NPRI by Canadian pulp and paper mills from 2010 to 2019. It also summarizes what facilities are doing to mitigate the environmental impacts of their operations and prevent pollution. 
+
 This overview of the pulp and paper sector reproduces the key points presented in the report produced, as part of the NPRI [Academic Challenge](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory/partnerships/academic-challenge.html), by students in the Environmental Management Masters program at the Université de Sherbrooke. Learn more about other NPRI [partnership and collaboration](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory/partnerships.html) initiatives.`,
                     type: 'text'
                 }
@@ -259,10 +260,10 @@ TRS is generally neither manufactured nor processed in high quantity. However, t
             ]
         },
         {
-            title: 'Criteria air contaminants',
+            title: 'TRS releases',
             panel: [
                 {
-                    title: 'Criteria air contaminants',
+                    title: 'TRS releases',
                     content: `The **graph below** illustrates the trend in TRS releases since 2010, together with the number of reporting facilities.
                     
 | Year | TRS releases (tonnes) | Number of reporting facilities |
