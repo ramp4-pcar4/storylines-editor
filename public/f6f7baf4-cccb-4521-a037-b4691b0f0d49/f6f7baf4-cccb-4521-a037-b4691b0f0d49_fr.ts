@@ -32,7 +32,7 @@ const config = {
                     type: 'text'
                 },
                 {
-                    title: 'Pulp and paper',
+                    title: 'Pâtes et papiers',
                     content: `L’industrie de pâtes et papiers fait partie des secteurs clés qui doivent déclarer annuellement à l’Inventaire national des rejets de polluants ([INRP](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants.html?utm_campaign=not-applicable&utm_medium=vanity-url&utm_source=canada-ca_inrp)). Depuis 1993, les entreprises, les établissements et d’autres entités à travers le Canada déclarent à l’INRP les polluants qu’ils rejettent dans l’eau, l’air et le sol, et qu’ils transfèrent hors site à des fins d’élimination et de recyclage. Tous les renseignements recueillis sont du domaine public et disponibles sur le [site internet de l’INRP](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants.html?utm_campaign=not-applicable&utm_medium=vanity-url&utm_source=canada-ca_inrp). Ces données aident les divers paliers gouvernementaux à établir les priorités en matière de gestion environnementale et de santé publique, ainsi qu’à informer les Canadiens sur les rejets de polluants.
 
 Le présent aperçu de secteur traite des substances déclarées à l’INRP par les papetières canadiennes pour la période de 2010 à 2019.  Il résume également ce que les exploitants de ces installations mettent en œuvre pour atténuer les répercussions de leurs activités sur l’environnement et prévenir la pollution. 
