@@ -1,32 +1,41 @@
 <template>
-    <div class="storyramp-app bg-white">
-        <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
-            <div class="flex w-full px-6 py-3 mx-auto">
-                <div class="flex-none font-semibold">
-                    <span class="text-lg">{{ config.title }}</span>
+    <div v-if="!isLoading">
+        <div class="storyramp-app bg-white">
+            <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
+                <div class="flex w-full px-6 py-3 mx-auto">
+                    <div class="flex-none font-semibold">
+                        <span class="text-lg">{{ config.title }}</span>
+                    </div>
+                    <div class="flex justify-end flex-auto space-x-6">
+                        <!-- Any links we want in the header can go here -->
+                    </div>
                 </div>
-                <div class="flex justify-end flex-auto space-x-6">
-                    <!-- Any links we want in the header can go here -->
-                </div>
+            </header>
+
+            <introduction :config="config.introSlide"></introduction>
+
+            <div class="w-full mx-auto pb-10" id="story">
+                <StoryV :config="config" />
             </div>
-        </header>
 
-        <introduction :config="config.introSlide"></introduction>
-
-        <div class="w-full mx-auto pb-10" id="story">
-            <StoryV :config="config" />
+            <footer class="p-8 pt-2 text-right text-sm">
+                Context:
+                <a class="text-blue-500 font-semibold" :href="config.contextLink" target="_NEW">{{
+                    config.contextLabel
+                }}</a>
+                |
+                <a href="https://github.com/ramp4-pcar4/story-ramp" target="_NEW" class="font-semibold text-blue-500"
+                    >ramp4-pcar4/story-ramp</a
+                >
+            </footer>
         </div>
+    </div>
 
-        <footer class="p-8 pt-2 text-right text-sm">
-            Context:
-            <a class="text-blue-500 font-semibold" :href="config.contextLink" target="_NEW">{{
-                config.contextLabel
-            }}</a>
-            |
-            <a href="https://github.com/ramp4-pcar4/story-ramp" target="_NEW" class="font-semibold text-blue-500"
-                >ramp4-pcar4/story-ramp</a
-            >
-        </footer>
+    <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
+    <div v-else>
+        <div class="block py-20 align-middle text-center h-full" style="margin: 0 auto">
+            <spinner size="120px" background="#00D2D3" color="#009cd1" stroke="10px" style="margin: 0 auto"></spinner>
+        </div>
     </div>
 </template>
 
@@ -36,21 +45,23 @@ import { Route } from 'vue-router';
 import StoryV from '@/components/story/story.vue';
 import IntroV from '@/components/story/introduction.vue';
 
-import config from '@/../public/00000000-0000-0000-0000-000000000000/00000000-0000-0000-0000-000000000000_en';
 import { StoryRampConfig } from '@/definitions';
+import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 
 @Component({
     components: {
         StoryV,
-        introduction: IntroV
+        introduction: IntroV,
+        spinner: Circle2
     }
 })
 export default class StoryRampV extends Vue {
-    config: StoryRampConfig = config;
+    config: StoryRampConfig | undefined = undefined;
+    isLoading = true;
 
     created(): void {
-        const uid = this.$route.params.uid;
-        const lang = this.$route.params.lang;
+        const uid = this.$route.params.uid ? this.$route.params.uid : '00000000-0000-0000-0000-000000000000';
+        const lang = this.$route.params.lang ? this.$route.params.lang : 'en';
         if (uid) {
             this.fetchConfig(uid, lang);
         }
@@ -65,11 +76,10 @@ export default class StoryRampV extends Vue {
     }
 
     fetchConfig(uid: string, lang?: string): void {
-        // default to 'en'
-        lang = lang ? lang : 'en';
         import(`@/../public/${uid}/${uid}_${lang}.ts`)
             .then((res) => {
                 this.config = res.default;
+                this.isLoading = false;
             })
             .catch((err) => {
                 console.error(`There exists no config given by the URL params: ${err}`);
