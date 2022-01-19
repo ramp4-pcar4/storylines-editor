@@ -8,7 +8,7 @@
                 class="flex pt-24"
                 :key="idx"
                 :data-chapter-index="idx"
-                :id="slide.title.toLowerCase().replaceAll(' ', '-')"
+                :id="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
             >
                 <slide :config="slide" :slideIdx="idx"></slide>
             </div>

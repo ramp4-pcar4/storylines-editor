@@ -1,7 +1,7 @@
 <template>
     <div
         :class="isMenuOpen ? 'w-72' : ''"
-        class="sticky self-start w-12 duration-500 ease-in-out transition-width top-16"
+        class="nav-bar sticky self-start w-12 duration-500 ease-in-out transition-width top-16"
     >
         <div class="flex items-center mt-4 mb-12">
             <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">Chapters</tippy>
@@ -24,16 +24,16 @@
                     <path d="m3.5 17h17" />
                 </svg>
                 <span
-                    class="flex-1 pl-2 ml-2 overflow-hidden leading-none text-left overflow-ellipsis whitespace-nowrap"
+                    class="flex-1 pl-2 ml-2 overflow-hidden leading-normal text-left overflow-ellipsis whitespace-nowrap"
                     >Chapters</span
                 >
             </button>
         </div>
 
-        <ul class="menu">
+        <ul class="nav-content menu">
             <li>
-                <tippy delay="200" placement="right">Return to Top</tippy>
-                <a name="return-to-top" href="#intro" class="flex items-center px-2 py-1 mx-1" v-smooth-scroll>
+                <tippy to="menu-options-tippy" delay="200" placement="right">Return to Top</tippy>
+                <a name="menu-options-tippy" href="#intro" class="flex items-center px-2 py-1 mx-1" v-smooth-scroll>
                     <svg
                         class="flex-shrink-0"
                         width="24"
@@ -57,7 +57,7 @@
                 <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right">{{ slide.title }}</tippy>
                 <a
                     :name="`menu-options-tippy-${idx}`"
-                    :href="`#${slide.title.toLowerCase().replaceAll(' ', '-')}`"
+                    :href="`#${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
                     class="flex items-center px-2 py-1 mx-1"
                     v-smooth-scroll
                 >
@@ -98,6 +98,22 @@ export default class ChapterMenuV extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.nav-bar {
+    max-height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-content {
+    overflow-y: auto;
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
+}
+
+.nav-content::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+
 .menu li {
     a:hover {
         text-decoration: none;
