@@ -4,11 +4,6 @@ import App from './app.vue';
 import router from './router';
 import './style.css';
 
-import VueSmoothScroll from 'vue2-smooth-scroll';
-Vue.use(VueSmoothScroll, {
-    updateHistory: false
-});
-
 import VueTippy, { TippyComponent } from 'vue-tippy';
 
 Vue.use(VueTippy);
