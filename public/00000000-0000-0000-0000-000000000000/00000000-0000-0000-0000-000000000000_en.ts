@@ -22,7 +22,8 @@ Businesses, institutions and other facilities across Canada must report their re
                 {
                     src:
                         '00000000-0000-0000-0000-000000000000/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
-                    type: 'image'
+                    type: 'image',
+                    caption: 'This is a caption for the image.'
                 }
             ]
         },

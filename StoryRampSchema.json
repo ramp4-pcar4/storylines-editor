@@ -215,6 +215,10 @@
                     "type": "string",
                     "description": "The supporting text for the image."
                 },
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the image."
+                },
                 "class": {
                     "type": "string",
                     "description": "Styling class properties for the image."

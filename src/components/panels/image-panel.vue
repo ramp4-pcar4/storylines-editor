@@ -1,6 +1,8 @@
 <template>
-    <div class="justify-center flex h-full align-middle py-5">
-        <img :src="config.src" :class="config.class" :alt="config.altText" class="px-10 my-8 block max-w-full" />
+    <div class="justify-center flex flex-col h-full align-middle py-5 w-full">
+        <img :src="config.src" :class="config.class" :alt="config.altText" class="px-10 my-6 block max-w-full flex" />
+
+        <div v-if="config.caption" class="text-center mt-5 text-sm max-w-full" v-html="md.render(config.caption)"></div>
     </div>
 </template>
 
@@ -8,9 +10,13 @@
 import { ImagePanel } from '@/definitions';
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
+import MarkdownIt from 'markdown-it';
+
 @Component({})
 export default class ImagePanelV extends Vue {
     @Prop() config!: ImagePanel;
+
+    md = new MarkdownIt({ html: true });
 }
 </script>
 

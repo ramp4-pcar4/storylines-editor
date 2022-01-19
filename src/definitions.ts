@@ -111,6 +111,7 @@ export interface ImagePanel extends BasePanel {
     height?: number;
     class?: string;
     altText?: string;
+    caption?: string;
     tooltip?: string;
 }
 
