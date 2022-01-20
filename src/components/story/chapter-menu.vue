@@ -33,7 +33,12 @@
         <ul class="nav-content menu">
             <li>
                 <tippy to="menu-options-tippy" delay="200" placement="right">Return to Top</tippy>
-                <a name="menu-options-tippy" href="#intro" class="flex items-center px-2 py-1 mx-1" v-smooth-scroll>
+                <router-link
+                    name="menu-options-tippy"
+                    :to="{ hash: '#intro' }"
+                    class="flex items-center px-2 py-1 mx-1"
+                    target
+                >
                     <svg
                         class="flex-shrink-0"
                         width="24"
@@ -51,15 +56,15 @@
                     <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap"
                         >Return to Top</span
                     >
-                </a>
+                </router-link>
             </li>
             <li v-for="(slide, idx) in slides" :key="idx" :class="{ 'is-active': activeChapterIndex === idx }">
                 <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right">{{ slide.title }}</tippy>
-                <a
+                <router-link
                     :name="`menu-options-tippy-${idx}`"
-                    :href="`#${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
+                    :to="{ hash: `#${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}` }"
                     class="flex items-center px-2 py-1 mx-1"
-                    v-smooth-scroll
+                    target
                 >
                     <svg
                         class="flex-shrink-0"
@@ -78,7 +83,7 @@
                     <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
                         slide.title
                     }}</span>
-                </a>
+                </router-link>
             </li>
         </ul>
     </div>

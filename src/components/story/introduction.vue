@@ -9,7 +9,7 @@
             {{ config.subtitle }}
         </p>
 
-        <a href="#story" class="inline-block mt-10 scroll-arrow" title="scroll to story" v-smooth-scroll>
+        <router-link :to="{ hash: '#story' }" class="inline-block mt-10 scroll-arrow" title="scroll to story" target>
             <svg
                 class="w-auto h-24 m-auto"
                 width="90"
@@ -32,7 +32,7 @@
                     stroke-width=".97921"
                 />
             </svg>
-        </a>
+        </router-link>
     </div>
 </template>
 

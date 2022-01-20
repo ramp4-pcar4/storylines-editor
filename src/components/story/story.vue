@@ -9,6 +9,7 @@
                 :key="idx"
                 :data-chapter-index="idx"
                 :id="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
+                :name="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
             >
                 <slide :config="slide" :slideIdx="idx"></slide>
             </div>
