@@ -49,6 +49,13 @@ export interface DQVChartConfig {
         categories: [];
     };
     plotOptions?: any;
+    exporting: {
+        buttons: {
+            contextButton: {
+                menuItems: string[];
+            };
+        };
+    };
     series: SeriesData[] | { data: SeriesData[] };
 }
 

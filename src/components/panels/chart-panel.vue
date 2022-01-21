@@ -13,8 +13,12 @@ import { Chart } from 'highcharts-vue';
 import { ChartPanel, DQVChartConfig, SeriesData } from '@/definitions';
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
+import exporting from 'highcharts/modules/exporting';
+import exportData from 'highcharts/modules/export-data';
 
 dataModule(Highcharts);
+exporting(Highcharts);
+exportData(Highcharts);
 
 @Component({
     components: {
@@ -26,6 +30,18 @@ export default class ChartPanelV extends Vue {
 
     chartOptions: DQVChartConfig = {} as DQVChartConfig;
     title = '';
+    menuOptions = [
+        'viewFullScreen',
+        'printChart',
+        'separator',
+        'downloadPNG',
+        'downloadJPEG',
+        'downloadPDF',
+        'downloadSVG',
+        'separator',
+        'downloadCSV',
+        'downloadXLS'
+    ];
 
     mounted(): void {
         const extension = this.config.src.split('.').pop();
@@ -97,6 +113,15 @@ export default class ChartPanelV extends Vue {
             }
         };
 
+        // export options displayed on hamburger menu
+        const exportOptions = {
+            buttons: {
+                contextButton: {
+                    menuItems: this.menuOptions
+                }
+            }
+        };
+
         // initializing chartOptions for line/bar charts
         this.chartOptions = {
             chart: {
@@ -110,6 +135,7 @@ export default class ChartPanelV extends Vue {
             },
             plotOptions: plotOptions,
             series: series,
+            exporting: exportOptions,
             credits: {
                 enabled: dqvOptions?.credits ? dqvOptions?.credits : false
             }
@@ -140,6 +166,15 @@ export default class ChartPanelV extends Vue {
             });
         });
 
+        // export options displayed on hamburger menu
+        const exportOptions = {
+            buttons: {
+                contextButton: {
+                    menuItems: this.menuOptions
+                }
+            }
+        };
+
         // initializing chartOptions for line/bar charts
         this.chartOptions = {
             chart: {
@@ -153,6 +188,7 @@ export default class ChartPanelV extends Vue {
             subtitle: {
                 text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
             },
+            exporting: exportOptions,
             credits: {
                 enabled: dqvOptions?.credits ? dqvOptions?.credits : false
             },
