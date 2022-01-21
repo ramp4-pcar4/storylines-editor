@@ -426,6 +426,28 @@ Le rapport sur [L’état des forêts au Canada 2019](https://www.rncan.gc.ca/ou
                     title: 'Pollution dans votre voisinage',
                     content: `Pour en savoir plus, vous pouvez trouver les installations et les polluants présents dans votre communauté en consultant les [cartes et jeux de données de l’INRP](https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/outils-ressources-donnees/explorerdonnees.html). Toutes les données de l’INRP sont publiques et gratuites.`,
                     type: 'text'
+                },
+                {
+                    title: 'Données de l’INRP',
+                    content: `Nous avons regroupé les données de différentes manières pour différentes utilisations. Vous pouvez effectuer une recherche dans toute la base de données, télécharger des sous-ensembles de données ou afficher les données sur des cartes.
+        
+### Rechercher dans les données de l’INRP
+
+Recherchez notre [Tableau de bord de l'Inventaire national des rejets de polluants](https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/outils-ressources-donnees/tableau-de-bord-toute-lannee.html) pour les données de rejets de polluants de 1994 à 2019, ainsi que des informations sur les installations. Les données préliminaires de 2020 sont aussi disponibles.
+
+### Télécharger les fichiers de données de l’INRP
+
+Ces fichiers faciles à utiliser vous permettent de pousser votre analyse des données plus loin de différentes manières
+
+- [Tableaux pour une année](https://open.canada.ca/data/fr/dataset/1fb7d8d4-7713-4ec6-b957-4a882a84fed3),
+-  tableaux annuels des données les plus couramment utilisées. Un tableau pour chacune des trois dernières années
+- [Résumés de cinq années](https://open.canada.ca/data/fr/dataset/ea0dc8ae-d93c-4e24-9f61-946f1736a26f)
+-  résumés des rejets dans l’atmosphère, dans l’eau ou dans le sol, regroupés par province, type d’industrie ou substance.
+- [Fichiers de données pour toutes les années](https://open.canada.ca/data/fr/dataset/40e01423-7728-429c-ac9d-2954385ccdfb)
+-  données annuelles sur les quantités de polluants, les commentaires et les géolocalisations depuis 1994.
+- [Fichiers complets de données déclarées](https://open.canada.ca/data/fr/dataset/06022cc0-a31e-4b4c-850d-d4dccda5f3ac)
+-  ensembles de données complets soumis par l’industrie depuis 1994.`,
+                    type: 'text'
                 }
             ]
         }

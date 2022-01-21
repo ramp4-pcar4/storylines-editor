@@ -502,6 +502,38 @@ Oil sands surface mining facilities in Alberta take much of their water from the
                     altText: 'An aerial view of the Athabasca River.'
                 }
             ]
+        },
+        {
+            title: 'Pollution in your neighborhood',
+            panel: [
+                {
+                    title: 'Pollution in your neighborhood',
+                    content: `You can identify the facilities and pollutants in your community by entering your postal code in the NPRI online data search. For further analysis, check out [other NPRI maps and datasets](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html).`,
+                    type: 'text'
+                },
+                {
+                    title: 'NPRI data',
+                    content: `We have packaged the data in different ways for different uses. You can search the entire database, download subsets of data, or view the data on maps.
+        
+### Search NPRI data
+
+[Search our database](https://pollution-waste.canada.ca/national-release-inventory/archives/index.cfm?lang=En) for 1994 to 2017 pollutant releases in your area, as well as information about the facility(s).
+
+### Download NPRI data
+
+These easy-to-use files let you dig deeper into the data in a variety of ways
+
+- [Single year tables](https://open.canada.ca/data/en/dataset/1fb7d8d4-7713-4ec6-b957-4a882a84fed3),
+- annual tables of our most popular data fields. One table for each of the last 3 years
+- [Five year summaries](https://open.canada.ca/data/en/dataset/ea0dc8ae-d93c-4e24-9f61-946f1736a26f)
+- summaries by air, water or land releases grouped by province, industry type or substance
+- [All years datasets](https://open.canada.ca/data/en/dataset/40e01423-7728-429c-ac9d-2954385ccdfb)
+- annual data since 1994 on pollutant quantities, comments and geolocations
+- [Complete reported datasets](https://open.canada.ca/data/en/dataset/06022cc0-a31e-4b4c-850d-d4dccda5f3ac)
+- comprehensive datasets going back to 1994`,
+                    type: 'text'
+                }
+            ]
         }
     ],
     contextLink:
