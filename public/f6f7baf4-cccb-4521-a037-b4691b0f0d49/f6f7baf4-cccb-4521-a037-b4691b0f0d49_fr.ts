@@ -14,21 +14,19 @@ const config = {
             panel: [
                 {
                     title: 'Sur cette page',
-                    content: `- Secteur des pâtes et papiers
-- Où sont situées les installations de pâtes et papiers?
-- Fabrication de pâtes et papiers
-- Sous-procédés de fabrication
-- Quels sont les polluants déclarés à l’INRP par les installations de pâtes et papiers?
-- Principaux contaminants atmosphériques
-- Soufre réduit total
-- Phosphore et nitrates
-- Recyclage, élimination hors site et sur place
-- Réglementation
-- Prévention de la pollution
-- Avenir de la production des pâtes et papiers
-- Pollution dans votre voisinage
-                    
-[[TODO: These should all be links!]]`,
+                    content: `- [Secteur des pâtes et papiers](#1-secteur-des-p%C3%A2tes-et-papiers)
+- [Où sont situées les installations de pâtes et papiers?](#2-o%C3%B9-sont-situ%C3%A9es-les-installations-de-p%C3%A2tes-et-papiers?)
+- [Fabrication de pâtes et papiers](#3-fabrication-de-p%C3%A2tes-et-papiers)
+- [Sous-procédés de fabrication](#6-sous-proc%C3%A9d%C3%A9s-de-fabrication)
+- [Quels sont les polluants déclarés à l’INRP par les installations de pâtes et papiers?](#7-quels-sont-les-polluants-d%C3%A9clar%C3%A9s-%C3%A0-l%E2%80%99inrp-par-les-installations-de-p%C3%A2tes-et-papiers?)
+- [Principaux contaminants atmosphériques](#8-principaux-contaminants-atmosph%C3%A9riques)
+- [Soufre réduit total](#10-soufre-r%C3%A9duit-total)
+- [Phosphore et nitrates](#12-phosphore-et-nitrates)
+- [Recyclage, élimination hors site et sur place](#13-recyclage,-traitement-et-%C3%A9limination)
+- [Réglementation](#15-r%C3%A9glementation)
+- [Prévention de la pollution](#16-pr%C3%A9vention-de-la-pollution)
+- [Avenir de la production des pâtes et papiers](#17-avenir-de-la-production-des-p%C3%A2tes-et-papiers)
+- [Pollution dans votre voisinage](#18-pollution-dans-votre-voisinage)`,
                     type: 'text'
                 },
                 {

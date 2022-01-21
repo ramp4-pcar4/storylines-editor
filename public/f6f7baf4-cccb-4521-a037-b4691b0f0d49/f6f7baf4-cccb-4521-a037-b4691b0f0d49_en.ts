@@ -14,21 +14,19 @@ const config = {
             panel: [
                 {
                     title: 'On this page',
-                    content: `- Pulp and paper sector
-- Where are pulp and paper facilities located?
-- Pulp and paper manufacturing
-- Manufacturing subprocesses
-- Which pollutants are reported to the NPRI by pulp and paper facilities?
-- Criteria air contaminants
-- Total reduced sulphur
-- Phosphorus and nitrates
-- Recycling, treatment and disposal
-- Regulatory measures
-- Pollution prevention
-- Future of pulp and paper production
-- Pollution in your neighbourhood
-- Pulp and paper sector
-[[TODO: These should all be links!]]`,
+                    content: `- [Pulp and paper sector](#1-pulp-and-paper-sector)
+- [Where are pulp and paper facilities located?](#2-where-are-pulp-and-paper-facilities-located?)
+- [Pulp and paper manufacturing](#3-pulp-and-paper-manufacturing)
+- [Manufacturing subprocesses](#6-manufacturing-subprocesses)
+- [Which pollutants are reported to the NPRI by pulp and paper facilities?](#7-which-pollutants-are-reported-to-the-npri-by-pulp-and-paper-facilities?)
+- [Criteria air contaminants](#8-criteria-air-contaminants)
+- [Total reduced sulphur](#10-total-reduced-sulphur)
+- [Phosphorus and nitrates](#12-phosphorus-and-nitrates)
+- [Recycling, treatment and disposal](#13-recycling,-treatment-and-disposal)
+- [Regulatory measures](#15-regulatory-measures)
+- [Pollution prevention](#15-regulatory-measures)
+- [Future of pulp and paper production](#17-future-of-pulp-and-paper-production)
+- [Pollution in your neighbourhood](#18-pollution-in-your-neighbourhood)`,
                     type: 'text'
                 },
                 {

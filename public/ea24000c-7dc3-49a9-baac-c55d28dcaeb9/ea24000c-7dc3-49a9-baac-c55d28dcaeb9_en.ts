@@ -14,16 +14,15 @@ const config = {
             panel: [
                 {
                     title: 'On this page',
-                    content: `-	Ethylene Glycol 
-- Effects of Ethylene Glycol – Human Health 
-- Effects of Ethylene Glycol – Environmental impacts
-- Facilities that report Ethylene Glycol to the NPRI 
-- Releases of Ethylene Glycol reported to the NPRI 
-- Disposals and recycling of Ethylene Glycol reported to the NPRI 
-- Government actions on the regulation of Ethylene Glycol 
-- Pollution prevention activities 
-- Pollution in your neighborhood 
-[[TODO: These should all be links!]]
+                    content: `-	[Ethylene Glycol](#1-ethylene-glycol) 
+- [Effects of Ethylene Glycol – Human Health](#3-effects-of-ethylene-glycol-%E2%80%93-human-health) 
+- [Effects of Ethylene Glycol – Environmental impacts](#2-effects-of-ethylene-glycol-%E2%80%93-environmental-impacts) 
+- [Facilities that report Ethylene Glycol to the NPRI](#4-location-of-npri-facilities-that-reported-ethylene-glycol-releases-in-2019-by-sector) 
+- [Releases of Ethylene Glycol reported to the NPRI](#5-releases-of-ethylene-glycol-reported-to-the-npri) 
+- [Disposals and recycling of Ethylene Glycol reported to the NPRI](#9-disposals-and-recycling-of-ethylene-glycol-reported-to-the-npri) 
+- [Government actions on the regulation of Ethylene Glycol](#12-government-actions-on-the-regulation-of-ethylene-glycol) 
+- [Pollution prevention activities](#12-government-actions-on-the-regulation-of-ethylene-glycol) 
+- [Pollution in your neighborhood](#13-pollution-in-your-neighborhood) 
                     
 Every year, facilities across Canada must report the pollutants they release into the air, water and land, as well as pollutants disposed and transferred, to the National Pollutant Release Inventory (NPRI), if they meet certain requirements. The information collected is publicly available, and can help Governments set environmental priorities and monitor environmental performance. Canadians can also use this information to learn about pollution in their environment.  
 
@@ -61,8 +60,7 @@ You can read more on [Ethylene Glycol here](https://www.canada.ca/en/health-cana
                     title: 'Effects of Ethylene Glycol – Human Health',
                     content: `Canadians may be exposed to ethylene glycol through the environment (e.g., air, food) and/or from use of consumer products that contain this substance (e.g., paints, automotive anti-freeze). However, based on estimated exposure levels for 2010, the Government of Canada concluded that ethylene glycol was not harmful to the health of the general population ([reference final assessment](https://www.canada.ca/en/environment-climate-change/services/canadian-environmental-protection-act-registry/publications/ethylene-glycol-final-content.html) and [state of the science report](https://www.canada.ca/en/health-canada/services/environmental-workplace-health/reports-publications/environmental-contaminants/canadian-environmental-protection-act-1999-priority-substances-list-assessment-report-ethylene-glycol.html)).
 
-Nevertheless, exposure to high levels or concentrations of ethylene glycol could lead to [different symptoms](https://www.cdc.gov/niosh/ershdb/emergencyresponsecard_29750031.html). If ingested at high doses, ethylene glycol could have impacts on human health, including the effects on the nervous system, blood, digestive system, heart, lungs and kidneys. Untreated ethylene glycol poisoning could be fatal. Contact with skin could burn or irritate. Inhalation could cause irritation of the nose and throat and long-term exposure may harm the respiratory system. 
-                    `,
+Nevertheless, exposure to high levels or concentrations of ethylene glycol could lead to [different symptoms](https://www.cdc.gov/niosh/ershdb/emergencyresponsecard_29750031.html). If ingested at high doses, ethylene glycol could have impacts on human health, including the effects on the nervous system, blood, digestive system, heart, lungs and kidneys. Untreated ethylene glycol poisoning could be fatal. Contact with skin could burn or irritate. Inhalation could cause irritation of the nose and throat and long-term exposure may harm the respiratory system.`,
                     type: 'text'
                 }
             ]
@@ -138,8 +136,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
+                    src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/EG_releases_2019_en.csv',
                     type: 'chart',
                     options: {
                         title: 'Figure 1: Percentage of total ethlyene glycol releases for 2019, by sector',
@@ -242,7 +239,7 @@ As for water releases, we are seeing an overall decreasing trend, driven by decr
             ]
         },
         {
-            title: '',
+            title: 'Ethlyene glycol disposal and recycling trends',
             panel: [
                 {
                     title: 'Ethlyene glycol disposal and recycling trends',
