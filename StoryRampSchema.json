@@ -328,9 +328,15 @@
                     "description": "The type of chart.",
                     "enum": ["line", "spline", "area", "areaspline", "column", "bar", "pie", "scatter", "gauge", "arearange", "areasplinerange", "columnrange"]
                 },
+                "export": {
+                    "type": "boolean",
+                    "description": "Specify whether export menu options are enabled.",
+                    "default": true
+                },
                 "credits": {
                     "type": "boolean",
-                    "description": "Specify whether credits are enabled."
+                    "description": "Specify whether credits are enabled.",
+                    "default": false
                 },
                 "xAxisLabel": {
                     "type": "string",

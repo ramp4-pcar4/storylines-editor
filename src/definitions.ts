@@ -12,6 +12,7 @@ export interface DQVOptions {
     subtitle: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    export: boolean;
     credits: boolean;
     type: string;
 }
@@ -55,6 +56,7 @@ export interface DQVChartConfig {
                 menuItems: string[];
             };
         };
+        enabled: boolean;
     };
     series: SeriesData[] | { data: SeriesData[] };
 }
