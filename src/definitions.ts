@@ -18,12 +18,16 @@ export interface DQVOptions {
 
 export interface SeriesData {
     name: string;
-    data: number[];
-    type: string;
+    y?: number;
+    data?: number[];
+    type?: string;
     color?: string;
 }
 
 export interface DQVChartConfig {
+    chart: {
+        type: string;
+    };
     title: {
         text: string;
     };
@@ -33,18 +37,19 @@ export interface DQVChartConfig {
     subtitle: {
         text: string;
     };
-    yAxis: {
+    yAxis?: {
         title: {
             text: string;
         };
     };
-    xAxis: {
+    xAxis?: {
         title: {
             text: string;
         };
         categories: [];
     };
-    series: SeriesData[];
+    plotOptions?: any;
+    series: SeriesData[] | { data: SeriesData[] };
 }
 
 export interface Intro {
