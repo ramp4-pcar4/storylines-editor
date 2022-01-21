@@ -10,21 +10,11 @@ const config = {
     },
     slides: [
         {
-            title: 'Sur cette page',
+            title: 'Aperçu',
             panel: [
                 {
-                    title: 'Sur cette page',
-                    content: `- [Éthylène glycol](#1-%C3%A9thyl%C3%A8ne-glycol)
-- [Effets de l’éthylène glycol – Santé humaine](#1-%C3%A9thyl%C3%A8ne-glycol)
-- [Effets de l’éthylène glycol – Impacts sur l’environnement](#2-effets-de-l%E2%80%99%C3%A9thyl%C3%A8ne-glycol-%E2%80%93-impacts-sur-l%E2%80%99environnement)
-- [Installations déclarant l’éthylène glycol à l’INRP](#3-installations-d%C3%A9clarant-l%E2%80%99%C3%A9thyl%C3%A8ne-glycol-%C3%A0-l%E2%80%99inrp)
-- [Rejets d’éthylène glycol déclarés à l’INRP](#5-rejets-d%E2%80%99%C3%A9thyl%C3%A8ne-glycol-d%C3%A9clar%C3%A9s-%C3%A0-l%E2%80%99inrp)
-- [Élimination et recyclage de l’éthylène glycol déclarés à l’INRP](#9-%C3%A9limination-et-recyclage-de-l%E2%80%99%C3%A9thyl%C3%A8ne-glycol-d%C3%A9clar%C3%A9s-%C3%A0-l%E2%80%99inrp)
-- [Mesures gouvernementales relatives à la réglementation de l’éthylène glycol](#12-mesures-gouvernementales-relatives-%C3%A0-la-r%C3%A9glementation-de-l%E2%80%99%C3%A9thyl%C3%A8ne-glycol-)
-- [Activités de prévention de la pollution](#11-ethlyene-glycol-disposal-and-recycling-trends)
-- [La pollution dans votre quartier](#13-la-pollution-dans-votre-quartier) 
-                    
-Chaque année, les installations de partout au Canada sont tenues de déclarer à l’[Inventaire national des rejets de polluants (INRP)](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants.html) les substances polluantes qu’elles rejettent dans l’air, l’eau et le sol, ainsi que les polluants éliminés et transférés, si elles répondent à certains critères. Les renseignements recueillis sont accessibles au public et peuvent aider les gouvernements à établir les priorités en matière d’environnement et à surveiller le bilan environnemental. Les Canadiens peuvent également utiliser ces renseignements pour s’informer sur la pollution dans leur milieu de vie.
+                    title: 'Aperçu',
+                    content: `Chaque année, les installations de partout au Canada sont tenues de déclarer à l’[Inventaire national des rejets de polluants (INRP)](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants.html) les substances polluantes qu’elles rejettent dans l’air, l’eau et le sol, ainsi que les polluants éliminés et transférés, si elles répondent à certains critères. Les renseignements recueillis sont accessibles au public et peuvent aider les gouvernements à établir les priorités en matière d’environnement et à surveiller le bilan environnemental. Les Canadiens peuvent également utiliser ces renseignements pour s’informer sur la pollution dans leur milieu de vie.
 
 L’éthylène glycol est une substance chimique utilisée notamment dans les procédés industriels pour éliminer la glace ou comme liquide antigel. Au Canada, c’est la substance la plus couramment utilisée dans les aéroports lors des opérations hivernales de dégivrage des avions.
 

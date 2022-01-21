@@ -13,23 +13,6 @@ const config = {
             title: 'On this page',
             panel: [
                 {
-                    title: 'On this page',
-                    content: `- [Pulp and paper sector](#1-pulp-and-paper-sector)
-- [Where are pulp and paper facilities located?](#2-where-are-pulp-and-paper-facilities-located?)
-- [Pulp and paper manufacturing](#3-pulp-and-paper-manufacturing)
-- [Manufacturing subprocesses](#6-manufacturing-subprocesses)
-- [Which pollutants are reported to the NPRI by pulp and paper facilities?](#7-which-pollutants-are-reported-to-the-npri-by-pulp-and-paper-facilities?)
-- [Criteria air contaminants](#8-criteria-air-contaminants)
-- [Total reduced sulphur](#10-total-reduced-sulphur)
-- [Phosphorus and nitrates](#12-phosphorus-and-nitrates)
-- [Recycling, treatment and disposal](#13-recycling,-treatment-and-disposal)
-- [Regulatory measures](#15-regulatory-measures)
-- [Pollution prevention](#15-regulatory-measures)
-- [Future of pulp and paper production](#17-future-of-pulp-and-paper-production)
-- [Pollution in your neighbourhood](#18-pollution-in-your-neighbourhood)`,
-                    type: 'text'
-                },
-                {
                     title: 'Pulp and paper',
                     content: `The pulp and paper industry is among the key sectors that are required to report annually to the National Pollutant Release Inventory ([NPRI](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory.html)). Since 1993, businesses, institutions and other facilities across Canada have been reporting to the NPRI their releases of pollutants to air, water and land and the pollutants they transfer off-site for disposal and recycling. All of the information collected is publicly available on the [NPRI website](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory.html). Different levels of government use this data to set priorities for environmental management and public health, as well as to provide information to Canadians about pollutant releases.
 
@@ -37,6 +20,13 @@ This sector overview covers substances reported to the NPRI by Canadian pulp and
 
 This overview of the pulp and paper sector reproduces the key points presented in the report produced, as part of the NPRI [Academic Challenge](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory/partnerships/academic-challenge.html), by students in the Environmental Management Masters program at the Université de Sherbrooke. Learn more about other NPRI [partnership and collaboration](https://www.canada.ca/en/services/environment/pollution-waste-management/national-pollutant-release-inventory/partnerships.html) initiatives.`,
                     type: 'text'
+                },
+                {
+                    src:
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg',
+                    type: 'image',
+                    altText:
+                        'An image describing the flow from industry of on-site releases to air, water, and land, on-site disposals, off-site disposals, and off-site transfers.'
                 }
             ]
         },

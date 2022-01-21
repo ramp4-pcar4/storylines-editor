@@ -10,21 +10,11 @@ const config = {
     },
     slides: [
         {
-            title: 'On this page',
+            title: 'Overview',
             panel: [
                 {
-                    title: 'On this page',
-                    content: `-	[Ethylene Glycol](#1-ethylene-glycol) 
-- [Effects of Ethylene Glycol – Human Health](#3-effects-of-ethylene-glycol-%E2%80%93-human-health) 
-- [Effects of Ethylene Glycol – Environmental impacts](#2-effects-of-ethylene-glycol-%E2%80%93-environmental-impacts) 
-- [Facilities that report Ethylene Glycol to the NPRI](#4-location-of-npri-facilities-that-reported-ethylene-glycol-releases-in-2019-by-sector) 
-- [Releases of Ethylene Glycol reported to the NPRI](#5-releases-of-ethylene-glycol-reported-to-the-npri) 
-- [Disposals and recycling of Ethylene Glycol reported to the NPRI](#9-disposals-and-recycling-of-ethylene-glycol-reported-to-the-npri) 
-- [Government actions on the regulation of Ethylene Glycol](#12-government-actions-on-the-regulation-of-ethylene-glycol) 
-- [Pollution prevention activities](#12-government-actions-on-the-regulation-of-ethylene-glycol) 
-- [Pollution in your neighborhood](#13-pollution-in-your-neighborhood) 
-                    
-Every year, facilities across Canada must report the pollutants they release into the air, water and land, as well as pollutants disposed and transferred, to the National Pollutant Release Inventory (NPRI), if they meet certain requirements. The information collected is publicly available, and can help Governments set environmental priorities and monitor environmental performance. Canadians can also use this information to learn about pollution in their environment.  
+                    title: 'Overview',
+                    content: `Every year, facilities across Canada must report the pollutants they release into the air, water and land, as well as pollutants disposed and transferred, to the National Pollutant Release Inventory (NPRI), if they meet certain requirements. The information collected is publicly available, and can help Governments set environmental priorities and monitor environmental performance. Canadians can also use this information to learn about pollution in their environment.  
 
 Ethylene glycol is a chemical substance notably used in industrial processes to remove ice or as anti-freeze liquid. In Canada, it is most commonly used by airports during airplane de-icing operations in winter. 
 

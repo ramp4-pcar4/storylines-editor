@@ -10,25 +10,8 @@ const config = {
     },
     slides: [
         {
-            title: 'Sur cette page',
+            title: 'Pâtes et papiers',
             panel: [
-                {
-                    title: 'Sur cette page',
-                    content: `- [Secteur des pâtes et papiers](#1-secteur-des-p%C3%A2tes-et-papiers)
-- [Où sont situées les installations de pâtes et papiers?](#2-o%C3%B9-sont-situ%C3%A9es-les-installations-de-p%C3%A2tes-et-papiers?)
-- [Fabrication de pâtes et papiers](#3-fabrication-de-p%C3%A2tes-et-papiers)
-- [Sous-procédés de fabrication](#6-sous-proc%C3%A9d%C3%A9s-de-fabrication)
-- [Quels sont les polluants déclarés à l’INRP par les installations de pâtes et papiers?](#7-quels-sont-les-polluants-d%C3%A9clar%C3%A9s-%C3%A0-l%E2%80%99inrp-par-les-installations-de-p%C3%A2tes-et-papiers?)
-- [Principaux contaminants atmosphériques](#8-principaux-contaminants-atmosph%C3%A9riques)
-- [Soufre réduit total](#10-soufre-r%C3%A9duit-total)
-- [Phosphore et nitrates](#12-phosphore-et-nitrates)
-- [Recyclage, élimination hors site et sur place](#13-recyclage,-traitement-et-%C3%A9limination)
-- [Réglementation](#15-r%C3%A9glementation)
-- [Prévention de la pollution](#16-pr%C3%A9vention-de-la-pollution)
-- [Avenir de la production des pâtes et papiers](#17-avenir-de-la-production-des-p%C3%A2tes-et-papiers)
-- [Pollution dans votre voisinage](#18-pollution-dans-votre-voisinage)`,
-                    type: 'text'
-                },
                 {
                     title: 'Pâtes et papiers',
                     content: `L’industrie de pâtes et papiers fait partie des secteurs clés qui doivent déclarer annuellement à l’Inventaire national des rejets de polluants ([INRP](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants.html?utm_campaign=not-applicable&utm_medium=vanity-url&utm_source=canada-ca_inrp)). Depuis 1993, les entreprises, les établissements et d’autres entités à travers le Canada déclarent à l’INRP les polluants qu’ils rejettent dans l’eau, l’air et le sol, et qu’ils transfèrent hors site à des fins d’élimination et de recyclage. Tous les renseignements recueillis sont du domaine public et disponibles sur le [site internet de l’INRP](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants.html?utm_campaign=not-applicable&utm_medium=vanity-url&utm_source=canada-ca_inrp). Ces données aident les divers paliers gouvernementaux à établir les priorités en matière de gestion environnementale et de santé publique, ainsi qu’à informer les Canadiens sur les rejets de polluants.
@@ -37,6 +20,13 @@ Le présent aperçu de secteur traite des substances déclarées à l’INRP par
                     
 Cet aperçu de secteur sur les pâtes et papiers reprend les points saillants du rapport réalisé par des étudiants à la Maîtrise en gestion de l’environnement de l’Université de Sherbrooke dans le cadre du [Défi académique](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants/partenariats/defi-academique.html) de l’INRP. Apprenez-en plus sur les autres initiatives de [partenariat et collaboration](https://www.canada.ca/fr/services/environnement/pollution-gestion-dechets/inventaire-national-rejets-polluants/partenariats.html) de l’INRP.`,
                     type: 'text'
+                },
+                {
+                    src:
+                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/NPRIpictogramme-2016data-FR__1552505700147__w975.jpg',
+                    type: 'image',
+                    altText:
+                        '[fr] An image describing the flow from industry of on-site releases to air, water, and land, on-site disposals, off-site disposals, and off-site transfers.'
                 }
             ]
         },
