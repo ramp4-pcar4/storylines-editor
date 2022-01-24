@@ -378,7 +378,12 @@ You can explore each facility using satellite imagery.`,
                 {
                     config:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/en/TailingsfromMiningFacilities2010to2019(timeslider).json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2010, 2019],
+                        attribute: 'Reporting_Year___Année'
+                    }
                 }
             ]
         },
@@ -439,7 +444,12 @@ This change in the number of facilities reporting over time follows changes in t
                 {
                     config:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/en/ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019(timeslider).json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2010, 2019],
+                        attribute: 'Reporting_Year___Année'
+                    }
                 }
             ]
         },

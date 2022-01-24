@@ -378,7 +378,12 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                 {
                     config:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/fr/TailingsfromMiningFacilities2010to2019(timeslider).json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2010, 2019],
+                        attribute: 'Reporting_Year___Année'
+                    }
                 }
             ]
         },
@@ -439,7 +444,12 @@ Ce changement dans le nombre d’installations déclarantes au fil du temps suit
                 {
                     config:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/ramp-config/fr/ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019(timeslider).json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2010, 2019],
+                        attribute: 'Reporting_Year___Année'
+                    }
                 }
             ]
         },

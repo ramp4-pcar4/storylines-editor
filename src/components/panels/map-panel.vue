@@ -16,7 +16,11 @@
 import { MapPanel } from '@/definitions';
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
-@Component({})
+import TimeSlider from '@/components/panels/helpers/time-slider.vue';
+
+@Component({
+    components: {}
+})
 export default class MapPanelV extends Vue {
     @Prop() config!: MapPanel;
     @Prop() slideIdx!: number;
@@ -44,6 +48,27 @@ export default class MapPanelV extends Vue {
 
     init(): void {
         new RAMP.Map(this.$el, this.config.config);
+
+        RAMP.mapAdded.pipe().subscribe(async (mapi: any) => {
+            if (this.config.timeSlider && mapi.id === this.$el.id) {
+                const timeSliderPanel = mapi.panels.create('time-slider-container');
+                const timeSliderComponent = new Vue({
+                    render: (h) =>
+                        h('time-slider', {
+                            props: {
+                                config: this.config.timeSlider,
+                                mapi
+                            }
+                        }),
+                    components: {
+                        // eslint-disable-next-line vue/no-unused-components
+                        'time-slider': TimeSlider
+                    }
+                }).$mount();
+                timeSliderPanel.body = timeSliderComponent.$el;
+                timeSliderPanel.open();
+            }
+        });
     }
 }
 </script>

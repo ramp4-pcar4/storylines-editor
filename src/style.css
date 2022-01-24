@@ -2,3 +2,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.time-slider-container.rv-content-pane {
+    bottom: 25px;
+    top: auto;
+    min-height: 110px;
+    padding: 5px;
+    pointer-events: none !important;
+    background: none !important;
+    box-shadow: none;
+}
