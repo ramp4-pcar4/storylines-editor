@@ -4,19 +4,20 @@ module.exports = {
             entry: './src/main.ts',
             template: 'public/index.html',
             filename: 'index.html',
-            title: 'Story RAMP'
+            title: 'RAMP Storylines'
         },
         indexCanadaEn: {
             entry: './src/main.ts',
             template: 'public/index-ca-en.html',
             filename: 'index-ca-en.html',
-            title: 'Story RAMP'
+            title: 'RAMP Storylines'
         },
         indexCanadaFr: {
             entry: './src/main.ts',
             template: 'public/index-ca-fr.html',
             filename: 'index-ca-fr.html',
-            title: 'Story RAMP' // TODO: add French translation
+            title: 'Scenarios de PCAR'
         }
-    }
+    },
+    publicPath: ''
 };

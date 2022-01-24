@@ -322,13 +322,13 @@ Recherchez notre [Tableau de bord de l'Inventaire national des rejets de polluan
 Ces fichiers faciles à utiliser vous permettent de pousser votre analyse des données plus loin de différentes manières
 
 - [Tableaux pour une année](https://open.canada.ca/data/fr/dataset/1fb7d8d4-7713-4ec6-b957-4a882a84fed3),
--  tableaux annuels des données les plus couramment utilisées. Un tableau pour chacune des trois dernières années
+  - tableaux annuels des données les plus couramment utilisées. Un tableau pour chacune des trois dernières années
 - [Résumés de cinq années](https://open.canada.ca/data/fr/dataset/ea0dc8ae-d93c-4e24-9f61-946f1736a26f)
--  résumés des rejets dans l’atmosphère, dans l’eau ou dans le sol, regroupés par province, type d’industrie ou substance.
+  - résumés des rejets dans l’atmosphère, dans l’eau ou dans le sol, regroupés par province, type d’industrie ou substance.
 - [Fichiers de données pour toutes les années](https://open.canada.ca/data/fr/dataset/40e01423-7728-429c-ac9d-2954385ccdfb)
--  données annuelles sur les quantités de polluants, les commentaires et les géolocalisations depuis 1994.
+  - données annuelles sur les quantités de polluants, les commentaires et les géolocalisations depuis 1994.
 - [Fichiers complets de données déclarées](https://open.canada.ca/data/fr/dataset/06022cc0-a31e-4b4c-850d-d4dccda5f3ac)
--  ensembles de données complets soumis par l’industrie depuis 1994.`,
+  - ensembles de données complets soumis par l’industrie depuis 1994.`,
                     type: 'text'
                 }
             ]
