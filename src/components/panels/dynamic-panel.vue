@@ -33,7 +33,7 @@ export default class DynamicPanelV extends Vue {
     md = new MarkdownIt({ html: true });
 
     mounted(): void {
-        document.querySelectorAll('a:not([target])').forEach((el: any) => (el.target = '_blank'));
+        document.querySelectorAll('.storyramp-app a:not([target])').forEach((el: any) => (el.target = '_blank'));
 
         this.addDynamicURLs();
     }
