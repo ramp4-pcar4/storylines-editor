@@ -33,7 +33,6 @@
         <!-- template footer and no-script fallback -->
         <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
 
-        <script src="scripts/multi-ramp/rv-main.js"></script>
         <script type="text/javascript">
             var url = new URL(window.location.href);
             var hashParams = url.hash.split('/');
@@ -64,6 +63,8 @@
         <script>
             document.write(wet.builder.refFooter({}));
         </script>
+
+        <script src="scripts/multi-ramp/rv-main.js"></script>
 
         <style>
             html {
