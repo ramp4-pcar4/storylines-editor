@@ -119,7 +119,8 @@ export default class ChartPanelV extends Vue {
                 contextButton: {
                     menuItems: this.menuOptions
                 }
-            }
+            },
+            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
         };
 
         // initializing chartOptions for line/bar charts
@@ -137,7 +138,7 @@ export default class ChartPanelV extends Vue {
             series: series,
             exporting: exportOptions,
             credits: {
-                enabled: dqvOptions?.credits ? dqvOptions?.credits : false
+                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
             }
         };
     }
@@ -172,7 +173,8 @@ export default class ChartPanelV extends Vue {
                 contextButton: {
                     menuItems: this.menuOptions
                 }
-            }
+            },
+            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
         };
 
         // initializing chartOptions for line/bar charts
@@ -190,7 +192,7 @@ export default class ChartPanelV extends Vue {
             },
             exporting: exportOptions,
             credits: {
-                enabled: dqvOptions?.credits ? dqvOptions?.credits : false
+                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
             },
             yAxis: {
                 title: {

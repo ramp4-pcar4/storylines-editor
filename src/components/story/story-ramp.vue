@@ -65,6 +65,10 @@ export default class StoryRampV extends Vue {
         if (uid) {
             this.fetchConfig(uid, lang);
         }
+
+        // set page lang
+        const html = document.documentElement; // returns the html tag
+        html.setAttribute('lang', lang);
     }
 
     // react to param changes in URL
