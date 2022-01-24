@@ -340,7 +340,10 @@
           "layerType": "esriFeature",
           "singleEntryCollapse": true,
           "symbologyExpanded": true,
-          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/8"
+          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/8",
+          "state": {
+            "opacity": 0.75
+          }
       }
     ],
     "tileSchemas": [

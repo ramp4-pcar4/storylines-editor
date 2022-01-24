@@ -381,7 +381,10 @@
         "singleEntryCollapse": true,
         "symbologyExpanded": true,
         "tolerance": 20,
-        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/ea24000c_7dc3_49a9_baac_c55d28dcaeb9/MapServer/2"
+        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/ea24000c_7dc3_49a9_baac_c55d28dcaeb9/MapServer/2",
+        "state": {
+          "opacity": 0.75
+        } 
       }
     ],
     "tileSchemas": [

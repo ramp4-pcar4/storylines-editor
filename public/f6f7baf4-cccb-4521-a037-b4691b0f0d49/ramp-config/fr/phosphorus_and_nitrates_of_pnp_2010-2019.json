@@ -90,11 +90,11 @@
         "officialOnly": true
       },
       "serviceUrls": {
-        "geoNames": "https://geogratis.gc.ca/services/geoname/en/geonames.json",
-        "geoLocation": "https://geogratis.gc.ca/services/geolocation/en/locate?q=",
-        "geoSuggest": "https://geogratis.gc.ca/services/geolocation/en/suggest?q=",
-        "provinces": "https://geogratis.gc.ca/services/geoname/en/codes/province.json",
-        "types": "https://geogratis.gc.ca/services/geoname/en/codes/concise.json"
+        "geoNames": "https://geogratis.gc.ca/services/geoname/fr/geonames.json",
+        "geoLocation": "https://geogratis.gc.ca/services/geolocation/fr/locate?q=",
+        "geoSuggest": "https://geogratis.gc.ca/services/geolocation/fr/suggest?q=",
+        "provinces": "https://geogratis.gc.ca/services/geoname/fr/codes/province.json",
+        "types": "https://geogratis.gc.ca/services/geoname/fr/codes/concise.json"
       }
     }
   },
@@ -386,7 +386,10 @@
         "tolerance": 20,
         "singleEntryCollapse": true,
         "symbologyExpanded": true,
-        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/14"
+        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/14",
+        "state": {
+          "opacity": 0.5
+        }
       },
       {
         "id": "Phosphorus",
@@ -395,7 +398,10 @@
         "tolerance": 20,
         "singleEntryCollapse": true,
         "symbologyExpanded": true,
-        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/15"
+        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/15",
+        "state": {
+          "opacity": 0.5
+        }
       }
     ],
     "tileSchemas": [

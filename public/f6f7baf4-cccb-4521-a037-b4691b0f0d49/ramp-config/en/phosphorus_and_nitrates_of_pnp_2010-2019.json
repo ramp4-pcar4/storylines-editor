@@ -346,7 +346,10 @@
           "tolerance": 20,
           "singleEntryCollapse": true,
           "symbologyExpanded": true,
-          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/5"
+          "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/5",
+          "state": {
+            "opacity": 0.75
+          }               
       },
       {
         "id": "Phosphorus",
@@ -355,7 +358,10 @@
         "tolerance": 20,
         "singleEntryCollapse": true,
         "symbologyExpanded": true,
-        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/6"
+        "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/f6f7baf4_cccb_4521_a037_b4691b0f0d49/MapServer/6",
+        "state": {
+          "opacity": 0.75
+        }           
       }      
     ],
     "tileSchemas": [

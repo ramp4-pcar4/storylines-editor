@@ -89,7 +89,10 @@
                 "singleEntryCollapse": true,
                 "symbologyExpanded": true,  
                 "tolerance": 20,                   
-                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/13"
+                "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/13",
+                "state": {
+                  "opacity": 0.75
+                } 
             }
         ],
         "extentSets": [
