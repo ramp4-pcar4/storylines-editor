@@ -43,7 +43,7 @@ export default class ChartPanelV extends Vue {
         'downloadXLS'
     ];
 
-    mounted(): void {
+    created(): void {
         const extension = this.config.src.split('.').pop();
 
         // get input given by src path
@@ -136,6 +136,7 @@ export default class ChartPanelV extends Vue {
             },
             plotOptions: plotOptions,
             series: series,
+            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
             exporting: exportOptions,
             credits: {
                 enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
@@ -191,6 +192,7 @@ export default class ChartPanelV extends Vue {
                 text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
             },
             exporting: exportOptions,
+            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
             credits: {
                 enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
             },

@@ -1,5 +1,5 @@
 <template>
-    <div :class="ratio && config.type !== 'text' ? 'flex-2' : 'flex'" class="flex-col">
+    <div :class="ratio && config.type !== 'text' ? 'sticky self-start flex-2 top-16' : 'flex'" class="flex-col">
         <component :is="getTemplate()" :config="config" :slideIdx="slideIdx"></component>
     </div>
 </template>

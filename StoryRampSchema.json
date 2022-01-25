@@ -328,6 +328,13 @@
                     "description": "The type of chart.",
                     "enum": ["line", "spline", "area", "areaspline", "column", "bar", "pie", "scatter", "gauge", "arearange", "areasplinerange", "columnrange"]
                 },
+                "colours": {
+                    "type": "array",
+                    "description": "A list of colors to display chart data that corresponds to the order of columns in CSV file.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "export": {
                     "type": "boolean",
                     "description": "Specify whether export menu options are enabled.",

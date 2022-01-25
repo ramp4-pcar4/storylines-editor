@@ -514,6 +514,27 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
                     }
                 }
             ]
+        },
+        {
+            title: 'Pie chart with custom colours',
+            panel: [
+                {
+                    title: 'Pie chart with custom colours',
+                    content: '(╯°□°)╯︵ ┻━┻',
+                    type: 'text'
+                },
+                {
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/en/CAC_en.csv',
+                    type: 'chart',
+                    options: {
+                        title:
+                            'Proportion of criteria air contaminants released by pulp and paper facilities that reported to the NPRI in 2019',
+                        subtitle: '',
+                        type: 'pie',
+                        colours: ['green', '#FAEBD7', 'indigo', '#FFD700', '#B22222', '#FF00FF']
+                    }
+                }
+            ]
         }
     ],
     contextLink:
