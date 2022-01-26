@@ -13,6 +13,7 @@ export interface DQVOptions {
     xAxisLabel: string;
     yAxisLabel: string;
     export: boolean;
+    colours?: string[];
     credits: boolean;
     type: string;
 }
@@ -22,7 +23,6 @@ export interface SeriesData {
     y?: number;
     data?: number[];
     type?: string;
-    color?: string;
 }
 
 export interface DQVChartConfig {
