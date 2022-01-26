@@ -104,6 +104,12 @@ export interface MapPanel extends BasePanel {
     type: PanelType.Map;
     config: string;
     expandable?: boolean;
+    timeSlider?: TimeSliderConfig;
+}
+export interface TimeSliderConfig {
+    range: number[];
+    start: number[];
+    attribute: string;
 }
 
 export interface DynamicPanel extends BasePanel {
