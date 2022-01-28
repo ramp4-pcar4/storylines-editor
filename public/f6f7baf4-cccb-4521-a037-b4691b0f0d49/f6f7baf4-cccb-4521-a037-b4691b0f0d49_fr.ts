@@ -173,7 +173,12 @@ Certaines installations du secteur industriel des pâtes et papiers possèdent u
                 {
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/fr/total_releases_and_disposals_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2010, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },

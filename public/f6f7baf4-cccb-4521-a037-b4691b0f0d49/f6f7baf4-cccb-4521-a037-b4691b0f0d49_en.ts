@@ -171,7 +171,12 @@ Some pulp and paper industry facilities include a wastewater treatment system an
                 {
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/en/total_releases_and_disposals_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2010, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },

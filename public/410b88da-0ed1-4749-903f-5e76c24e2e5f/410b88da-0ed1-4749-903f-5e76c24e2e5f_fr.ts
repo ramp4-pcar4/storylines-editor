@@ -231,7 +231,8 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                         yAxisLabel: 'Nombre de barils par année',
                         title: `Nombre de barils produits annuellement par les mines à ciel ouvert de l'Alberta de 2010 à 2019`,
                         subtitle: '',
-                        type: 'bar'
+                        type: 'bar',
+                        colours: ['orange']
                     }
                 },
                 {
@@ -243,7 +244,8 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                         yAxisLabel: 'Rejets de PCA par 1000 barils',
                         title: 'Rejects de PCA (tonnes) par 1000 barils de bitume de 2010 à 2019',
                         subtitle: '',
-                        type: 'line'
+                        type: 'line',
+                        colours: ['green']
                     }
                 }
             ]
@@ -470,7 +472,7 @@ Bien que les installations in situ aient signalé un accroissement des émission
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_1.csv',
                     type: 'chart',
                     options: {
-                        xAxisLabel: 'Year',
+                        //xAxisLabel: 'Year',
                         yAxisLabel: 'Émissions de PCA (tonnes)',
                         title: `Rejets de PCA des installations in situ déclarés à l'INRP de 2010 à 2019`,
                         subtitle: '',
@@ -482,12 +484,13 @@ Bien que les installations in situ aient signalé un accroissement des émission
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_2.csv',
                     type: 'chart',
                     options: {
-                        xAxisLabel: 'Year',
+                        //xAxisLabel: 'Year',
                         yAxisLabel: 'Nombre de barils par année',
                         title:
                             'Production de bitume des sables bitumineux in situ de 2010 à 2019 (nombre de barils par année)',
                         subtitle: '',
-                        type: 'line'
+                        type: 'line',
+                        colours: ['orange']
                     }
                 }
             ]
