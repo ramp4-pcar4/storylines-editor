@@ -211,47 +211,45 @@ You can explore each facility using satellite imagery.`,
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_1.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: 'Year',
-                        yAxisLabel: 'CAC releases',
-                        title: 'Oil Sands Surface Mining, CAC Releases (tonnes) 2010 to 2019',
-                        subtitle: '',
-                        type: 'bar'
-                    }
-                }
-            ]
-        },
-        {
-            title: 'Criteria air contaminant releases from oil sands mines',
-            panel: [
-                {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_2.csv',
-                    type: 'chart',
-                    options: {
-                        xAxisLabel: 'Year',
-                        yAxisLabel: 'Barrels per year',
-                        title: 'Barrels Per Year produced by Alberta Surface Mines 2010 to 2019',
-                        subtitle: '',
-                        type: 'bar',
-                        colours: ['orange']
-                    }
-                },
-                {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_3.csv',
-                    type: 'chart',
-                    options: {
-                        //xAxisLabel: 'Year',
-                        yAxisLabel: 'Releases per 1000 barrels',
-                        title: 'CAC releases (tonnes) per 1000 barrels of Bitumen for 2010 to 2019',
-                        subtitle: '',
-                        type: 'line',
-                        colours: ['green']
-                    }
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_1.csv',
+
+                            options: {
+                                xAxisLabel: 'Year',
+                                yAxisLabel: 'CAC releases',
+                                title: 'Oil Sands Surface Mining, CAC Releases (tonnes) 2010 to 2019',
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_2.csv',
+                            options: {
+                                xAxisLabel: 'Year',
+                                yAxisLabel: 'Barrels per year',
+                                title: 'Barrels Per Year produced by Alberta Surface Mines 2010 to 2019',
+                                subtitle: '',
+                                type: 'bar',
+                                colours: ['orange']
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_3.csv',
+                            options: {
+                                xAxisLabel: 'Year',
+                                yAxisLabel: 'Releases per 1000 barrels',
+                                title: 'CAC releases (tonnes) per 1000 barrels of Bitumen for 2010 to 2019',
+                                subtitle: '',
+                                type: 'line',
+                                colours: ['green']
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -275,15 +273,19 @@ While the tailings reported by these mines have large amounts of manganese, ammo
                     type: 'text'
                 },
                 {
-                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Mine tailings reported.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: 'Substances',
-                        title: 'Top 10 substances in oil sands tailings reported to the NPRI in 2019',
-                        subtitle: '',
-                        type: 'bar'
-                    }
+                    charts: [
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Mine tailings reported.csv',
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: 'Substances',
+                                title: 'Top 10 substances in oil sands tailings reported to the NPRI in 2019',
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -468,29 +470,33 @@ While in-situ facilities have reported an increase in reported CAC emissions, th
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/NPRI releases from thermal in-situ facilities_1.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: 'Year',
-                        yAxisLabel: 'CAC Emissions (tonnes)',
-                        title: 'CAC Emissions from In-Situ Facilities reporting to the NPRI, 2010-2019',
-                        subtitle: '',
-                        type: 'bar'
-                    }
-                },
-                {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/NPRI releases from thermal in-situ facilities_2.csv',
-                    type: 'chart',
-                    options: {
-                        xAxisLabel: 'Year',
-                        yAxisLabel: 'Barrels per year',
-                        title: 'Bitumen production from In-Situ Oil Sands from 2010-2019 (Barrels per year)',
-                        subtitle: '',
-                        type: 'line',
-                        colours: ['orange']
-                    }
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/NPRI releases from thermal in-situ facilities_1.csv',
+
+                            options: {
+                                xAxisLabel: 'Year',
+                                yAxisLabel: 'CAC Emissions (tonnes)',
+                                title: 'CAC Emissions from In-Situ Facilities reporting to the NPRI, 2010-2019',
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/NPRI releases from thermal in-situ facilities_2.csv',
+                            options: {
+                                xAxisLabel: 'Year',
+                                yAxisLabel: 'Barrels per year',
+                                title: 'Bitumen production from In-Situ Oil Sands from 2010-2019 (Barrels per year)',
+                                subtitle: '',
+                                type: 'line',
+                                colours: ['orange']
+                            }
+                        }
+                    ]
                 }
             ]
         },

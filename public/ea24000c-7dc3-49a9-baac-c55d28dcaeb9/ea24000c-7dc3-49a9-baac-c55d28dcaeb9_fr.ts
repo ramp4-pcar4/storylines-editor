@@ -133,13 +133,18 @@ En 2019, la province comptant le plus grand nombre d’installations ayant décl
                     type: 'text'
                 },
                 {
-                    src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/EG_releases_2019_fr.csv',
                     type: 'chart',
-                    options: {
-                        title: `Figure 1 : Pourcentage des rejets totaux d'éthylène glycol pour 2019, par secteur`,
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    charts: [
+                        {
+                            src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/EG_releases_2019_fr.csv',
+
+                            options: {
+                                title: `Figure 1 : Pourcentage des rejets totaux d'éthylène glycol pour 2019, par secteur`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -152,14 +157,19 @@ En 2019, la province comptant le plus grand nombre d’installations ayant décl
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Total releases of ethylene glycol for 2019, by province_fr.csv',
                     type: 'chart',
-                    options: {
-                        title: `Figure 2: Rejets totaux d'éthylène glycol pour 2019, par province`,
-                        subtitle: '',
-                        type: 'bar'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Total releases of ethylene glycol for 2019, by province_fr.csv',
+
+                            options: {
+                                title: `Figure 2: Rejets totaux d'éthylène glycol pour 2019, par province`,
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -191,14 +201,19 @@ Pour ce qui est des rejets dans l’eau, nous observons une tendance générale 
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Ethlyene glycol release trends, by sector 2010-2019 (tonnes)_fr.csv',
                     type: 'chart',
-                    options: {
-                        title: `Figure 3: Tendances des rejets d'éthylène glycol, par secteur 2010-2019 (tonnes)`,
-                        subtitle: '',
-                        type: 'line'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Ethlyene glycol release trends, by sector 2010-2019 (tonnes)_fr.csv',
+
+                            options: {
+                                title: `Figure 3: Tendances des rejets d'éthylène glycol, par secteur 2010-2019 (tonnes)`,
+                                subtitle: '',
+                                type: 'line'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -211,14 +226,19 @@ Pour ce qui est des rejets dans l’eau, nous observons une tendance générale 
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
                     type: 'chart',
-                    options: {
-                        title: `Figure 4: Pourcentage des éliminations et du recyclage d'éthylène glycol, par secteur (2019)`,
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
+
+                            options: {
+                                title: `Figure 4: Pourcentage des éliminations et du recyclage d'éthylène glycol, par secteur (2019)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -249,14 +269,19 @@ Obtenez plus de détails sur le [transport aérien](https://tc.canada.ca/fr/serv
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)_fr.csv',
                     type: 'chart',
-                    options: {
-                        title: `Figure 5 : Tendances des élimination et du recyclage d'éthylène glycol, par secteur 2010-2019 (tonnes)`,
-                        subtitle: '',
-                        type: 'line'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)_fr.csv',
+
+                            options: {
+                                title: `Figure 5 : Tendances des élimination et du recyclage d'éthylène glycol, par secteur 2010-2019 (tonnes)`,
+                                subtitle: '',
+                                type: 'line'
+                            }
+                        }
+                    ]
                 }
             ]
         },

@@ -55,6 +55,10 @@ export default class SlideshowPanelV extends Vue {
 .hooper {
     height: auto;
 
+    ::v-deep .hooper-navigation svg {
+        overflow: visible;
+    }
+
     ::v-deep .hooper-indicator {
         border: 1px solid #878787;
 

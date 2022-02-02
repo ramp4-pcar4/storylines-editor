@@ -206,47 +206,45 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_1.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: 'Rejets de PCA (tonnes)',
-                        title: 'Rejects de PCA (tonnes) des mines à ciel ouvert des sables bitumineux de 2010 à 2019',
-                        subtitle: '',
-                        type: 'bar'
-                    }
-                }
-            ]
-        },
-        {
-            title: 'Rejets de principaux contaminants atmosphériques de mines de sables bitumineux',
-            panel: [
-                {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_2.csv',
-                    type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: 'Nombre de barils par année',
-                        title: `Nombre de barils produits annuellement par les mines à ciel ouvert de l'Alberta de 2010 à 2019`,
-                        subtitle: '',
-                        type: 'bar',
-                        colours: ['orange']
-                    }
-                },
-                {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_3.csv',
-                    type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: 'Rejets de PCA par 1000 barils',
-                        title: 'Rejects de PCA (tonnes) par 1000 barils de bitume de 2010 à 2019',
-                        subtitle: '',
-                        type: 'line',
-                        colours: ['green']
-                    }
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_1.csv',
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: 'Rejets de PCA (tonnes)',
+                                title:
+                                    'Rejects de PCA (tonnes) des mines à ciel ouvert des sables bitumineux de 2010 à 2019',
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_2.csv',
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: 'Nombre de barils par année',
+                                title: `Nombre de barils produits annuellement par les mines à ciel ouvert de l'Alberta de 2010 à 2019`,
+                                subtitle: '',
+                                type: 'bar',
+                                colours: ['orange']
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_3.csv',
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: 'Rejets de PCA par 1000 barils',
+                                title: 'Rejects de PCA (tonnes) par 1000 barils de bitume de 2010 à 2019',
+                                subtitle: '',
+                                type: 'line',
+                                colours: ['green']
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -271,15 +269,20 @@ Bien que les résidus déclarés par ces mines contiennent de grandes quantités
                     type: 'text'
                 },
                 {
-                    src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Mine tailings reported.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: 'Substances',
-                        title: `Les 10 principales substances des résidus miniers des sables bitumineux déclarés a l'INRP en 2019`,
-                        subtitle: '',
-                        type: 'bar'
-                    }
+                    charts: [
+                        {
+                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Mine tailings reported.csv',
+
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: 'Substances',
+                                title: `Les 10 principales substances des résidus miniers des sables bitumineux déclarés a l'INRP en 2019`,
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -468,30 +471,34 @@ Bien que les installations in situ aient signalé un accroissement des émission
                     type: 'text'
                 },
                 {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_1.csv',
                     type: 'chart',
-                    options: {
-                        //xAxisLabel: 'Year',
-                        yAxisLabel: 'Émissions de PCA (tonnes)',
-                        title: `Rejets de PCA des installations in situ déclarés à l'INRP de 2010 à 2019`,
-                        subtitle: '',
-                        type: 'bar'
-                    }
-                },
-                {
-                    src:
-                        '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_2.csv',
-                    type: 'chart',
-                    options: {
-                        //xAxisLabel: 'Year',
-                        yAxisLabel: 'Nombre de barils par année',
-                        title:
-                            'Production de bitume des sables bitumineux in situ de 2010 à 2019 (nombre de barils par année)',
-                        subtitle: '',
-                        type: 'line',
-                        colours: ['orange']
-                    }
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_1.csv',
+
+                            options: {
+                                //xAxisLabel: 'Year',
+                                yAxisLabel: 'Émissions de PCA (tonnes)',
+                                title: `Rejets de PCA des installations in situ déclarés à l'INRP de 2010 à 2019`,
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/NPRI releases from thermal in-situ facilities_2.csv',
+                            options: {
+                                //xAxisLabel: 'Year',
+                                yAxisLabel: 'Nombre de barils par année',
+                                title:
+                                    'Production de bitume des sables bitumineux in situ de 2010 à 2019 (nombre de barils par année)',
+                                subtitle: '',
+                                type: 'line',
+                                colours: ['orange']
+                            }
+                        }
+                    ]
                 }
             ]
         },

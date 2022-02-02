@@ -126,13 +126,18 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
                     type: 'text'
                 },
                 {
-                    src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/EG_releases_2019_en.csv',
                     type: 'chart',
-                    options: {
-                        title: 'Figure 1: Percentage of total ethlyene glycol releases for 2019, by sector',
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    charts: [
+                        {
+                            src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/EG_releases_2019_en.csv',
+
+                            options: {
+                                title: 'Figure 1: Percentage of total ethlyene glycol releases for 2019, by sector',
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -145,14 +150,19 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Total releases of ethylene glycol for 2019, by province_en.csv',
                     type: 'chart',
-                    options: {
-                        title: 'Figure 2: Total releases of ethylene glycol for 2019, by province',
-                        subtitle: '',
-                        type: 'bar'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Total releases of ethylene glycol for 2019, by province_en.csv',
+
+                            options: {
+                                title: 'Figure 2: Total releases of ethylene glycol for 2019, by province',
+                                subtitle: '',
+                                type: 'bar'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -183,14 +193,19 @@ As for water releases, we are seeing an overall decreasing trend, driven by decr
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol release trends, by sector 2010-2019 (tonnes)_en.csv',
                     type: 'chart',
-                    options: {
-                        title: 'Figure 3: Ethlyene glycol release trends, by sector 2010-2019 (tonnes)',
-                        subtitle: '',
-                        type: 'line'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol release trends, by sector 2010-2019 (tonnes)_en.csv',
+
+                            options: {
+                                title: 'Figure 3: Ethlyene glycol release trends, by sector 2010-2019 (tonnes)',
+                                subtitle: '',
+                                type: 'line'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -203,14 +218,19 @@ As for water releases, we are seeing an overall decreasing trend, driven by decr
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
                     type: 'chart',
-                    options: {
-                        title: `Figure 4: Percentage of ethylene glycol disposal and recycling, by sector (2019)`,
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Percentage of ethylene glycol disposal and recycling, by sector (2019).csv',
+
+                            options: {
+                                title: `Figure 4: Percentage of ethylene glycol disposal and recycling, by sector (2019)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -241,14 +261,20 @@ You can read more on [Air Transportation](https://tc.canada.ca/en/corporate-serv
                     type: 'text'
                 },
                 {
-                    src:
-                        'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)_en.csv',
                     type: 'chart',
-                    options: {
-                        title: 'Figure 5: Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)',
-                        subtitle: '',
-                        type: 'line'
-                    }
+                    charts: [
+                        {
+                            src:
+                                'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)_en.csv',
+
+                            options: {
+                                title:
+                                    'Figure 5: Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)',
+                                subtitle: '',
+                                type: 'line'
+                            }
+                        }
+                    ]
                 }
             ]
         },

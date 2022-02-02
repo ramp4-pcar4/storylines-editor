@@ -158,8 +158,12 @@ export interface SlideshowPanel extends BasePanel {
 
 export interface ChartPanel extends BasePanel {
     type: PanelType.Chart;
-    src: string;
+    charts: ChartConfig[];
     expandable?: boolean;
+}
+
+export interface ChartConfig {
+    src: string;
     options?: DQVOptions;
 }
 

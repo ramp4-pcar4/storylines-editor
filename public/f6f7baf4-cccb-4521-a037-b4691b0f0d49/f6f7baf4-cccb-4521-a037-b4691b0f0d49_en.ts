@@ -214,16 +214,21 @@ The chart illustrates the distribution of CAC releases reported to the NPRI in 2
                     type: 'text'
                 },
                 {
-                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/en/CAC_en.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: '',
-                        title:
-                            'Proportion of criteria air contaminants released by pulp and paper facilities that reported to the NPRI in 2019',
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    charts: [
+                        {
+                            src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/en/CAC_en.csv',
+
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: '',
+                                title:
+                                    'Proportion of criteria air contaminants released by pulp and paper facilities that reported to the NPRI in 2019',
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
                 }
             ]
         },

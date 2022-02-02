@@ -1,213 +1,90 @@
 <template>
-    <div class="dv-chart justify-center flex h-full align-middle" dv-config="config" id="chart1">
-        <div class="dv-chart-container" role="region" aria-hidden="false" :aria-label="title">
-            <highcharts :options="chartOptions" ref="chart"></highcharts>
+    <div class="w-full px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
+        <hooper
+            ref="carousel"
+            v-if="width !== -1 && config.charts.length > 1"
+            class="h-auto"
+            :infiniteScroll="config.loop"
+        >
+            <slide
+                v-for="(chartConfig, index) in config.charts"
+                :key="`chart-${index}`"
+                :index="index"
+                class="self-center"
+            >
+                <dqv-chart :config="chartConfig" />
+            </slide>
+
+            <hooper-navigation slot="hooper-addons"></hooper-navigation>
+            <hooper-pagination slot="hooper-addons"></hooper-pagination>
+        </hooper>
+
+        <div v-else-if="width !== -1">
+            <dqv-chart :config="config.charts[0]" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Hooper, Slide, Navigation as HooperNavigation, Pagination as HooperPagination } from 'hooper';
+import 'hooper/dist/hooper.css';
 
-import { Chart } from 'highcharts-vue';
-import { ChartPanel, DQVChartConfig, SeriesData } from '@/definitions';
-import Highcharts from 'highcharts';
-import dataModule from 'highcharts/modules/data';
-import exporting from 'highcharts/modules/exporting';
-import exportData from 'highcharts/modules/export-data';
+import { ChartPanel } from '@/definitions';
 
-dataModule(Highcharts);
-exporting(Highcharts);
-exportData(Highcharts);
+import ChartV from '@/components/panels/helpers/chart.vue';
 
 @Component({
     components: {
-        highcharts: Chart
+        'dqv-chart': ChartV,
+        Hooper,
+        Slide,
+        HooperNavigation,
+        HooperPagination
     }
 })
 export default class ChartPanelV extends Vue {
     @Prop() config!: ChartPanel;
 
-    chartOptions: DQVChartConfig = {} as DQVChartConfig;
-    title = '';
-    menuOptions = [
-        'viewFullScreen',
-        'printChart',
-        'separator',
-        'downloadPNG',
-        'downloadJPEG',
-        'downloadPDF',
-        'downloadSVG',
-        'separator',
-        'downloadCSV',
-        'downloadXLS'
-    ];
+    width = -1;
 
-    created(): void {
-        const extension = this.config.src.split('.').pop();
-
-        // get input given by src path
-        if (extension === 'json') {
-            fetch(this.config.src).then((data) => {
-                // parse JSON data
-                data.json().then((res: DQVChartConfig) => {
-                    this.chartOptions = res;
-                    this.title = this.chartOptions.title.text;
-                });
-            });
-        } else if (extension === 'csv') {
-            // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
-            this.parseCSVFile();
-        }
-    }
-
-    /**
-     * Parse and process CSV file contents and return a properly configured highcharts options object.
-     */
-    parseCSVFile(): void {
-        fetch(this.config.src).then((data) => {
-            const dqvOptions = this.config.options;
-
-            // download: true needed for local files which is treated as an URL
-            this.$papa.parse(data.url, {
-                header: dqvOptions?.type === 'pie' ? false : true,
-                dynamicTyping: true,
-                download: true,
-                complete: (res: any) => {
-                    // construct highcharts objects based on chart type
-                    if (dqvOptions?.type === 'pie') {
-                        this.makePieChart(res.data);
-                    } else {
-                        this.makeLineChart(res.meta.fields, res.data);
-                    }
-                }
-            });
-        });
-    }
-
-    /**
-     * Parse chart data content and return a highcharts formatted series object for a pie chart.
-     */
-    makePieChart(data: any): void {
-        const dqvOptions = this.config.options;
-        let series: { data: SeriesData[] } = { data: [] };
-
-        // construct series data
-        data.forEach((slice: any) => {
-            series.data.push({
-                name: slice[0],
-                // in case of strings being passed in such as '10%'
-                y: parseFloat(slice[1])
-            });
-        });
-
-        // plot options for pie charts
-        const plotOptions = {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                }
-            }
-        };
-
-        // export options displayed on hamburger menu
-        const exportOptions = {
-            buttons: {
-                contextButton: {
-                    menuItems: this.menuOptions
-                }
-            },
-            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
-        };
-
-        // initializing chartOptions for line/bar charts
-        this.chartOptions = {
-            chart: {
-                type: dqvOptions?.type ? dqvOptions?.type : 'chart'
-            },
-            title: {
-                text: dqvOptions?.title ? dqvOptions?.title : ''
-            },
-            subtitle: {
-                text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
-            },
-            plotOptions: plotOptions,
-            series: series,
-            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
-            exporting: exportOptions,
-            credits: {
-                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
-            }
-        };
-    }
-
-    /**
-     * Parse chart data content and return a highcharts formatted series object for a line/bar chart.
-     */
-    makeLineChart(fields: string[], data: any): void {
-        const dqvOptions = this.config.options;
-        // find xAxis categories for line/bar charts
-        const cato = fields.shift() as string;
-        const xAxis = {
-            title: {
-                text: dqvOptions?.xAxisLabel ? dqvOptions?.xAxisLabel : ''
-            },
-            categories: data.map((row: any) => row[cato])
-        };
-
-        // construct series data
-        let series: SeriesData[] = [];
-        fields.forEach((f: string) => {
-            const colData = data.map((row: any) => row[f]);
-            series.push({
-                name: f,
-                data: colData
-            });
-        });
-
-        // export options displayed on hamburger menu
-        const exportOptions = {
-            buttons: {
-                contextButton: {
-                    menuItems: this.menuOptions
-                }
-            },
-            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
-        };
-
-        // initializing chartOptions for line/bar charts
-        this.chartOptions = {
-            chart: {
-                type: dqvOptions?.type ? dqvOptions?.type : 'line'
-            },
-            series: series,
-            xAxis: xAxis,
-            title: {
-                text: dqvOptions?.title ? dqvOptions?.title : ''
-            },
-            subtitle: {
-                text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
-            },
-            exporting: exportOptions,
-            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
-            credits: {
-                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
-            },
-            yAxis: {
-                title: {
-                    text: dqvOptions?.yAxisLabel ? dqvOptions?.yAxisLabel : ''
-                }
-            }
-        };
+    mounted(): void {
+        setTimeout(() => {
+            this.width = this.$el.clientWidth;
+        }, 100);
     }
 }
 </script>
 
-<style lang="scss">
-.dv-chart-container {
-    overflow: hidden;
+<style lang="scss" scoped>
+.hooper {
+    height: auto;
+
+    ::v-deep .hooper-navigation svg {
+        overflow: visible;
+    }
+
+    ::v-deep .hooper-pagination {
+        bottom: -20px;
+    }
+
+    ::v-deep .hooper-indicator {
+        border: 1px solid #878787;
+
+        width: 24px;
+        height: 6px;
+        border-radius: 0px;
+
+        &.is-active {
+            border: none;
+            background-color: var(--sr-accent-colour);
+        }
+
+        &:hover {
+            background-color: white;
+            // background-color: lighten(#00d2d3, 20%);
+            border-color: var(--sr-accent-colour);
+        }
+    }
 }
 </style>
