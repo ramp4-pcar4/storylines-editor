@@ -216,16 +216,21 @@ Le **schéma ci-dessous** illustre la répartition des rejets de PCA déclarés 
                     type: 'text'
                 },
                 {
-                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/fr/CAC_fr.csv',
                     type: 'chart',
-                    options: {
-                        xAxisLabel: '',
-                        yAxisLabel: '',
-                        title:
-                            'Proportion des substances rejetées faisant partie des principaux contaminants atmosphériques (PCA) pour les installations de pâtes et papiers déclarant à l’INRP en 2019',
-                        subtitle: '',
-                        type: 'pie'
-                    }
+                    charts: [
+                        {
+                            src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/fr/CAC_fr.csv',
+
+                            options: {
+                                xAxisLabel: '',
+                                yAxisLabel: '',
+                                title:
+                                    'Proportion des substances rejetées faisant partie des principaux contaminants atmosphériques (PCA) pour les installations de pâtes et papiers déclarant à l’INRP en 2019',
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
                 }
             ]
         },
