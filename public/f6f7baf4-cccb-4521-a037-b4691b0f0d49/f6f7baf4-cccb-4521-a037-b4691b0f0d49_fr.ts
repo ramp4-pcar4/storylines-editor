@@ -176,7 +176,7 @@ Certaines installations du secteur industriel des pâtes et papiers possèdent u
                     type: 'map',
                     timeSlider: {
                         range: [2010, 2019],
-                        start: [2010, 2019],
+                        start: [2019, 2019],
                         attribute: 'Report_Year_Année_de_déclaration'
                     }
                 }

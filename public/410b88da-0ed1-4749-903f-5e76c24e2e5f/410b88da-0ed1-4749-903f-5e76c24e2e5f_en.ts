@@ -385,7 +385,7 @@ You can explore each facility using satellite imagery.`,
                     type: 'map',
                     timeSlider: {
                         range: [2010, 2019],
-                        start: [2010, 2019],
+                        start: [2019, 2019],
                         attribute: 'Reporting_Year___Année'
                     }
                 }
@@ -451,7 +451,7 @@ This change in the number of facilities reporting over time follows changes in t
                     type: 'map',
                     timeSlider: {
                         range: [2010, 2019],
-                        start: [2010, 2019],
+                        start: [2019, 2019],
                         attribute: 'Reporting_Year___Année'
                     }
                 }

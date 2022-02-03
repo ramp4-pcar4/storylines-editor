@@ -386,7 +386,7 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                     type: 'map',
                     timeSlider: {
                         range: [2010, 2019],
-                        start: [2010, 2019],
+                        start: [2019, 2019],
                         attribute: 'Reporting_Year___Année'
                     }
                 }
@@ -452,7 +452,7 @@ Ce changement dans le nombre d’installations déclarantes au fil du temps suit
                     type: 'map',
                     timeSlider: {
                         range: [2010, 2019],
-                        start: [2010, 2019],
+                        start: [2019, 2019],
                         attribute: 'Reporting_Year___Année'
                     }
                 }
