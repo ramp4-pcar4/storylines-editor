@@ -66,6 +66,15 @@ export default class MapPanelV extends Vue {
                     }
                 }).$mount();
                 timeSliderPanel.body = timeSliderComponent.$el;
+                timeSliderPanel.element.css({
+                    bottom: '73px',
+                    right: '60px',
+                    left: 'auto',
+                    top: 'auto',
+                    width: '50%',
+                    padding: '5px',
+                    'min-height': '110px'
+                });
                 timeSliderPanel.open();
             }
         });

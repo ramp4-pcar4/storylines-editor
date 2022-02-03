@@ -71,7 +71,7 @@ export default class TimeSlider extends Vue {
 .time-slider {
     @import './../../../../node_modules/nouislider/dist/nouislider';
 
-    @apply absolute left-1/4 right-1/4 flex flex-col items-center bg-white;
+    @apply absolute w-full left-0 flex flex-col items-center bg-white;
 
     height: 150px;
     pointer-events: all;
