@@ -107,14 +107,21 @@ export default class TimeSlider extends Vue {
         });
     }
 
+    /**
+     * Begins looping through the values on the time slider
+     */
     startLoop(): void {
         const sliderValues = this.slider.get() as string | string[];
         if (Array.isArray(sliderValues)) {
             this.slider.set(sliderValues.map(() => sliderValues[0]));
         }
+        // delay happens before first call
         this.intervalID = setInterval(this.moveHandleRight, 1400);
     }
 
+    /**
+     * Moves handle(s) one to the right of the first (leftmost) handle. Loops if the handles are at the end.
+     */
     moveHandleRight(): void {
         const sliderValues = this.slider.get(true) as number | number[];
         let newValues;
@@ -128,8 +135,12 @@ export default class TimeSlider extends Vue {
         this.slider.set(newValues);
     }
 
+    /**
+     * Cancels looping through the values on the time slider
+     */
     endLoop(): void {
         clearInterval(this.intervalID);
+        // reset so template knows we aren't looping
         this.intervalID = -1;
     }
 }
