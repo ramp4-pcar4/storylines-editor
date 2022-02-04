@@ -1,11 +1,11 @@
 const config = {
-    title: 'National Pollutant Releases Inventory Substance Overview: Ethylene Glycol',
+    title: 'National Pollutant Release Inventory Substance Overview: Ethylene Glycol',
     introSlide: {
         logo: {
             src: '',
             altText: ''
         },
-        title: 'National Pollutant Releases Inventory Substance Overview: Ethylene Glycol',
+        title: 'National Pollutant Release Inventory Substance Overview: Ethylene Glycol',
         subtitle: ''
     },
     slides: [
@@ -76,14 +76,14 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
             ]
         },
         {
-            title: 'Effects of Ethylene Glycol – Human Health',
+            title: 'Facilities reporting ethylene glycol to the NPRI',
             panel: [
                 {
-                    title: 'Effects of Ethylene Glycol – Human Health',
+                    title: 'Facilities reporting ethylene glycol to the NPRI',
                     content: `                   
 #### Breakdown of facilities reporting ethylene glycol to the NPRI for 2019 by sectors and province
 | **Sectors**                   | **Airports and Services to Airports** | **All Other Sectors** | **Chemical Manufacturing** | **Oil and Gas (Conventional and Non-Conventional)** | **Waste Treatment and Disposal** | **TOTAL** |
-| ----------------------------- | ------------------------------------- | --------------------- | -------------------------- | --------------------------------------------------- | -------------------------------- | --------- |
+| ----------------------------- | :-------------------------------------: | :---------------------: | :--------------------------: | :---------------------------------------------------: | :--------------------------------: | :---------: |
 | **Alberta**                   | 10                                    | 4                     | 25                         | 56                                                  | 16                               | **111**   |
 | **British Columbia**          | 9                                     | 3                     | 3                          | 7                                                   | 6                                | **28**    |
 | **Manitoba**                  | 1                                     | 4                     | 2                          |                                                     | 1                                | **8**     |
@@ -112,6 +112,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
                     type: 'text'
                 },
                 {
+                    title: 'Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector',
                     config: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/ramp-config/en/locations.json',
                     type: 'map'
                 }
@@ -122,7 +123,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
             panel: [
                 {
                     title: 'Releases of Ethylene Glycol reported to the NPRI',
-                    content: `In 2019, facilities reported a total of 16 072, 920 tonnes of ethylene glycol released into air, water and land combined. The airports and services to air transportation sector is by far the largest contributor in terms of quantities, with nearly all of the reported releases to air, water and land combined (94% or 15 099 tonnes) for 2019. Of those releases, 99% were land releases from de-icing operations. The pie chart (figure 1) below shows the breakdown of total releases by selected sector.`,
+                    content: `In 2019, facilities reported a total of 16,073 tonnes of ethylene glycol released into air, water and land combined. The airports and services to air transportation sector is by far the largest contributor in terms of quantities, with nearly all of the reported releases to air, water and land combined (94% or 15 099 tonnes) for 2019. Of those releases, 99% were land releases from de-icing operations. The pie chart (figure 1) below shows the breakdown of total releases by selected sector.`,
                     type: 'text'
                 },
                 {
@@ -132,7 +133,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
                             src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/EG_releases_2019_en.csv',
 
                             options: {
-                                title: 'Figure 1: Percentage of total ethlyene glycol releases for 2019, by sector',
+                                title: 'Figure 1: Percentage of total ethylene glycol releases for 2019, by sector',
                                 subtitle: '',
                                 type: 'pie'
                             }
@@ -158,6 +159,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
 
                             options: {
                                 title: 'Figure 2: Total releases of ethylene glycol for 2019, by province',
+                                xAxisLabel: 'Quantity (tonnes)',
                                 subtitle: '',
                                 type: 'bar'
                             }
@@ -183,10 +185,10 @@ Overall, total releases of ethylene glycol have increased between 2010 and 2019,
             ]
         },
         {
-            title: 'Ethlyene glycol release trends',
+            title: 'Ethylene glycol release trends',
             panel: [
                 {
-                    title: 'Ethlyene glycol release trends',
+                    title: 'Ethylene glycol release trends',
                     content: `Although air releases only account for a very small fraction of reported releases of ethylene glycol through time (less than 1% for 2019), the chemicals sector shows a significant increase (130 tonnes, or 531% increase) from 2015 to 2016, and has remained constant since then. However, in 2019 there is a significant decrease for the chemicals sector.  Compared to the overall amount of ethylene glycol releases in Canada, the total amount of ethylene glycol released to the air by the chemicals sector remains low.
 
 As for water releases, we are seeing an overall decreasing trend, driven by decreases in reported releases by the oil and gas sector from offshore oil platforms.`,
@@ -200,7 +202,7 @@ As for water releases, we are seeing an overall decreasing trend, driven by decr
                                 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene glycol release trends, by sector 2010-2019 (tonnes)_en.csv',
 
                             options: {
-                                title: 'Figure 3: Ethlyene glycol release trends, by sector 2010-2019 (tonnes)',
+                                title: 'Figure 3: Ethylene glycol release trends, by sector 2010-2019 (tonnes)',
                                 subtitle: '',
                                 type: 'line'
                             }
@@ -249,10 +251,10 @@ As for water releases, we are seeing an overall decreasing trend, driven by decr
             ]
         },
         {
-            title: 'Ethlyene glycol disposal and recycling trends',
+            title: 'Ethylene glycol disposal and recycling trends',
             panel: [
                 {
-                    title: 'Ethlyene glycol disposal and recycling trends',
+                    title: 'Ethylene glycol disposal and recycling trends',
                     content: `Figure 5 shows that total quantities of ethylene glycol disposed or recycled overtime tend to remain constant for most sectors. The sector showing the most variability is the waste management sector as these facilities typically experience a lot of variation depending of type of material that they receive, which may change from year to year (as shown by the orange line in figure 5).
 
 When examining disposals and recycling separately, we can see that disposals have remained fairly constant while recycling has slightly increased over time. In the mid-1990’s, new guidelines for releases concentrations of ethylene glycol in water were established by Transport Canada and Fisheries and Ocean Canada. All Canadian airports put in place new operational procedures to implement remediation work. The increase in recycling and treatment indicates a positive change, as it significantly reduce the amount of substance that would otherwise end up in landfills and environments. 
@@ -269,7 +271,7 @@ You can read more on [Air Transportation](https://tc.canada.ca/en/corporate-serv
 
                             options: {
                                 title:
-                                    'Figure 5: Ethlyene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)',
+                                    'Figure 5: Ethylene glycol disposal and recycling trends, by sector 2010-2019 (tonnes)',
                                 subtitle: '',
                                 type: 'line'
                             }

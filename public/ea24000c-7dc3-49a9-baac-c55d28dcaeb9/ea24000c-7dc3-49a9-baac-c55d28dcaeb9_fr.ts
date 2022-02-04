@@ -88,7 +88,7 @@ En 2019, la province comptant le plus grand nombre d’installations ayant décl
 #### Répartition des installations ayant déclaré l’utilisation de l’éthylène glycol à l’INRP en 2019, par secteur et par province
 
 | Secteurs                  | Aéroports et services aux aéroports | Tous les autres secteurs | Fabrication de produits chimiques | Pétrole et gaz (conventionnel et non conventionnel) | Traitement et élimination de déchets | TOTAL |
-| ------------------------- | ----------------------------------- | ------------------------ | --------------------------------- | --------------------------------------------------- | ------------------------------------ | ----- |
+| ------------------------- | :-----------------------------------: | :------------------------: | :---------------------------------: | :---------------------------------------------------: | :------------------------------------: | :-----: |
 | Alberta                   | 10                                  | 56                       | 25                                | 4                                                   | 16                                   | 111   |
 | Colombie-Britannique      | 9                                   | 7                        | 3                                 | 3                                                   | 6                                    | 28    |
 | Manitoba                  | 1                                   |                          |                                   |                                                     |                                      | 1     |
@@ -129,7 +129,7 @@ En 2019, la province comptant le plus grand nombre d’installations ayant décl
             panel: [
                 {
                     title: 'Rejets d’éthylène glycol déclarés à l’INRP',
-                    content: `En 2019, des installations ont déclaré un rejet de 16 072, 920 tonnes d’éthylène glycol au total dans l’air, l’eau et le sol combinés. Comptant presque la totalité des rejets déclarés dans l’air, l’eau et le sol combinés (94% ou 15 099 tonnes) en 2019, le secteur des aéroports et des services de transport aérien est de loin le plus grand responsable au niveau des quantités rejetées. Parmi ces rejets, 99 % étaient des rejets dans le sol provenant d’opérations de dégivrage. Le diagramme à circulaire ci-dessous (figure 1) montre la répartition de tous les rejets pour certains secteurs.`,
+                    content: `En 2019, des installations ont déclaré un rejet de 16 073 tonnes d’éthylène glycol au total dans l’air, l’eau et le sol combinés. Comptant presque la totalité des rejets déclarés dans l’air, l’eau et le sol combinés (94% ou 15 099 tonnes) en 2019, le secteur des aéroports et des services de transport aérien est de loin le plus grand responsable au niveau des quantités rejetées. Parmi ces rejets, 99 % étaient des rejets dans le sol provenant d’opérations de dégivrage. Le diagramme à circulaire ci-dessous (figure 1) montre la répartition de tous les rejets pour certains secteurs.`,
                     type: 'text'
                 },
                 {

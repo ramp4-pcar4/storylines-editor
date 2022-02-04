@@ -99,7 +99,7 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
                     content: `Les installations d’extraction des sables bitumineux qui produisent des déclarations à l’INRP sont situées exclusivement dans le nord de l’Alberta, surtout autour de la municipalité de Fort McMurray. Parmi les installations déclarantes en 2019, une se trouve dans le gisement Peace River, cinq sont dans le gisement Cold Lake et 30 sont dans le gisement Athabasca. Cette carte comprend également une [installation de valorisation](https://www.rncan.gc.ca/energie/sources-denergie-et-reseau-de-distribution/petrole-brut/valorisation-des-sables-bitumineux-et-du-petrole-lourd/5876?_ga=2.12839347.524335214.1562344489-2057911658.1562344489) à Fort Saskatchewan, en Alberta, qui valorise le pétrole de l’installation d’exploitation minière à ciel ouvert des sables bitumineux de Muskeg River de Canadian Natural Resources. Parmi les installations ayant fait l’objet d’une déclaration à l’INRP, sept sont des exploitations minières à ciel ouvert, une est une installation de valorisation et les 30 autres sont des installations in situ.
 #### Installations de sables bitumineux déclarantes à l'INRP - 2019
 | **Emplacement de l’installation** | **Installation in situ** | **Exploitation minière à ciel ouvert** | **Installation de valorisation** | **Total** |
-| ----------------------| ------------------- | ------------------ | --------- | --------- |
+| ----------------------| :-------------------: | :------------------: | :---------: | :---------: |
 | Athabasca             | 23                  | 7                  | 0         | **30**    |
 | Peace River           | 1                   | 0                  | 0         | **1**     |
 | Cold Lake             | 5                   | 0                  | 0         | **5**     |
@@ -213,7 +213,7 @@ Explorez chaque installation avec l’imagerie par satellite.`,
                                 '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Criteria air contaminant releases from oil sands mines_1.csv',
                             options: {
                                 xAxisLabel: '',
-                                yAxisLabel: 'Rejets de PCA (tonnes)',
+                                yAxisLabel: 'Rejets de PCA (mille tonnes)',
                                 title:
                                     'Rejects de PCA (tonnes) des mines à ciel ouvert des sables bitumineux de 2010 à 2019',
                                 subtitle: '',
@@ -275,8 +275,8 @@ Bien que les résidus déclarés par ces mines contiennent de grandes quantités
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/Mine tailings reported.csv',
 
                             options: {
-                                xAxisLabel: '',
-                                yAxisLabel: 'Substances',
+                                xAxisLabel: 'Substances',
+                                yAxisLabel: 'Rejets (mille tonnes)',
                                 title: `Les 10 principales substances des résidus miniers des sables bitumineux déclarés a l'INRP en 2019`,
                                 subtitle: '',
                                 type: 'bar'
@@ -479,7 +479,7 @@ Bien que les installations in situ aient signalé un accroissement des émission
 
                             options: {
                                 //xAxisLabel: 'Year',
-                                yAxisLabel: 'Émissions de PCA (tonnes)',
+                                yAxisLabel: 'Émissions de PCA (mille tonnes)',
                                 title: `Rejets de PCA des installations in situ déclarés à l'INRP de 2010 à 2019`,
                                 subtitle: '',
                                 type: 'bar'

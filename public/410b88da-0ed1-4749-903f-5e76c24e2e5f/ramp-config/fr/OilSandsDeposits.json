@@ -203,13 +203,13 @@
                 "symbologyExpanded": false,
                 "layerEntries": [
                     {
-                        "index": 18,
+                        "index": 14,
                         "name": "Gisements de sables bitumineux",
                         "disabledControls": [
                             "query"
                         ],
                         "state": {
-                            "opacity": 0.5
+                            "opacity": 0.25
                         }                               
                     }
                 ]

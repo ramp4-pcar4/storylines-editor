@@ -70,34 +70,25 @@ Les installations du secteur des pâtes et papiers sont des usines de production
                     
 Plusieurs polluants rejetés dans l’environnement par la fabrication de pâtes et papiers sont déclarés à l’INRP. Selon le procédé de fabrication employé pour le bois et le papier recyclé, c’est-à-dire chimique ou mécanique, les étapes de fabrication ainsi que les polluants déclarés à l’INRP varient. Ces procédés sont décrits ci-dessous.`,
                     type: 'text'
-                },
-                {
-                    title: 'Procédé mécanique',
-                    content: `Le procédé mécanique repose principalement sur l’action physique (attrition) pour séparer les fibres. Ce procédé permet de conserver la majeure partie de la lignine dans la pâte, soit la substance qui lie les fibres de cellulose entre-elles. De ce fait, le procédé mécanique permet de fournir des rendements plus élevés de mise en pâte. Les pâtes mécaniques sont généralement caractérisées par une rigidité élevée, mais une résistance relativement faible en raison de la présence de la lignine. Il existe également des usines de pâte mécanique qui utilise un prétraitement chimique et thermique des copeaux de bois, suivi d’un raffinage mécanique et d’un blanchiment (pâte chimico-thermo-mécanique blanchie ou PCTMB). Les pâtes mécaniques sont entre autres utilisées pour la fabrication de papier journal et de catalogue.`,
-                    type: 'text'
                 }
             ]
         },
         {
-            title: 'Schéma des étapes du procédé de fabrication mécanique',
+            title: 'Procédé mécanique',
             panel: [
                 {
-                    title: 'Schéma des étapes du procédé de fabrication mécanique',
-                    content: ``,
+                    title: 'Procédé mécanique',
+                    content: `Le procédé mécanique repose principalement sur l’action physique (attrition) pour séparer les fibres. Ce procédé permet de conserver la majeure partie de la lignine dans la pâte, soit la substance qui lie les fibres de cellulose entre-elles. De ce fait, le procédé mécanique permet de fournir des rendements plus élevés de mise en pâte. Les pâtes mécaniques sont généralement caractérisées par une rigidité élevée, mais une résistance relativement faible en raison de la présence de la lignine. Il existe également des usines de pâte mécanique qui utilise un prétraitement chimique et thermique des copeaux de bois, suivi d’un raffinage mécanique et d’un blanchiment (pâte chimico-thermo-mécanique blanchie ou PCTMB). Les pâtes mécaniques sont entre autres utilisées pour la fabrication de papier journal et de catalogue.`,
                     type: 'text'
                 },
                 {
                     caption:
                         'Source: Gettyimages, Dorling Kindersley (2021), [schéma d’une usine de fabrication de papier](https://www.gettyimages.ca/detail/illustration/diagram-of-a-paper-making-factory-royalty-free-illustration/75488548?adppopup=true)',
-                    type: 'slideshow',
-                    images: [
-                        {
-                            src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Mechanical_process_FR.png',
-                            type: 'image',
-                            altText:
-                                'Étape 1. Préparation de la matière première : broyage mécanique des copeaux de bois. Étape 2. Mise en pâte et blanchiment. Étape 3. Finition de la pâte dans la machine à papier. Étape 4. Expédition du produit final.'
-                        }
-                    ]
+
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Mechanical_process_FR.png',
+                    type: 'image',
+                    altText:
+                        'Étape 1. Préparation de la matière première : broyage mécanique des copeaux de bois. Étape 2. Mise en pâte et blanchiment. Étape 3. Finition de la pâte dans la machine à papier. Étape 4. Expédition du produit final.'
                 }
             ]
         },
@@ -110,21 +101,17 @@ Plusieurs polluants rejetés dans l’environnement par la fabrication de pâtes
 
 La grande majorité de la pâte chimique produite au Canada est blanchie. La pâte chimique blanchie peut être utilisée pour fabriquer des produits spécialisés en papier et carton tels que du papier de qualité supérieure, des mouchoirs ou du carton ondulé. La pâte chimique non-blanchie est surtout utilisée pour des papiers et cartons d’emballage.
                     
- Une partie de la fibre de bois normalement utilisée pour la fabrication de pâte et papier peut aussi être réorientée vers d'autres utilisations innovantes. Veuillez-voir la section « Avenir de la production des pâtes et papiers» pour plus d’information.`,
+ Une partie de la fibre de bois normalement utilisée pour la fabrication de pâte et papier peut aussi être réorientée vers d'autres utilisations innovantes. Veuillez-voir la section «Avenir de la production des pâtes et papiers» pour plus d’information.`,
                     type: 'text'
                 },
                 {
                     caption:
                         'Source: Gettyimages, Dorling Kindersley (2021), [schéma d’une usine de fabrication de papier](https://www.gettyimages.ca/detail/illustration/diagram-of-a-paper-making-factory-royalty-free-illustration/75488548?adppopup=true)',
-                    type: 'slideshow',
-                    images: [
-                        {
-                            src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Chemical_process_FR.png',
-                            type: 'image',
-                            altText:
-                                'Étape 1. Préparation de la matière première : séparation des fibres de bois à l’aide de produits chimiques et de cuisson à haute température. Étape 2. Mise en pâte et blanchiment. Étape 3. Finition de la pâte dans la machine à papier. Étape 4. Expédition du produit final.'
-                        }
-                    ]
+
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Chemical_process_FR.png',
+                    type: 'image',
+                    altText:
+                        'Étape 1. Préparation de la matière première : séparation des fibres de bois à l’aide de produits chimiques et de cuisson à haute température. Étape 2. Mise en pâte et blanchiment. Étape 3. Finition de la pâte dans la machine à papier. Étape 4. Expédition du produit final.'
                 }
             ]
         },
@@ -200,19 +187,17 @@ Certaines installations du secteur industriel des pâtes et papiers possèdent u
             ]
         },
         {
-            title: 'Principaux contaminants atmosphériques',
+            title: 'Proportion des PCA',
             panel: [
                 {
-                    title: 'Principaux contaminants atmosphériques',
+                    title: 'Proportion des PCA',
                     content: `À certains niveaux de concentrations dans l’air ambiant, les PCA peuvent être nuisibles pour l’environnement et contribuer à des problèmes de santé, tels que des problèmes respiratoires et cardiovasculaires. Par exemple, les oxydes d’azote (NO<sub>x</sub>) et les oxydes de soufre (SO<sub>x</sub>) sont des précurseurs des [pluies acides](https://www.canada.ca/fr/environnement-changement-climatique/services/pollution-atmospherique/enjeux/pluies-acides-causes-effets.html), et les NOx et les composés organiques volatils (COV) contribuent à la formation de l’[ozone troposphérique](https://www.canada.ca/fr/environnement-changement-climatique/services/pollution-atmospherique/polluants/principaux-contaminants/ozone-tropospherique.html) qui constitue le smog. 
 
 Depuis 2010, les données de l’INRP indiquent que les rejets annuels de monoxyde de carbone (CO) du secteur industriel des pâtes et papiers ont augmenté d’environ 7 000 tonnes. Les rejets de CO sont généralement associés à une [mauvaise combustion](https://www.rncan.gc.ca/energie/publications/efficacite/industrie/peeic/6696) liée à des problèmes opérationnels, tels qu’un mauvais mélange d’air et du combustible, un temps de séjour insuffisant, une température trop faible, plusieurs démarrages d’usine, des équipements désuets ou un excès d’air total . Il est à noter que l’efficacité de combustion dépend également du type de combustible et de la technologie de combustion.
                     
 Le principal composé organique volatil (COV) rejeté dans l’air par l’industrie est le méthanol, qui représente plus de 55% des COV déclarés par l’industrie papetière. Le méthanol se trouve dans les condensats où il peut être récupéré pour la combustion sur place ou pour la vente.
                     
-Dans les usines de pâtes et papiers, l’ammoniac (NH<sub>3</sub>) n’est généralement ni fabriqué ni traité à des concentrations supérieures à 1%. Toutefois, des quantités minimes de cette substance peuvent être fabriquées comme sous-produit et rejetées directement dans l’air. En général, l’ammoniac est surtout présent en faible quantité dans les effluents traités des usines en raison de l’ajout de nutriments contenant de l’azote dans les systèmes de traitement des eaux usées des papetières.
-
-Le **schéma ci-dessous** illustre la répartition des rejets de PCA déclarés à l’INRP en 2019.`,
+Dans les usines de pâtes et papiers, l’ammoniac (NH<sub>3</sub>) n’est généralement ni fabriqué ni traité à des concentrations supérieures à 1%. Toutefois, des quantités minimes de cette substance peuvent être fabriquées comme sous-produit et rejetées directement dans l’air. En général, l’ammoniac est surtout présent en faible quantité dans les effluents traités des usines en raison de l’ajout de nutriments contenant de l’azote dans les systèmes de traitement des eaux usées des papetières.`,
                     type: 'text'
                 },
                 {
@@ -259,7 +244,7 @@ Le SRT n’est généralement pas fabriqué ni traité en grande quantité, mais
                     type: 'map'
                 }
             ]
-        },
+        } /*
         {
             title: 'Rejets de soufre réduit total',
             panel: [
@@ -287,7 +272,7 @@ Le SRT n’est généralement pas fabriqué ni traité en grande quantité, mais
                     altText: '[fr] A graphical pie chart representation of the data table in the previous slide.'
                 }
             ]
-        },
+        },*/,
         {
             title: 'Phosphore et nitrates',
             panel: [
@@ -327,11 +312,11 @@ Les installations de pâtes et papiers doivent effectuer des [études de suivis 
             ]
         },
         {
-            title: 'Recyclage, traitement et élimination',
+            title: 'Recyclage, traitement et élimination en proportion',
             panel: [
                 {
-                    title: 'Recyclage, traitement et élimination',
-                    content: `Tel qu’illustré dans le **graphique ci-dessous**, parmi tous les polluants déclarés par les papetières, la majeure partie est rejetée directement dans l’environnement. Les données de l’INRP indiquent que 4% des substances déclarées sont récupérées. Parmi celles-ci, le manganèse et le phosphore sont les deux substances récupérées en plus grande quantité (supérieure à 2 000 tonnes). Les données montrent que ce sont les métaux qui subissent le plus souvent des procédés de récupération. Par exemple, un minimum de 88% des quantités déclarées d’aluminium, de plomb et de zinc sont éliminées, traitées ou recyclées. `,
+                    title: 'Recyclage, traitement et élimination en proportion',
+                    content: `Tel qu’illustré dans le **graphique ci-contre**, parmi tous les polluants déclarés par les papetières, la majeure partie est rejetée directement dans l’environnement. Les données de l’INRP indiquent que 4% des substances déclarées sont récupérées. Parmi celles-ci, le manganèse et le phosphore sont les deux substances récupérées en plus grande quantité (supérieure à 2 000 tonnes). Les données montrent que ce sont les métaux qui subissent le plus souvent des procédés de récupération. Par exemple, un minimum de 88% des quantités déclarées d’aluminium, de plomb et de zinc sont éliminées, traitées ou recyclées. `,
                     type: 'text'
                 },
                 {
@@ -353,9 +338,9 @@ Les installations de pâtes et papiers doivent effectuer des [études de suivis 
 
 - Les [Normes canadiennes de qualité de l’air ambiant](https://www.canada.ca/fr/environnement-changement-climatique/services/indicateurs-environnementaux/qualite-air.html) (NCQAA) définissent des objectifs nationaux à atteindre pour la qualité de l’air et les exigences de base relatives aux émissions industrielles (EBEI). Ces normes ne sont pas restrictives, c’est-à-dire qu’il n’y a pas de sanction ou d’amende si elles sont dépassées. Cependant, elles permettent de cibler les zones problématiques et développer des plans d’action et de nouveaux règlements fédéraux et provinciaux pour limiter le rejet de polluants. 
 
-- Le [Règlement multisectoriel sur les polluants atmosphériques](https://laws-lois.justice.gc.ca/fra/reglements/DORS-2016-151/page-1.html) (RMSPA) définit les limites nationales d’émissions industrielles, entre autres les émissions de NOX.
+- Le [Règlement multisectoriel sur les polluants atmosphériques](https://laws-lois.justice.gc.ca/fra/reglements/DORS-2016-151/page-1.html) (RMSPA) définit les limites nationales d’émissions industrielles, entre autres les émissions de NO<sub>x</sub>.
 
-- Le [Code de pratiques pour la gestion des émissions atmosphériques des installations de pâtes et papiers](https://www.canada.ca/fr/environnement-changement-climatique/services/registre-environnemental-loi-canadienne-protection/directives-objectifs-codes-pratiques/emission-avis-installations-pates-papier/code-pratiques-installations-pates-papier.html) décrit les activités opérationnelles pour les usines de pâtes et papiers et les préoccupations environnementales qu’elles soulèvent, liées aux émissions atmosphériques de dioxyde de soufre (SO2) et de matières particulaires totales (MPT). Des limites d’émissions et des pratiques recommandées y sont présentées pour atténuer ces préoccupations.
+- Le [Code de pratiques pour la gestion des émissions atmosphériques des installations de pâtes et papiers](https://www.canada.ca/fr/environnement-changement-climatique/services/registre-environnemental-loi-canadienne-protection/directives-objectifs-codes-pratiques/emission-avis-installations-pates-papier/code-pratiques-installations-pates-papier.html) décrit les activités opérationnelles pour les usines de pâtes et papiers et les préoccupations environnementales qu’elles soulèvent, liées aux émissions atmosphériques de dioxyde de soufre (SO<sub>2</sub>) et de matières particulaires totales (MPT). Des limites d’émissions et des pratiques recommandées y sont présentées pour atténuer ces préoccupations.
 
 - Les [Directives pour la réduction des rejets de colorants provenant des fabriques de pâtes et papiers](https://www.canada.ca/fr/environnement-changement-climatique/services/registre-environnemental-loi-canadienne-protection/publications/directives-reduction-rejets-colorants-fabriques.html) précisent certaines limites à ne pas dépasser et les bonnes pratiques applicables à suivre pour les colorants qui y sont listés afin de limiter la quantité de colorants rejetés vers l’effluent final.
 
@@ -383,7 +368,7 @@ Les installations de pâtes et papiers doivent effectuer des [études de suivis 
 - l’ammoniac; et
 - les composés organiques volatils.
 
-La plupart des installations brûlent la biomasse résiduelles  (par exemple, l’écorce, la liqueur de cuisson, la boue issue du traitement des effluents) afin de produire de [l’énergie et à des fins de récupération](https://www.rncan.gc.ca/science-data/data-analysis/energy-data-analysis/faits-lenergie-renouvelable/20080). Certaines installations souscrivent aussi à des certifications pour leur approvisionnement en bois, telles que des certifications du [Conseil de soutien de la forêt](https://ca.fsc.org/fr-ca) (FSC) et de la société [Sustainable Forestery Initiative](https://www.forests.org/fr/) (SFI). 
+La plupart des installations brûlent la biomasse résiduelles  (par exemple, l’écorce, la liqueur de cuisson, la boue issue du traitement des effluents) afin de produire de l’énergie et à des fins de récupération. Certaines installations souscrivent aussi à des certifications pour leur approvisionnement en bois, telles que des certifications du [Conseil de soutien de la forêt](https://ca.fsc.org/fr-ca) (FSC) et de la société [Sustainable Forestery Initiative](https://www.forests.org/fr/) (SFI). 
 
 Les plus grandes sources d’émission de matière particulaire et de composés gazeux des papetières sont équipées de dispositifs de contrôle qui permettent de contrôler les émissions afin qu’elles soient conformes aux règlements provinciaux et aux exigences des permis. De plus, la matière organique soluble et en suspension dans les eaux usées sont contrôlées grâce aux systèmes de traitements des eaux usées sur place qui utilisent la dégradation sédimentaire et biologique afin de produire des effluents finaux conformes aux règlements fédéraux, provinciaux et aux exigences des permis.
 

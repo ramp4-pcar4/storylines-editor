@@ -43,7 +43,7 @@ All three of the deposits are located in northern Alberta except for a small por
 
 The oil sands extraction sector is a major contributor to Canada’s economy, with more than 528,000 people deriving direct, indirect and induced employment from the oil sands and its supporting sectors. To date, an estimated $325 billion of capital expenditures has been invested in the oil sands industry, and the sector produces 2.95 million barrels of oil per day.
 
-This map shows a generalized potential extent of the three oil sands areas. The actual geological deposits themselves cover larger areas.`,
+This map shows a generalized overview of the three oil sands areas. The actual geological deposits themselves cover larger areas.`,
                     type: 'text'
                 },
                 {
@@ -97,8 +97,9 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
                     title: 'Where are facilities located?',
                     content: `Oil sands extraction facilities that report to the NPRI are located exclusively in northern Alberta, particularly around the municipality of Fort McMurray. Of the facilities that reported in 2019, 1 of them are in the Peace River deposit, 5 in the Cold Lake deposit and 30 in the Athabasca deposit. Also included in this map is an upgrader facility in Fort Saskatchewan, Alberta, that upgrades oil from the Canadian Natural Resources’ Muskeg River oil sands surface mining facility. Of the facilities that reported to the NPRI, seven of them are surface mining operations, one was an [upgrader facility](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/upgrading-oil-sands-and-heavy-oil/5875) and the remaining 30 were in-situ facilities.
 #### Oil sands facilities reporting to the NPRI - 2019
+
 | **Facility location** | **Thermal in-situ** | **Surface mining** | **Upgrader** | **Total** |
-| ----------------------| ------------------- | ------------------ | --------- | --------- |
+| ----------------------| :-------------------: | :------------------: | :---------: | :---------: |
 | Athabasca             | 23                  | 7                  | 0         | **30**    |
 | Peace River           | 1                   | 0                  | 0         | **1**     |
 | Cold Lake             | 5                   | 0                  | 0         | **5**     |
@@ -219,7 +220,7 @@ You can explore each facility using satellite imagery.`,
 
                             options: {
                                 xAxisLabel: 'Year',
-                                yAxisLabel: 'CAC releases',
+                                yAxisLabel: 'CAC releases (thousands)',
                                 title: 'Oil Sands Surface Mining, CAC Releases (tonnes) 2010 to 2019',
                                 subtitle: '',
                                 type: 'bar'
@@ -230,7 +231,7 @@ You can explore each facility using satellite imagery.`,
                                 '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Criteria air contaminant releases from oil sands mines_2.csv',
                             options: {
                                 xAxisLabel: 'Year',
-                                yAxisLabel: 'Barrels per year',
+                                yAxisLabel: 'Barrels per year (thousands)',
                                 title: 'Barrels Per Year produced by Alberta Surface Mines 2010 to 2019',
                                 subtitle: '',
                                 type: 'bar',
@@ -278,8 +279,8 @@ While the tailings reported by these mines have large amounts of manganese, ammo
                         {
                             src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/Mine tailings reported.csv',
                             options: {
-                                xAxisLabel: '',
-                                yAxisLabel: 'Substances',
+                                xAxisLabel: 'Substances',
+                                yAxisLabel: 'Releases (thousands tonnes)',
                                 title: 'Top 10 substances in oil sands tailings reported to the NPRI in 2019',
                                 subtitle: '',
                                 type: 'bar'
@@ -478,7 +479,7 @@ While in-situ facilities have reported an increase in reported CAC emissions, th
 
                             options: {
                                 xAxisLabel: 'Year',
-                                yAxisLabel: 'CAC Emissions (tonnes)',
+                                yAxisLabel: 'CAC Emissions (thousand tonnes)',
                                 title: 'CAC Emissions from In-Situ Facilities reporting to the NPRI, 2010-2019',
                                 subtitle: '',
                                 type: 'bar'

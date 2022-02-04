@@ -1,11 +1,11 @@
 const config = {
-    title: 'NPRI sector overview: Pulp and Paper',
+    title: 'NPRI Sector Overview: Pulp and Paper',
     introSlide: {
         logo: {
             src: '',
             altText: ''
         },
-        title: 'NPRI sector overview: Pulp and Paper',
+        title: 'NPRI Sector Overview: Pulp and Paper',
         subtitle: ''
     },
     slides: [
@@ -70,34 +70,24 @@ Pulp and paper sector facilities are chemical pulp, mechanical pulp, or paper-ma
 
 Several pollutants reportable under NPRI are released to the environment as by-products of pulp and paper manufacturing. Depending on the manufacturing process applied to wood and recycled fibre, i.e., either chemical or mechanical, the manufacturing steps and pollutants reported to the NPRI will change. The following is a description of some of these processes.`,
                     type: 'text'
-                },
-                {
-                    title: 'Mechanical process',
-                    content: `The mechanical process primarily relies on physical action (attrition) to separate fibres. This process retains most of the lignin in the pulp, which is the substance that binds cellulose fibres together. Thus, the mechanical process provides higher pulp yield. Mechanical pulps are typically characterized by their high stiffness, but relatively low strength due to the presence of lignin. There are also mechanical pulp mills that use chemical and thermal pretreatment of wood chips followed by mechanical refining and bleaching (Bleached chemi-thermo mechanical pulping or BCTMP). Mechanical pulps are used for the manufacturing of newsprint and catalog paper.`,
-                    type: 'text'
                 }
             ]
         },
         {
-            title: 'Diagram of steps in the mechanical pulp and paper manufacturing process',
+            title: 'Mechanical process',
             panel: [
                 {
-                    title: 'Diagram of steps in the mechanical pulp and paper manufacturing process',
-                    content: ``,
+                    title: 'Mechanical process',
+                    content: `The mechanical process primarily relies on physical action (attrition) to separate fibres. This process retains most of the lignin in the pulp, which is the substance that binds cellulose fibres together. Thus, the mechanical process provides higher pulp yield. Mechanical pulps are typically characterized by their high stiffness, but relatively low strength due to the presence of lignin. There are also mechanical pulp mills that use chemical and thermal pretreatment of wood chips followed by mechanical refining and bleaching (Bleached chemi-thermo mechanical pulping or BCTMP). Mechanical pulps are used for the manufacturing of newsprint and catalog paper.`,
                     type: 'text'
                 },
                 {
                     caption:
                         'Source: Gettyimages, Dorling Kindersley (2021), [Diagram of a paper making factory](https://www.gettyimages.ca/detail/illustration/diagram-of-a-paper-making-factory-royalty-free-illustration/75488548?adppopup=true)',
-                    type: 'slideshow',
-                    images: [
-                        {
-                            src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/en/Mechanical_process_EN.png',
-                            type: 'image',
-                            altText:
-                                'Step 1. Preparation of raw material: wood chips are mechanically shredded. Step 2. Pulping and bleaching. Step 3. Pulp is finished in the paper machine. Step 4. Shipping of the final product.'
-                        }
-                    ]
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/en/Mechanical_process_EN.png',
+                    type: 'image',
+                    altText:
+                        'Step 1. Preparation of raw material: wood chips are mechanically shredded. Step 2. Pulping and bleaching. Step 3. Pulp is finished in the paper machine. Step 4. Shipping of the final product.'
                 }
             ]
         },
@@ -116,15 +106,10 @@ Some of the wood fibre that is traditionally used for making pulp and paper can 
                 {
                     caption:
                         'Source: Gettyimages, Dorling Kindersley (2021), [Diagram of a paper making factory](https://www.gettyimages.ca/detail/illustration/diagram-of-a-paper-making-factory-royalty-free-illustration/75488548?adppopup=true)',
-                    type: 'slideshow',
-                    images: [
-                        {
-                            src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/en/Chemical_process_EN.png',
-                            type: 'image',
-                            altText:
-                                'Step 1. Preparation of raw material: wood fibres are separated using chemical and high temperature treatments. Step 2. Pulping and bleaching. Step 3. Pulp is finished in the paper machine. Step 4. Shipping of the final product.'
-                        }
-                    ]
+                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/en/Chemical_process_EN.png',
+                    type: 'image',
+                    altText:
+                        'Step 1. Preparation of raw material: wood fibres are separated using chemical and high temperature treatments. Step 2. Pulping and bleaching. Step 3. Pulp is finished in the paper machine. Step 4. Shipping of the final product.'
                 }
             ]
         },
@@ -136,7 +121,7 @@ Some of the wood fibre that is traditionally used for making pulp and paper can 
                     content: `In addition to pulping processes, pulp and paper mills also release pollutants from subprocesses designed to recover chemicals and energy. 
 For example, residual bark from the preparation of the raw material is burned in power boilers for energy recovery purposes. Energy is recovered as steam, electricity or both, and is used to meet on-site energy demands and/or sold to the power grid.
 
-Another example is the chemical recovery process operated at kraft pulp mills where inorganic cooking chemicals [sodium hydroxide (NaOH) and sodium sulphide (Na2S) are recovered for reuse in pulping. This process generates large amounts of heat as a result of the burning of organic materials derived from the wood (black liquor) in recovery furnaces. This heat is therefore used to produce steam and/or electricity. 
+Another example is the chemical recovery process operated at kraft pulp mills where inorganic cooking chemicals [sodium hydroxide (NaOH) and sodium sulphide (Na<sub>2</sub>S) are recovered for reuse in pulping. This process generates large amounts of heat as a result of the burning of organic materials derived from the wood (black liquor) in recovery furnaces. This heat is therefore used to produce steam and/or electricity. 
 
 Some pulp and paper industry facilities include a wastewater treatment system and a landfill for their waste material. Therefore, mill residuals such as wood ash from wood combustion in boilers, sludge from wastewater treatment operations, causticizing residuals from chemical recovery systems at kraft mills and wood residues can be reused, treated or disposed.`,
                     type: 'text'
@@ -198,19 +183,17 @@ Some pulp and paper industry facilities include a wastewater treatment system an
             ]
         },
         {
-            title: 'Criteria air contaminants',
+            title: 'CACs proportion',
             panel: [
                 {
-                    title: 'Criteria air contaminants',
+                    title: 'CACs proportion',
                     content: `CACs can, at certain concentration levels in the ambient air, cause environmental harm and contribute to health problems such as respiratory and cardiovascular problems. For example, nitrous oxide (NOx) and sulfur oxides (SOx) are precursors to acid rain and NOx and volatile organic compounds (VOCs) contribute to the formation of ground-level ozone, which is the main ingredient in smog. 
  
 NPRI data show that annual carbon monoxide (CO) releases from the pulp and paper industry have increased by approximately 7,000 tonnes since 2010. CO releases are generally associated with poor combustion linked to operational issues, such as poor mixing of air and fuel, insufficient residence time, temperature, multiple plant start ups, outdated equipment and total excess air. It should be noted that combustion efficiencies also depend on fuel type and combustor technology.
 
 Methanol is the main volatile organic compound (VOC) released to the air by the paper industry, accounting for over 55% of VOCs reported. Recovered methanol can be used for combustion on site or sold.
 
-In pulp and paper mills, ammonia (NH3) is generally neither manufactured nor processed at concentrations above 1%. However, trace quantities of this substance could be manufactured as a by-product and released directly into the air. Typically, ammonia is mostly present in relatively small quantities in treated mill effluents as a result of adding nitrogen-containing supplemental nutrients to paper mill water treatment systems. 
-
-The chart illustrates the distribution of CAC releases reported to the NPRI in 2019.`,
+In pulp and paper mills, ammonia (NH<sub>3</sub>) is generally neither manufactured nor processed at concentrations above 1%. However, trace quantities of this substance could be manufactured as a by-product and released directly into the air. Typically, ammonia is mostly present in relatively small quantities in treated mill effluents as a result of adding nitrogen-containing supplemental nutrients to paper mill water treatment systems.`,
                     type: 'text'
                 },
                 {
@@ -239,11 +222,11 @@ The chart illustrates the distribution of CAC releases reported to the NPRI in 2
                     title: 'Total reduced sulphur',
                     content: `Total reduced sulphur (TRS) is a mixture of sulphur compounds that emit an odour similar to that of rotten eggs or boiled cabbage.
 
-For reporting under the NPRI, carbon disulphide and carbonyl sulphide are included in the definition of TRS. However, the Forest product sector expressed their TRS release in terms of hydrogen sulphide (H2S), and is restricted to the following substances: 
+For reporting under the NPRI, carbon disulphide and carbonyl sulphide are included in the definition of TRS. However, the Forest product sector expressed their TRS release in terms of hydrogen sulphide (H<sub>2</sub>S), and is restricted to the following substances: 
 - Hydrogen sulphide (H<sub>2</sub>S)
 - Dimethyl sulphide (C<sub>2</sub>H<sub>6</sub>S)
 - Dimethyl disulphide (C<sub>2</sub>H<sub>6</sub>S<sub>2</sub>) 
-- Methyl mercaptan (CH4<sub>4</sub>S)
+- Methyl mercaptan (CH<sub>4</sub>S)
                     
 TRS is generally neither manufactured nor processed in high quantity. However, trace quantities of this substance could be manufactured as a by-product (mainly from the use of sodium sulphide in kraft cooking) and be directly released to the atmosphere. Much of the TRS formed is controlled and burned in combustion units (e.g., recovery furnaces, lime kilns or thermal oxidizers). TRS releases from the pulp and paper industry account for 50% of the total releases of this substance reported to the NPRI.
 
@@ -256,7 +239,7 @@ TRS is generally neither manufactured nor processed in high quantity. However, t
                     type: 'map'
                 }
             ]
-        },
+        } /*
         {
             title: 'TRS releases',
             panel: [
@@ -284,17 +267,17 @@ TRS is generally neither manufactured nor processed in high quantity. However, t
                     altText: 'A graphical pie chart representation of the data table in the previous slide.'
                 }
             ]
-        },
+        },*/,
         {
             title: 'Phosphorus and nitrates',
             panel: [
                 {
                     title: 'Phosphorus and nitrates',
-                    content: `Phosphorus (P) and nitrates (NO3-) are released mainly to water. Nitrogen and phosphorus are present in raw materials and are also added as nutrients to wastewater treatment systems. Excess bioavailable forms of phosphorus and nitrogen in aquatic environments can cause eutrophication, i.e., accumulation of nutrients resulting in excessive growth of aquatic plants. This phenomenon accelerates the aging of lakes, as it reduces the amount of oxygen available to support the survival of living organisms, impacting water quality.
+                    content: `Phosphorus (P) and nitrates (NO<sub>3</sub>-) are released mainly to water. Nitrogen and phosphorus are present in raw materials and are also added as nutrients to wastewater treatment systems. Excess bioavailable forms of phosphorus and nitrogen in aquatic environments can cause eutrophication, i.e., accumulation of nutrients resulting in excessive growth of aquatic plants. This phenomenon accelerates the aging of lakes, as it reduces the amount of oxygen available to support the survival of living organisms, impacting [water quality](https://maps.canada.ca/journal/content-en.html?lang=en&appid=8a338d0681824636998c355671ce4f88&appidalt=361e6a263e6547a0b2e0e36f04546599).
 
 In 2019, phosphorus accounted for 22% of industry effluents, while nitrates accounted for 27%. According to NPRI data, the trend in phosphorus and nitrate releases from paper mills has remained constant over the years.
 
-Pulp and paper facilities are required to conduct Environmental Effects Monitoring (EEM) studies to measure the effect of final effluent releases on receiving water environments.
+Pulp and paper facilities are required to conduct [Environmental Effects Monitoring](https://www.canada.ca/en/environment-climate-change/services/managing-pollution/environmental-effects-monitoring/pulp-paper-technical-guidance.html) (EEM) studies to measure the effect of final effluent releases on receiving water environments.
 
 ## Phosphorus and nitrates released by pulp and paper facilities that reported to the NPRI from 2010 to 2019`,
                     type: 'text'
@@ -324,11 +307,11 @@ Pulp and paper facilities are required to conduct Environmental Effects Monitori
             ]
         },
         {
-            title: 'Recycling, treatment and disposal',
+            title: 'Recycling, treatment and disposal proportion',
             panel: [
                 {
-                    title: 'Recycling, treatment and disposal',
-                    content: `As shown in the chart below, of all pollutants reported by paper mills, most of it is  directly released into the environment. NPRI data indicate that 4% of substances are recovered. Of these, manganese and phosphorus are the two substances recovered in the greatest quantities (over 2,000 tonnes). The data show that metals are most often subjected to recovery processes. For example, at least 88% of reported aluminium, lead and zinc quantities are disposed of, treated or recycled.`,
+                    title: 'Recycling, treatment and disposal proportion',
+                    content: `As shown in the chart *on the right*, of all pollutants reported by paper mills, most of it is  directly released into the environment. NPRI data indicate that 4% of substances are recovered. Of these, manganese and phosphorus are the two substances recovered in the greatest quantities (over 2,000 tonnes). The data show that metals are most often subjected to recovery processes. For example, at least 88% of reported aluminium, lead and zinc quantities are disposed of, treated or recycled.`,
                     type: 'text'
                 },
                 {
@@ -345,10 +328,10 @@ Pulp and paper facilities are required to conduct Environmental Effects Monitori
                 {
                     title: 'Regulatory measures',
                     content: `Standards, acts, regulations and voluntary measures are in place to control the release of pollutants to air, water and land from pulp and paper mills. For example:
-- The federal [Pulp and Paper Effluent Regulations](https://laws-lois.justice.gc.ca/eng/regulations/SOR-92-269/page-1.html) (PPER) govern the discharge of substancesto watercourses with the goal of protecting fish habitat. 
+- The federal [Pulp and Paper Effluent Regulations](https://laws-lois.justice.gc.ca/eng/regulations/SOR-92-269/page-1.html) (PPER) govern the discharge of substances to watercourses with the goal of protecting fish habitat. 
 - The [Canadian Ambient Air Quality Standards](https://www.canada.ca/en/environment-climate-change/services/environmental-indicators/air-quality.html) (CAAQS) set national air quality objectives and base level industrial emission requirements (BLIERs). These standards are not restrictive—that is, there is no penalty or fine or if they are exceeded. However, they make it possible to target problem areas as well as develop action plans and new federal and provincial regulations to limit the release of pollutants. 
-- The [Multi-Sector Air Pollutants Regulations](https://laws-lois.justice.gc.ca/eng/regulations/SOR-2016-151/page-1.html) (MSAPR) set out the national limits on industrial emissions, including NOX.
-- The [Code of practice for the management of air emissions from pulp and paper mills](https://www.canada.ca/en/environment-climate-change/services/canadian-environmental-protection-act-registry/guidelines-objectives-codes-practice/issuance-statement-pulp-paper-facilities/code-practice-pulp-paper-facilities.html) describes the operational activities of pulp and paper mills and the environmental concerns those activities raise in relation to air emissions of sulphur dioxide (SO2) and total particulate matter (TPM). The Code sets out emission limits and recommended practices to mitigate these concerns.
+- The [Multi-Sector Air Pollutants Regulations](https://laws-lois.justice.gc.ca/eng/regulations/SOR-2016-151/page-1.html) (MSAPR) set out the national limits on industrial emissions, including NO<sub>x</sub>.
+- The [Code of practice for the management of air emissions from pulp and paper mills](https://www.canada.ca/en/environment-climate-change/services/canadian-environmental-protection-act-registry/guidelines-objectives-codes-practice/issuance-statement-pulp-paper-facilities/code-practice-pulp-paper-facilities.html) describes the operational activities of pulp and paper mills and the environmental concerns those activities raise in relation to air emissions of sulphur dioxide (SO<sub>2</sub>) and total particulate matter (TPM). The Code sets out emission limits and recommended practices to mitigate these concerns.
 - The [Guidelines for the reduction of dyes released from pulp and paper mills](https://www.canada.ca/en/environment-climate-change/services/canadian-environmental-protection-act-registry/publications/guidelines-reduction-dyes-released-mills.html) prescribe certain limits that should not be exceeded and outline applicable best practices for the listed dyes, with the aim of minimizing the amount of dyes released into the final effluent.
 - The [Pulp and Paper Mill Effluent Chlorinated Dioxins and Furans Regulations](https://laws-lois.justice.gc.ca/eng/regulations/SOR-92-267/page-1.html) limit the release of chlorinated dioxins and furans in effluents.
 - The [Pulp and Paper Mill Defoamer and Wood Chip Regulations](https://laws-lois.justice.gc.ca/eng/regulations/SOR-92-268/page-1.html) govern the manufacture, import, offering for sale, sale and use of defoamers at pulp and paper mills using chlorine bleaching processes and of wood chips containing polychlorinated polyphenols at pulp and paper mills.`,
@@ -372,7 +355,7 @@ Pulp and paper facilities are required to conduct Environmental Effects Monitori
 - ammonia; and
 - volatile organic compounds.
 
-Most facilities burn biomass residuals (e.g. bark, pulping liquor, sludge from effluent treatment) for [energy](https://www.nrcan.gc.ca/science-data/data-analysis/energy-data-analysis/energy-facts/renewable-energy-facts/20069?_ga=2.170341927.649404953.1617160478-1132748700.1617160478) recovery purposes. Some facilities also subscribe to certifications for their supply of wood, such as [Forest Stewardship Council](https://ca.fsc.org/en-ca) (FSC) or the [Sustainable Forest Initiative](https://www.forests.org/) (SFI) certifications. 
+Most facilities burn biomass residuals (e.g. bark, pulping liquor, sludge from effluent treatment) for energy recovery purposes. Some facilities also subscribe to certifications for their supply of wood, such as [Forest Stewardship Council](https://ca.fsc.org/en-ca) (FSC) or the [Sustainable Forest Initiative](https://www.forests.org/) (SFI) certifications. 
                     
 The largest sources of particulate matter and gaseous compounds at pulp and paper mills are equipped with emission control devices and operate such that these emissions meet provincial regulations and permit requirements. Also, suspended and soluble organics in process wastewaters are controlled via on-site wastewater treatment systems, which use sedimentation and biological degradation to produce final effluent discharges that meet federal and provincial permits and regulations.
 

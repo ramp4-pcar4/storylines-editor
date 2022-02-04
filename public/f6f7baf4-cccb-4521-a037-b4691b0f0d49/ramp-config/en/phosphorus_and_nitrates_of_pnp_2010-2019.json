@@ -327,12 +327,12 @@
           "children": [
             {
                 "layerId": "Nitrates",
-                "description": "Nitrate (ion in solution at pH <- 6.) (tonnes)",
+                "description": "Nitrates released by pulp and paper facilities that reported to the NPRI from 2010 to 2019 (tonnes)",
                 "symbologyExpanded": true
             },
             {
               "layerId": "Phosphorus",
-              "description": "Phosphorus (tonnes)",
+              "description": "Phosphorus released by pulp and paper facilities that reported to the NPRI from 2010 to 2019 (tonnes)",
               "symbologyExpanded": true
           }            
         ]
