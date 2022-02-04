@@ -34,6 +34,23 @@ module.exports = {
                         'img:not(.story-graphic)': {
                             marginTop: em(32, 16),
                             marginBottom: em(32, 16)
+                        },
+                        a: {
+                            '&:link': {
+                                color: 'blue'
+                            },
+
+                            '&:visited': {
+                                color: 'purple'
+                            },
+
+                            '&:hover': {
+                                color: 'purple'
+                            },
+
+                            '&:active': {
+                                color: 'blue'
+                            }
                         }
                     }
                 },
@@ -43,6 +60,23 @@ module.exports = {
                         'img:not(.story-graphic)': {
                             marginTop: em(24, 14),
                             marginBottom: em(24, 14)
+                        },
+                        a: {
+                            '&:link': {
+                                color: 'blue'
+                            },
+
+                            '&:visited': {
+                                color: 'purple'
+                            },
+
+                            '&:hover': {
+                                color: 'purple'
+                            },
+
+                            '&:active': {
+                                color: 'blue'
+                            }
                         }
                     }
                 },
@@ -52,6 +86,23 @@ module.exports = {
                         'img:not(.story-graphic)': {
                             marginTop: em(32, 18),
                             marginBottom: em(32, 18)
+                        },
+                        a: {
+                            '&:link': {
+                                color: 'blue'
+                            },
+
+                            '&:visited': {
+                                color: 'purple'
+                            },
+
+                            '&:hover': {
+                                color: 'purple'
+                            },
+
+                            '&:active': {
+                                color: 'blue'
+                            }
                         }
                     }
                 },
@@ -61,6 +112,23 @@ module.exports = {
                         'img:not(.story-graphic)': {
                             marginTop: em(40, 20),
                             marginBottom: em(40, 20)
+                        },
+                        a: {
+                            '&:link': {
+                                color: 'blue'
+                            },
+
+                            '&:visited': {
+                                color: 'purple'
+                            },
+
+                            '&:hover': {
+                                color: 'purple'
+                            },
+
+                            '&:active': {
+                                color: 'blue'
+                            }
                         }
                     }
                 },
@@ -70,6 +138,23 @@ module.exports = {
                         'img:not(.story-graphic)': {
                             marginTop: em(48, 24),
                             marginBottom: em(48, 24)
+                        },
+                        a: {
+                            '&:link': {
+                                color: 'blue'
+                            },
+
+                            '&:visited': {
+                                color: 'purple'
+                            },
+
+                            '&:hover': {
+                                color: 'purple'
+                            },
+
+                            '&:active': {
+                                color: 'blue'
+                            }
                         }
                     }
                 }
