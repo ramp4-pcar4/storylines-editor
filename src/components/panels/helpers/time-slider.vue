@@ -1,6 +1,33 @@
 <template>
     <div class="time-slider">
-        <span class="my-2.5 text-base">{{ range[0] }} - {{ range[1] }}</span>
+        <button class="absolute top-1 left-4" @click="intervalID >= 0 ? endLoop() : startLoop()">
+            <svg
+                v-if="intervalID === -1"
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="#595959"
+            >
+                <path d="M0 0h24v24H0z" fill="none" />
+                <path d="M8 5v14l11-7z" />
+            </svg>
+            <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="#595959"
+            >
+                <path d="M0 0h24v24H0z" fill="none" />
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+        </button>
+        <span class="my-2.5 text-base"
+            ><span class="">{{ range[0] }}</span
+            ><span class="" v-if="range[1]"> - {{ range[1] }}</span></span
+        >
         <div class="time-slider-backdrop"></div>
         <div ref="sliderTarget" class="noUi-target noUiSlider"></div>
     </div>
@@ -21,6 +48,7 @@ export default class TimeSlider extends Vue {
     start: number | undefined;
     end: number | undefined;
     range: string[] = ['', ''];
+    intervalID = -1;
 
     mounted(): void {
         this.start = 2010;
@@ -47,14 +75,28 @@ export default class TimeSlider extends Vue {
         });
 
         this.slider.on('update', () => {
-            this.range = (this.slider.get() as string[]).map((n: string) => {
-                return n.split('.')[0];
-            });
+            const sliderValues = this.slider.get() as string | string[];
+            if (Array.isArray(sliderValues)) {
+                this.range = sliderValues.map((n: string) => {
+                    return n.split('.')[0];
+                });
+            } else {
+                this.range = [sliderValues.split('.')[0]];
+            }
 
-            this.mapi.layers.allLayers[0].setFilterSql(
-                'time_slider',
-                `${this.config.attribute} >= ${this.range[0]} AND ${this.config.attribute} <= ${this.range[1]}`
-            );
+            let sqlString: string;
+
+            switch (this.range.length) {
+                case 1:
+                    sqlString = `${this.config.attribute} = ${this.range[0]}`;
+                    break;
+
+                default:
+                    sqlString = `${this.config.attribute} >= ${this.range[0]} AND ${this.config.attribute} <= ${this.range[1]}`;
+                    break;
+            }
+
+            this.mapi.layers.allLayers[0].setFilterSql('time_slider', sqlString);
         });
 
         // to have an element focusable inside the RAMP container, its tabindex must not be 0;
@@ -63,6 +105,43 @@ export default class TimeSlider extends Vue {
         sliderHandles.forEach((handle: Element) => {
             handle.setAttribute('tabindex', '-2');
         });
+    }
+
+    /**
+     * Begins looping through the values on the time slider
+     */
+    startLoop(): void {
+        const sliderValues = this.slider.get() as string | string[];
+        if (Array.isArray(sliderValues)) {
+            this.slider.set(sliderValues.map(() => sliderValues[0]));
+        }
+        // delay happens before first call
+        this.intervalID = setInterval(this.moveHandleRight, 1400);
+    }
+
+    /**
+     * Moves handle(s) one to the right of the first (leftmost) handle. Loops if the handles are at the end.
+     */
+    moveHandleRight(): void {
+        const sliderValues = this.slider.get(true) as number | number[];
+        let newValues;
+        if (Array.isArray(sliderValues)) {
+            newValues = sliderValues.map(() => {
+                return sliderValues[0] === this.config.range[1] ? this.config.range[0] : sliderValues[0] + 1;
+            });
+        } else {
+            newValues = [sliderValues === this.config.range[1] ? this.config.range[0] : sliderValues + 1];
+        }
+        this.slider.set(newValues);
+    }
+
+    /**
+     * Cancels looping through the values on the time slider
+     */
+    endLoop(): void {
+        clearInterval(this.intervalID);
+        // reset so template knows we aren't looping
+        this.intervalID = -1;
     }
 }
 </script>
