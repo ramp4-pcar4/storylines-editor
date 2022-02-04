@@ -367,12 +367,12 @@
         "children": [
           {
             "layerId": "Nitrates",
-            "description": "Nitrates (ion in sol. à pH de >= 6.) (tonnes)",
+            "description": "Rejets de nitrates par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019 (tonnes)",
             "symbologyExpanded": true
           },
           {
             "layerId": "Phosphorus",
-            "description": "Phosphore (tonnes)",
+            "description": "Rejets de phosphore par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019 (tonnes)",
             "symbologyExpanded": true
           }
         ]
