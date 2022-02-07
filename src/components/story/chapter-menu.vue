@@ -4,7 +4,9 @@
         class="nav-bar sticky self-start w-12 duration-500 ease-in-out transition-width top-16"
     >
         <div class="flex items-center mt-4 mb-12">
-            <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">Chapters</tippy>
+            <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">{{
+                lang === 'en' ? 'Chapters' : 'Chapitres'
+            }}</tippy>
             <button
                 name="menu-button-tippy"
                 class="flex items-center flex-shrink-0 px-2 py-1 mx-1 overflow-hidden"
@@ -25,14 +27,16 @@
                 </svg>
                 <span
                     class="flex-1 pl-2 ml-2 overflow-hidden leading-normal text-left overflow-ellipsis whitespace-nowrap"
-                    >Chapters</span
+                    >{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span
                 >
             </button>
         </div>
 
         <ul class="nav-content menu">
             <li>
-                <tippy to="menu-options-tippy" delay="200" placement="right">Return to Top</tippy>
+                <tippy to="menu-options-tippy" delay="200" placement="right">{{
+                    lang === 'en' ? 'Return to top' : 'Retournez en haut'
+                }}</tippy>
                 <router-link
                     name="menu-options-tippy"
                     :to="{ hash: '#intro' }"
@@ -53,9 +57,9 @@
                             stroke-width=".93974"
                         />
                     </svg>
-                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap"
-                        >Return to Top</span
-                    >
+                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
+                        lang === 'en' ? 'Return to top' : 'Retournez en haut'
+                    }}</span>
                 </router-link>
             </li>
             <li v-for="(slide, idx) in slides" :key="idx" :class="{ 'is-active': activeChapterIndex === idx }">
@@ -97,6 +101,7 @@ import { Slide } from '@/definitions';
 export default class ChapterMenuV extends Vue {
     @Prop() slides!: Slide[];
     @Prop() activeChapterIndex!: number;
+    @Prop() lang!: string;
 
     isMenuOpen = false;
 }
