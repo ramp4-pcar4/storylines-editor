@@ -166,6 +166,15 @@
                 "type": {
                     "type": "string",
                     "enum": ["map"]
+                },
+                "scrollguard": {
+                    "type": "boolean",
+                    "description": "Whether or not CTRL is required to scroll this map.",
+                    "default": false
+                },
+                "title": {
+                    "type": "string",
+                    "description": "A title that is displayed centered above this map."
                 }
             },
             "required": ["config", "type"]

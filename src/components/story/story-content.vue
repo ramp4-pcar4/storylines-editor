@@ -16,7 +16,7 @@
                 :id="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
                 :name="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
             >
-                <slide :config="slide" :slideIdx="idx"></slide>
+                <slide :config="slide" :slideIdx="idx" :lang="lang"></slide>
             </div>
         </Scrollama>
     </div>

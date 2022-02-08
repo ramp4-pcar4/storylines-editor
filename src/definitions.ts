@@ -105,6 +105,8 @@ export interface MapPanel extends BasePanel {
     config: string;
     expandable?: boolean;
     timeSlider?: TimeSliderConfig;
+    title: string;
+    scrollguard: boolean;
 }
 export interface TimeSliderConfig {
     range: number[];

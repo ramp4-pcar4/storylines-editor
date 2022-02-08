@@ -62,7 +62,8 @@ Fun stuff.`,
                             panel: {
                                 config:
                                     '00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json',
-                                type: 'map'
+                                type: 'map',
+                                scrollguard: true
                             }
                         }
                     ]
@@ -89,7 +90,8 @@ This map shows a generalized potential extent of the three oil sands areas. The 
                 },
                 {
                     config: '00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsDeposits.json',
-                    type: 'map'
+                    type: 'map',
+                    scrollguard: true
                 }
             ]
         },
@@ -147,7 +149,8 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
                 },
                 {
                     config: '00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json',
-                    type: 'map'
+                    type: 'map',
+                    title: 'Map Title Test'
                 }
             ]
         },

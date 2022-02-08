@@ -14,7 +14,7 @@ const config = {
             panel: [
                 {
                     title: 'Aperçu',
-                    content: `**L’extraction de sables bitumineux** fait partie de la série Aperçu des secteurs de l’Inventaire national des rejets de polluants (INRP). Cet aperçu du secteur présente les substances de l’INRP rejetées, éliminées et transférées par cette industrie. Il résume également les mesures prises par les installations de ce secteur pour atténuer leurs répercussions environnementales.  
+                    content: `**L’extraction de sables bitumineux** fait partie de la série Aperçu des secteurs de l’Inventaire national des rejets de polluants (INRP). Cet aperçu du secteur présente les substances de l’INRP rejetées, éliminées et transférées par cette industrie. Il résume également les mesures prises par les installations de ce secteur pour atténuer leurs répercussions environnementales.
 
 Les entreprises, les établissements et d’autres entités partout au Canada doivent chaque année déclarer à l’Inventaire national des rejets de polluants (INRP) du gouvernement du Canada les polluants qu’ils rejettent, transfèrent et déchargent dans l’air, l’eau et le sol. Les renseignements recueillis sont du domaine public. Ils aident les gouvernements à établir leurs priorités en matière d’environnement et à surveiller leur bilan environnemental, ainsi qu’à fournir aux Canadiens l’occasion de s’informer au sujet de la pollution dans leur environnement immédiat.`,
                     type: 'text'
@@ -47,7 +47,8 @@ Cette carte montre une étendue potentielle généralisée des trois zones de sa
                 },
                 {
                     config: '00000000-0000-0000-0000-000000000000/ramp-config/fr/OilSandsDeposits.json',
-                    type: 'map'
+                    type: 'map',
+                    scrollguard: true
                 }
             ]
         },
@@ -75,7 +76,7 @@ L’exploitation à ciel ouvert consiste à creuser de grandes surfaces à l’a
             panel: [
                 {
                     title: 'Extraction des sables bitumineux',
-                    content: `L’extraction in situ consiste généralement à pomper de la vapeur à haute pression à grande profondeur. Cette opération chauffe le bitume jusqu’au point où il s’écoule et peut être remonté à la surface. Si le bitume a une viscosité suffisamment faible pour pouvoir être extrait par les méthodes classiques, il n’est pas nécessaire d’utiliser des méthodes thermiques pour favoriser l’extraction pendant les activités in situ. 
+                    content: `L’extraction in situ consiste généralement à pomper de la vapeur à haute pression à grande profondeur. Cette opération chauffe le bitume jusqu’au point où il s’écoule et peut être remonté à la surface. Si le bitume a une viscosité suffisamment faible pour pouvoir être extrait par les méthodes classiques, il n’est pas nécessaire d’utiliser des méthodes thermiques pour favoriser l’extraction pendant les activités in situ.
 
 Les installations in situ ont une empreinte physique beaucoup plus petite que les mines à ciel ouvert et ne produisent généralement pas de résidus qui doivent être stockés sur place. Elles consomment également beaucoup moins d’eau que les installations d’exploitation à ciel ouvert. Cependant, les installations in situ consomment plus d’énergie en raison de la production de vapeur. Néanmoins, les nouvelles technologies et la recherche industrielle sont axées sur la réduction de l’intensité énergétique in situ.`,
                     type: 'text'
@@ -91,7 +92,7 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
             panel: [
                 {
                     title: 'Où sont situées les installations?',
-                    content: `Les installations d’extraction des sables bitumineux qui produisent des déclarations à l’INRP sont situées exclusivement dans le nord de l’Alberta, surtout autour de la municipalité de Fort McMurray. Parmi les installations déclarantes en 2019, une se trouve dans le gisement Peace River, cinq sont dans le gisement Cold Lake et 30 sont dans le gisement Athabasca. Cette carte comprend également une [installation de valorisation](https://www.rncan.gc.ca/energie/sources-denergie-et-reseau-de-distribution/petrole-brut/valorisation-des-sables-bitumineux-et-du-petrole-lourd/5876?_ga=2.12839347.524335214.1562344489-2057911658.1562344489) à Fort Saskatchewan, en Alberta, qui valorise le pétrole de l’installation d’exploitation minière à ciel ouvert des sables bitumineux de Muskeg River de Canadian Natural Resources. Parmi les installations ayant fait l’objet d’une déclaration à l’INRP, sept sont des exploitations minières à ciel ouvert, une est une installation de valorisation et les 30 autres sont des installations in situ.   
+                    content: `Les installations d’extraction des sables bitumineux qui produisent des déclarations à l’INRP sont situées exclusivement dans le nord de l’Alberta, surtout autour de la municipalité de Fort McMurray. Parmi les installations déclarantes en 2019, une se trouve dans le gisement Peace River, cinq sont dans le gisement Cold Lake et 30 sont dans le gisement Athabasca. Cette carte comprend également une [installation de valorisation](https://www.rncan.gc.ca/energie/sources-denergie-et-reseau-de-distribution/petrole-brut/valorisation-des-sables-bitumineux-et-du-petrole-lourd/5876?_ga=2.12839347.524335214.1562344489-2057911658.1562344489) à Fort Saskatchewan, en Alberta, qui valorise le pétrole de l’installation d’exploitation minière à ciel ouvert des sables bitumineux de Muskeg River de Canadian Natural Resources. Parmi les installations ayant fait l’objet d’une déclaration à l’INRP, sept sont des exploitations minières à ciel ouvert, une est une installation de valorisation et les 30 autres sont des installations in situ.
 #### Installations de sables bitumineux déclarantes à l'INRP - 2019
 | **Emplacement de l’installation** | **Installation in situ** | **Exploitation minière à ciel ouvert** | **Installation de valorisation** | **Total** |
 | ----------------------| ------------------- | ------------------ | --------- | --------- |
@@ -117,7 +118,7 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
                     content: `Sept installations d’exploitation minière à ciel ouvert de sables bitumineux ont fait l’objet d’une déclaration à l’INRP en 2019. Ces installations ont déclaré des renseignements sur 70 substances et groupes de substances différents pour 2019, représentant un total de 319 888 tonnes de polluants rejetés, éliminés et transférés. Près de 76% de cette quantité, soit 242 395 tonnes, provient des principaux contaminants atmosphériques (PCA) tels que les matières particulaires (MP), les oxydes d’azote (NO), le dioxyde de soufre (SO<sub>2</sub>), le monoxyde de carbone (CO) et les composés organiques volatils (COV). Les PCA sont des précurseurs du smog et contribuent à la mauvaise qualité de l’air.
 
 Les sept installations d’exploitation minière à ciel ouvert des sables bitumineux qui ont déclaré à l’INRP sont listées ci-dessous. Cliquez sur le nom des installations pour voir le détail de ce qu’elles ont déclaré.
-                    
+
 - Mine de la rivière Muskeg et mine Jackpine, et usine de transformation et mine Horizon  (Canadian Natural Resources);
 - Mine de sables bitumineux Fort Hills;
 - Usine de transformation et mine Kearl d’Imperial Oil;
@@ -212,7 +213,7 @@ En 2019, les exploitations minières de sables bitumineux qui produisent des dé
 
 Les substances éliminées comme résidus peuvent être groupées en quatre grandes catégories :
 1. les métaux (40 257 tonnes);
-2. les composés organiques volatils (COV) (8 099 tonnes); 
+2. les composés organiques volatils (COV) (8 099 tonnes);
 3. les hydrocarbures aromatiques polycycliques (HAP) (360 tonnes); et
 4. les autres substances (16 118 tonnes).
 
@@ -339,7 +340,7 @@ En comparaison avec l’exploitation minière à ciel ouvert, l’exploitation i
                     content: `En 2019, 30 installations in situ ont produit des déclarations à l’INRP. Les principales sources d’émission de ces installations sont l’équipement de combustion utilisé pour produire de la vapeur et l’équipement de compression, alimenté aux combustibles fossiles, pour l’injecter sous terre.
 
 Les installations in situ ont déclaré 70 500 tonnes de rejets dans l’atmosphère en 2019, et très peu d’autres rejets. Comme il a été mentionné, le processus ne produit pas de résidus miniers comparativement aux exploitations minières. L’eau récupérée de la vapeur injectée est généralement traitée sur place et réutilisée.
-                    
+
 Les rejets atmosphériques déclarés par les installations in situ sont presque entièrement (98%) des principaux contaminants atmosphériques (PCA); il s’agit surtout de monoxyde de carbone (CO) (23 000 tonnes) et d’oxydes d’azote (NOx) (24 000 tonnes). Les autres principaux contaminants atmosphériques (PCA) déclarés étaient le dioxyde de soufre (SO2) (17 000 tonnes), les composés organiques volatils (COV) (2 800 tonnes) et les matières particulaires (2 000 tonnes). Certains contaminants atmosphériques autres que les principaux ont été déclarés en très petites quantités, par exemple :
 
 - Ammoniac (NH<sub>3</sub>);
@@ -360,7 +361,7 @@ Les rejets atmosphériques déclarés par les installations in situ sont presque
             panel: [
                 {
                     title: 'Tendances entourant les substances déclarées à l’INRP par les installations in situ',
-                    content: `Le nombre d’installations in situ qui produisent des déclarations à l’INRP est resté le même en 2019 qu’en 2010, soit 30 installations. Le nombre d’installations a culminé à 38 en 2015. Afin de tenir compte de toutes les installations d’extraction des sables bitumineux, les données utilisées dans cet aperçu de secteur tiennent compte des batteries et des stations de compression. 
+                    content: `Le nombre d’installations in situ qui produisent des déclarations à l’INRP est resté le même en 2019 qu’en 2010, soit 30 installations. Le nombre d’installations a culminé à 38 en 2015. Afin de tenir compte de toutes les installations d’extraction des sables bitumineux, les données utilisées dans cet aperçu de secteur tiennent compte des batteries et des stations de compression.
 
 Ce changement dans le nombre d’installations déclarantes au fil du temps suit les changements survenus dans l’ensemble du secteur. Le prix du pétrole a fortement augmenté en 2009 et en 2010 et est resté élevé jusqu’en 2015, ce qui a alimenté une croissance importante dans ce secteur et mené à la mise en service de nombreuses nouvelles installations, qui ont produit une première déclaration. Une baisse significative du prix du pétrole en 2015 a entraîné un ralentissement du nombre de nouvelles installations mises en service, voire la suspension des activités de certaines installations.`,
                     type: 'text'
@@ -377,7 +378,7 @@ Ce changement dans le nombre d’installations déclarantes au fil du temps suit
             panel: [
                 {
                     title: 'Rejets à l’air déclarés à l’INRP par les installations in situ',
-                    content: `Les émissions de principaux contaminants atmosphériques (PCA) provenant des activités in situ ont augmenté en même temps que le nombre d’installations déclarantes depuis 2010. 
+                    content: `Les émissions de principaux contaminants atmosphériques (PCA) provenant des activités in situ ont augmenté en même temps que le nombre d’installations déclarantes depuis 2010.
 
 L’augmentation des émissions observée en 2017 est probablement attribuable à un rebond du prix du pétrole cette année-là. Entre 2018 et 2019, 18 installations in situ déclarantes à l’INRP ont augmenté leurs émissions de principaux contaminants atmosphériques (PCA).
 
