@@ -1,17 +1,7 @@
 <template>
-    <div
-        :class="isMenuOpen ? 'w-72' : ''"
-        class="nav-bar sticky self-start w-12 duration-500 ease-in-out transition-width top-16"
-    >
-        <div class="flex items-center mt-4 mb-12">
-            <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">{{
-                lang === 'en' ? 'Chapters' : 'Chapitres'
-            }}</tippy>
-            <button
-                name="menu-button-tippy"
-                class="flex items-center flex-shrink-0 px-2 py-1 mx-1 overflow-hidden"
-                @click="isMenuOpen = !isMenuOpen"
-            >
+    <div class="sticky w-12 duration-500 ease-in-out transition-width">
+        <div class="flex px-3 py-2">
+            <button @click="isMenuOpen = !isMenuOpen">
                 <svg
                     class="flex-shrink-0"
                     width="24"
@@ -25,24 +15,28 @@
                     <path class="transition-all duration-500 ease-in-out" :d="`m3.5 12h${isMenuOpen ? '17' : '8.5'}`" />
                     <path d="m3.5 17h17" />
                 </svg>
-                <span
-                    class="flex-1 pl-2 ml-2 overflow-hidden leading-normal text-left overflow-ellipsis whitespace-nowrap"
-                    >{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span
-                >
             </button>
         </div>
 
-        <ul class="nav-content menu">
+        <ul v-show="isMenuOpen" class="dropdown-nav-content bg-white my-3 w-72 z-10 border-r border-gray-200">
+            <div class="flex py-4">
+                <span class="flex-2 pl-2 ml-4 leading-normal">{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span>
+                <button @click="isMenuOpen = !isMenuOpen">
+                    <svg
+                        class="flex-shrink-0 mr-4"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="#c0c0c0"
+                        stroke="#c0c0c0"
+                    >
+                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+                    </svg>
+                </button>
+            </div>
             <li>
-                <tippy to="menu-options-tippy" delay="200" placement="right">{{
-                    lang === 'en' ? 'Return to top' : 'Retournez en haut'
-                }}</tippy>
-                <router-link
-                    name="menu-options-tippy"
-                    :to="{ hash: '#intro' }"
-                    class="flex items-center px-2 py-1 mx-1"
-                    target
-                >
+                <router-link :to="{ hash: '#intro' }" class="flex py-1 px-3" target>
                     <svg
                         class="flex-shrink-0"
                         width="24"
@@ -63,11 +57,9 @@
                 </router-link>
             </li>
             <li v-for="(slide, idx) in slides" :key="idx" :class="{ 'is-active': activeChapterIndex === idx }">
-                <tippy :to="`menu-options-tippy-${idx}`" delay="200" placement="right">{{ slide.title }}</tippy>
                 <router-link
-                    :name="`menu-options-tippy-${idx}`"
                     :to="{ hash: `#${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}` }"
-                    class="flex items-center px-2 py-1 mx-1"
+                    class="flex py-1 px-3"
                     target
                 >
                     <svg
@@ -98,7 +90,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Slide } from '@/definitions';
 
 @Component
-export default class ChapterMenuV extends Vue {
+export default class SideMenuV extends Vue {
     @Prop() slides!: Slide[];
     @Prop() activeChapterIndex!: number;
     @Prop() lang!: string;
@@ -108,23 +100,17 @@ export default class ChapterMenuV extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.nav-bar {
-    max-height: calc(100vh - 4rem);
-    display: flex;
-    flex-direction: column;
-}
-
-.nav-content {
+.dropdown-nav-content {
     overflow-y: auto;
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */
 }
 
-.nav-content::-webkit-scrollbar {
+.dropdown-nav-content::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
 }
 
-.menu li {
+.dropdown-nav-content li {
     a:hover {
         text-decoration: none;
         color: inherit;

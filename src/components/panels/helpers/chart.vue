@@ -1,6 +1,6 @@
 <template>
-    <div class="dv-chart justify-center flex h-full align-middle" dv-config="config">
-        <div class="dv-chart-container" role="region" aria-hidden="false" :aria-label="title">
+    <div class="dv-chart justify-center flex align-middle" dv-config="config">
+        <div class="dv-chart-container items-stretch" role="region" aria-hidden="false" :aria-label="title">
             <highcharts :options="chartOptions" ref="chart"></highcharts>
         </div>
     </div>
@@ -209,5 +209,18 @@ export default class ChartV extends Vue {
 <style lang="scss">
 .dv-chart-container {
     overflow: hidden;
+}
+
+@media screen and (max-width: 640px) {
+    .dv-chart {
+        max-width: 100vw;
+        max-height: 40vh;
+        background-color: white;
+    }
+
+    .dv-chart-container {
+        // height: 100%;
+        width: 100%;
+    }
 }
 </style>

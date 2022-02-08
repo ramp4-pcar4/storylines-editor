@@ -87,4 +87,10 @@ export default class MapPanelV extends Vue {
     height: calc(100vh - 4rem) !important;
     width: 100%;
 }
+
+@media screen and (max-width: 640px) {
+    .rv-map {
+        max-height: 40vh;
+    }
+}
 </style>

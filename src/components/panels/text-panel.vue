@@ -4,7 +4,7 @@
             {{ config.title }}
         </h2>
 
-        <div class="px-10 md-content" v-html="md.render(config.content)"></div>
+        <div class="px-10 md-content object-contain" v-html="md.render(config.content)"></div>
     </Scrollama>
 </template>
 
@@ -31,4 +31,14 @@ export default class TextPanelV extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@media screen and (max-width: 640px) {
+    .chapter-title {
+        max-width: 100vw;
+    }
+
+    .md-content {
+        max-width: 100vw;
+    }
+}
+</style>

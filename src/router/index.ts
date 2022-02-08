@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import StoryRampV from '@/components/story/story-ramp.vue';
+import StoryV from '@/components/story/story.vue';
 import Router, { Route } from 'vue-router';
 
 Vue.use(Router);
@@ -7,15 +7,15 @@ Vue.use(Router);
 const routes = [
     {
         path: '/',
-        component: StoryRampV
+        component: StoryV
     },
     {
         path: '/:uid',
-        component: StoryRampV
+        component: StoryV
     },
     {
         path: '/:lang/:uid',
-        component: StoryRampV
+        component: StoryV
     }
 ];
 

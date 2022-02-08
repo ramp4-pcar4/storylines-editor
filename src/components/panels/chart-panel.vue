@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
+    <div class="self-start w-full px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <hooper
             ref="carousel"
             v-if="width !== -1 && config.charts.length > 1"
@@ -52,6 +52,17 @@ export default class ChartPanelV extends Vue {
         setTimeout(() => {
             this.width = this.$el.clientWidth;
         }, 100);
+
+        // window.addEventListener('resize', () => {
+        //     // adjust width for mobile resolutions
+        //     if (window.innerWidth > 640) {
+        //         this.width = 1121;
+        //         console.log('NORMAL SCREEN: ', this.width);
+        //     } else {
+        //         this.width = 0.97 * window.innerWidth;
+        //         console.log('MOBILE SCREEN: ', this.width);
+        //     }
+        // });
     }
 }
 </script>
