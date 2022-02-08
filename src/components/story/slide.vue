@@ -1,5 +1,5 @@
 <template>
-    <div :id="this.$vnode.key" class="story-slide w-full h-full flex flex-row">
+    <div :id="this.$vnode.key" class="story-slide h-full flex sm:flex-row flex-col">
         <panel
             v-for="(panel, idx) in config.panel"
             :key="idx"

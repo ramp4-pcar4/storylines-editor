@@ -1,5 +1,12 @@
 <template>
-    <div :class="ratio && config.type !== 'text' ? 'sticky self-start flex-2 top-16' : 'flex'" class="flex-col">
+    <div
+        :class="
+            config.type !== 'text'
+                ? `sticky ${config.type === 'map' ? 'top-16' : 'top-8'} sm:self-start flex-2 order-1 sm:order-2`
+                : 'flex order-2 sm:order-1'
+        "
+        class="flex-col"
+    >
         <component :is="getTemplate()" :config="config" :slideIdx="slideIdx"></component>
     </div>
 </template>

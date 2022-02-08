@@ -1,10 +1,10 @@
 <template>
-    <div class="justify-center flex flex-col h-full align-middle py-5 w-full">
+    <div class="graphic self-start justify-center flex flex-col h-full align-middle py-5 w-full">
         <img
             :src="config.src"
             :class="config.class"
             :alt="config.altText"
-            class="px-10 my-6 block w-auto flex object-contain max-h-screen"
+            class="graphic px-10 my-6 block flex object-contain sm:max-h-screen"
         />
 
         <div v-if="config.caption" class="text-center mt-5 text-sm max-w-full" v-html="md.render(config.caption)"></div>
@@ -25,4 +25,12 @@ export default class ImagePanelV extends Vue {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+@media screen and (max-width: 640px) {
+    .graphic {
+        max-width: 100vw;
+        max-height: 40vh;
+        background-color: white;
+    }
+}
+</style>

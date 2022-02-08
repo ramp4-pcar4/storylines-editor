@@ -1,6 +1,6 @@
 <template>
-    <div class="w-full px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
-        <hooper ref="carousel" v-if="width !== -1" class="h-auto" :infiniteScroll="config.loop">
+    <div class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
+        <hooper ref="carousel" v-if="width !== -1" class="h-full" :infiniteScroll="config.loop">
             <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
                 <img
                     :src="image.src"
@@ -47,6 +47,19 @@ export default class SlideshowPanelV extends Vue {
         setTimeout(() => {
             this.width = this.$el.clientWidth;
         }, 100);
+
+        // window.addEventListener('resize', () => {
+        //     setTimeout(() => {
+        //         // adjust width for mobile resolutions
+        //         if (window.innerWidth > 640) {
+        //             this.width = 1121;
+        //             console.log('NORMAL SCREEN: ', this.width);
+        //         } else {
+        //             this.width = 0.97 * window.innerWidth;
+        //             console.log('MOBILE SCREEN: ', this.width);
+        //         }
+        //     }, 100);
+        // });
     }
 }
 </script>
@@ -76,6 +89,14 @@ export default class SlideshowPanelV extends Vue {
             // background-color: lighten(#00d2d3, 20%);
             border-color: var(--sr-accent-colour);
         }
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .carousel {
+        max-width: 100vw;
+        max-height: 40vh;
+        background-color: white;
     }
 }
 </style>
