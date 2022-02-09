@@ -44,6 +44,16 @@ export default class StoryContentV extends Vue {
 
     activeChapterIndex = -1;
 
+    mounted(): void {
+        const hash = this.$route.hash.substring(1);
+        if (hash) {
+            // decode in case there are special french characters that are encoded in hash
+            const decodedHash = decodeURIComponent(hash);
+            const el = document.getElementById(decodedHash);
+            el?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
     stepEnter({ element }: { element: HTMLElement }): void {
         this.activeChapterIndex = parseInt(element.dataset.chapterIndex || '-1');
         this.$emit('step', this.activeChapterIndex);
