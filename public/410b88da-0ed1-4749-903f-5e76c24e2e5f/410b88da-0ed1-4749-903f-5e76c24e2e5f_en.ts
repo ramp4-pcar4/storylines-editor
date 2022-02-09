@@ -132,54 +132,72 @@ The seven oil sands surface mining facilities that reported to the NPRI are list
                     type: 'text'
                 },
                 {
-                    images: [
+                    type: 'chart',
+                    charts: [
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/1_AuroraNorth_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Syncrude Canada Ltd., Aurora North Mine Site 2019 Releases and Disposals (Tonnes): Particulate Matter Releases- 10733,66%; Tailings- 2957,18%; Volatile Organic Compound Releases-1149,7%; Carbon Monoxide Releases- 807,5%; Nitrogen Oxide Releases- 589,4%; Other Releases- 27,0%.'
-                        },
-                        {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/2_FortHills_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Fort Hills Energy L.P., Fort Hills Oil Sands, 2019 Releases and Dispostals (Tonnes): Particulate Matter Releases- 14701,57%; Tailings- 8322,32%; Nitrogen Oxide Releases- 1071,4%; Volatile Organic Compound Releases- 710,3%; Carbon Monoxide Releases- 793,3%; Other Releases- 178,1%; Sulphur Dioxide Releases- 34,0%; Other Disposals and Transfers- 105,0%.'
-                        },
-                        {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/3_Horizon_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Releases and Dispostals (Tonnes): Volatile Organic Compound Releases- 10815,33%; Particulate Matter Releases- 6518,20%; Tailings- 5700,18%; Sulphur Dioxide Releases- 2754,8%; Nitrogen Oxide Releases- 2621,8%; Carbon Monoxide Releases- 2576,8%; Other Releases- 1581,5%.'
-                        },
-                        {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/4_Kearl_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Imperial Oil Resources Limited, Kearl Oil Sands Processing Plant and Mine 2019 Releases and Disposals (Tonnes): Particulate Matter Releases- 24564,81%, Carbon Monoxide Releases- 2271,8%, Volatile Organic Compound Releases- 2265,7%; Nitrogen Oxide Releases- 723,2%; Other Releases- 255,1%; Tailings- 238,1%; Other Disposals and Transfers- 43,0%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/1.Imperial Oil Resources Limited-Kearl Oil Sands Processing Plant and Mine.csv',
+                            options: {
+                                title: `Imperial Oil Resources Limited, Kearl Oil Sands Processing Plant and Mine 2019 Releases and Disposals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
                             src:
-                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/5_MuskegJackpine_R5_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Releases and Disposals (Tonnes): Tailings- 23716,65%; Particulate Matter Releases- 6381,18%; Volatile Organic Compound Releases- 4828,13%; Nitrogen Oxide Releases- 1014,3%; Other Releases- 359,1%; Carbon Monoxide Releases- 152,0%.'
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/2.Suncor Energy Oil Sands Limited Partnership-Suncor Energy Inc. Oil Sands.csv',
+                            options: {
+                                title: `Suncor Energy Oil Sands Limited Partnership, Suncor Energy Inc. Oil Sands 2019 Releases and Disposals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/6_Suncor_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Suncore Energy Oil Sands Limited Partnership, Suncor Energy Inc. Oil Sands 2019 Releases and Disposals (Tonnes): Particulate Matter Releases- 36725,39%; Volatile Organic Compound Releases- 14807,16%; Sulphur Dioxide Releases- 13404,14%; Nitrogen Oxide Releases- 13110,14%; Tailings- 9516,10%; Carbon Monoxide Releases- 3216,3%; Other Releases- 2346,3%; Other Disposals and Transfers- 748,1%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/3.Syncrude Canada Ltd.-Syncrude Canada Ltd.csv',
+                            options: {
+                                title: `Syncrude Canada Ltd., Syncrude Canada Ltd 2019 Releases and Disposals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/substances/7_Syncrude_RelDisp.PNG',
-                            type: 'image',
-                            altText:
-                                'Syncrude Canada Ltd., Syncrude Canada Ltd 2019 Releases and Disposals (Tonnes): Sulphur Dioxide Releases- 27763,33%; Tailings- 17490,21%; Nitrogen Oxide Releases- 13322,16%; Particulate Matter Releases- 11731,14%; Volatile Organic Compound Releases- 5728,7%; Carbon Monoxide Releases- 4609,5%; Other Releases- 2992,3%; Other Disposals and Transfers- 896,1%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/4.Syncrude Canada Ltd.-Aurora North Mine Site.csv',
+                            options: {
+                                title: `Syncrude Canada Ltd., Aurora North Mine Site 2019 Releases and Disposals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/5.Canadian Natural Upgrading Ltd-Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine.csv',
+                            options: {
+                                title: `Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Releases and Disposals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/6.Canadian Natural Resources Limited-Horizon Oil Sands Processing Plant and Mine.csv',
+                            options: {
+                                title: `Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Releases and Dispostals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/7.Fort Hills Energy L.P.-Fort Hills Oil Sands.csv',
+                            options: {
+                                title: `Fort Hills Energy L.P., Fort Hills Oil Sands, 2019 Releases and Dispostals (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         }
-                    ],
-                    loop: true,
-                    caption: 'NPRI substances reported for oil sands mining facilities.',
-                    type: 'slideshow'
+                    ]
                 }
             ]
         },
@@ -305,53 +323,72 @@ While the tailings reported by these mines have large amounts of manganese, ammo
                     type: 'text'
                 },
                 {
-                    images: [
+                    type: 'chart',
+                    charts: [
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/AuroraNorth_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings (Tonnes): Ammonia- 412,14%; Manganese- 1755,60%; PAH- 35,1%; Phenol- 3,0%; Phosphorus- 155,5%; Other substances- 597,20%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/1.Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings.csv',
+                            options: {
+                                title: `Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/FortHills_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes): Ammonia- 537,6%; BTEX (benzene, toluene, ethylbenzene, xylene)- 4,0%; Manganese- 4925,59%; PAH- 0,0%; Phosphorus- 1650,20%; Other substances- 1205,15%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/2.Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings.csv',
+                            options: {
+                                title: `Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Horizon_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes): Ammonia- 273,5%; BTEX (benzene, toluene, ethylbenzene, xylene)- 373,6%; PAH- 104,2%; Other substances- 4950,87%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/3.Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings.csv',
+                            options: {
+                                title: `Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Kearl_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Imperial Oil Resources Limited, Kearl Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes): Ammonia- 116,49%; BTEX (benzene, toluene, ethylbenzene, xylene)- 0,0%; Manganese- 38,16%; PAH- 0,0%; n-Hexane- 3,1%; Phosphorus- 49,21%; Other substances- 32,13%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/4.Imperial Oil Resources Limited, Kearl Oil Sands Processing Plant and Mine 2019 Tailings.csv',
+                            options: {
+                                title: `Imperial Oil Resources Limited, Kearl Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Muskeg_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings (Tonnes): Ammonia- 193,1%; BTEX (benzene, toluene, ethylbenzene, xylene)- 303,1%; Manganese- 7735,33%; PAH- 52,0%; n-Hexane- 4370,19%; Phosphorus- 5984,25%; Other substances- 5082,21%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/5.Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings.csv',
+                            options: {
+                                title: `Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Suncor_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Suncor Energy Oil Sands Limited Partnership, Suncor Energy Inc. Oil Sands Tailings (Tonnes): Ammonia- 577,6%; BTEX (benzene, toluene, ethylbenzene, xylene)- 2259,24%; Manganese- 1794,19%; PAH- 132,1%; Phenol- 72,1%; Phosphorus- 2381,25%; Other substances- 2311,24%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/6.Suncor Energy Oil Sands Limited Partnership, Suncor Energy Inc. Oil Sands Tailings.csv',
+                            options: {
+                                title: `Suncor Energy Oil Sands Limited Partnership, Suncor Energy Inc. Oil Sands Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         },
                         {
-                            src: '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/en/tailings/Syncrude_Tailings.PNG',
-                            type: 'image',
-                            altText:
-                                'Syncrude Canada Ltd., Syncrude Canada Ltd. 2019 Tailings (Tonnes): Ammonia- 713,4%; BTEX (benzene, toluene, ethylbenzene, xylene)- 1237,7%; Manganese- 9460,54%; PAH- 36,0%; Phenol- 8,0%; Phosphorus- 4094,24%; Other substances- 1942,11%.'
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/7.Syncrude Canada Ltd., Syncrude Canada Ltd. 2019 Tailings.csv',
+                            options: {
+                                title: `Syncrude Canada Ltd., Syncrude Canada Ltd. 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
                         }
-                    ],
-                    loop: true,
-                    caption: 'Reported mine tailings from oil sands surface mining facilities',
-                    type: 'slideshow'
+                    ]
                 }
             ]
         },

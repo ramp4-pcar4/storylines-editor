@@ -103,7 +103,7 @@ En 2019, la province comptant le plus grand nombre d’installations ayant décl
 | Yukon                     | 1                                   |                          |                                   |                                                     |                                      | 1     |
 | TOTAL                     | 55                                  | 74                       | 62                                | 55                                                  | 38                                   | 284   |
                     
-<sub>[[fr] Download this data in CSV](ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Breakdown%20of%20facilities%20reporting%20ethylene%20glycol%20to%20the%20NPRI%20for%202019_fr.csv)</sub>`,
+<sub>[Télécharger ces données en format CSV.](ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/fr/Breakdown%20of%20facilities%20reporting%20ethylene%20glycol%20to%20the%20NPRI%20for%202019_fr.csv)</sub>`,
                     type: 'text'
                 }
             ]

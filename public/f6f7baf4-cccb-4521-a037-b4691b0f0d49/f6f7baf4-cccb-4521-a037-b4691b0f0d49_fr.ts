@@ -25,8 +25,7 @@ Cet aperçu de secteur sur les pâtes et papiers reprend les points saillants du
                     src:
                         '410b88da-0ed1-4749-903f-5e76c24e2e5f/assets/fr/NPRIpictogramme-2016data-FR__1552505700147__w975.jpg',
                     type: 'image',
-                    altText:
-                        '[fr] An image describing the flow from industry of on-site releases to air, water, and land, on-site disposals, off-site disposals, and off-site transfers.'
+                    altText: `Image décrivant le flux industriel des rejets sur place dans l'air, l'eau et le sol, des éliminations sur place, des éliminations hors site et des transferts hors site.`
                 }
             ]
         },
@@ -40,7 +39,7 @@ Cet aperçu de secteur sur les pâtes et papiers reprend les points saillants du
                 },
                 {
                     src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/PP_sector.jpg',
-                    altText: '[fr] A stock image of a pulp and paper facility.',
+                    altText: `Image d'une usine de pâte et papier.`,
                     type: 'image'
                 }
             ]
@@ -131,7 +130,7 @@ Certaines installations du secteur industriel des pâtes et papiers possèdent u
                 },
                 {
                     src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Subprocess.jpg',
-                    altText: '[fr] A stock image of a pulp and paper facility, aerial view.',
+                    altText: `Vue aérienne d'une usine de pâte et papier`,
                     type: 'image'
                 }
             ]
@@ -269,7 +268,7 @@ Le SRT n’est généralement pas fabriqué ni traité en grande quantité, mais
                 {
                     src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/trs_fr.png',
                     type: 'image',
-                    altText: '[fr] A graphical pie chart representation of the data table in the previous slide.'
+                    altText: '[fr-] A graphical pie chart representation of the data table in the previous slide.'
                 }
             ]
         },*/,
@@ -351,7 +350,7 @@ Les installations de pâtes et papiers doivent effectuer des [études de suivis 
                 },
                 {
                     src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Regulations.jpg',
-                    altText: '[fr] A stock image of a pulp and paper facility.',
+                    altText: `Image d'une usine de pâte et papier`,
                     type: 'image'
                 }
             ]
@@ -399,7 +398,7 @@ Le rapport sur [L’état des forêts au Canada 2019](https://www.rncan.gc.ca/ou
                 },
                 {
                     src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/assets/fr/Futur.jpg',
-                    altText: '[fr] An image of a large pile of lumber.',
+                    altText: `Image d'une pile de bois.`,
                     type: 'image'
                 }
             ]
