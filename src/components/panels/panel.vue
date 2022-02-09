@@ -7,7 +7,7 @@
         "
         class="flex-col"
     >
-        <component :is="getTemplate()" :config="config" :slideIdx="slideIdx"></component>
+        <component :is="getTemplate()" :config="config" :slideIdx="slideIdx" :lang="lang"></component>
     </div>
 </template>
 
@@ -33,6 +33,7 @@ export default class PanelV extends Vue {
     @Prop() config!: BasePanel;
     @Prop() ratio!: boolean;
     @Prop() slideIdx!: number;
+    @Prop() lang!: string;
 
     /**
      * Returns the corresponding component for this panel.
