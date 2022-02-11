@@ -31,7 +31,7 @@ export default class ChartV extends Vue {
     chartOptions: DQVChartConfig = {} as DQVChartConfig;
     title = '';
     menuOptions = [
-        'viewFullScreen',
+        'viewFullscreen',
         'printChart',
         'separator',
         'downloadPNG',

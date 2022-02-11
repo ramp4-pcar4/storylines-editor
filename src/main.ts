@@ -18,6 +18,9 @@ Vue.use(VuePapaParse);
 import VueProgressiveImage from 'vue-progressive-image';
 Vue.use(VueProgressiveImage);
 
+import VueFullScreen from 'vue-fullscreen';
+Vue.use(VueFullScreen);
+
 Vue.config.productionTip = false;
 
 new Vue({

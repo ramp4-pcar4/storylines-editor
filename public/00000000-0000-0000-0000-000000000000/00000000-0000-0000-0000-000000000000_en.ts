@@ -110,7 +110,8 @@ Surface mining involves digging up large areas with large excavators. The result
                 {
                     src:
                         '00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg',
-                    type: 'image'
+                    type: 'image',
+                    fullscreen: false
                 }
             ]
         },

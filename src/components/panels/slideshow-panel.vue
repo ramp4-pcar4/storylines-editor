@@ -1,19 +1,21 @@
 <template>
     <div class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
-        <hooper ref="carousel" v-if="width !== -1" class="h-full" :infiniteScroll="config.loop">
-            <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
-                <img
-                    :src="image.src"
-                    :height="image.height"
-                    :width="image.width"
-                    :alt="image.altText"
-                    class="m-auto story-graphic"
-                />
-            </slide>
+        <full-screen :expandable="config.fullscreen" :type="config.type">
+            <hooper ref="carousel" v-if="width !== -1" class="h-full" :infiniteScroll="config.loop">
+                <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
+                    <img
+                        :src="image.src"
+                        :height="image.height"
+                        :width="image.width"
+                        :alt="image.altText"
+                        class="m-auto story-graphic"
+                    />
+                </slide>
 
-            <hooper-navigation slot="hooper-addons"></hooper-navigation>
-            <hooper-pagination slot="hooper-addons"></hooper-pagination>
-        </hooper>
+                <hooper-navigation slot="hooper-addons"></hooper-navigation>
+                <hooper-pagination slot="hooper-addons"></hooper-pagination>
+            </hooper>
+        </full-screen>
 
         <div v-if="config.caption" class="text-center mt-5 text-sm" v-html="md.render(config.caption)"></div>
     </div>
@@ -26,12 +28,14 @@ import 'hooper/dist/hooper.css';
 import MarkdownIt from 'markdown-it';
 
 import { SlideshowPanel } from '@/definitions';
+import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
 @Component({
     components: {
         Hooper,
         Slide,
+        'full-screen': FullscreenV,
         HooperNavigation,
         HooperPagination
     }
