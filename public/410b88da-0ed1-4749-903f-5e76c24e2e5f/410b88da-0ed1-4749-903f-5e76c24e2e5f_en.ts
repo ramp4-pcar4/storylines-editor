@@ -172,7 +172,7 @@ The seven oil sands surface mining facilities that reported to the NPRI are list
                         },
                         {
                             src:
-                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/5.Canadian Natural Upgrading Ltd-Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine.csv',
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/substances/5.Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings.csv',
                             options: {
                                 title: `Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Releases and Disposals (Tonnes)`,
                                 subtitle: '',
