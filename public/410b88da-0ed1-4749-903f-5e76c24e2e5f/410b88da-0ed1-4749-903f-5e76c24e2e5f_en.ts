@@ -363,7 +363,7 @@ While the tailings reported by these mines have large amounts of manganese, ammo
                         },
                         {
                             src:
-                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/5.Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings.csv',
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/5.Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings.csv',
                             options: {
                                 title: `Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings (Tonnes)`,
                                 subtitle: '',

@@ -170,7 +170,7 @@ Les sept installations d’exploitation minière à ciel ouvert des sables bitum
                         },
                         {
                             src:
-                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/5.Canadian Natural Upgrading Ltd-Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine.csv',
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/5.Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine.csv',
                             options: {
                                 title: `Canadian Natural Upgrading Mine de la Rivière Muskeg et Mine Jackpine 2019 Rejets et Éliminations (tonnes)`,
                                 subtitle: '',
@@ -366,7 +366,7 @@ Bien que les résidus déclarés par ces mines contiennent de grandes quantités
                         },
                         {
                             src:
-                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/tailings/5.Canadian Natural Upgrading Ltd., Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings.csv',
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/tailings/5.Canadian Natural Upgrading Limited Muskeg River Mine and Jackpine Mine 2019 Tailings.csv',
                             options: {
                                 title: `Canadian Natural Upgrading Mine de la Rivière Muskeg et Mine Jackpine 2019 Résidus miniers (tonnes)`,
                                 subtitle: '',
