@@ -5,6 +5,7 @@ export interface StoryRampConfig {
     slides: Slide[];
     contextLink: string;
     contextLabel: string;
+    dateModified: string;
 }
 
 export interface DQVOptions {

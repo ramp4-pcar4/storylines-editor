@@ -34,6 +34,11 @@
                     >ramp4-pcar4/story-ramp</a
                 >
             </footer>
+
+            <div class="storyramp-modified" v-if="config.dateModified">
+                {{ lang === 'en' ? 'Date modified:' : 'Date de modification:' }}
+                {{ config.dateModified }}
+            </div>
         </div>
     </div>
 
@@ -95,6 +100,11 @@ export default class StoryV extends Vue {
             .then((res) => {
                 this.config = res.default;
                 this.isLoading = false;
+
+                // set page title
+                if (this.config) {
+                    document.title = this.config.title + ' - Canada.ca';
+                }
             })
             .catch((err) => {
                 console.error(`There exists no config given by the URL params: ${err}`);
@@ -128,6 +138,14 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-family: $font-list;
         line-height: 1.5;
         border-bottom: 0px;
+    }
+
+    .storyramp-modified {
+        max-width: 1536px;
+        margin: 0 auto;
+        padding-left: 15px;
+        padding-top: 1em;
+        padding-bottom: 1em;
     }
 }
 
