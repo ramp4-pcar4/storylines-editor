@@ -429,6 +429,11 @@
             "type": "string",
             "description": "The language to display in the app",
             "enum": ["en", "fr"]
+        },
+
+        "dateModified": {
+            "type": "string",
+            "description": "The last date that this config file was modified."
         }
     },
 
