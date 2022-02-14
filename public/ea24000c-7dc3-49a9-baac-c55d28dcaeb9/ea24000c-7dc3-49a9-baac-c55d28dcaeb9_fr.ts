@@ -257,10 +257,10 @@ Pour ce qui est des rejets dans l’eau, nous observons une tendance générale 
             ]
         },
         {
-            title: 'Ethlyene glycol disposal and recycling trends',
+            title: `Éliminations et du recyclage d'éthylène glycol`,
             panel: [
                 {
-                    title: 'Ethlyene glycol disposal and recycling trends',
+                    title: `Éliminations et du recyclage d'éthylène glycol`,
                     content: `La figure 5 montre que les quantités totales d’éthylène glycol éliminées ou recyclées au fil du temps demeurent généralement constantes dans la plupart des secteurs. La gestion des déchets représente le secteur avec la plus grande variabilité, car ces installations connaissent généralement beaucoup de fluctuations selon le type de matières qu’elles reçoivent, ce qui peut changer d’une année à l’autre (comme le montre la ligne orange de la figure 5 ci-dessous).
 
 Si nous étudions séparément l’élimination et le recyclage, nous constatons que le taux d’élimination est resté assez constant, alors que celui du recyclage a légèrement augmenté au fil du temps. Au milieu des années 1990, de nouvelles lignes directrices concernant les concentrations des rejets d’éthylène glycol dans l’eau ont été établies par Transports Canada et Pêches et Océans Canada. Tous les aéroports canadiens ont mis en place de nouvelles procédures opérationnelles pour mettre en œuvre des travaux d’assainissement. L’augmentation des quantités recyclées et traitées indique un changement positif, car cela a permis de réduire considérablement les quantités d’éthylène glycol qui, autrement, se retrouva dans les sites d’enfouissement et l’environnement.

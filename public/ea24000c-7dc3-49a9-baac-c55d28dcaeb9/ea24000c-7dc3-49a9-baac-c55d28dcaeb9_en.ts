@@ -107,11 +107,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
             title: 'Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector',
             panel: [
                 {
-                    title: 'Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector',
-                    content: ``,
-                    type: 'text'
-                },
-                {
+                    scrollguard: true,
                     title: 'Location of NPRI facilities that reported ethylene glycol releases in 2019 by sector',
                     config: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/ramp-config/en/locations.json',
                     type: 'map'

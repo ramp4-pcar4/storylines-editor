@@ -35,7 +35,7 @@
       "allowImport": false,
       "isOpen": {
         "large": true,
-        "medium": true,
+        "medium": false,
         "small": false
       }
     }
