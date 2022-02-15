@@ -81,7 +81,7 @@ The rapid degradation, low concentrations in terms of toxicity, seasonality of r
                 {
                     title: 'Facilities reporting ethylene glycol to the NPRI',
                     content: `                   
-#### Breakdown of facilities reporting ethylene glycol to the NPRI for 2019 by sectors and province
+### Breakdown of facilities reporting ethylene glycol to the NPRI for 2019 by sectors and province
 | **Sectors**                   | **Airports and Services to Airports** | **All Other Sectors** | **Chemical Manufacturing** | **Oil and Gas (Conventional and Non-Conventional)** | **Waste Treatment and Disposal** | **TOTAL** |
 | ----------------------------- | :-------------------------------------: | :---------------------: | :--------------------------: | :---------------------------------------------------: | :--------------------------------: | :---------: |
 | **Alberta**                   | 10                                    | 4                     | 25                         | 56                                                  | 16                               | **111**   |

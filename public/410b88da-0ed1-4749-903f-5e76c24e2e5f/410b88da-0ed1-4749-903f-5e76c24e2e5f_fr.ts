@@ -95,7 +95,7 @@ Les installations in situ ont une empreinte physique beaucoup plus petite que le
                 {
                     title: 'Où sont situées les installations?',
                     content: `Les installations d’extraction des sables bitumineux qui produisent des déclarations à l’INRP sont situées exclusivement dans le nord de l’Alberta, surtout autour de la municipalité de Fort McMurray. Parmi les installations déclarantes en 2019, une se trouve dans le gisement Peace River, cinq sont dans le gisement Cold Lake et 30 sont dans le gisement Athabasca. Cette carte comprend également une [installation de valorisation](https://www.rncan.gc.ca/energie/sources-denergie-et-reseau-de-distribution/petrole-brut/valorisation-des-sables-bitumineux-et-du-petrole-lourd/5876?_ga=2.12839347.524335214.1562344489-2057911658.1562344489) à Fort Saskatchewan, en Alberta, qui valorise le pétrole de l’installation d’exploitation minière à ciel ouvert des sables bitumineux de Muskeg River de Canadian Natural Resources. Parmi les installations ayant fait l’objet d’une déclaration à l’INRP, sept sont des exploitations minières à ciel ouvert, une est une installation de valorisation et les 30 autres sont des installations in situ.
-#### Installations de sables bitumineux déclarantes à l'INRP - 2019
+### Installations de sables bitumineux déclarantes à l'INRP - 2019
 | **Emplacement de l’installation** | **Installation in situ** | **Exploitation minière à ciel ouvert** | **Installation de valorisation** | **Total** |
 | ----------------------| :-------------------: | :------------------: | :---------: | :---------: |
 | Athabasca             | 23                  | 7                  | 0         | **30**    |

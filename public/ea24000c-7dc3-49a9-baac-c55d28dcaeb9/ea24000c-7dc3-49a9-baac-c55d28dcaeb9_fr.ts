@@ -85,7 +85,7 @@ En 2019, la province comptant le plus grand nombre d’installations ayant décl
                 {
                     title: 'Installations déclarant l’éthylène glycol à l’INRP',
                     content: `
-#### Répartition des installations ayant déclaré l’utilisation de l’éthylène glycol à l’INRP en 2019, par secteur et par province
+### Répartition des installations ayant déclaré l’utilisation de l’éthylène glycol à l’INRP en 2019, par secteur et par province
 
 | Secteurs                  | Aéroports et services aux aéroports | Tous les autres secteurs | Fabrication de produits chimiques | Pétrole et gaz (conventionnel et non conventionnel) | Traitement et élimination de déchets | TOTAL |
 | ------------------------- | :-----------------------------------: | :------------------------: | :---------------------------------: | :---------------------------------------------------: | :------------------------------------: | :-----: |
