@@ -22,6 +22,7 @@
 </template>
 
 <script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Hooper, Slide, Navigation as HooperNavigation, Pagination as HooperPagination } from 'hooper';
 import 'hooper/dist/hooper.css';
 
@@ -29,7 +30,6 @@ import MarkdownIt from 'markdown-it';
 
 import { SlideshowPanel } from '@/definitions';
 import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
-import { Component, Vue, Prop } from 'vue-property-decorator';
 
 @Component({
     components: {

@@ -211,6 +211,54 @@ The seven oil sands surface mining facilities that reported to the NPRI are list
             ]
         },
         {
+            title: 'Reported mine tailings from oil sands surface mining facilities',
+            panel: [
+                {
+                    title: 'Reported mine tailings from oil sands surface mining facilities',
+                    content: `Similar to comparing release and transfer profiles, it is difficult to compare the seven oil sands surface mining facilities in terms of what they dispose of in their tailings impoundment areas. These facilities vary greatly in their size and in how much bitumen processing occurs on-site. Breakdowns of reported tailings for each facility are provided below.
+
+- Canadian Natural Resources Muskeg River and Jackpine Mines, and Horizon Oil Sands Processing Plant and Mine;
+- Fort Hills Oil Sands Mine;
+- Imperial Oil Kearl Processing Plant and Mine;
+- Suncor Energy Inc. Oil Sands; and
+- Syncrude Canada Aurora North Mine Site, and Syncrude Canada Ltd. (formerly Mildred Lake).`,
+                    type: 'text'
+                },
+                {
+                    type: 'chart',
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/1.Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings.csv',
+                            options: {
+                                title: `Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/2.Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings.csv',
+                            options: {
+                                title: `Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/3.Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings.csv',
+                            options: {
+                                title: `Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             title: 'NPRI substances reported for oil sands mining facilities',
             panel: [
                 {
