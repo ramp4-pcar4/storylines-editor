@@ -28,7 +28,9 @@
         <!-- template top and no-script fallback -->
         <div id="def-top">d<%= require('html-loader!../src/assets/static/cdts/top-en.html') %></div>
 
-        <div id="app"></div>
+        <div id="wb-cont">
+            <div id="app"></div>
+        </div>
 
         <!-- template footer and no-script fallback -->
         <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
@@ -53,6 +55,16 @@
                     }
                 ]
             });
+            document.querySelectorAll('.wb-sl').forEach(function (skipLink) {
+                skipLink.setAttribute('href', url.href.split(/#[^\/]/)[0] + '#' + skipLink.href.split('#')[1]);
+            });
+            var interval = setInterval(function () {
+                var links = document.querySelectorAll('.wb-sl');
+                if (links.length === 3) {
+                    clearInterval(interval);
+                    links[2].setAttribute('href', url.href.split(/#[^\/]/)[0] + '?' + links[2].href.split('?')[1]);
+                }
+            }, 200);
         </script>
 
         <script>
@@ -92,11 +104,19 @@
     _tag.dcsCustom = function () {
         // Add custom parameters here.
         //_tag.DCSext.param_name=param_value;
-    }
+    };
     _tag.dcsCollect();
-//]]>
+    //]]>
 </script>
 <noscript>
-    <div><img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="https://sdc.ncr.ec.gc.ca/dcs2kf7dq10000kzg8kpqz5gp_3q4i/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.environmental-maps.canada.ca" /></div>
+    <div>
+        <img
+            alt="DCSIMG"
+            id="DCSIMG"
+            width="1"
+            height="1"
+            src="https://sdc.ncr.ec.gc.ca/dcs2kf7dq10000kzg8kpqz5gp_3q4i/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.environmental-maps.canada.ca"
+        />
+    </div>
 </noscript>
 <!-- END OF SmartSource Data Collector TAG -->
