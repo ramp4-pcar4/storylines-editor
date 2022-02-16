@@ -104,7 +104,7 @@ export interface TextPanel extends BasePanel {
 export interface MapPanel extends BasePanel {
     type: PanelType.Map;
     config: string;
-    expandable?: boolean;
+    fullscreen?: boolean;
     timeSlider?: TimeSliderConfig;
     title: string;
     scrollguard: boolean;
@@ -133,6 +133,7 @@ export interface ImagePanel extends BasePanel {
     width?: number;
     height?: number;
     class?: string;
+    fullscreen?: boolean;
     altText?: string;
     caption?: string;
     tooltip?: string;
@@ -155,6 +156,7 @@ export interface AudioPanel extends BasePanel {
 export interface SlideshowPanel extends BasePanel {
     type: PanelType.Slideshow;
     images: ImagePanel[];
+    fullscreen?: boolean;
     loop?: boolean;
     caption?: string;
 }
@@ -162,7 +164,7 @@ export interface SlideshowPanel extends BasePanel {
 export interface ChartPanel extends BasePanel {
     type: PanelType.Chart;
     charts: ChartConfig[];
-    expandable?: boolean;
+    fullscreen?: boolean;
 }
 
 export interface ChartConfig {
