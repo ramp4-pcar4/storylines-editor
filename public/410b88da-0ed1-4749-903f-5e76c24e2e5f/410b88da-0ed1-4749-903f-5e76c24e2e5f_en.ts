@@ -96,7 +96,7 @@ Thermal in-situ facilities have a much smaller physical footprint than surface m
                 {
                     title: 'Where are facilities located?',
                     content: `Oil sands extraction facilities that report to the NPRI are located exclusively in northern Alberta, particularly around the municipality of Fort McMurray. Of the facilities that reported in 2019, 1 of them are in the Peace River deposit, 5 in the Cold Lake deposit and 30 in the Athabasca deposit. Also included in this map is an upgrader facility in Fort Saskatchewan, Alberta, that upgrades oil from the Canadian Natural Resources’ Muskeg River oil sands surface mining facility. Of the facilities that reported to the NPRI, seven of them are surface mining operations, one was an [upgrader facility](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/upgrading-oil-sands-and-heavy-oil/5875) and the remaining 30 were in-situ facilities.
-#### Oil sands facilities reporting to the NPRI - 2019
+### Oil sands facilities reporting to the NPRI - 2019
 
 | **Facility location** | **Thermal in-situ** | **Surface mining** | **Upgrader** | **Total** |
 | ----------------------| :-------------------: | :------------------: | :---------: | :---------: |
