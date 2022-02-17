@@ -5,15 +5,6 @@
         </div>
 
         <div :id="`ramp-map-${slideIdx}`" class="w-full bg-gray-200 rv-map h-story">
-            <div class="sg" ref="scrollGuard" v-if="config.scrollguard">
-                <p class="sg-label">
-                    {{
-                        lang === 'en'
-                            ? 'Use ctrl + scroll to zoom the map'
-                            : 'Utilisez les touches Ctrl et + pour faire un zoom de la carte'
-                    }}
-                </p>
-            </div>
             <div class="flex items-center justify-center w-full h-full map-loading">
                 <svg class="animate-pulse w-52" viewBox="0 0 100 82.202" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -32,6 +23,7 @@ import { MapPanel } from '@/definitions';
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
 import TimeSlider from '@/components/panels/helpers/time-slider.vue';
+import Scrollguard from '@/components/panels/helpers/scrollguard.vue';
 
 @Component({
     components: {}
@@ -42,6 +34,7 @@ export default class MapPanelV extends Vue {
     @Prop() lang!: string;
 
     intersectTimeoutHandle = -1;
+    scrollguardOpen = false;
 
     mounted(): void {
         const observer = new IntersectionObserver(
@@ -51,13 +44,6 @@ export default class MapPanelV extends Vue {
                         this.init();
                         observer.disconnect();
                         this.$el.children[1].querySelector('.map-loading')?.remove();
-
-                        // If set in config, add scrollguard to the map element.
-                        if (this.config.scrollguard) {
-                            (this.$el.children[1]! as HTMLElement).addEventListener('wheel', this.wheelHandler, {
-                                capture: true
-                            });
-                        }
                     }, 350);
                 } else {
                     clearTimeout(this.intersectTimeoutHandle);
@@ -73,7 +59,59 @@ export default class MapPanelV extends Vue {
         new RAMP.Map(this.$el.children[1], this.config.config);
 
         RAMP.mapAdded.pipe().subscribe(async (mapi: any) => {
-            if (this.config.timeSlider && mapi.id === this.$el.id) {
+            if (this.config.scrollguard && mapi.id === this.$el.children[1].id) {
+                const scrollguardPanel = mapi.panels.create('scrollguard');
+                const scrollguardComponent = new Vue({
+                    render: (h) =>
+                        h('scrollguard', {
+                            props: {
+                                lang: this.lang
+                            }
+                        }),
+                    components: {
+                        scrollguard: Scrollguard
+                    }
+                }).$mount();
+                scrollguardPanel.body = scrollguardComponent.$el;
+                scrollguardPanel.element.css({
+                    opacity: 0.45,
+                    zindex: 100,
+                    top: 0,
+                    left: 0,
+                    position: 'absolute'
+                });
+
+                (this.$el.children[1] as HTMLElement).addEventListener(
+                    'wheel',
+                    (event) => {
+                        if (!event.ctrlKey) {
+                            // This is not working in Firefox for some reason.
+                            event.stopPropagation();
+
+                            // If CTRL is not pressed, display the scrollguard.
+                            scrollguardPanel.open();
+
+                            // Only set the timeout if it's not already set, otherwise the panel will be glitchy.
+                            if (!this.scrollguardOpen) {
+                                window.setTimeout(() => {
+                                    scrollguardPanel.close();
+                                    this.scrollguardOpen = false;
+                                }, 3000);
+                            }
+
+                            this.scrollguardOpen = true;
+                        } else {
+                            scrollguardPanel.close();
+                            this.scrollguardOpen = false;
+                        }
+                    },
+                    {
+                        capture: true
+                    }
+                );
+            }
+
+            if (this.config.timeSlider && mapi.id === this.$el.children[1].id) {
                 const timeSliderPanel = mapi.panels.create('time-slider-container');
                 const timeSliderComponent = new Vue({
                     render: (h) =>
@@ -102,23 +140,6 @@ export default class MapPanelV extends Vue {
             }
         });
     }
-
-    wheelHandler(event: WheelEvent): void {
-        const scrollGuardClassList = this.$el.children[1].querySelector('.sg')!.classList;
-
-        // prevent scroll unless ctrlKey is depressed
-        if (!event.ctrlKey) {
-            event.stopPropagation();
-            scrollGuardClassList.remove('sg-scrolling');
-            scrollGuardClassList.add('sg-active');
-
-            // remove scroll guard notification after two seconds
-            window.setTimeout(() => scrollGuardClassList.remove('sg-active'), 2000);
-        } else {
-            scrollGuardClassList.remove('sg-active');
-            scrollGuardClassList.add('sg-scrolling');
-        }
-    }
 }
 </script>
 
@@ -135,45 +156,6 @@ export default class MapPanelV extends Vue {
     margin-top: 2em;
     margin-bottom: 1em;
     line-height: 1.3333333;
-}
-
-.sg {
-    transition: opacity ease-in-out;
-    background-color: rgba(0, 0, 0, 0.45);
-    text-align: center;
-
-    position: absolute;
-    padding: 0px;
-    margin: 0px;
-    border-width: 0px;
-    width: 100%;
-    height: 100%;
-    left: 0px;
-    top: 0px;
-
-    transition-duration: 0.8s;
-
-    opacity: 0;
-    pointer-events: none !important;
-    z-index: 1000;
-
-    &.sg-active {
-        opacity: 1;
-        transition-duration: 0.3s;
-    }
-
-    &.sg-scrolling {
-        transition-duration: 0.3s;
-    }
-
-    .sg-label {
-        font-size: 1em * 1.5;
-        color: white;
-        position: relative;
-        margin: 0;
-        top: 50% !important;
-        transform: translateY(-50%);
-    }
 }
 
 @media screen and (max-width: 640px) {
