@@ -68,6 +68,32 @@ export default class ChartV extends Vue {
         fetch(this.config.src).then((data) => {
             const dqvOptions = this.config.options;
 
+            // export options displayed on hamburger menu
+            const exportOptions = {
+                buttons: {
+                    contextButton: {
+                        menuItems: this.menuOptions
+                    }
+                },
+                enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
+            };
+
+            // extract general chart options that applies to all chart types
+            const defaultOptions = {
+                chart: {
+                    type: dqvOptions?.type,
+                    ...(dqvOptions?.height && { height: dqvOptions?.height }),
+                    ...(dqvOptions?.width && { width: dqvOptions?.width })
+                },
+                ...(dqvOptions?.title && { title: { text: dqvOptions?.title } }),
+                ...(dqvOptions?.subtitle && { subtitle: { text: dqvOptions?.subtitle } }),
+                ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
+                exporting: exportOptions,
+                credits: {
+                    enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
+                }
+            };
+
             // download: true needed for local files which is treated as an URL
             this.$papa.parse(data.url, {
                 header: dqvOptions?.type === 'pie' ? false : true,
@@ -76,9 +102,9 @@ export default class ChartV extends Vue {
                 complete: (res: any) => {
                     // construct highcharts objects based on chart type
                     if (dqvOptions?.type === 'pie') {
-                        this.makePieChart(res.data);
+                        this.makePieChart(res.data, defaultOptions);
                     } else {
-                        this.makeLineChart(res.meta.fields, res.data);
+                        this.makeLineChart(res.meta.fields, res.data, defaultOptions);
                     }
                 }
             });
@@ -88,8 +114,7 @@ export default class ChartV extends Vue {
     /**
      * Parse chart data content and return a highcharts formatted series object for a pie chart.
      */
-    makePieChart(data: any): void {
-        const dqvOptions = this.config.options;
+    makePieChart(data: any, defaultOptions: any): void {
         let series: { data: SeriesData[] } = { data: [] };
 
         // construct series data
@@ -104,6 +129,7 @@ export default class ChartV extends Vue {
         // plot options for pie charts
         const plotOptions = {
             pie: {
+                name: '',
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
@@ -113,41 +139,18 @@ export default class ChartV extends Vue {
             }
         };
 
-        // export options displayed on hamburger menu
-        const exportOptions = {
-            buttons: {
-                contextButton: {
-                    menuItems: this.menuOptions
-                }
-            },
-            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
-        };
-
         // initializing chartOptions for line/bar charts
         this.chartOptions = {
-            chart: {
-                type: dqvOptions?.type ? dqvOptions?.type : 'chart'
-            },
-            title: {
-                text: dqvOptions?.title ? dqvOptions?.title : ''
-            },
-            subtitle: {
-                text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
-            },
+            ...defaultOptions,
             plotOptions: plotOptions,
-            series: series,
-            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
-            exporting: exportOptions,
-            credits: {
-                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
-            }
+            series: series
         };
     }
 
     /**
      * Parse chart data content and return a highcharts formatted series object for a line/bar chart.
      */
-    makeLineChart(fields: string[], data: any): void {
+    makeLineChart(fields: string[], data: any, defaultOptions: any): void {
         const dqvOptions = this.config.options;
         // find xAxis categories for line/bar charts
         const cato = fields.shift() as string;
@@ -168,34 +171,11 @@ export default class ChartV extends Vue {
             });
         });
 
-        // export options displayed on hamburger menu
-        const exportOptions = {
-            buttons: {
-                contextButton: {
-                    menuItems: this.menuOptions
-                }
-            },
-            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
-        };
-
         // initializing chartOptions for line/bar charts
         this.chartOptions = {
-            chart: {
-                type: dqvOptions?.type ? dqvOptions?.type : 'line'
-            },
+            ...defaultOptions,
             series: series,
             xAxis: xAxis,
-            title: {
-                text: dqvOptions?.title ? dqvOptions?.title : ''
-            },
-            subtitle: {
-                text: dqvOptions?.subtitle ? dqvOptions?.subtitle : ''
-            },
-            exporting: exportOptions,
-            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
-            credits: {
-                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
-            },
             yAxis: {
                 title: {
                     text: dqvOptions?.yAxisLabel ? dqvOptions?.yAxisLabel : ''

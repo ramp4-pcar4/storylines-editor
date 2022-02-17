@@ -337,6 +337,14 @@
                     "description": "The type of chart.",
                     "enum": ["line", "spline", "area", "areaspline", "column", "bar", "pie", "scatter", "gauge", "arearange", "areasplinerange", "columnrange"]
                 },
+                "width": {
+                    "type": "number",
+                    "description": "The width of the chart (will not exceed panel container width)."
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The height of chart (will not exceed panel container height on mobile resolutions)."
+                },
                 "colours": {
                     "type": "array",
                     "description": "A list of colors to display chart data that corresponds to the order of columns in CSV file.",

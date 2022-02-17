@@ -573,7 +573,7 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
             ]
         },
         {
-            title: 'Pie chart with custom colours',
+            title: 'Pie chart with custom colours and size',
             panel: [
                 {
                     title: 'Pie chart with custom colours',
@@ -581,15 +581,21 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
                     type: 'text'
                 },
                 {
-                    src: 'f6f7baf4-cccb-4521-a037-b4691b0f0d49/charts/en/CAC_en.csv',
-                    type: 'chart',
-                    options: {
-                        title:
-                            'Proportion of criteria air contaminants released by pulp and paper facilities that reported to the NPRI in 2019',
-                        subtitle: '',
-                        type: 'pie',
-                        colours: ['green', '#FAEBD7', 'indigo', '#FFD700', '#B22222', '#FF00FF']
-                    }
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/2.Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings.csv',
+                            options: {
+                                title: `Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)`,
+                                subtitle: '',
+                                type: 'pie',
+                                colours: ['green', '#FAEBD7', 'indigo', '#FFD700', 'orange', 'red'],
+                                width: 800,
+                                height: 500
+                            }
+                        }
+                    ],
+                    type: 'chart'
                 }
             ]
         }
