@@ -1,13 +1,13 @@
 <template>
-    <div :id="this.$vnode.key" class="story-slide w-full h-full flex flex-row">
-        <Scrollama class="flex-1 prose max-w-none my-5">
+    <div :id="this.$vnode.key" class="story-slide w-full h-full flex sm:flex-row flex-col">
+        <Scrollama class="flex-1 order-2 sm:order-1 prose max-w-none my-5">
             <h2 class="px-10 mb-0 chapter-title top-20">
                 {{ config.title }}
             </h2>
 
             <div class="px-10 md-content" v-html="md.render(config.content)"></div>
         </Scrollama>
-        <panel class="flex-2" :config="activeConfig" :ratio="false"></panel>
+        <panel class="dynamic-content flex-2" :config="activeConfig" :ratio="false"></panel>
     </div>
 </template>
 
@@ -62,4 +62,10 @@ export default class DynamicPanelV extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@media screen and (max-width: 640px) {
+    .dynamic-content {
+        max-height: 40vh;
+    }
+}
+</style>
