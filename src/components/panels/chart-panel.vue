@@ -75,10 +75,6 @@ export default class ChartPanelV extends Vue {
         overflow: visible;
     }
 
-    ::v-deep .hooper-pagination {
-        bottom: -20px;
-    }
-
     ::v-deep .hooper-indicator {
         border: 1px solid #878787;
 

@@ -170,6 +170,57 @@ Les sept installations d’exploitation minière à ciel ouvert des sables bitum
             panel: [
                 {
                     title: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
+                    content: `Sept installations d’exploitation minière à ciel ouvert de sables bitumineux ont fait l’objet d’une déclaration à l’INRP en 2019. Ces installations ont déclaré des renseignements sur 70 substances et groupes de substances différents pour 2019, représentant un total de 319 888 tonnes de polluants rejetés, éliminés et transférés. Près de 76% de cette quantité, soit 242 395 tonnes, provient des principaux contaminants atmosphériques (PCA) tels que les matières particulaires (MP), les oxydes d’azote (NO), le dioxyde de soufre (SO<sub>2</sub>), le monoxyde de carbone (CO) et les composés organiques volatils (COV). Les PCA sont des précurseurs du smog et contribuent à la mauvaise qualité de l’air.
+
+Les sept installations d’exploitation minière à ciel ouvert des sables bitumineux qui ont déclaré à l’INRP sont listées ci-dessous. Cliquez sur le nom des installations pour voir le détail de ce qu’elles ont déclaré.
+
+- Mine de la rivière Muskeg et mine Jackpine, et usine de transformation et mine Horizon  (Canadian Natural Resources);
+- Mine de sables bitumineux Fort Hills;
+- Usine de transformation et mine Kearl d’Imperial Oil;
+- Sables bitumineux de Suncor Energy Inc; et
+- Site de la mine Aurora nord de Syncrude Canada et site de la mine Syncrude Canada Ltd. (anciennement Mildred Lake).
+`,
+                    type: 'text'
+                },
+                {
+                    type: 'chart',
+                    charts: [
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/1.Imperial Oil Resources Limited-Kearl Oil Sands Processing Plant and Mine.csv',
+                            options: {
+                                title: `Usine de Transformation e Mine Kearl D'imperial 2019 Rejets et Éliminations (tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/2.Suncor Energy Oil Sands Limited Partnership-Suncor Energy Inc. Oil Sands.csv',
+                            options: {
+                                title: `Sables bitumineux de Suncor Energy Inc. 2019 Rejets et Éliminations (tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        },
+                        {
+                            src:
+                                '410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/3.Syncrude Canada Ltd.-Syncrude Canada Ltd.csv',
+                            options: {
+                                title: `Site de la Mine Syncrude Canada Ltd. 2019 Rejets et Éliminations (tonnes)`,
+                                subtitle: '',
+                                type: 'pie'
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            title: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
+            panel: [
+                {
+                    title: `Substances de l'INRP déclarées par les installations d’exploitation minière de sables bitumineux`,
                     content: `Pour plus d’information sur l’utilisation et l’interprétation des données de l’INRP, veuillez consulter notre [guide](https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/utilisation-interpretation-donnees.html).
 
 Il est à noter que même si la mine de la rivière Muskeg et la mine Jackpine sont des mines autonomes, aux fins des déclarations à l’INRP, Canadian Natural Resources déclare les renseignements les concernant comme une seule installation.

@@ -13,6 +13,8 @@ export interface DQVOptions {
     subtitle: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    width?: number;
+    height?: number;
     export: boolean;
     colours?: string[];
     credits: boolean;
