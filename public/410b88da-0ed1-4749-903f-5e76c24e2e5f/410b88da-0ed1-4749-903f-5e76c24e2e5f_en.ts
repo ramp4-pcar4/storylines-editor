@@ -596,7 +596,8 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
     contextLink:
         'https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html',
     contextLabel: 'Explore National Pollutant Release Inventory data',
-    lang: 'en'
+    lang: 'en',
+    dateModified: '2022-02-14'
 };
 
 export default config;

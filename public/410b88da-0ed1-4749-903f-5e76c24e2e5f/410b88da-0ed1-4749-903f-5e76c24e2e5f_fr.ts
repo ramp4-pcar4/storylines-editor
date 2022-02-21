@@ -600,7 +600,8 @@ Ces fichiers faciles à utiliser vous permettent de pousser votre analyse des do
     contextLink:
         'https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/outils-ressources-donnees/explorerdonnees.html',
     contextLabel: `Explorez les données de l'Inventaire national des rejets de polluants`,
-    lang: 'fr'
+    lang: 'fr',
+    dateModified: '2022-02-14'
 };
 
 export default config;
