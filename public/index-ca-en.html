@@ -36,15 +36,33 @@
         <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
 
         <script type="text/javascript">
+            // URL Parsing for Language Switch
             var url = new URL(window.location.href);
             var hashParams = url.hash.split('/');
+
+            // If there's an empty item at the end of the paramater list (occurs if there's a trailing slash in the URL), clear it.
+            if(hashParams.at(-1).length === 0) {
+                hashParams.pop();
+            }
+
+            // If content after the last slash in the URL is an anchor, clear it.
+            if(hashParams.at(-1).startsWith("#")) {
+                hashParams.pop();
+            }
+
+            // Finally, extract the StoryRAMP ID from the URL. If it has an anchor tag in it, remove it since it's not useful on the new page.
+            var productID = hashParams.pop();
+
+            if(productID.includes("#")) {
+                productID = productID.split('#')[0];
+            }
 
             var defTop = document.getElementById('def-top');
             defTop.outerHTML = wet.builder.top({
                 lngLinks: [
                     {
                         lang: 'fr',
-                        href: 'index-ca-fr.html#/fr/' + hashParams.pop(),
+                        href: 'index-ca-fr.html#/fr/' + productID,
                         text: 'Français'
                     }
                 ],
