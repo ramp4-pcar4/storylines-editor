@@ -87,20 +87,20 @@
                 "name": "Releases to Air",
                 "layerType": "esriFeature",
                 "singleEntryCollapse": true,
-                "symbologyExpanded": true,  
+                "symbologyExpanded": true,
                 "tolerance": 20,
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/5",
                 "state": {
-                  "opacity": 0.75
-                } 
+                    "opacity": 0.75
+                }
             }
         ],
         "extentSets": [
             {
                 "id": "EXT_ESRI_World_AuxMerc_3857",
                 "default": {
-                    "xmax": -11484319.392198805,
-                    "xmin": -14267850.214231044,
+                    "xmax": -11554319.392198805,
+                    "xmin": -14337850.214231044,
                     "ymax": 8349344.827914256,
                     "ymin": 6637155.394326762
                 },

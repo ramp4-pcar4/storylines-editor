@@ -75,7 +75,7 @@
                 "children": [
                     {
                         "symbologyExpanded": true,
-                        "description": "Rejets à l'air par des installations in situ pour toutes les substances en 2019 (tonnes)",                        
+                        "description": "Rejets à l'air par des installations in situ pour toutes les substances en 2019 (tonnes)",
                         "layerId": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019"
                     }
                 ]
@@ -87,20 +87,20 @@
                 "name": "Rejets à l'air",
                 "layerType": "esriFeature",
                 "singleEntryCollapse": true,
-                "symbologyExpanded": true,  
-                "tolerance": 20,                
+                "symbologyExpanded": true,
+                "tolerance": 20,
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/12",
                 "state": {
-                  "opacity": 0.75
-                } 
+                    "opacity": 0.75
+                }
             }
         ],
         "extentSets": [
             {
                 "id": "EXT_ESRI_World_AuxMerc_3857",
                 "default": {
-                    "xmax": -11484319.392198805,
-                    "xmin": -14267850.214231044,
+                    "xmax": -11554319.392198805,
+                    "xmin": -14337850.214231044,
                     "ymax": 8349344.827914256,
                     "ymin": 6637155.394326762
                 },
@@ -237,11 +237,11 @@
                 "description": "La carte du monde topographique est conçue pour être utilisé comme une carte de base par les professionnels du SIG et comme une carte de référence par quiconque.",
                 "altText": "altText - La carte du monde topographique",
                 "layers": [
-                  {
-                    "id": "World_Topo_Map",
-                    "layerType": "esriFeature",
-                    "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
-                  }
+                    {
+                        "id": "World_Topo_Map",
+                        "layerType": "esriFeature",
+                        "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
+                    }
                 ],
                 "tileSchemaId": "EXT_ESRI_World_AuxMerc_3857#LOD_ESRI_World_AuxMerc_3857"
             }
