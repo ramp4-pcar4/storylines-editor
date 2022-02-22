@@ -75,7 +75,7 @@
                 "children": [
                     {
                         "symbologyExpanded": true,
-                        "description": "Releases and Disposals by Mining Facilities in 2019 (tonnes)",                        
+                        "description": "Releases and Disposals by Mining Facilities in 2019 (tonnes)",
                         "layerId": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)"
                     }
                 ]
@@ -91,16 +91,16 @@
                 "symbologyExpanded": true,
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/2",
                 "state": {
-                  "opacity": 0.75
-                }         
+                    "opacity": 0.75
+                }
             }
         ],
         "extentSets": [
             {
                 "id": "EXT_ESRI_World_AuxMerc_3857",
                 "default": {
-                    "xmax": -12272079.405705657,
-                    "xmin": -12620020.758459613,
+                    "xmax": -12279079.405705657,
+                    "xmin": -12627020.758459613,
                     "ymax": 7916959.668162176,
                     "ymin": 7702935.9889637865
                 },
