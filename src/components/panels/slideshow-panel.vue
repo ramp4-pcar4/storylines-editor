@@ -51,19 +51,6 @@ export default class SlideshowPanelV extends Vue {
         setTimeout(() => {
             this.width = this.$el.clientWidth;
         }, 100);
-
-        // window.addEventListener('resize', () => {
-        //     setTimeout(() => {
-        //         // adjust width for mobile resolutions
-        //         if (window.innerWidth > 640) {
-        //             this.width = 1121;
-        //             console.log('NORMAL SCREEN: ', this.width);
-        //         } else {
-        //             this.width = 0.97 * window.innerWidth;
-        //             console.log('MOBILE SCREEN: ', this.width);
-        //         }
-        //     }, 100);
-        // });
     }
 }
 </script>
@@ -99,7 +86,7 @@ export default class SlideshowPanelV extends Vue {
 @media screen and (max-width: 640px) {
     .carousel {
         max-width: 100vw;
-        max-height: 40vh;
+        max-height: 50vh;
         background-color: white;
     }
 }

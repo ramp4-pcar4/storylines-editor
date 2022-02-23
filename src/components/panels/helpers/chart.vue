@@ -61,6 +61,17 @@ export default class ChartV extends Vue {
         }
     }
 
+    mounted(): void {
+        setTimeout(() => {
+            (this.$refs.chart as any).chart.reflow();
+        }, 100);
+
+        window.addEventListener('resize', () => {
+            // adjust width for mobile resolutions
+            (this.$refs.chart as any).chart.reflow();
+        });
+    }
+
     /**
      * Parse and process CSV file contents and return a properly configured highcharts options object.
      */
@@ -81,9 +92,11 @@ export default class ChartV extends Vue {
             // extract general chart options that applies to all chart types
             const defaultOptions = {
                 chart: {
+                    renderTo: 'dv-chart-container',
                     type: dqvOptions?.type,
-                    ...(dqvOptions?.height && { height: dqvOptions?.height }),
-                    ...(dqvOptions?.width && { width: dqvOptions?.width })
+                    ...(dqvOptions?.height &&
+                        this.$el.clientHeight > dqvOptions?.height && { height: dqvOptions?.height }),
+                    ...(dqvOptions?.width && this.$el.clientWidth > dqvOptions?.width && { width: dqvOptions?.width })
                 },
                 ...(dqvOptions?.title && { title: { text: dqvOptions?.title } }),
                 ...(dqvOptions?.subtitle && { subtitle: { text: dqvOptions?.subtitle } }),
@@ -193,14 +206,12 @@ export default class ChartV extends Vue {
 
 @media screen and (max-width: 640px) {
     .dv-chart {
-        max-width: 100vw;
-        max-height: 40vh;
         background-color: white;
     }
 
     .dv-chart-container {
-        // height: 100%;
-        width: 100%;
+        width: 100% !important;
+        height: 100% !important;
     }
 }
 </style>
