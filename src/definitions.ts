@@ -173,5 +173,3 @@ export interface ChartConfig {
     src: string;
     options?: DQVOptions;
 }
-
-// TODO: add more definitions here as needed
