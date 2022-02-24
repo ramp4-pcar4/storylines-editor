@@ -22,3 +22,8 @@ pnpm-debug.log*
 *.sln
 *.sw?
 /.vs
+Fortifystory-ramp.bat
+Fortifystory-ramp.bat.args
+Fortifystory-ramp.bat.bytecode.args
+Fortifystory-ramp.bat.fileno
+Fortifystory-ramp.fpr
