@@ -5,11 +5,15 @@
                 :src="config.src"
                 :class="config.class"
                 :alt="config.altText"
-                class="graphic px-10 mx-auto my-6 block flex object-contain sm:max-w-screen sm:max-h-screen"
+                class="graphic-image px-10 mx-auto my-6 block flex object-contain sm:max-w-screen sm:max-h-screen"
             />
         </full-screen>
 
-        <div v-if="config.caption" class="text-center mt-5 text-sm max-w-full" v-html="md.render(config.caption)"></div>
+        <div
+            v-if="config.caption"
+            class="text-center text-sm max-w-full graphic-caption"
+            v-html="md.render(config.caption)"
+        ></div>
     </div>
 </template>
 
@@ -36,8 +40,10 @@ export default class ImagePanelV extends Vue {
 @media screen and (max-width: 640px) {
     .graphic {
         max-width: 100vw;
-        max-height: 40vh;
         background-color: white;
+    }
+    .graphic-image {
+        max-height: 38vh;
     }
 }
 </style>
