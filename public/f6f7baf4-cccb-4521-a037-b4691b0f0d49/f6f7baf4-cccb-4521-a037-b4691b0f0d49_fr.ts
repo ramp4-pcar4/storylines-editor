@@ -151,12 +151,12 @@ Certaines installations du secteur industriel des pâtes et papiers possèdent u
 - Monoxyde de carbone (CO)
 - Soufre réduit total (SRT);
 - Phosphore (P);
-- Nitrates (NO<sub>3</sub>-).
-
-## Rejets et éliminations totaux des installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
+- Nitrates (NO<sub>3</sub>-).`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Rejets et éliminations totaux des installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/fr/total_releases_and_disposals_of_pnp_2010-2019.json',
                     type: 'map',
@@ -173,15 +173,20 @@ Certaines installations du secteur industriel des pâtes et papiers possèdent u
             panel: [
                 {
                     title: 'Principaux contaminants atmosphériques',
-                    content: `Près de 86% des substances émises par l’industrie sont des [principaux contaminants atmosphériques](https://www.canada.ca/fr/environnement-changement-climatique/services/pollution-atmospherique/polluants/principaux-contaminants.html) (PCA) directement rejetés dans l’air. Une grande proportion des PCA déclarés par l’industrie papetière est associée avec des sources de combustions (par exemple : les chaudières à combustible fossile ou à biomasse, les chaudières de récupération et les fours à chaux).
-                    
-## Principaux contaminants atmosphériques totaux rejetés par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
+                    content: `Près de 86% des substances émises par l’industrie sont des [principaux contaminants atmosphériques](https://www.canada.ca/fr/environnement-changement-climatique/services/pollution-atmospherique/polluants/principaux-contaminants.html) (PCA) directement rejetés dans l’air. Une grande proportion des PCA déclarés par l’industrie papetière est associée avec des sources de combustions (par exemple : les chaudières à combustible fossile ou à biomasse, les chaudières de récupération et les fours à chaux).`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Principaux contaminants atmosphériques totaux rejetés par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/fr/total_criteria_air_contaminants_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },
@@ -232,15 +237,19 @@ Pour déclarer à l'INRP, le disulfure de carbone et le sulfure de carbonyle son
 - Disulfure de diméthyle (C<sub>2</sub>H<sub>6</sub>S<sub>2</sub>); et
 - Méthyl mercaptan (CH<sub>4</sub>S).
 
-Le SRT n’est généralement pas fabriqué ni traité en grande quantité, mais des traces de cette substance peuvent être fabriquées comme sous-produit (provenant principalement de l’utilisation de sulfure de sodium dans la cuisson kraft) et être directement rejetées dans l’atmosphère. La plupart du SRT formé est contrôlée et brûlée dans des unités de combustion (par exemple : les chaudières de récupération, les fours à chaux ou les oxydateurs thermiques). Les rejets de SRT de l’industrie des pâtes et papiers constituent 50% des rejets totaux déclarés à l’INRP pour cette substance. 
-                    
-## Rejets de soufre réduit total par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
+Le SRT n’est généralement pas fabriqué ni traité en grande quantité, mais des traces de cette substance peuvent être fabriquées comme sous-produit (provenant principalement de l’utilisation de sulfure de sodium dans la cuisson kraft) et être directement rejetées dans l’atmosphère. La plupart du SRT formé est contrôlée et brûlée dans des unités de combustion (par exemple : les chaudières de récupération, les fours à chaux ou les oxydateurs thermiques). Les rejets de SRT de l’industrie des pâtes et papiers constituent 50% des rejets totaux déclarés à l’INRP pour cette substance.`,
                     type: 'text'
                 },
                 {
+                    title: `Rejets de soufre réduit total par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/fr/total_reduced_sulphur_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         } /*
@@ -281,15 +290,19 @@ Le SRT n’est généralement pas fabriqué ni traité en grande quantité, mais
 
 En 2019, les effluents de l’industrie étaient constitués de 22% de phosphore et de 27% de nitrates. Selon les données de l’INRP, la tendance des rejets de phosphore et de nitrates par les papetières se maintient au fil des ans.
 
-Les installations de pâtes et papiers doivent effectuer des [études de suivis des effets sur l’environnement](https://www.canada.ca/fr/environnement-changement-climatique/services/gestion-pollution/suivi-effets-environnement/guide-technique-pates-papiers.html) (ESEE) pour mesurer les effets des effluents finaux rejetés sur les milieux aquatiques récepteurs.
-
-## Rejets de phosphore et de nitrates par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
+Les installations de pâtes et papiers doivent effectuer des [études de suivis des effets sur l’environnement](https://www.canada.ca/fr/environnement-changement-climatique/services/gestion-pollution/suivi-effets-environnement/guide-technique-pates-papiers.html) (ESEE) pour mesurer les effets des effluents finaux rejetés sur les milieux aquatiques récepteurs.`,
                     type: 'text'
                 },
                 {
+                    title: `Rejets de phosphore et de nitrates par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/fr/phosphorus_and_nitrates_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },
@@ -298,15 +311,19 @@ Les installations de pâtes et papiers doivent effectuer des [études de suivis 
             panel: [
                 {
                     title: 'Recyclage, traitement et élimination',
-                    content: `Les installations qui déclarent à l’INRP fournissent de l’information quant aux activités de récupération des substances déclarées. La récupération des polluants permet d’éviter les rejets directs dans l’environnement, soit par élimination sur place, hors site, par recyclage ou par traitement. 
-
-## Éliminations et transferts totaux par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
+                    content: `Les installations qui déclarent à l’INRP fournissent de l’information quant aux activités de récupération des substances déclarées. La récupération des polluants permet d’éviter les rejets directs dans l’environnement, soit par élimination sur place, hors site, par recyclage ou par traitement.`,
                     type: 'text'
                 },
                 {
+                    title: `Éliminations et transferts totaux par les installations de pâtes et papiers déclarant à l’INRP de 2010 à 2019`,
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/fr/total_disposals_and_transfers_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },
@@ -439,7 +456,8 @@ Ces fichiers faciles à utiliser vous permettent de pousser votre analyse des do
     contextLink:
         'https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html',
     contextLabel: 'Explore National Pollutant Release Inventory data',
-    lang: 'en'
+    lang: 'en',
+    dateModified: '2022-02-25'
 };
 
 export default config;

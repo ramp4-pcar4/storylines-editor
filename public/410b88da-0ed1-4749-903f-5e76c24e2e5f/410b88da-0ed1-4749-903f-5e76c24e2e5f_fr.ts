@@ -601,7 +601,7 @@ Ces fichiers faciles à utiliser vous permettent de pousser votre analyse des do
         'https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/outils-ressources-donnees/explorerdonnees.html',
     contextLabel: `Explorez les données de l'Inventaire national des rejets de polluants`,
     lang: 'fr',
-    dateModified: '2022-02-14'
+    dateModified: '2022-02-25'
 };
 
 export default config;

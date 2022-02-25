@@ -148,12 +148,12 @@ Some pulp and paper industry facilities include a wastewater treatment system an
 - Carbon monoxide (CO)
 - Total reduced sulphur (TRS)
 - Phosphorus (P)
-- Nitrates (NO<sub>3</sub>-)
-
-## Total releases and disposals of pulp and paper facilities that reported to the NPRI from 2010 to 2019`,
+- Nitrates (NO<sub>3</sub>-)`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Total releases and disposals of pulp and paper facilities that reported to the NPRI from 2010 to 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/en/total_releases_and_disposals_of_pnp_2010-2019.json',
                     type: 'map',
@@ -170,15 +170,20 @@ Some pulp and paper industry facilities include a wastewater treatment system an
             panel: [
                 {
                     title: 'Criteria air contaminants',
-                    content: `Nearly 86% of substances emitted by the industry are [Criteria air contaminants](https://www.canada.ca/en/environment-climate-change/services/air-pollution/pollutants/common-contaminants.html) (CACs) released directly into the air. A significant portion of the CACs reported by the paper industry are associated with combustion sources (e.g., power boilers, recovery furnaces and lime kilns).
-                    
-## Total criteria air contaminants released by pulp and paper facilities that reported to the NPRI from 2010 to 2019`,
+                    content: `Nearly 86% of substances emitted by the industry are [Criteria air contaminants](https://www.canada.ca/en/environment-climate-change/services/air-pollution/pollutants/common-contaminants.html) (CACs) released directly into the air. A significant portion of the CACs reported by the paper industry are associated with combustion sources (e.g., power boilers, recovery furnaces and lime kilns).`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Total criteria air contaminants released by pulp and paper facilities that reported to the NPRI from 2010 to 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/en/total_criteria_air_contaminants_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },
@@ -228,15 +233,20 @@ For reporting under the NPRI, carbon disulphide and carbonyl sulphide are includ
 - Dimethyl disulphide (C<sub>2</sub>H<sub>6</sub>S<sub>2</sub>) 
 - Methyl mercaptan (CH<sub>4</sub>S)
                     
-TRS is generally neither manufactured nor processed in high quantity. However, trace quantities of this substance could be manufactured as a by-product (mainly from the use of sodium sulphide in kraft cooking) and be directly released to the atmosphere. Much of the TRS formed is controlled and burned in combustion units (e.g., recovery furnaces, lime kilns or thermal oxidizers). TRS releases from the pulp and paper industry account for 50% of the total releases of this substance reported to the NPRI.
-
-## Total reduced sulphur released by pulp and paper facilities that reported to the NPRI from 2010 to 2019`,
+TRS is generally neither manufactured nor processed in high quantity. However, trace quantities of this substance could be manufactured as a by-product (mainly from the use of sodium sulphide in kraft cooking) and be directly released to the atmosphere. Much of the TRS formed is controlled and burned in combustion units (e.g., recovery furnaces, lime kilns or thermal oxidizers). TRS releases from the pulp and paper industry account for 50% of the total releases of this substance reported to the NPRI.`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Total reduced sulphur released by pulp and paper facilities that reported to the NPRI from 2010 to 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/en/total_reduced_sulphur_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         } /*
@@ -277,15 +287,20 @@ TRS is generally neither manufactured nor processed in high quantity. However, t
 
 In 2019, phosphorus accounted for 22% of industry effluents, while nitrates accounted for 27%. According to NPRI data, the trend in phosphorus and nitrate releases from paper mills has remained constant over the years.
 
-Pulp and paper facilities are required to conduct [Environmental Effects Monitoring](https://www.canada.ca/en/environment-climate-change/services/managing-pollution/environmental-effects-monitoring/pulp-paper-technical-guidance.html) (EEM) studies to measure the effect of final effluent releases on receiving water environments.
-
-## Phosphorus and nitrates released by pulp and paper facilities that reported to the NPRI from 2010 to 2019`,
+Pulp and paper facilities are required to conduct [Environmental Effects Monitoring](https://www.canada.ca/en/environment-climate-change/services/managing-pollution/environmental-effects-monitoring/pulp-paper-technical-guidance.html) (EEM) studies to measure the effect of final effluent releases on receiving water environments.`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Phosphorus and nitrates released by pulp and paper facilities that reported to the NPRI from 2010 to 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/en/phosphorus_and_nitrates_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },
@@ -294,15 +309,20 @@ Pulp and paper facilities are required to conduct [Environmental Effects Monitor
             panel: [
                 {
                     title: 'Recycling, treatment and disposal',
-                    content: `NPRI reporting facilities provide information on activities undertaken to recover reported substances. Pollutant recovery prevents direct releases to the environment, through on-site or off-site disposal, recycling or treatment. 
-
-## Total disposals and transfers of pulp and paper facilities that reported to the NPRI from 2010 to 2019`,
+                    content: `NPRI reporting facilities provide information on activities undertaken to recover reported substances. Pollutant recovery prevents direct releases to the environment, through on-site or off-site disposal, recycling or treatment.`,
                     type: 'text'
                 },
                 {
+                    title:
+                        'Total disposals and transfers of pulp and paper facilities that reported to the NPRI from 2010 to 2019',
                     config:
                         'f6f7baf4-cccb-4521-a037-b4691b0f0d49/ramp-config/en/total_disposals_and_transfers_of_pnp_2010-2019.json',
-                    type: 'map'
+                    type: 'map',
+                    timeSlider: {
+                        range: [2010, 2019],
+                        start: [2019, 2019],
+                        attribute: 'Report_Year_Année_de_déclaration'
+                    }
                 }
             ]
         },
@@ -381,8 +401,7 @@ For example, by breaking down wood into its central components – cellulose, he
                     
 To achieve this diversification of products, the industry relies on certain funding programs, such as the [Forest Innovation Program](https://www.nrcan.gc.ca/science-and-data/funding-partnerships/funding-opportunities/forest-sector-funding-programs/forest-innovation-program/13137?_ga=2.266829321.649404953.1617160478-1132748700.1617160478) (FIP) and the [Investments in Forest Industry Transformation](https://www.nrcan.gc.ca/science-data/funding-partnerships/funding-opportunities/forest-sector-funding-programs/investments-forest-industry-transformation-ifit/13139?_ga=2.194928298.649404953.1617160478-1132748700.1617160478) (IFIT) program. 
                     
-The [2019 State of Canada’s Forests report](https://www.nrcan.gc.ca/our-natural-resources/forests-forestry/state-canadas-forests-report/16496?_ga=2.262577419.649404953.1617160478-1132748700.1617160478), published by Natural Resources Canada, provides an overview of the social, economic and environmental condition of forests and forestry in Canada.
-                    `,
+The [2019 State of Canada’s Forests report](https://www.nrcan.gc.ca/our-natural-resources/forests-forestry/state-canadas-forests-report/16496?_ga=2.262577419.649404953.1617160478-1132748700.1617160478), published by Natural Resources Canada, provides an overview of the social, economic and environmental condition of forests and forestry in Canada.`,
                     type: 'text'
                 },
                 {
@@ -428,7 +447,8 @@ These easy-to-use files let you dig deeper into the data in a variety of ways
     contextLink:
         'https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html',
     contextLabel: 'Explore National Pollutant Release Inventory data',
-    lang: 'en'
+    lang: 'en',
+    dateModified: '2022-02-25'
 };
 
 export default config;

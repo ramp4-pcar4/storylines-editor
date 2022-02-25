@@ -24,14 +24,9 @@ Le présent aperçu de substance analyse les quantités totales d’éthylène g
                 {
                     caption:
                         'Source: Gettyimages, Richard Goerge (2021), a [dégivrage d’un avion avant le décollage](https://www.gettyimages.ca/detail/photo/plane-deicing-royalty-free-image/547930075?adppopup=true)',
-                    type: 'slideshow',
-                    images: [
-                        {
-                            src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/assets/fr/1-Plane deiced.jpg',
-                            type: 'image',
-                            altText: 'Dégivrage d’un avion avant le décollage'
-                        }
-                    ]
+                    src: 'ea24000c-7dc3-49a9-baac-c55d28dcaeb9/assets/fr/1-Plane deiced.jpg',
+                    type: 'image',
+                    altText: 'Dégivrage d’un avion avant le décollage'
                 }
             ]
         },
@@ -362,7 +357,8 @@ Ces fichiers faciles à utiliser vous permettent de pousser votre analyse des do
     contextLink:
         'https://www.canada.ca/fr/environnement-changement-climatique/services/inventaire-national-rejets-polluants/outils-ressources-donnees/explorerdonnees.html',
     contextLabel: `Explorez les données de l'Inventaire national des rejets de polluants`,
-    lang: 'fr'
+    lang: 'fr',
+    dateModified: '2022-02-25'
 };
 
 export default config;
