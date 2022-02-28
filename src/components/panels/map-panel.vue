@@ -1,5 +1,5 @@
 <template>
-    <div class="rv-map">
+    <div class="rv-map flex flex-col h-full align-middle w-full">
         <div class="px-10 mb-0 chapter-title top-20 map-title text-center">
             {{ config.title }}
         </div>
