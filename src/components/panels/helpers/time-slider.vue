@@ -1,6 +1,6 @@
 <template>
     <div class="time-slider">
-        <button class="absolute top-1 left-4" @click="intervalID >= 0 ? endLoop() : startLoop()">
+        <button class="absolute top-1 left-4 play-button" @click="intervalID >= 0 ? endLoop() : startLoop()">
             <svg
                 v-if="intervalID === -1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
             </svg>
         </button>
-        <span class="my-2.5 text-base"
+        <span class="my-2.5 text-base range-display"
             ><span class="">{{ range[0] }}</span
             ><span class="" v-if="range[1]"> - {{ range[1] }}</span></span
         >
@@ -157,6 +157,25 @@ export default class TimeSlider extends Vue {
 
     .noUi-target {
         @apply w-4/5;
+    }
+
+    // MEDIA QUERY
+    @media screen and (max-width: 640px) {
+        .noUi-value:nth-of-type(4n) {
+            display: none;
+        }
+
+        .range-display {
+            @apply m-0;
+        }
+
+        .noUi-marker-large {
+            height: 9px !important;
+        }
+
+        .play-button {
+            @apply left-2 top-0;
+        }
     }
 
     // hide the slider rail
