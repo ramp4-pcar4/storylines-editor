@@ -18,23 +18,24 @@
             </button>
         </div>
 
-        <ul v-show="isMenuOpen" class="dropdown-nav-content bg-white my-3 w-72 z-10 border-r border-gray-200">
-            <div class="flex py-4">
-                <span class="flex-2 pl-2 ml-4 leading-normal">{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span>
-                <button @click="isMenuOpen = !isMenuOpen">
-                    <svg
-                        class="flex-shrink-0 mr-4"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="#c0c0c0"
-                        stroke="#c0c0c0"
-                    >
-                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
-                    </svg>
-                </button>
-            </div>
+        <div v-show="isMenuOpen" class="flex items-center mt-3 py-4 w-72 bg-white">
+            <span class="flex-2 pl-2 ml-4 leading-normal">{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span>
+            <button @click="isMenuOpen = !isMenuOpen">
+                <svg
+                    class="flex-shrink-0 mr-4"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#c0c0c0"
+                    stroke="#c0c0c0"
+                >
+                    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <ul v-show="isMenuOpen" class="dropdown-nav-content bg-white pb-10 w-72 z-10 border-r border-gray-200">
             <li>
                 <router-link :to="{ hash: '#intro' }" class="flex py-1 px-3" target>
                     <svg
@@ -101,6 +102,7 @@ export default class SideMenuV extends Vue {
 
 <style lang="scss" scoped>
 .dropdown-nav-content {
+    height: calc(100vh - 4rem);
     overflow-y: auto;
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */

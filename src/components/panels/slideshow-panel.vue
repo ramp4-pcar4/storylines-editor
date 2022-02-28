@@ -1,13 +1,7 @@
 <template>
     <div class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <full-screen :expandable="config.fullscreen" :type="config.type">
-            <hooper
-                ref="carousel"
-                v-if="width !== -1"
-                class="h-full bg-white"
-                style="max-height: 45vh"
-                :infiniteScroll="config.loop"
-            >
+            <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
                 <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
                     <img
                         :src="image.src"
