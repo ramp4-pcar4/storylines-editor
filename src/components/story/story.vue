@@ -1,5 +1,25 @@
 <template>
-    <div v-if="!isLoading">
+    <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
+    <div v-if="loadStatus === 'loading'">
+        <div class="block py-20 align-middle text-center h-full" style="margin: 0 auto">
+            <spinner size="120px" background="#00D2D3" color="#009cd1" stroke="10px" style="margin: 0 auto"></spinner>
+        </div>
+    </div>
+
+    <div v-else-if="loadStatus === 'error'">
+        <div class="block py-20 align-middle text-center h-full" style="margin: 0 auto">
+            <div style="font-size: 200px">!</div>
+            <div>
+                {{
+                    lang === 'en'
+                        ? 'An error occurred while loading this Storylines product. See developer console for more information.'
+                        : 'Une erreur est survenue pendant le chargement ce synopsis produit. Voir la console du promoteur pour obtenir de plus amples renseignements.'
+                }}
+            </div>
+        </div>
+    </div>
+
+    <div v-else-if="loadStatus === 'loaded'">
         <div class="storyramp-app bg-white">
             <header class="sticky top-0 z-50 w-full h-16 leading-9 bg-white border-b border-gray-200">
                 <div class="flex w-full sm:px-6 py-3 mx-auto">
@@ -41,13 +61,6 @@
             </div>
         </div>
     </div>
-
-    <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
-    <div v-else>
-        <div class="block py-20 align-middle text-center h-full" style="margin: 0 auto">
-            <spinner size="120px" background="#00D2D3" color="#009cd1" stroke="10px" style="margin: 0 auto"></spinner>
-        </div>
-    </div>
 </template>
 
 <script lang="ts">
@@ -71,7 +84,7 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 })
 export default class StoryV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    isLoading = true;
+    loadStatus: string = 'loading';
     activeChapterIndex = -1;
     lang = 'en';
 
@@ -99,7 +112,7 @@ export default class StoryV extends Vue {
         import(`@/../public/${uid}/${uid}_${lang}.ts`)
             .then((res) => {
                 this.config = res.default;
-                this.isLoading = false;
+                this.loadStatus = 'loaded';
 
                 // set page title
                 if (this.config) {
@@ -107,9 +120,18 @@ export default class StoryV extends Vue {
                 }
             })
             .catch((err) => {
-                console.error(`There exists no config given by the URL params: ${err}`);
-                // redirect to canada.ca 404 page on invalid URL params
-                window.location.href = 'https://www.canada.ca/errors/404.html';
+                if (err.code === 'MODULE_NOT_FOUND') {
+                    console.error(`There exists no config given by the URL params: ${err}`);
+                    // redirect to canada.ca 404 page on invalid URL params
+                    window.location.href = 'https://www.canada.ca/errors/404.html';
+                } else {
+                    // Some unknown error, possibly a build error that could indicate an error in the
+                    // configuration file.
+                    this.loadStatus = 'error';
+
+                    // Print out the error stack.
+                    console.error(err.stack);
+                }
             });
     }
 
