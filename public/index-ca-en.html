@@ -41,19 +41,19 @@
             var hashParams = url.hash.split('/');
 
             // If there's an empty item at the end of the paramater list (occurs if there's a trailing slash in the URL), clear it.
-            if(hashParams.at(-1).length === 0) {
+            if (hashParams.at(-1).length === 0) {
                 hashParams.pop();
             }
 
             // If content after the last slash in the URL is an anchor, clear it.
-            if(hashParams.at(-1).startsWith("#")) {
+            if (hashParams.at(-1).startsWith('#')) {
                 hashParams.pop();
             }
 
             // Finally, extract the StoryRAMP ID from the URL. If it has an anchor tag in it, remove it since it's not useful on the new page.
             var productID = hashParams.pop();
 
-            if(productID.includes("#")) {
+            if (productID.includes('#')) {
                 productID = productID.split('#')[0];
             }
 
@@ -94,6 +94,7 @@
             document.write(wet.builder.refFooter({}));
         </script>
 
+        <script src="scripts/multi-ramp/legacy-api.js"></script>
         <script src="scripts/multi-ramp/rv-main.js"></script>
 
         <style>

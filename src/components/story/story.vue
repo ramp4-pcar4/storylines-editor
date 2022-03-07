@@ -84,7 +84,7 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 })
 export default class StoryV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    loadStatus: string = 'loading';
+    loadStatus = 'loading';
     activeChapterIndex = -1;
     lang = 'en';
 
