@@ -89,10 +89,14 @@ export default class StoryV extends Vue {
     lang = 'en';
 
     created(): void {
-        const uid = this.$route.params.uid ? this.$route.params.uid : '00000000-0000-0000-0000-000000000000';
+        const uid = this.$route.params.uid;
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
         if (uid) {
             this.fetchConfig(uid, this.lang);
+        } else {
+            console.error(`Please supply the language and id URL params in the form of /[lang]/[uid].`);
+            // if no URL params have been provided redirect to canada.ca 404 page
+            window.location.href = 'https://www.canada.ca/errors/404.html';
         }
 
         // set page lang
