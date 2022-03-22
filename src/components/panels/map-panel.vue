@@ -1,6 +1,6 @@
 <template>
-    <div class="rv-map flex flex-col h-full align-middle w-full">
-        <div class="px-10 mb-0 chapter-title top-20 map-title text-center">
+    <div class="flex flex-col h-full align-middle w-full">
+        <div class="px-10 mb-0 chapter-title top-20 map-title text-center" v-if="config.title">
             {{ config.title }}
         </div>
 
@@ -35,6 +35,7 @@ export default class MapPanelV extends Vue {
 
     intersectTimeoutHandle = -1;
     scrollguardOpen = false;
+    mapComponent: Element | undefined = undefined;
 
     mounted(): void {
         const observer = new IntersectionObserver(
@@ -43,7 +44,7 @@ export default class MapPanelV extends Vue {
                     this.intersectTimeoutHandle = setTimeout(() => {
                         this.init();
                         observer.disconnect();
-                        this.$el.children[1].querySelector('.map-loading')?.remove();
+                        this.mapComponent?.querySelector('.map-loading')?.remove();
                     }, 350);
                 } else {
                     clearTimeout(this.intersectTimeoutHandle);
@@ -56,10 +57,13 @@ export default class MapPanelV extends Vue {
     }
 
     init(): void {
-        new RAMP.Map(this.$el.children[1], this.config.config);
+        // Find the correct map component based on whether there's a title component.
+        this.mapComponent = this.config.title ? this.$el.children[1] : this.$el.children[0];
+
+        new RAMP.Map(this.mapComponent, this.config.config);
 
         RAMP.mapAdded.pipe().subscribe(async (mapi: any) => {
-            if (this.config.scrollguard && mapi.id === this.$el.children[1].id) {
+            if (this.config.scrollguard && mapi.id === this.mapComponent?.id) {
                 const scrollguardPanel = mapi.panels.create('scrollguard');
                 const scrollguardComponent = new Vue({
                     render: (h) =>
@@ -81,7 +85,7 @@ export default class MapPanelV extends Vue {
                     position: 'absolute'
                 });
 
-                (this.$el.children[1] as HTMLElement).addEventListener(
+                (this.mapComponent as HTMLElement).addEventListener(
                     'wheel',
                     (event) => {
                         if (!event.ctrlKey) {
@@ -111,7 +115,7 @@ export default class MapPanelV extends Vue {
                 );
             }
 
-            if (this.config.timeSlider && mapi.id === this.$el.children[1].id) {
+            if (this.config.timeSlider && mapi.id === this.mapComponent?.id) {
                 const timeSliderPanel = mapi.panels.create('time-slider-container');
                 const timeSliderComponent = new Vue({
                     render: (h) =>
