@@ -1,6 +1,12 @@
 <template>
     <div class="dv-chart justify-center flex align-middle" dv-config="config">
-        <div class="dv-chart-container items-stretch" role="region" aria-hidden="false" :aria-label="title">
+        <div
+            class="dv-chart-container items-stretch"
+            role="region"
+            aria-hidden="false"
+            :aria-label="title"
+            v-if="!loading"
+        >
             <highcharts :options="chartOptions" ref="chart"></highcharts>
         </div>
     </div>
@@ -30,6 +36,7 @@ export default class ChartV extends Vue {
 
     chartOptions: DQVChartConfig = {} as DQVChartConfig;
     title = '';
+    loading = true;
     menuOptions = [
         'viewFullscreen',
         'printChart',
@@ -53,6 +60,7 @@ export default class ChartV extends Vue {
                 data.json().then((res: DQVChartConfig) => {
                     this.chartOptions = res;
                     this.title = this.chartOptions.title.text;
+                    this.loading = false;
                 });
             });
         } else if (extension === 'csv') {
@@ -121,6 +129,8 @@ export default class ChartV extends Vue {
                     }
                 }
             });
+
+            this.loading = false;
         });
     }
 

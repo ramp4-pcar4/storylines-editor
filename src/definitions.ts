@@ -35,10 +35,10 @@ export interface DQVChartConfig {
     title: {
         text: string;
     };
-    credits: {
+    credits?: {
         enabled: boolean;
     };
-    subtitle: {
+    subtitle?: {
         text: string;
     };
     yAxis?: {
@@ -52,8 +52,12 @@ export interface DQVChartConfig {
         };
         categories: [];
     };
+    data?: {
+        csvURL: string;
+        enablePolling: boolean;
+    };
     plotOptions?: any;
-    exporting: {
+    exporting?: {
         buttons: {
             contextButton: {
                 menuItems: string[];
@@ -61,7 +65,7 @@ export interface DQVChartConfig {
         };
         enabled: boolean;
     };
-    series: SeriesData[] | { data: SeriesData[] };
+    series?: SeriesData[] | { data: SeriesData[] };
 }
 
 export interface Intro {
