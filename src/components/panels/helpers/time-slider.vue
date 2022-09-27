@@ -28,8 +28,23 @@
             ><span class="">{{ range[0] }}</span
             ><span class="" v-if="range[1]"> - {{ range[1] }}</span></span
         >
+        <button class="absolute top-1 right-4 minimize-button" @click="minimizeToggle()">
+            <svg
+                v-if="!minimized"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="6 6 36 36"
+                height="24"
+                width="24"
+                fill="#595959"
+            >
+                <path d="m24 30.75-12-12 2.15-2.15L24 26.5l9.85-9.85L36 18.8Z" />
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="6 6 36 36" fill="#595959">
+                <path d="M14.15 30.75 12 28.6l12-12 12 11.95-2.15 2.15L24 20.85Z" />
+            </svg>
+        </button>
         <div class="time-slider-backdrop"></div>
-        <div ref="sliderTarget" class="noUi-target noUiSlider"></div>
+        <div v-show="!minimized" ref="sliderTarget" class="noUi-target noUiSlider"></div>
     </div>
 </template>
 
@@ -42,6 +57,8 @@ import { TimeSliderConfig } from '@/definitions';
 export default class TimeSlider extends Vue {
     @Prop() config!: TimeSliderConfig;
     @Prop() mapi!: any;
+
+    minimized = false;
 
     sliderElement!: HTMLElement;
     slider!: API;
@@ -143,6 +160,17 @@ export default class TimeSlider extends Vue {
         // reset so template knows we aren't looping
         this.intervalID = -1;
     }
+
+    minimizeToggle(): void {
+        this.minimized = !this.minimized;
+        (this.$el.closest('.rv-content-pane') as HTMLElement).style.minHeight = this.minimized
+            ? window.matchMedia('(max-width: 640px)').matches
+                ? '32px'
+                : '50px'
+            : window.matchMedia('(max-width: 640px)').matches
+            ? '90px'
+            : '110px';
+    }
 }
 </script>
 
@@ -175,6 +203,9 @@ export default class TimeSlider extends Vue {
 
         .play-button {
             @apply left-2 top-0;
+        }
+        .minimize-button {
+            @apply right-2 top-0;
         }
     }
 

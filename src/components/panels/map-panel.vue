@@ -138,7 +138,7 @@ export default class MapPanelV extends Vue {
                     top: 'auto',
                     width: '50%',
                     padding: '5px',
-                    'min-height': '110px'
+                    'min-height': window.matchMedia('(max-width: 640px)').matches ? '90px' : '110px'
                 });
                 timeSliderPanel.open();
             }
@@ -170,7 +170,6 @@ export default class MapPanelV extends Vue {
             left: 0px !important;
             right: 38px !important;
             bottom: 29px !important;
-            min-height: 90px !important;
             width: auto !important;
         }
     }
