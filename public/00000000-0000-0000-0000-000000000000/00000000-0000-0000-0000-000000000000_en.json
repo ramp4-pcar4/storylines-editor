@@ -480,6 +480,20 @@
                     "charts": [{ "src": "00000000-0000-0000-0000-000000000000/charts/en/hybridChartConfig.json" }]
                 }
             ]
+        },
+        {
+            "title": "Chart with external CSV remote-hosted file",
+            "panel": [
+                {
+                    "title": "Chart with external CSV remote-hosted file",
+                    "content": "Demo of a chart containing external CSV file and using fetch()",
+                    "type": "text"
+                },
+                {
+                    "type": "chart",
+                    "charts": [{ "src": "00000000-0000-0000-0000-000000000000/charts/en/csvUrlChart.json" }]
+                }
+            ]
         }
     ],
     "contextLink": "https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html",
