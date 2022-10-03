@@ -19,7 +19,7 @@
         </div>
 
         <div v-show="isMenuOpen" class="flex items-center mt-3 py-4 w-72 bg-white">
-            <span class="flex-2 pl-2 ml-4 leading-normal">{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span>
+            <span class="flex-2 pl-2 ml-4 leading-normal">{{ $t('chapters.title') }}</span>
             <button @click="isMenuOpen = !isMenuOpen">
                 <svg
                     class="flex-shrink-0 mr-4"
@@ -53,7 +53,7 @@
                         />
                     </svg>
                     <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
-                        lang === 'en' ? 'Return to top' : 'Retournez en haut'
+                        $t('chapters.return')
                     }}</span>
                 </router-link>
             </li>

@@ -1,11 +1,7 @@
 <template>
     <div class="sg" ref="scrollGuard">
         <p class="sg-label">
-            {{
-                lang === 'en'
-                    ? 'Use ctrl + scroll to zoom the map'
-                    : 'Utilisez les touches Ctrl et + pour faire un zoom de la carte'
-            }}
+            {{ $t('scrollguard.desc') }}
         </p>
     </div>
 </template>

@@ -128,7 +128,8 @@ export default class MapPanelV extends Vue {
                     components: {
                         // eslint-disable-next-line vue/no-unused-components
                         'time-slider': TimeSlider
-                    }
+                    },
+                    i18n: this.$i18n
                 }).$mount();
                 timeSliderPanel.body = timeSliderComponent.$el;
                 timeSliderPanel.element.css({

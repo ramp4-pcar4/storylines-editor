@@ -5,7 +5,7 @@
     >
         <div class="flex items-center mt-4 mb-12">
             <tippy to="menu-button-tippy" placement="right" delay="200" v-if="!isMenuOpen">{{
-                lang === 'en' ? 'Chapters' : 'Chapitres'
+                $t('chapters.title')
             }}</tippy>
             <button
                 name="menu-button-tippy"
@@ -27,16 +27,14 @@
                 </svg>
                 <span
                     class="flex-1 pl-2 ml-2 overflow-hidden leading-normal text-left overflow-ellipsis whitespace-nowrap"
-                    >{{ lang === 'en' ? 'Chapters' : 'Chapitres' }}</span
+                    >{{ $t('chapters.title') }}</span
                 >
             </button>
         </div>
 
         <ul class="nav-content menu">
             <li>
-                <tippy to="menu-options-tippy" delay="200" placement="right">{{
-                    lang === 'en' ? 'Return to top' : 'Retournez en haut'
-                }}</tippy>
+                <tippy to="menu-options-tippy" delay="200" placement="right">{{ $t('chapters.return') }}</tippy>
                 <router-link
                     name="menu-options-tippy"
                     :to="{ hash: '#intro' }"
@@ -58,7 +56,7 @@
                         />
                     </svg>
                     <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
-                        lang === 'en' ? 'Return to top' : 'Retournez en haut'
+                        $t('chapters.return')
                     }}</span>
                 </router-link>
             </li>
