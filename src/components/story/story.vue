@@ -10,11 +10,7 @@
         <div class="block py-20 align-middle text-center h-full" style="margin: 0 auto">
             <div style="font-size: 200px">!</div>
             <div>
-                {{
-                    lang === 'en'
-                        ? 'An error occurred while loading this Storylines product. See developer console for more information.'
-                        : 'Une erreur est survenue pendant le chargement ce synopsis produit. Voir la console du promoteur pour obtenir de plus amples renseignements.'
-                }}
+                {{ $t('story.error') }}
             </div>
         </div>
     </div>
@@ -56,7 +52,7 @@
             </footer>
 
             <div class="storyramp-modified" v-if="config.dateModified">
-                {{ lang === 'en' ? 'Date modified:' : 'Date de modification:' }}
+                {{ $t('story.date') }}
                 {{ config.dateModified }}
             </div>
         </div>
@@ -102,12 +98,14 @@ export default class StoryV extends Vue {
         // set page lang
         const html = document.documentElement; // returns the html tag
         html.setAttribute('lang', this.lang);
+        this.$i18n.locale = this.lang;
     }
 
     // react to param changes in URL
     beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
         const uid = to.params.uid;
         this.lang = to.params.lang;
+        this.$i18n.locale = this.lang;
         this.fetchConfig(uid, this.lang);
         next();
     }

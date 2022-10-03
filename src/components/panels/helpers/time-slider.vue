@@ -1,6 +1,11 @@
 <template>
     <div class="time-slider">
-        <button class="absolute top-1 left-4 play-button" @click="intervalID >= 0 ? endLoop() : startLoop()">
+        <button
+            class="absolute top-1 left-4 play-button"
+            @click="intervalID >= 0 ? endLoop() : startLoop()"
+            :content="$t(intervalID >= 0 ? 'timeslider.pause' : 'timeslider.play')"
+            v-tippy="{ placement: 'top', hideOnClick: false }"
+        >
             <svg
                 v-if="intervalID === -1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +33,12 @@
             ><span class="">{{ range[0] }}</span
             ><span class="" v-if="range[1]"> - {{ range[1] }}</span></span
         >
-        <button class="absolute top-1 right-4 minimize-button" @click="minimizeToggle()">
+        <button
+            class="absolute top-1 right-4 minimize-button"
+            @click="minimizeToggle()"
+            :content="$t(minimized ? 'timeslider.expand' : 'timeslider.minimize')"
+            v-tippy="{ placement: 'top', hideOnClick: false }"
+        >
             <svg
                 v-if="!minimized"
                 xmlns="http://www.w3.org/2000/svg"

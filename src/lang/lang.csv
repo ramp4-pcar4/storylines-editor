@@ -1,0 +1,10 @@
+key,enValue,enValid,frValue,frValid
+chapters.title,Chapters,1,Chapitres,1
+chapters.return,Return to top,1,Retournez en haut,1
+scrollguard.desc,Use ctrl + scroll to zoom the map,1,Utilisez les touches Ctrl et + pour faire un zoom de la carte,1
+story.date,Date modified:,1,Date de modification:,1
+story.error,An error occurred while loading this Storylines product. See developer console for more information.,1,Une erreur est survenue pendant le chargement ce synopsis produit. Voir la console du promoteur pour obtenir de plus amples renseignements.,1
+timeslider.expand,Expand,1,Développer,1
+timeslider.minimize,Minimize,1,Réduire,1
+timeslider.play,Play,1,Lire,0
+timeslider.pause,Pause,1,Pause,0
