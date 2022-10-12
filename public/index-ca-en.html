@@ -57,12 +57,18 @@
                 productID = productID.split('#')[0];
             }
 
+            // Check to see if the 'editor' route is included in the URL. If so, keep it.
+            var hasEditor = hashParams.pop() === 'editor';
+
+            // Build new URL route.
+            var newURLRoute = hasEditor ? 'editor/' + productID : productID;
+
             var defTop = document.getElementById('def-top');
             defTop.outerHTML = wet.builder.top({
                 lngLinks: [
                     {
                         lang: 'fr',
-                        href: 'index-ca-fr.html#/fr/' + productID,
+                        href: 'index-ca-fr.html#/fr/' + newURLRoute,
                         text: 'Français'
                     }
                 ],
