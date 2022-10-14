@@ -175,5 +175,6 @@ export interface ChartPanel extends BasePanel {
 
 export interface ChartConfig {
     src: string;
+    config: any;
     options?: DQVOptions;
 }

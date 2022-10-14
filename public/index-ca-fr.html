@@ -7,6 +7,9 @@
 
         <title>Scénarios de PCAR</title>
 
+        <script src="https://code.highcharts.com/highcharts.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://code.highcharts.com/modules/data.js" type="text/javascript" charset="utf-8"></script>
+
         <!-- replace `rn` in the url with a version number ("v4_0_30" for example) if desired -->
         <script
             type="text/javascript"
@@ -17,6 +20,7 @@
             src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-fr.js"
         ></script>
         <link rel="stylesheet" href="scripts/multi-ramp/rv-styles.css" />
+        <link rel="stylesheet" href="scripts/highcharts-editor/highcharts-editor.min.css">
 
         <!-- top reference links and no-script fallback -->
         <noscript> <%= require('html-loader!../src/assets/static/cdts/refTop.html') %> </noscript>
@@ -102,6 +106,7 @@
 
         <script src="scripts/multi-ramp/legacy-api.js"></script>
         <script src="scripts/multi-ramp/rv-main.js"></script>
+        <script src="scripts/highcharts-editor/highcharts-editor.complete.js"></script>
 
         <style>
             html {

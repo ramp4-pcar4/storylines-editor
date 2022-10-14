@@ -51,21 +51,27 @@ export default class ChartV extends Vue {
     ];
 
     created(): void {
-        const extension = this.config.src.split('.').pop();
-
-        // get input given by src path
-        if (extension === 'json') {
-            fetch(this.config.src).then((data) => {
-                // parse JSON data
-                data.json().then((res: DQVChartConfig) => {
-                    this.chartOptions = res;
-                    this.title = this.chartOptions.title.text;
-                    this.loading = false;
+        if (this.config.config) {
+            // configured JSON structure if exists - for highcharts demo purposes
+            this.chartOptions = this.config.config;
+            this.title = this.chartOptions.title.text;
+            this.loading = false;
+        } else {
+            // get input given by src path
+            const extension = this.config.src.split('.').pop();
+            if (extension === 'json') {
+                fetch(this.config.src).then((data) => {
+                    // parse JSON data
+                    data.json().then((res: DQVChartConfig) => {
+                        this.chartOptions = res;
+                        this.title = this.chartOptions.title.text;
+                        this.loading = false;
+                    });
                 });
-            });
-        } else if (extension === 'csv') {
-            // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
-            this.parseCSVFile();
+            } else if (extension === 'csv') {
+                // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
+                this.parseCSVFile();
+            }
         }
     }
 
