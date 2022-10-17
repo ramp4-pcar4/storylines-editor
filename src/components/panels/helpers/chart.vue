@@ -62,11 +62,16 @@ export default class ChartV extends Vue {
             if (extension === 'json') {
                 fetch(this.config.src).then((data) => {
                     // parse JSON data
-                    data.json().then((res: DQVChartConfig) => {
-                        this.chartOptions = res;
-                        this.title = this.chartOptions.title.text;
-                        this.loading = false;
-                    });
+                    data.json().then(
+                        (res: DQVChartConfig) => {
+                            this.chartOptions = res;
+                            this.title = this.chartOptions.title.text;
+                            this.loading = false;
+                        },
+                        (err) => {
+                            console.error(`Error fetching chart JSON file: ${err}`);
+                        }
+                    );
                 });
             } else if (extension === 'csv') {
                 // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
@@ -78,7 +83,7 @@ export default class ChartV extends Vue {
     mounted(): void {
         setTimeout(() => {
             (this.$refs.chart as any).chart.reflow();
-        }, 100);
+        }, 500);
 
         window.addEventListener('resize', () => {
             // adjust width for mobile resolutions
