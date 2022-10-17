@@ -27,8 +27,14 @@
         <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
         <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
 
+        <!-- MD editor demo -->
         <v-md-editor v-model="text" height="400px"></v-md-editor>
-        <button @click="generateConfig">Generate Config</button>
+        <button class="bg-gray-500 text-white font-semibold h-16 cursor-pointer" @click="generateConfig">
+            Generate Config
+        </button>
+
+        <!-- chart editor demo -->
+        <chart-editor class="pt-8"></chart-editor>
     </div>
 </template>
 
@@ -38,10 +44,12 @@ import { Route } from 'vue-router';
 
 import { StoryRampConfig } from '@/definitions';
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
+import ChartEditorV from './chart-editor.vue';
 
 @Component({
     components: {
-        spinner: Circle2
+        spinner: Circle2,
+        'chart-editor': ChartEditorV
     }
 })
 export default class EditorV extends Vue {

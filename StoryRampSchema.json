@@ -188,6 +188,10 @@
                     "type": "string",
                     "description": "The source containing the dqvchart json config."
                 },
+                "config": {
+                    "type": "object",
+                    "description": "Configured Highcharts JSON object (from editor)."
+                },
                 "fullscreen": {
                     "type": "boolean",
                     "description": "Specifies whether the panel can be expanded to full screen.",
