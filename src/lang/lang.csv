@@ -18,3 +18,5 @@ editor.contextLabel,Context Label,1,Libellé de contexte,0
 editor.dateModified,Date Modified,1,Date modifiée,0
 editor.load,Load,1,Charger,0
 editor.browse,Browse,1,Parcourir,0
+editor.frenchConfig,View French Config,1,Afficher la configuration française,0
+editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0

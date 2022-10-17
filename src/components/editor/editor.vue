@@ -1,9 +1,15 @@
 <template>
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
-        <div class="text-2xl font-bold mb-5">
-            {{ uuid ? $t('editor.editProduct') : $t('editor.createProduct') }}
+        <div class="flex">
+            <div class="flex text-2xl font-bold mb-5">
+                {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+            </div>
+            <button v-if="config" @click="swapLang">
+                {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+            </button>
         </div>
+
         <label>{{ $t('editor.uuid') }}:</label> <input type="text" v-model="uuid" />
         <button v-on:click="fetchConfig">{{ $t('editor.load') }}</button>
 
@@ -19,7 +25,10 @@
         <br />
         <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
         <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
-        <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br />
+        <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
+
+        <v-md-editor v-model="text" height="400px"></v-md-editor>
+        <button @click="generateConfig">Generate Config</button>
     </div>
 </template>
 
@@ -47,6 +56,8 @@ export default class EditorV extends Vue {
     contextLink = '';
     contextLabel = '';
     dateModified = '';
+    text =
+        '# Hello!\n\nThis is a **test**. When you press the `generate config` button, a config snippet will be printed to the console.';
 
     created(): void {
         this.uuid = this.$route.params.uid ?? undefined;
@@ -91,6 +102,42 @@ export default class EditorV extends Vue {
                     console.error(err.stack);
                 }
             });
+    }
+
+    swapLang() {
+        this.lang = this.lang === 'en' ? 'fr' : 'en';
+        this.fetchConfig();
+    }
+
+    generateConfig(): StoryRampConfig {
+        const config = {
+            title: this.title,
+            lang: this.lang,
+            introSlide: {
+                logo: {
+                    src: this.logo
+                },
+                title: this.title
+            },
+            slides: [
+                {
+                    title: 'Test Slide',
+                    panel: [
+                        {
+                            title: 'Text Slide',
+                            content: this.text,
+                            type: 'text'
+                        }
+                    ]
+                }
+            ],
+            contextLabel: this.contextLabel,
+            contextLink: this.contextLink,
+            dateModified: this.dateModified
+        };
+
+        console.log(config);
+        return config;
     }
 
     // react to param changes in URL

@@ -8,6 +8,7 @@
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
+        "@kangc/v-md-editor": "^1.7.11",
         "@tailwindcss/typography": "^0.4.0",
         "@types/highcharts": "^7.0.0",
         "core-js": "^3.6.5",
