@@ -189,21 +189,21 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         width: 60vw;
     }
 
-    label {
+    .editor-container label {
         width: 10vw;
         text-align: right;
         margin-right: 15px;
         display: inline-block;
     }
 
-    input {
+    .editor-container input {
         padding: 5px 10px;
         margin: 2px;
         border: 1px solid black;
         width: 20vw;
     }
 
-    button {
+    .editor-container button {
         padding: 5px 10px;
         margin: 2px;
         border: 1px solid black;
