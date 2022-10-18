@@ -111,17 +111,15 @@ export default class StoryV extends Vue {
     }
 
     fetchConfig(uid: string, lang: string): void {
-        fetch(`${uid}/${uid}_${lang}.json`)
+        import(`@/../public/${uid}/${uid}_${lang}.json`)
             .then((res) => {
-                res.json().then((config: any) => {
-                    this.config = config;
-                    this.loadStatus = 'loaded';
+                this.config = res.default;
+                this.loadStatus = 'loaded';
 
-                    // set page title
-                    if (this.config) {
-                        document.title = this.config.title + ' - Canada.ca';
-                    }
-                });
+                // set page title
+                if (this.config) {
+                    document.title = this.config.title + ' - Canada.ca';
+                }
             })
             .catch((err) => {
                 if (err.code === 'MODULE_NOT_FOUND') {
