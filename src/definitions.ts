@@ -93,7 +93,8 @@ export enum PanelType {
     Video = 'video',
     Audio = 'audio',
     Slideshow = 'slideshow',
-    Dynamic = 'dynamic'
+    Dynamic = 'dynamic',
+    Loading = 'loading'
 }
 
 export interface BasePanel {
