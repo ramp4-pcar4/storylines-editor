@@ -7,7 +7,13 @@
 
             <div class="px-10 md-content" v-html="md.render(config.content)"></div>
         </Scrollama>
-        <panel class="dynamic-content flex-2" :config="activeConfig" :ratio="false"></panel>
+        <panel
+            class="dynamic-content flex-2"
+            :config="activeConfig"
+            :slideIdx="slideIdx"
+            :dynamicIdx="activeIdx"
+            :ratio="false"
+        ></panel>
     </div>
 </template>
 
@@ -26,9 +32,11 @@ import { DynamicPanel, BasePanel } from '@/definitions';
 })
 export default class DynamicPanelV extends Vue {
     @Prop() config!: DynamicPanel;
+    @Prop() slideIdx!: string;
 
     // By default, the active config is set to the first child in the children list.
     activeConfig: BasePanel = this.config.children[0].panel;
+    activeIdx = '0';
 
     md = new MarkdownIt({ html: true });
 
@@ -55,7 +63,17 @@ export default class DynamicPanelV extends Vue {
                 });
 
                 // If the panel exists, switch the displayed panel.
-                if (panel) this.activeConfig = panel.panel;
+                if (panel) {
+                    // Quickly reset the config so the panel component can be reset.
+                    this.activeConfig = {
+                        type: 'loading'
+                    };
+
+                    setTimeout(() => {
+                        this.activeConfig = panel.panel;
+                        this.activeIdx = panel.id;
+                    }, 10);
+                }
             };
         });
     }
