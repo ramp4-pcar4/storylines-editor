@@ -1,7 +1,7 @@
 <template>
     <div class="dv-chart justify-center flex align-middle" dv-config="config">
         <div
-            class="dv-chart-container items-stretch"
+            class="dv-chart-container items-stretch h-full w-full"
             role="region"
             aria-hidden="false"
             :aria-label="title"
@@ -14,9 +14,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-
-import { Chart } from 'highcharts-vue';
 import { ChartConfig, DQVChartConfig, SeriesData } from '@/definitions';
+import { Chart } from 'highcharts-vue';
+
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
 import exporting from 'highcharts/modules/exporting';
@@ -50,7 +50,7 @@ export default class ChartV extends Vue {
         'downloadXLS'
     ];
 
-    created(): void {
+    mounted(): void {
         if (this.config.config) {
             // configured JSON structure if exists - for highcharts demo purposes
             this.chartOptions = this.config.config;
@@ -78,17 +78,8 @@ export default class ChartV extends Vue {
                 this.parseCSVFile();
             }
         }
-    }
 
-    mounted(): void {
-        setTimeout(() => {
-            (this.$refs.chart as any).chart.reflow();
-        }, 500);
-
-        window.addEventListener('resize', () => {
-            // adjust width for mobile resolutions
-            (this.$refs.chart as any).chart.reflow();
-        });
+        // window.addEventListener('resize', this.chartResize);
     }
 
     /**
@@ -114,8 +105,10 @@ export default class ChartV extends Vue {
                     renderTo: 'dv-chart-container',
                     type: dqvOptions?.type,
                     ...(dqvOptions?.height &&
-                        this.$el.clientHeight > dqvOptions?.height && { height: dqvOptions?.height }),
-                    ...(dqvOptions?.width && this.$el.clientWidth > dqvOptions?.width && { width: dqvOptions?.width })
+                        this.$el.clientHeight >= dqvOptions.height && {
+                            height: dqvOptions.height
+                        }),
+                    ...(dqvOptions?.width && this.$el.clientWidth >= dqvOptions.width && { width: dqvOptions.width })
                 },
                 ...(dqvOptions?.title && { title: { text: dqvOptions?.title } }),
                 ...(dqvOptions?.subtitle && { subtitle: { text: dqvOptions?.subtitle } }),
@@ -217,6 +210,14 @@ export default class ChartV extends Vue {
             }
         };
     }
+
+    // /**
+    //  * Handle chart resizing to be responsive to screen size.
+    //  */
+    // chartResize(): void {
+    //     console.log('REFLOW');
+    //     this.$refs.chart.chart.reflow();
+    // }
 }
 </script>
 
@@ -231,8 +232,8 @@ export default class ChartV extends Vue {
     }
 
     .dv-chart-container {
-        width: 100% !important;
-        height: 100% !important;
+        max-width: 100vw;
+        max-height: 50vh;
     }
 }
 </style>

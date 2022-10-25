@@ -403,7 +403,7 @@
             ]
         },
         {
-            "title": "DQV Chart",
+            "title": "DQV Chart Gallery",
             "panel": [
                 {
                     "title": "DQV Chart",
@@ -412,7 +412,23 @@
                 },
                 {
                     "type": "chart",
-                    "charts": [{ "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json" }]
+                    "charts": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json"
+                        },
+                        {
+                            "src": "ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene.glycol.release.trends.by.sector.2010-2019.tonnes.csv"
+                        },
+                        {
+                            "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/2.Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings.csv",
+                            "options": {
+                                "title": "Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)",
+                                "subtitle": "",
+                                "type": "pie",
+                                "colours": ["green", "#FAEBD7", "indigo", "#FFD700", "orange", "red"]
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -421,7 +437,7 @@
             "panel": [
                 {
                     "title": "DQV Chart with CSV input",
-                    "content": "Test",
+                    "content": "Test (╯°□°)╯︵ ┻━┻",
                     "type": "text"
                 },
                 {
@@ -438,32 +454,6 @@
                             }
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "title": "Pie chart with custom colours and size",
-            "panel": [
-                {
-                    "title": "Pie chart with custom colours",
-                    "content": "(╯°□°)╯︵ ┻━┻",
-                    "type": "text"
-                },
-                {
-                    "charts": [
-                        {
-                            "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/2.Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings.csv",
-                            "options": {
-                                "title": "Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)",
-                                "subtitle": "",
-                                "type": "pie",
-                                "colours": ["green", "#FAEBD7", "indigo", "#FFD700", "orange", "red"],
-                                "width": 800,
-                                "height": 500
-                            }
-                        }
-                    ],
-                    "type": "chart"
                 }
             ]
         },
