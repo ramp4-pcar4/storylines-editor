@@ -13,7 +13,17 @@
             :slideIdx="slideIdx"
             :dynamicIdx="activeIdx"
             :ratio="false"
-        ></panel>
+        >
+            <div class="return-button-container" :class="activeConfig.type === 'image' ? 'mt-6' : ''">
+                <button v-if="activeIdx !== defaultPanel.id" class="return-button" @click="clickBack">
+                    <img
+                        style="display: inline"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAB4UlEQVRIie3WP08WQRAG8J+2SolRQaLyKvR+BTsVaQnfwD9YCH4PS6I2ViAS1GhMKLWESkzUmBAT7azECoS8Fjcvqxe52zuMseBJNpebe2ae2dmdveUA/wiHGnCHcBWXcBqDYf+CT3iOp/j8t5IbwCy20a0ZO3gUie0L4/geQTcxhwmM4EiMkbDNB6eLDYy1Fb2lmEEXj3E2w2cYi9Lsp5qKjofjNm43dcZ0+O9oMPNBqbxtRHuYkcp+MsfhgVTe/WIpYt2rIw4pyrtp7zU9hlW8zhDuRKxtqf3+iJuR4VyF6FpwVjKEKdqri+tVpJdBmqgRXYv3HEyGz4sq0scgnSvZ+/Emvr3D8UxRij7v4n0VaSNIfSX7qvpTqzfKa98n7e5dHG6QeS66bZw+hOP5kr1c6hMNYo7+4reL8ozX43mhZP+Ki3gbgZblb65erPUq0o3Ibn6P723aaSH416pIp6QDZLhCfAWvMkQ72MIPNQcI3I8MFzMC1+FJxJrNIQ9IbTW9D9E7EeObBptxTPqtzbQU7flfaeo8JV0ElhTrVYeOVN4dxdnfCmNS2bcUB/6koqWOxhgN20JweuW93Fa0h37cVezMnMveQxlr2uR6Oyhdb8/4/Xq7rvj7PIv3A/w/+Am/TqGFCMnpPgAAAABJRU5ErkJggg=="
+                    />
+                    {{ $t('dynamic.back') }}
+                </button>
+            </div>
+        </panel>
     </div>
 </template>
 
@@ -34,9 +44,12 @@ export default class DynamicPanelV extends Vue {
     @Prop() config!: DynamicPanel;
     @Prop() slideIdx!: string;
 
+    // Get the ID of the first (and default) panel.
+    defaultPanel = this.config.children[0];
+
     // By default, the active config is set to the first child in the children list.
-    activeConfig: BasePanel = this.config.children[0].panel;
-    activeIdx = '0';
+    activeConfig: BasePanel = this.defaultPanel.panel;
+    activeIdx = this.defaultPanel.id;
 
     md = new MarkdownIt({ html: true });
 
@@ -77,6 +90,14 @@ export default class DynamicPanelV extends Vue {
             };
         });
     }
+
+    /**
+     * When clicking the back button, change the panel back to the default (first) panel.
+     */
+    clickBack() {
+        this.activeConfig = this.defaultPanel.panel;
+        this.activeIdx = this.defaultPanel.id;
+    }
 }
 </script>
 
@@ -85,5 +106,20 @@ export default class DynamicPanelV extends Vue {
     .dynamic-content {
         max-height: 40vh;
     }
+}
+
+.return-button-container {
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    z-index: 100;
+    pointer-events: none;
+}
+.return-button {
+    padding: 10px;
+    font-size: 24px;
+    pointer-events: auto;
+    background: #fff;
+    box-shadow: 0px 5px 10px #000;
 }
 </style>

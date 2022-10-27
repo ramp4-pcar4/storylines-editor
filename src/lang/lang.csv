@@ -20,3 +20,4 @@ editor.load,Load,1,Charger,0
 editor.browse,Browse,1,Parcourir,0
 editor.frenchConfig,View French Config,1,Afficher la configuration française,0
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0
+dynamic.back,Back,1,Retour,0
