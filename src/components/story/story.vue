@@ -172,6 +172,10 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         padding-top: 1em;
         padding-bottom: 1em;
     }
+
+    .prose a {
+        font-weight: bold;
+    }
 }
 
 @media screen and (min-width: 640px) {
