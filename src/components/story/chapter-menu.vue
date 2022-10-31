@@ -10,6 +10,7 @@
             <button
                 name="menu-button-tippy"
                 class="flex items-center flex-shrink-0 px-2 py-1 mx-1 overflow-hidden"
+                :aria-label="$t('chapters.menu')"
                 @click="isMenuOpen = !isMenuOpen"
             >
                 <svg

@@ -7,7 +7,8 @@
                         :src="image.src"
                         :height="image.height"
                         :width="image.width"
-                        :alt="image.altText"
+                        :alt="image.altText || ''"
+                        :style="{ width: `${image.width}px`, height: `${image.height}px` }"
                         class="m-auto story-graphic carousel-image"
                     />
                 </slide>
