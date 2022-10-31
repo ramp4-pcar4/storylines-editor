@@ -4,8 +4,9 @@
             <img
                 :src="config.src"
                 :class="config.class"
-                :alt="config.altText"
-                class="graphic-image px-10 mx-auto my-6 block flex object-contain sm:max-w-screen sm:max-h-screen"
+                :alt="config.altText || ''"
+                :style="{ width: `${config.width}px`, height: `${config.height}px` }"
+                class="graphic-image px-10 mx-auto my-6 flex object-contain sm:max-w-screen sm:max-h-screen"
             />
         </full-screen>
 

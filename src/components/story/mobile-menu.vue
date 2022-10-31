@@ -1,7 +1,7 @@
 <template>
     <div class="sticky w-12 duration-500 ease-in-out transition-width">
         <div class="flex px-3 py-2">
-            <button @click="isMenuOpen = !isMenuOpen">
+            <button @click="isMenuOpen = !isMenuOpen" :aria-label="$t('chapters.menu')">
                 <svg
                     class="flex-shrink-0"
                     width="24"
@@ -20,7 +20,7 @@
 
         <div v-show="isMenuOpen" class="flex items-center mt-3 py-4 w-72 bg-white">
             <span class="flex-2 pl-2 ml-4 leading-normal">{{ $t('chapters.title') }}</span>
-            <button @click="isMenuOpen = !isMenuOpen">
+            <button @click="isMenuOpen = !isMenuOpen" :aria-label="$t('chapters.menu')">
                 <svg
                     class="flex-shrink-0 mr-4"
                     width="24"

@@ -5,6 +5,7 @@
                 v-if="expandable !== undefined ? expandable : true"
                 class="expand-button absolute items-center justify-center p-3 z-10"
                 :class="[fullscreen ? `top-0` : `bottom-0`, type === 'image' ? `right-10` : `right-2`]"
+                :aria-label="$t('image.fullscreen')"
                 @click="toggleFullscreen"
             >
                 <svg
