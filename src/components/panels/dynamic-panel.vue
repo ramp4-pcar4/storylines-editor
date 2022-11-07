@@ -1,7 +1,20 @@
 <template>
     <div :id="this.$vnode.key" class="story-slide w-full h-full flex sm:flex-row flex-col">
         <Scrollama class="flex-1 order-2 sm:order-1 prose max-w-none my-5">
-            <h2 class="px-10 mb-0 chapter-title top-20">
+            <div v-if="activeIdx !== defaultPanel.id" class="return-button-container top-16">
+                <button class="return-button" @click="clickBack">
+                    <img
+                        style="display: inline; margin: 0px"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAB4UlEQVRIie3WP08WQRAG8J+2SolRQaLyKvR+BTsVaQnfwD9YCH4PS6I2ViAS1GhMKLWESkzUmBAT7azECoS8Fjcvqxe52zuMseBJNpebe2ae2dmdveUA/wiHGnCHcBWXcBqDYf+CT3iOp/j8t5IbwCy20a0ZO3gUie0L4/geQTcxhwmM4EiMkbDNB6eLDYy1Fb2lmEEXj3E2w2cYi9Lsp5qKjofjNm43dcZ0+O9oMPNBqbxtRHuYkcp+MsfhgVTe/WIpYt2rIw4pyrtp7zU9hlW8zhDuRKxtqf3+iJuR4VyF6FpwVjKEKdqri+tVpJdBmqgRXYv3HEyGz4sq0scgnSvZ+/Emvr3D8UxRij7v4n0VaSNIfSX7qvpTqzfKa98n7e5dHG6QeS66bZw+hOP5kr1c6hMNYo7+4reL8ozX43mhZP+Ki3gbgZblb65erPUq0o3Ibn6P723aaSH416pIp6QDZLhCfAWvMkQ72MIPNQcI3I8MFzMC1+FJxJrNIQ9IbTW9D9E7EeObBptxTPqtzbQU7flfaeo8JV0ElhTrVYeOVN4dxdnfCmNS2bcUB/6koqWOxhgN20JweuW93Fa0h37cVezMnMveQxlr2uR6Oyhdb8/4/Xq7rvj7PIv3A/w/+Am/TqGFCMnpPgAAAABJRU5ErkJggg=="
+                    />
+                    {{ $t('dynamic.back') }}
+                </button>
+            </div>
+
+            <h2
+                class="px-10 mb-0 chapter-title top-20"
+                :style="activeIdx !== defaultPanel.id ? 'margin-top: 0px;' : ''"
+            >
                 {{ config.title }}
             </h2>
 
@@ -14,15 +27,6 @@
             :dynamicIdx="activeIdx"
             :ratio="false"
         >
-            <div class="return-button-container" :class="activeConfig.type === 'image' ? 'mt-6' : ''">
-                <button v-if="activeIdx !== defaultPanel.id" class="return-button" @click="clickBack">
-                    <img
-                        style="display: inline"
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAB4UlEQVRIie3WP08WQRAG8J+2SolRQaLyKvR+BTsVaQnfwD9YCH4PS6I2ViAS1GhMKLWESkzUmBAT7azECoS8Fjcvqxe52zuMseBJNpebe2ae2dmdveUA/wiHGnCHcBWXcBqDYf+CT3iOp/j8t5IbwCy20a0ZO3gUie0L4/geQTcxhwmM4EiMkbDNB6eLDYy1Fb2lmEEXj3E2w2cYi9Lsp5qKjofjNm43dcZ0+O9oMPNBqbxtRHuYkcp+MsfhgVTe/WIpYt2rIw4pyrtp7zU9hlW8zhDuRKxtqf3+iJuR4VyF6FpwVjKEKdqri+tVpJdBmqgRXYv3HEyGz4sq0scgnSvZ+/Emvr3D8UxRij7v4n0VaSNIfSX7qvpTqzfKa98n7e5dHG6QeS66bZw+hOP5kr1c6hMNYo7+4reL8ozX43mhZP+Ki3gbgZblb65erPUq0o3Ibn6P723aaSH416pIp6QDZLhCfAWvMkQ72MIPNQcI3I8MFzMC1+FJxJrNIQ9IbTW9D9E7EeObBptxTPqtzbQU7flfaeo8JV0ElhTrVYeOVN4dxdnfCmNS2bcUB/6koqWOxhgN20JweuW93Fa0h37cVezMnMveQxlr2uR6Oyhdb8/4/Xq7rvj7PIv3A/w/+Am/TqGFCMnpPgAAAABJRU5ErkJggg=="
-                    />
-                    {{ $t('dynamic.back') }}
-                </button>
-            </div>
         </panel>
     </div>
 </template>
@@ -102,24 +106,31 @@ export default class DynamicPanelV extends Vue {
 </script>
 
 <style scoped lang="scss">
-@media screen and (max-width: 640px) {
-    .dynamic-content {
-        max-height: 40vh;
-    }
-}
-
 .return-button-container {
-    width: 100%;
-    position: absolute;
-    text-align: center;
+    position: sticky;
+    text-align: right;
     z-index: 100;
     pointer-events: none;
 }
 .return-button {
-    padding: 10px;
-    font-size: 24px;
+    padding: 5px;
+    font-size: 20px;
     pointer-events: auto;
     background: #fff;
-    box-shadow: 0px 5px 10px #000;
+    box-shadow: 0px 2px 5px #000;
+}
+.return-button img {
+    margin: 0px;
+}
+
+@media screen and (max-width: 640px) {
+    .dynamic-content {
+        max-height: 40vh;
+    }
+    .return-button-container {
+        position: static;
+        text-align: center;
+        margin-bottom: 10px;
+    }
 }
 </style>
