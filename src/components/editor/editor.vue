@@ -35,6 +35,8 @@
 
         <!-- chart editor demo -->
         <chart-editor class="pt-8"></chart-editor>
+
+        <iframe src="scripts/ramp-editor/samples/fgpv-author.html" style="width: 70vw; height: 100vh"></iframe>
     </div>
 </template>
 
