@@ -34,7 +34,7 @@ export default new Router({
     scrollBehavior: function (to: Route) {
         if (to.hash) {
             return {
-                selector: to.hash,
+                selector: decodeURIComponent(to.hash),
                 behavior: 'smooth'
             };
         }
