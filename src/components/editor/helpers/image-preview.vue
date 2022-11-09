@@ -1,23 +1,23 @@
 <template>
-    <li class="relative w-1/5 m-4 overflow-hidden">
-        <button class="cursor-pointer" @click="() => $emit('delete', imageFile)">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+    <li class="image-item items-center my-8 mx-5 overflow-hidden">
+        <div class="relative items-center justify-center text-center w-full">
+            <button
+                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
+                @click="() => $emit('delete', imageFile)"
             >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
-        </button>
-        <img class="block object-cover w-full h-full" :src="imageFile.src" />
+                <svg height="20px" width="20px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                    />
+                </svg>
+            </button>
+            <img
+                class="image-file object-cover w-full h-full"
+                :title="imageFile.id"
+                :src="imageFile.src"
+                :alt="imageFile.altText"
+            />
+        </div>
         <slot></slot>
     </li>
 </template>
@@ -32,4 +32,12 @@ export default class ImagePreviewV extends Vue {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.image-item {
+    width: 30%;
+
+    .image-file {
+        aspect-ratio: 1/1;
+    }
+}
+</style>
