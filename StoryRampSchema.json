@@ -58,6 +58,11 @@
                     "type": "string",
                     "description": "The title for the text panel."
                 },
+                "titleTag": {
+                    "type": "string",
+                    "description": "An optional tag to use for the panel title. If not supplied h2 is used.",
+                    "default": "h2"
+                },
                 "content": {
                     "type": "string",
                     "description": "The main text body."
