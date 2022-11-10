@@ -182,4 +182,8 @@ export default class MapPanelV extends Vue {
         background: #fff;
     }
 }
+
+::v-deep rv-basemap-item .rv-basemap-thumb img {
+    max-width: none;
+}
 </style>
