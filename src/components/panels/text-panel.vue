@@ -1,8 +1,8 @@
 <template>
     <Scrollama class="flex-1 prose max-w-none my-5">
-        <h2 class="px-10 mb-0 chapter-title top-20">
+        <component :is="config.titleTag || 'h2'" class="px-10 mb-0 chapter-title top-20">
             {{ config.title }}
-        </h2>
+        </component>
 
         <div class="px-10 md-content object-contain" v-html="md.render(config.content)"></div>
     </Scrollama>
