@@ -11,12 +11,12 @@
                 </button>
             </div>
 
-            <h2
+            <component :is="config.titleTag || 'h2'"
                 class="px-10 mb-0 chapter-title top-20"
                 :style="activeIdx !== defaultPanel.id ? 'margin-top: 0px;' : ''"
             >
                 {{ config.title }}
-            </h2>
+            </component>
 
             <div class="px-10 md-content" v-html="md.render(config.content)"></div>
         </Scrollama>
