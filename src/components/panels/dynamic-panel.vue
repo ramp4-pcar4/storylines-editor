@@ -11,7 +11,8 @@
                 </button>
             </div>
 
-            <component :is="config.titleTag || 'h2'"
+            <component
+                :is="config.titleTag || 'h2'"
                 class="px-10 mb-0 chapter-title top-20"
                 :style="activeIdx !== defaultPanel.id ? 'margin-top: 0px;' : ''"
             >
