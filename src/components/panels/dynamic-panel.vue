@@ -11,7 +11,8 @@
                 </button>
             </div>
 
-            <component :is="config.titleTag || 'h2'"
+            <component
+                :is="config.titleTag || 'h2'"
                 class="px-10 mb-0 chapter-title top-20"
                 :style="activeIdx !== defaultPanel.id ? 'margin-top: 0px;' : ''"
             >
@@ -72,6 +73,12 @@ export default class DynamicPanelV extends Vue {
         urls.forEach((el: any) => {
             // Find the target panel and add an event listener to the URL.
             const target = el.attributes['panel'].value;
+
+            // Change the target to self so clicking the link doesn't open in a new window. Also add a
+            // dotted underline to indicate that clicking this link will stay in this window.
+            el.style = 'text-decoration-style: dotted; text-underline-offset: 3px;';
+            el.href = 'javascript:;';
+            el.target = '_self';
 
             el.onclick = () => {
                 // Find the panel.
