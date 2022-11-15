@@ -88,6 +88,7 @@
                     }}</span>
                 </router-link>
             </li>
+            <div class="h-10 flex-shrink-0"></div>
         </ul>
     </div>
 </template>
