@@ -186,4 +186,7 @@ export default class MapPanelV extends Vue {
 ::v-deep rv-basemap-item .rv-basemap-thumb img {
     max-width: none;
 }
+::v-deep .rv-details-attrib-value a {
+    white-space: unset !important;
+}
 </style>
