@@ -3,8 +3,8 @@
         <button class="bg-gray-500 text-white font-semibold h-16 cursor-pointer" id="modal-btn">
             Create New Chart
         </button>
-        <div id="chart-result" class="border-2 border-black m-5" style="height: 500px" v-if="!loading">
-            <chart :config="chartConfig" :key="chartIdx"></chart>
+        <div id="chart-result" class="border-2 border-black m-5" style="height: 500px">
+            <chart-panel :config="chartConfig" :key="chartIdx" v-if="!loading"></chart-panel>
         </div>
     </div>
 </template>
@@ -15,7 +15,7 @@ import ChartPanelV from '@/components/panels/chart-panel.vue';
 
 @Component({
     components: {
-        chart: ChartPanelV
+        'chart-panel': ChartPanelV
     }
 })
 export default class ChartEditorV extends Vue {
@@ -34,6 +34,7 @@ export default class ChartEditorV extends Vue {
                         options: 'plugins csv json samples'
                     }
                 },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (chart: any) => {
                     this.createNewChart(chart.toString());
                 }

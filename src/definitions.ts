@@ -179,3 +179,11 @@ export interface ChartConfig {
     config: any;
     options?: DQVOptions;
 }
+
+export interface ImageFile {
+    id: string;
+    src: string;
+    altText: string;
+    width?: number;
+    height?: number;
+}

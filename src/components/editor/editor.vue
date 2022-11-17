@@ -27,31 +27,41 @@
         <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
         <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
 
-        <!-- MD editor demo -->
+        <!-- MD (text panel) editor demo -->
+        <h3 class="text-xl font-bold my-4">Text Panel Editor Demo</h3>
         <v-md-editor v-model="text" height="400px"></v-md-editor>
         <button class="bg-gray-500 text-white font-semibold h-16 cursor-pointer" @click="generateConfig">
             Generate Config
         </button>
 
-        <!-- chart editor demo -->
-        <chart-editor class="pt-8"></chart-editor>
-
+        <!-- map panel editor demo -->
+        <h3 class="text-xl font-bold mt-8 mb-4">RAMP Panel Editor Demo</h3>
         <iframe src="scripts/ramp-editor/samples/fgpv-author.html" style="width: 70vw; height: 100vh"></iframe>
+
+        <!-- chart panel editor demo -->
+        <h3 class="text-xl font-bold mt-8 mb-4">Chart Panel Editor Demo</h3>
+        <chart-editor></chart-editor>
+
+        <!-- image panel editor demo -->
+        <h3 class="text-xl font-bold mt-8 mb-4">Image Panel Editor Demo</h3>
+        <image-editor></image-editor>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Route } from 'vue-router';
-
 import { StoryRampConfig } from '@/definitions';
+
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
+import ImageEditorV from './image-editor.vue';
 
 @Component({
     components: {
         spinner: Circle2,
-        'chart-editor': ChartEditorV
+        'chart-editor': ChartEditorV,
+        'image-editor': ImageEditorV
     }
 })
 export default class EditorV extends Vue {
@@ -114,7 +124,7 @@ export default class EditorV extends Vue {
             });
     }
 
-    swapLang() {
+    swapLang(): void {
         this.lang = this.lang === 'en' ? 'fr' : 'en';
         this.fetchConfig();
     }

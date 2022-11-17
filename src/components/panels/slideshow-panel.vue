@@ -5,8 +5,6 @@
                 <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
                     <img
                         :src="image.src"
-                        :height="image.height"
-                        :width="image.width"
                         :alt="image.altText || ''"
                         :style="{ width: `${image.width}px`, height: `${image.height}px` }"
                         class="m-auto story-graphic carousel-image"
