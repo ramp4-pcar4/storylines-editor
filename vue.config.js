@@ -25,6 +25,11 @@ module.exports = {
             .rule('lint')
             .test(/lang\.csv$/)
             .use('eslint')
-            .loader('dsv-loader');
+            .loader('dsv-loader')
+            .end()
+            .rule('html')
+            .test(/(.)*.(html)$/)
+            .use('html-loader')
+            .loader('html-loader');
     }
 };
