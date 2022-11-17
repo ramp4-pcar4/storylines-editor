@@ -74,7 +74,8 @@ export default class MapPanelV extends Vue {
                         }),
                     components: {
                         scrollguard: Scrollguard
-                    }
+                    },
+                    i18n: this.$i18n
                 }).$mount();
                 scrollguardPanel.body = scrollguardComponent.$el;
                 scrollguardPanel.element.css({
