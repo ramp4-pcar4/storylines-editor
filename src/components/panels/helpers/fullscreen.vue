@@ -1,5 +1,5 @@
 <template>
-    <fullscreen v-model="fullscreen">
+    <fullscreen v-model="fullscreen" :pageOnly="true" :teleport="true" fullscreenClass="fullscreenElement">
         <div class="relative bg-white">
             <button
                 v-if="expandable !== undefined ? expandable : true"
@@ -54,3 +54,10 @@ export default class FullscreenV extends Vue {
     }
 }
 </script>
+
+<style>
+.fullscreenElement {
+    z-index: 100;
+    background: #000;
+}
+</style>
