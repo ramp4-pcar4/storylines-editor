@@ -1,7 +1,7 @@
 <template>
     <div :id="this.$vnode.key" class="story-slide w-full h-full flex sm:flex-row flex-col">
         <Scrollama class="flex-1 order-2 sm:order-1 prose max-w-none my-5">
-            <div v-if="activeIdx !== defaultPanel.id" class="return-button-container top-16">
+            <div class="return-button-container top-16" v-show="activeIdx !== defaultPanel.id">
                 <button class="return-button" @click="clickBack">
                     <img
                         style="display: inline; margin: 0px"
@@ -67,7 +67,7 @@ export default class DynamicPanelV extends Vue {
     /**
      * Adds panel-switching functionality to URLs.
      */
-    addDynamicURLs() {
+    addDynamicURLs(): void {
         // Find all URLs that contain the `panel` attribute.
         const urls = Array.from(this.$el.querySelectorAll('a[panel]'));
         urls.forEach((el: any) => {
@@ -105,7 +105,7 @@ export default class DynamicPanelV extends Vue {
     /**
      * When clicking the back button, change the panel back to the default (first) panel.
      */
-    clickBack() {
+    clickBack(): void {
         this.activeConfig = this.defaultPanel.panel;
         this.activeIdx = this.defaultPanel.id;
     }
