@@ -31,7 +31,6 @@ import { Hooper, Slide, Navigation as HooperNavigation, Pagination as HooperPagi
 import 'hooper/dist/hooper.css';
 
 import { ChartPanel } from '@/definitions';
-
 import ChartV from '@/components/panels/helpers/chart.vue';
 
 @Component({
