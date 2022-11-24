@@ -22,5 +22,14 @@ editor.load,Load,1,Charger,0
 editor.browse,Browse,1,Parcourir,0
 editor.frenchConfig,View French Config,1,Afficher la configuration française,0
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0
-editor.deleteImage,Delete Image,1,Supprimer l'image,0
+editor.image.delete,Delete Image,1,Supprimer l'image,0
+editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,0
+editor.image.label.or,or,1,ou,1
+editor.image.label.browse,browse,1,feuilleter,0
+editor.image.label.upload,to upload,1,télécharger,0
+editor.chart.label.name,Name,1,Nom,1
+editor.chart.label.edit,Edit,1,Éditer,1
+editor.chart.label.empty,Empty,1,Vide,1
+editor.chart.label.create,Add new chart,1,Add new chart,0
+editor.chart.label.info,Interactive charts ({num}),1,Interactive charts ({num}),0
 dynamic.back,Back,1,Retour,0

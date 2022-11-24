@@ -144,6 +144,10 @@ export default class MapPanelV extends Vue {
                 });
                 timeSliderPanel.open();
             }
+
+            // remove rv-focus-trap from map
+            const mapInstance = document.getElementById(`ramp-map-${this.slideIdx}`);
+            mapInstance?.removeAttribute('rv-trap-focus');
         });
     }
 }
