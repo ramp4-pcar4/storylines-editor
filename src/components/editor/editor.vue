@@ -1,50 +1,49 @@
 <template>
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
-        <div class="flex">
-            <div class="flex text-2xl font-bold mb-5">
-                {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+        <template v-if="(loadStatus === 'waiting') | 'error'">
+            <div class="flex">
+                <div class="flex text-2xl font-bold mb-5">
+                    {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                </div>
+                <button v-if="config" @click="swapLang">
+                    {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                </button>
             </div>
-            <button v-if="config" @click="swapLang">
-                {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
-            </button>
-        </div>
 
-        <label>{{ $t('editor.uuid') }}:</label> <input type="text" v-model="uuid" />
-        <button v-on:click="fetchConfig">{{ $t('editor.load') }}</button>
+            <label>{{ $t('editor.uuid') }}:</label> <input type="text" v-model="uuid" />
+            <button v-on:click="fetchConfig">{{ $t('editor.load') }}</button>
+            <br />
+
+            <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
+            <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
+            <button v-on:click="fetchConfig">{{ $t('editor.browse') }}</button>
+            <br />
+            <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
+            <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
+            <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
+
+            <button v-on:click="newConfig">TESTING CONFIG</button>
+        </template>
 
         <!-- If config is loading, display a small spinner. -->
         <div v-if="loadStatus === 'loading'" class="inline m-3">
             <spinner size="20px" background="#00D2D3" color="#009cd1" stroke="2px" class="inline-block"></spinner>
         </div>
-        <br />
 
-        <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
-        <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
-        <button v-on:click="fetchConfig">{{ $t('editor.browse') }}</button>
-        <br />
-        <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
-        <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
-        <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
-
-        <!-- MD (text panel) editor demo -->
-        <h3 class="text-xl font-bold my-4">Text Panel Editor Demo</h3>
-        <v-md-editor v-model="text" height="400px"></v-md-editor>
-        <button class="bg-gray-500 text-white font-semibold h-16 cursor-pointer" @click="generateConfig">
-            Generate Config
-        </button>
-
-        <!-- map panel editor demo -->
-        <h3 class="text-xl font-bold mt-8 mb-4">RAMP Panel Editor Demo</h3>
-        <iframe src="scripts/ramp-editor/samples/fgpv-author.html" style="width: 70vw; height: 100vh"></iframe>
-
-        <!-- chart panel editor demo -->
-        <h3 class="text-xl font-bold mt-8 mb-4">Chart Panel Editor Demo</h3>
-        <chart-editor></chart-editor>
-
-        <!-- image panel editor demo -->
-        <h3 class="text-xl font-bold mt-8 mb-4">Image Panel Editor Demo</h3>
-        <image-editor></image-editor>
+        <template v-if="loadStatus === 'loaded'">
+            <div class="flex">
+                <span>{{ config.title }}</span
+                ><span class="ml-auto"></span><button>Preview</button><button>Save Changes</button>
+            </div>
+            <div class="flex">
+                <div class="w-60 flex-shrink-0">
+                    <button>Edit Project Metadata</button>
+                    <slide-toc :slides="slides" @slide-change="selectSlide"></slide-toc>
+                </div>
+                <slide-editor :currentSlide="currentSlide"></slide-editor>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -54,14 +53,14 @@ import { Route } from 'vue-router';
 import { StoryRampConfig } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
-import ChartEditorV from './chart-editor.vue';
-import ImageEditorV from './image-editor.vue';
+import SlideEditorV from './slide-editor.vue';
+import SlideTocV from './slide-toc.vue';
 
 @Component({
     components: {
         spinner: Circle2,
-        'chart-editor': ChartEditorV,
-        'image-editor': ImageEditorV
+        'slide-editor': SlideEditorV,
+        'slide-toc': SlideTocV
     }
 })
 export default class EditorV extends Vue {
@@ -76,6 +75,9 @@ export default class EditorV extends Vue {
     contextLink = '';
     contextLabel = '';
     dateModified = '';
+    slides: any[] = [];
+    currentSlide = '';
+    slideIndex: number | undefined = undefined;
     text =
         '# Hello!\n\nThis is a **test**. When you press the `generate config` button, a config snippet will be printed to the console.';
 
@@ -90,6 +92,41 @@ export default class EditorV extends Vue {
         }
     }
 
+    selectSlide(index: number): void {
+        this.currentSlide = this.slides[index];
+        this.slideIndex = index;
+    }
+
+    newConfig(): void {
+        this.config = this.configHelper();
+
+        this.title = this.config.title;
+        this.slides = this.config.slides;
+        this.logo = this.config.introSlide.logo.src;
+        this.contextLink = this.config.contextLink;
+        this.contextLabel = this.config.contextLabel;
+        this.dateModified = this.config.dateModified;
+
+        this.loadStatus = 'loaded';
+    }
+
+    configHelper(): StoryRampConfig {
+        return {
+            title: 'Test Config',
+            lang: 'en',
+            introSlide: {
+                logo: {
+                    src: ''
+                },
+                title: 'Test Config Intro Slide'
+            },
+            slides: [],
+            contextLabel: this.contextLabel,
+            contextLink: this.contextLink,
+            dateModified: this.dateModified
+        };
+    }
+
     fetchConfig(): void {
         this.loadStatus = 'loading';
 
@@ -102,6 +139,7 @@ export default class EditorV extends Vue {
                     // Load in form values from the config file.
                     if (this.config) {
                         this.title = this.config.title;
+                        this.slides = this.config.slides;
                         this.logo = this.config.introSlide.logo.src;
                         this.contextLink = this.config.contextLink;
                         this.contextLabel = this.config.contextLabel;
@@ -198,7 +236,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     .editor-container {
         margin: 0 auto;
-        width: 60vw;
     }
 
     .editor-container label {

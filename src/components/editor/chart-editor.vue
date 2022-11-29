@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
 
 @Component({
@@ -19,6 +19,7 @@ import ChartPanelV from '@/components/panels/chart-panel.vue';
     }
 })
 export default class ChartEditorV extends Vue {
+    @Prop() panel!: any;
     chartConfig = {};
     chartIdx = 0;
     loading = true;
@@ -48,6 +49,7 @@ export default class ChartEditorV extends Vue {
             charts: [{ config: JSON.parse(chartInfo) }]
         };
         console.log('CHART CONFIG: ', chartConfig);
+        this.panel = chartConfig;
         this.chartConfig = chartConfig;
         this.loading = false;
         this.chartIdx += 1;

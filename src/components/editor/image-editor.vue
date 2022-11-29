@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { ImageFile } from '@/definitions';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
@@ -40,6 +40,7 @@ import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
     }
 })
 export default class ImageEditorV extends Vue {
+    @Prop() panel!: any;
     imageURLs = [] as Array<string>;
     imageFiles = [] as Array<ImageFile>;
     dragging = false;
