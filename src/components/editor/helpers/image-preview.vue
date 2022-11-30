@@ -1,9 +1,11 @@
 <template>
-    <li class="image-item items-center my-8 mx-5 overflow-hidden">
+    <li class="image-item items-center my-8 mx-4 overflow-hidden">
         <div class="relative items-center justify-center text-center w-full">
             <button
                 class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
                 @click="() => $emit('delete', imageFile)"
+                :content="$t('editor.image.delete')"
+                v-tippy="{ placement: 'top', hideOnClick: false }"
             >
                 <svg height="22px" width="22px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
                     <path
