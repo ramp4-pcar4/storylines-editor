@@ -8,10 +8,14 @@
             @dragleave.prevent="() => (dragging = false)"
             @drop.prevent="dropImages($event)"
         >
-            <label class="cursor-pointer">
+            <label class="drag-label cursor-pointer">
                 <span>
-                    <div>Drag your images here</div>
-                    <div>or <span class="text-blue-400 font-bold">browse</span> to upload</div>
+                    <div>{{ $t('editor.image.label.drag') }}</div>
+                    <div>
+                        {{ $t('editor.image.label.or') }}
+                        <span class="text-blue-400 font-bold">{{ $t('editor.image.label.browse') }}</span>
+                        {{ $t('editor.image.label.upload') }}
+                    </div>
                 </span>
                 <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
             </label>
@@ -109,8 +113,12 @@ export default class ImageEditorV extends Vue {
     }
 }
 
+.drag-label {
+    width: auto !important;
+}
+
 .alt-label {
-    width: 21% !important;
+    width: 25% !important;
     margin: 0 0.5rem !important;
 }
 

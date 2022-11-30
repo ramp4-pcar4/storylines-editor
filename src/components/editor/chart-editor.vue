@@ -1,26 +1,73 @@
 <template>
     <div class="block">
-        <button class="bg-gray-500 text-white font-semibold h-16 cursor-pointer" id="modal-btn">
-            Create New Chart
-        </button>
-        <div id="chart-result" class="border-2 border-black m-5" style="height: 500px">
-            <chart-panel :config="chartConfig" :key="chartIdx" v-if="!loading"></chart-panel>
+        <!-- Menu with option to add a new chart -->
+        <div class="flex items-center">
+            <span class="font-bold px-4">{{
+                $t('editor.chart.label.info', {
+                    num: chartConfigs.length
+                })
+            }}</span>
+            <!-- add chart button -->
+            <button class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200" id="modal-btn">
+                <div class="flex items-center">
+                    <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                    </svg>
+                    <span class="px-2">
+                        {{ $t('editor.chart.label.create') }}
+                    </span>
+                </div>
+            </button>
         </div>
+        <hr class="border-solid border-t-2 border-gray-300 my-2" />
+
+        <!-- No charts to display -->
+        <div class="m-4" v-if="chartConfigs.length === 0">
+            <span class="italic text-gray-400">{{ $t('editor.chart.label.empty') }}</span>
+        </div>
+
+        <!-- Gallery preview of all charts -->
+        <ul class="flex flex-wrap list-none" v-else>
+            <ChartPreview v-for="(chart, idx) in chartConfigs" :key="idx" :chart="chart" @delete="deleteChart(chart)">
+                <div class="flex mt-4 items-center">
+                    <label class="name-label font-bold flex-2"
+                        >{{ $t('editor.chart.label.name') }}: <span class="font-normal">{{ chart.name }}</span></label
+                    >
+                    <!-- edit button -->
+                    <button class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200">
+                        <div class="flex items-center">
+                            <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M 18 2 L 15.585938 4.4140625 L 19.585938 8.4140625 L 22 6 L 18 2 z M 14.076172 5.9238281 L 3 17 L 3 21 L 7 21 L 18.076172 9.9238281 L 14.076172 5.9238281 z"
+                                />
+                            </svg>
+                            <span class="px-2">
+                                {{ $t('editor.chart.label.edit') }}
+                            </span>
+                        </div>
+                    </button>
+                </div>
+            </ChartPreview>
+        </ul>
     </div>
 </template>
 
 <script lang="ts">
+
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { ChartFile } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
+import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 
 @Component({
     components: {
-        'chart-panel': ChartPanelV
+        'chart-panel': ChartPanelV,
+        ChartPreview: ChartPreviewV
     }
 })
 export default class ChartEditorV extends Vue {
     @Prop() panel!: any;
-    chartConfig = {};
+    chartConfigs = [] as Array<ChartFile>;
     chartIdx = 0;
     loading = true;
 
@@ -44,17 +91,35 @@ export default class ChartEditorV extends Vue {
     }
 
     createNewChart(chartInfo: string): void {
+        const chart = JSON.parse(chartInfo);
         const chartConfig = {
-            type: 'chart',
-            charts: [{ config: JSON.parse(chartInfo) }]
+            name: chart.title.text,
+            config: chart
         };
-        console.log('CHART CONFIG: ', chartConfig);
-        this.panel = chartConfig;
-        this.chartConfig = chartConfig;
         this.loading = false;
         this.chartIdx += 1;
+
+        this.chartConfigs.push(chartConfig);
+    }
+
+    deleteChart(chart: ChartFile): void {
+        const idx = this.chartConfigs.findIndex((chartFile: ChartFile) => chartFile.name === chart.name);
+        if (idx !== -1) {
+            this.chartConfigs.splice(idx, 1);
+        }
+    }
+
+    saveChanges(): void {
+        // TODO - save chart configs
     }
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.name-label {
+    text-align: left !important;
+}
+.chart-btn {
+    border: none !important;
+}
+</style>
