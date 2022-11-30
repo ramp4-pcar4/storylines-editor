@@ -10,6 +10,8 @@ timeslider.expand,Expand,1,Développer,1
 timeslider.minimize,Minimize,1,Réduire,1
 timeslider.play,Play,1,Lire,0
 timeslider.pause,Pause,1,Pause,0
+fullscreen.activate,Enter Fullscreen,1,Entrer en plein écran,0
+fullscreen.deactivate,Exit Fullscreen,1,Sortie plein écran,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit Storylines,0
 editor.editProduct,Edit Existing Storylines Product,1,Modifier le produit Storylines existant,0
 editor.uuid,UUID,1,UUID,0
