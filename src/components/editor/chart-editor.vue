@@ -53,7 +53,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { ChartFile } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
@@ -65,6 +66,7 @@ import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
     }
 })
 export default class ChartEditorV extends Vue {
+    @Prop() panel!: any;
     chartConfigs = [] as Array<ChartFile>;
     chartIdx = 0;
     loading = true;
