@@ -56,6 +56,7 @@ export interface DQVChartConfig {
         csvURL: string;
         enablePolling: boolean;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     plotOptions?: any;
     exporting?: {
         buttons: {
@@ -105,6 +106,7 @@ export interface BasePanel {
 export interface TextPanel extends BasePanel {
     type: PanelType.Text;
     title: string;
+    titleTag: string;
     content: string; // in md format
 }
 
@@ -125,6 +127,7 @@ export interface TimeSliderConfig {
 export interface DynamicPanel extends BasePanel {
     type: PanelType.Dynamic;
     title: string;
+    titleTag: string;
     content: string;
     children: DynamicChildItem[];
 }
@@ -176,6 +179,7 @@ export interface ChartPanel extends BasePanel {
 
 export interface ChartConfig {
     src: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config: any;
     options?: DQVOptions;
 }
@@ -186,4 +190,10 @@ export interface ImageFile {
     altText: string;
     width?: number;
     height?: number;
+}
+
+export interface ChartFile {
+    name: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    config: any;
 }
