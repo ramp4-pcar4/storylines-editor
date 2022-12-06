@@ -27,33 +27,19 @@
         </div>
 
         <!-- Gallery preview of all charts -->
-        <ul class="flex flex-wrap list-none" v-else>
-            <ChartPreview v-for="(chart, idx) in chartConfigs" :key="idx" :chart="chart" @delete="deleteChart(chart)">
-                <div class="flex mt-4 items-center">
-                    <label class="name-label font-bold flex-2"
-                        >{{ $t('editor.chart.label.name') }}: <span class="font-normal">{{ chart.name }}</span></label
-                    >
-                    <!-- edit button -->
-                    <button class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200">
-                        <div class="flex items-center">
-                            <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M 18 2 L 15.585938 4.4140625 L 19.585938 8.4140625 L 22 6 L 18 2 z M 14.076172 5.9238281 L 3 17 L 3 21 L 7 21 L 18.076172 9.9238281 L 14.076172 5.9238281 z"
-                                />
-                            </svg>
-                            <span class="px-2">
-                                {{ $t('editor.chart.label.edit') }}
-                            </span>
-                        </div>
-                    </button>
-                </div>
-            </ChartPreview>
+        <ul class="flex flex-wrap list-none" v-show="chartConfigs.length">
+            <ChartPreview
+                v-for="(chart, idx) in chartConfigs"
+                :key="idx"
+                :chart="chart"
+                @delete="deleteChart"
+                @edit="editChart"
+            ></ChartPreview>
         </ul>
     </div>
 </template>
 
 <script lang="ts">
-
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { ChartFile } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
@@ -68,8 +54,6 @@ import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 export default class ChartEditorV extends Vue {
     @Prop() panel!: any;
     chartConfigs = [] as Array<ChartFile>;
-    chartIdx = 0;
-    loading = true;
 
     mounted(): void {
         highed.ready(() => {
@@ -77,9 +61,12 @@ export default class ChartEditorV extends Vue {
                 'modal-btn',
                 {
                     allowDone: true,
-                    features: 'import templates customize welcome done',
-                    importer: {
-                        options: 'plugins csv json samples'
+                    features: 'import templates customize',
+                    defaultChartOptions: {
+                        title: {
+                            text: `Chart ${this.chartConfigs.length + 1}`
+                        },
+                        data: {}
                     }
                 },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,14 +79,24 @@ export default class ChartEditorV extends Vue {
 
     createNewChart(chartInfo: string): void {
         const chart = JSON.parse(chartInfo);
-        const chartConfig = {
-            name: chart.title.text,
-            config: chart
-        };
-        this.loading = false;
-        this.chartIdx += 1;
+        // prevent duplicate chart names (alternative is to assign a unique ID for each chart)
+        if (this.chartConfigs.some((chartConfig) => chartConfig.name === chart.title.text)) {
+            alert('Existing chart already has the same chart name.');
+        } else {
+            const chartConfig = {
+                name: chart.title.text,
+                config: chart
+            };
 
-        this.chartConfigs.push(chartConfig);
+            this.chartConfigs.push(chartConfig);
+        }
+    }
+
+    editChart(chartInfo: { oldChart: ChartFile; newChart: ChartFile }): void {
+        const idx = this.chartConfigs.findIndex((chartFile: ChartFile) => chartFile.name === chartInfo.oldChart.name);
+        if (idx !== -1) {
+            this.chartConfigs[idx] = chartInfo.newChart;
+        }
     }
 
     deleteChart(chart: ChartFile): void {
@@ -115,11 +112,40 @@ export default class ChartEditorV extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .name-label {
     text-align: left !important;
 }
 .chart-btn {
     border: none !important;
+}
+
+.highed-chart-frame-body {
+    pointer-events: none;
+}
+
+.highed-toolbar-right .highed-icon {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding-left: 0 !important;
+}
+
+.panel.top.highed-scrollbar {
+    margin-bottom: 0 !important;
+}
+
+.highed-res-preview {
+    padding: 4px 0;
+}
+
+.highed-res-number:disabled {
+    border-color: rgba(118, 118, 118, 0.3);
+}
+
+.highed-res-number {
+    line-height: normal;
+    background-color: field;
+    border-width: 2px;
+    border-style: inset;
 }
 </style>
