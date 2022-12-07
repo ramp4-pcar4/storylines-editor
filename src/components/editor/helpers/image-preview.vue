@@ -41,5 +41,9 @@ export default class ImagePreviewV extends Vue {
     .image-file {
         aspect-ratio: 1/1;
     }
+
+    button {
+        padding: 0 !important;
+    }
 }
 </style>

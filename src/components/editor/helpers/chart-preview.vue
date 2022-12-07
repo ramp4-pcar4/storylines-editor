@@ -2,7 +2,7 @@
     <li class="chart-item items-center my-8 mx-5 overflow-hidden">
         <div class="relative border-solid border-2 items-center justify-center text-center w-full">
             <button
-                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 left-0 p-0 z-10 cursor-pointer"
+                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 left-0 z-10 cursor-pointer"
                 @click="() => $emit('delete', chart)"
             >
                 <svg height="22px" width="22px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
@@ -11,9 +11,28 @@
                     />
                 </svg>
             </button>
-            <dqv-chart class="w-full h-full" :config="chart" :key="chartIdx"></dqv-chart>
+            <!-- chart component -->
+            <dqv-chart class="w-full h-full" :config="chartConfig" :key="chartIdx" v-if="!loading"></dqv-chart>
         </div>
-        <slot></slot>
+        <!-- chart description and edit  -->
+        <div class="flex mt-4 items-center">
+            <label class="name-label font-bold flex-2"
+                >{{ $t('editor.chart.label.name') }}: <span class="font-normal">{{ chartName }}</span></label
+            >
+            <!-- edit button -->
+            <button class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200" :id="`edit-${chart.name}-btn`">
+                <div class="flex items-center">
+                    <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M 18 2 L 15.585938 4.4140625 L 19.585938 8.4140625 L 22 6 L 18 2 z M 14.076172 5.9238281 L 3 17 L 3 21 L 7 21 L 18.076172 9.9238281 L 14.076172 5.9238281 z"
+                        />
+                    </svg>
+                    <span class="px-2">
+                        {{ $t('editor.chart.label.edit') }}
+                    </span>
+                </div>
+            </button>
+        </div>
     </li>
 </template>
 
@@ -29,12 +48,46 @@ import ChartV from '@/components/panels/helpers/chart.vue';
 })
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartFile;
-    @Prop() chartIdx!: number;
+
+    loading = true;
+    chartIdx = 0;
+    chartConfig = {};
+    chartName = '';
+
+    mounted(): void {
+        this.chartConfig = this.chart;
+        this.chartName = this.chart.name;
+        highed.ModalEditor(
+            `edit-${this.chartName}-btn`,
+            {
+                allowDone: true,
+                features: 'import templates customize',
+                defaultChartOptions: this.chart.config
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (newChart: any) => {
+                const chart = JSON.parse(newChart);
+                const chartConfig = {
+                    name: chart.title.text,
+                    config: chart
+                };
+                this.$emit('edit', { oldChart: this.chart, newChart: chartConfig });
+                this.chartConfig = chartConfig;
+                this.chartName = chartConfig.name;
+                this.chartIdx += 1;
+            }
+        );
+        this.loading = false;
+    }
 }
 </script>
 
 <style lang="scss" scoped>
 .chart-item {
     width: 46%;
+
+    button {
+        padding: 0 !important;
+    }
 }
 </style>
