@@ -1,5 +1,5 @@
 <template>
-    <li class="image-item items-center my-8 mx-4 overflow-hidden">
+    <li class="image-item items-center my-8 mx-6 overflow-hidden">
         <div class="relative items-center justify-center text-center w-full">
             <button
                 class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
