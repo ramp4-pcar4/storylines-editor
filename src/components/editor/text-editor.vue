@@ -3,7 +3,7 @@
         <label class="text-left">Panel title:</label>
         <input type="text" v-model="panel.title" />
         <label class="text-left">Panel body:</label>
-        <v-md-editor v-model="panel.text" height="400px"></v-md-editor>
+        <v-md-editor v-model="panel.content" height="400px"></v-md-editor>
     </div>
 </template>
 

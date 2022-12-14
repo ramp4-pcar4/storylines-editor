@@ -34,14 +34,19 @@
         <template v-if="loadStatus === 'loaded'">
             <div class="flex">
                 <span>{{ config.title }}</span
-                ><span class="ml-auto"></span><button>Preview</button><button>Save Changes</button>
+                ><span class="ml-auto"></span><button>Preview</button
+                ><button @click="generateConfig">Save Changes</button>
             </div>
             <div class="flex">
                 <div class="w-60 flex-shrink-0">
                     <button>Edit Project Metadata</button>
                     <slide-toc :slides="slides" @slide-change="selectSlide"></slide-toc>
                 </div>
-                <slide-editor :currentSlide="currentSlide"></slide-editor>
+                <slide-editor
+                    :configFileStructure="configFileStructure"
+                    :currentSlide="currentSlide"
+                    :lang="lang"
+                ></slide-editor>
             </div>
         </template>
     </div>
@@ -51,6 +56,10 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { StoryRampConfig } from '@/definitions';
+import { saveAs } from 'file-saver';
+
+const JSZip = require('jszip');
+const axios = require('axios').default;
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
@@ -65,6 +74,7 @@ import SlideTocV from './slide-toc.vue';
 })
 export default class EditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
+    configFileStructure: any = undefined;
     loadStatus = 'waiting';
     lang = 'en';
 
@@ -78,14 +88,13 @@ export default class EditorV extends Vue {
     slides: any[] = [];
     currentSlide = '';
     slideIndex: number | undefined = undefined;
-    text =
-        '# Hello!\n\nThis is a **test**. When you press the `generate config` button, a config snippet will be printed to the console.';
 
     created(): void {
         this.uuid = this.$route.params.uid ?? undefined;
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
 
         this.config = undefined;
+        this.configFileStructure = this.configFileStructureHelper();
 
         if (this.uuid) {
             this.fetchConfig();
@@ -167,8 +176,38 @@ export default class EditorV extends Vue {
         this.fetchConfig();
     }
 
+    /**
+     * Generates a new ZIP file and creates required project folders.
+     * Returns an object that makes it easy to access any specific folder.
+     */
+    configFileStructureHelper() {
+        // Create a new ZIP file with our configuration structure.
+        this.configFileStructure = new JSZip();
+
+        const assetsFolder = this.configFileStructure.folder('assets');
+        const chartsFolder = this.configFileStructure.folder('charts');
+        const rampConfigFolder = this.configFileStructure.folder('ramp-config');
+
+        return {
+            uuid: this.uuid,
+            config: this.configFileStructure,
+            assets: {
+                en: assetsFolder.folder('en'),
+                fr: assetsFolder.folder('fr')
+            },
+            charts: {
+                en: chartsFolder.folder('en'),
+                fr: chartsFolder.folder('fr')
+            },
+            rampConfig: {
+                en: rampConfigFolder.folder('en'),
+                fr: rampConfigFolder.folder('fr')
+            }
+        };
+    }
+
     generateConfig(): StoryRampConfig {
-        const config = {
+        const configFile = {
             title: this.title,
             lang: this.lang,
             introSlide: {
@@ -177,25 +216,35 @@ export default class EditorV extends Vue {
                 },
                 title: this.title
             },
-            slides: [
-                {
-                    title: 'Test Slide',
-                    panel: [
-                        {
-                            title: 'Text Slide',
-                            content: this.text,
-                            type: 'text'
-                        }
-                    ]
-                }
-            ],
+            slides: this.slides,
             contextLabel: this.contextLabel,
             contextLink: this.contextLink,
             dateModified: this.dateModified
         };
 
-        console.log(config);
-        return config;
+        // Add the Storylines configuration file to the ZIP file.
+        const fileName = `${this.uuid}_${this.lang}.json`;
+        const formattedConfigFile = JSON.stringify(configFile, null, 4);
+
+        this.configFileStructure.config.file(fileName, formattedConfigFile);
+
+        // Generate the ZIP file.
+        this.configFileStructure.config.generateAsync({ type: 'blob' }).then((content: any) => {
+            // Upload the ZIP file.
+            const formData = new FormData();
+            formData.append('data', content, `${this.uuid}.zip`);
+            const headers = { 'Content-Type': 'multipart/form-data' };
+
+            // axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
+            //     res.data.files; // binary representation of the file
+            //     res.status; // HTTP status
+            // });
+
+            // Temporarily: download the ZIP file to browser instead of uploading to server.
+            saveAs(content, `${this.uuid}.zip`);
+        });
+
+        return this.configFileStructure;
     }
 
     // react to param changes in URL
