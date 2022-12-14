@@ -53,6 +53,9 @@ import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 })
 export default class ChartEditorV extends Vue {
     @Prop() panel!: any;
+    @Prop() configFileStructure!: any;
+    @Prop() lang!: string;
+
     chartConfigs = [] as Array<ChartFile>;
 
     mounted(): void {
@@ -88,6 +91,9 @@ export default class ChartEditorV extends Vue {
                 config: chart
             };
 
+            // Add chart config to ZIP file.
+            this.configFileStructure.charts[this.lang].file(`${chart.title.text}.json`, JSON.stringify(chart, null, 4));
+
             this.chartConfigs.push(chartConfig);
         }
     }
@@ -95,6 +101,13 @@ export default class ChartEditorV extends Vue {
     editChart(chartInfo: { oldChart: ChartFile; newChart: ChartFile }): void {
         const idx = this.chartConfigs.findIndex((chartFile: ChartFile) => chartFile.name === chartInfo.oldChart.name);
         if (idx !== -1) {
+            // Remove old chart config from ZIP file and add in new one.
+            this.configFileStructure.charts[this.lang].remove(`${chartInfo.oldChart.name}.json`);
+            this.configFileStructure.charts[this.lang].file(
+                `${chartInfo.newChart.name}.json`,
+                JSON.stringify(chartInfo.newChart.config, null, 4)
+            );
+
             this.chartConfigs[idx] = chartInfo.newChart;
         }
     }
@@ -102,6 +115,8 @@ export default class ChartEditorV extends Vue {
     deleteChart(chart: ChartFile): void {
         const idx = this.chartConfigs.findIndex((chartFile: ChartFile) => chartFile.name === chart.name);
         if (idx !== -1) {
+            // Remove the chart from the config file.
+            this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
             this.chartConfigs.splice(idx, 1);
         }
     }

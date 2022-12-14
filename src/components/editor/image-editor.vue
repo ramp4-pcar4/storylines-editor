@@ -45,6 +45,9 @@ import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 })
 export default class ImageEditorV extends Vue {
     @Prop() panel!: any;
+    @Prop() configFileStructure!: any;
+    @Prop() lang!: string;
+
     imageURLs = [] as Array<string>;
     imageFiles = [] as Array<ImageFile>;
     dragging = false;
@@ -60,6 +63,9 @@ export default class ImageEditorV extends Vue {
         this.imageURLs = filelist.map((file: File) => URL.createObjectURL(file));
         this.imageFiles.push(
             ...filelist.map((file: File) => {
+                // Add the uploaded images to the product ZIP file.
+                this.configFileStructure.assets[this.lang].file(file.name, file);
+
                 return {
                     id: file.name,
                     src: URL.createObjectURL(file),
@@ -74,6 +80,9 @@ export default class ImageEditorV extends Vue {
             const files = [...e.dataTransfer.files];
             this.imageFiles.push(
                 ...files.map((file: File) => {
+                    // Add the uploaded images to the product ZIP file.
+                    this.configFileStructure.assets[this.lang].file(file.name, file);
+
                     return {
                         id: file.name,
                         src: URL.createObjectURL(file),
@@ -88,6 +97,8 @@ export default class ImageEditorV extends Vue {
     deleteImage(img: ImageFile): void {
         const idx = this.imageFiles.findIndex((file: ImageFile) => file.id === img.id);
         if (idx !== -1) {
+            // Remove the image from the product ZIP file.
+            this.configFileStructure.assets[this.lang].remove(this.imageFiles[idx].id);
             this.imageFiles.splice(idx, 1);
         }
     }
