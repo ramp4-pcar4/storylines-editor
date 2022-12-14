@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="flex">
-            <span>SLIDES</span>
+            <span>{{ $t('editor.slides.title') }}</span>
             <span class="ml-auto"></span>
-            <button v-on:click="addNewSlide">+ New Slide</button>
+            <button v-on:click="addNewSlide">{{ $t('editor.slides.addSlide') }}</button>
         </div>
         <ul>
             <li class="flex toc-slide" v-for="(slide, index) in slides" :key="slide.title + index">
@@ -89,11 +89,13 @@ export default class SlideTocV extends Vue {
     }
 
     removeSlide(index: number): void {
-        if (index === this.slideIndex) {
-            this.slideIndex = undefined;
-            this.$emit('slide-change', this.slideIndex);
+        if (confirm(this.$t('editor.slides.deleteSlide.confirm') as string)) {
+            if (index === this.slideIndex) {
+                this.slideIndex = undefined;
+                this.$emit('slide-change', this.slideIndex);
+            }
+            const removedSlide = this.slides.splice(index, 1) as any;
         }
-        const removedSlide = this.slides.splice(index, 1) as any;
     }
 
     moveUp(index: number): void {
