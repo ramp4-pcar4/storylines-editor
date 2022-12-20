@@ -8,7 +8,11 @@
                 })
             }}</span>
             <!-- add chart button -->
-            <button class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200" id="modal-btn">
+            <button
+                class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
+                id="modal-btn"
+                @click="clearEditor()"
+            >
                 <div class="flex items-center">
                     <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
@@ -41,7 +45,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartFile } from '@/definitions';
+import { ChartConfig } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 
@@ -56,28 +60,52 @@ export default class ChartEditorV extends Vue {
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
 
-    chartConfigs = [] as Array<ChartFile>;
+    chartConfigs = [] as Array<ChartConfig>;
+    modalEditor = {} as any;
 
     mounted(): void {
+        // attach highcharts modal editor to summoner node
         highed.ready(() => {
-            highed.ModalEditor(
+            this.modalEditor = highed.ModalEditor(
                 'modal-btn',
                 {
                     allowDone: true,
-                    features: 'import templates customize',
-                    defaultChartOptions: {
-                        title: {
-                            text: `Chart ${this.chartConfigs.length + 1}`
-                        },
-                        data: {}
-                    }
+                    features: 'import templates customize'
                 },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (chart: any) => {
+                    // const saved = this.modalEditor.editor.chart.saveProject();
                     this.createNewChart(chart.toString());
                 }
             );
         });
+
+        // load charts from existing storylines product
+        if (this.panel.charts && this.panel.charts.length) {
+            this.chartConfigs = this.panel.charts.map((chart: ChartConfig) => {
+                let chartName = '';
+                // extract chart name
+                if (chart.options && chart.options.title) {
+                    chartName = chart.options.title;
+                } else {
+                    const path = chart.src.match(/.*\/(.*)$/);
+                    chartName = path ? path[1].replace(/\.[^/.]+$/, '').replace(/\./g, ' ') : chart.src;
+                }
+                return {
+                    name: chartName,
+                    ...chart
+                };
+            });
+        }
+    }
+
+    clearEditor(): void {
+        this.modalEditor.editor.chart.options.setAll({
+            title: {
+                text: `Chart ${this.chartConfigs.length + 1}`
+            }
+        });
+        this.modalEditor.editor.chart.data.clear();
     }
 
     createNewChart(chartInfo: string): void {
@@ -88,6 +116,7 @@ export default class ChartEditorV extends Vue {
         } else {
             const chartConfig = {
                 name: chart.title.text,
+                src: '',
                 config: chart
             };
 
@@ -98,8 +127,8 @@ export default class ChartEditorV extends Vue {
         }
     }
 
-    editChart(chartInfo: { oldChart: ChartFile; newChart: ChartFile }): void {
-        const idx = this.chartConfigs.findIndex((chartFile: ChartFile) => chartFile.name === chartInfo.oldChart.name);
+    editChart(chartInfo: { oldChart: ChartConfig; newChart: ChartConfig }): void {
+        const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chartInfo.oldChart.name);
         if (idx !== -1) {
             // Remove old chart config from ZIP file and add in new one.
             this.configFileStructure.charts[this.lang].remove(`${chartInfo.oldChart.name}.json`);
@@ -112,17 +141,13 @@ export default class ChartEditorV extends Vue {
         }
     }
 
-    deleteChart(chart: ChartFile): void {
-        const idx = this.chartConfigs.findIndex((chartFile: ChartFile) => chartFile.name === chart.name);
+    deleteChart(chart: ChartConfig): void {
+        const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
         if (idx !== -1) {
             // Remove the chart from the config file.
             this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
             this.chartConfigs.splice(idx, 1);
         }
-    }
-
-    saveChanges(): void {
-        // TODO - save chart configs
     }
 }
 </script>

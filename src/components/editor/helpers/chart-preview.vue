@@ -12,7 +12,13 @@
                 </svg>
             </button>
             <!-- chart component -->
-            <dqv-chart class="w-full h-full" :config="chartConfig" :key="chartIdx" v-if="!loading"></dqv-chart>
+            <dqv-chart
+                class="w-full h-full"
+                :config="chartConfig"
+                :key="chartIdx"
+                @loaded="loadChart"
+                v-if="!loading"
+            ></dqv-chart>
         </div>
         <!-- chart description and edit  -->
         <div class="flex mt-4 items-center">
@@ -38,7 +44,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartFile } from '@/definitions';
+import { ChartConfig, DQVChartConfig } from '@/definitions';
 import ChartV from '@/components/panels/helpers/chart.vue';
 
 @Component({
@@ -47,7 +53,7 @@ import ChartV from '@/components/panels/helpers/chart.vue';
     }
 })
 export default class ChartPreviewV extends Vue {
-    @Prop() chart!: ChartFile;
+    @Prop() chart!: ChartConfig;
 
     loading = true;
     chartIdx = 0;
@@ -56,20 +62,24 @@ export default class ChartPreviewV extends Vue {
 
     mounted(): void {
         this.chartConfig = this.chart;
-        this.chartName = this.chart.name;
-        highed.ModalEditor(
+        this.chartName = this.chart.name || '';
+        this.loading = false;
+    }
+
+    loadChart(chartOptions: DQVChartConfig): void {
+        // initialize higcharts editor and link to edit summoner node
+        const modalEditor = highed.ModalEditor(
             `edit-${this.chartName}-btn`,
             {
                 allowDone: true,
-                features: 'import templates customize',
-                defaultChartOptions: this.chart.config
+                features: 'import templates customize'
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (newChart: any) => {
                 const chart = JSON.parse(newChart);
                 const chartConfig = {
                     name: chart.title.text,
-                    config: chart
+                    config: chart,
+                    src: ''
                 };
                 this.$emit('edit', { oldChart: this.chart, newChart: chartConfig });
                 this.chartConfig = chartConfig;
@@ -77,7 +87,9 @@ export default class ChartPreviewV extends Vue {
                 this.chartIdx += 1;
             }
         );
-        this.loading = false;
+
+        modalEditor.editor.chart.options.setAll(chartOptions);
+        // modalEditor.editor.chart.loadProject(chartOptions);
     }
 }
 </script>
