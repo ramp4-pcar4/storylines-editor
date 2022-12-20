@@ -176,6 +176,10 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     .prose a {
         font-weight: bold;
     }
+
+    .prose a:not([panel])::after {
+        content: url('../../assets/popout.svg');
+    }
 }
 
 @media screen and (min-width: 640px) {
