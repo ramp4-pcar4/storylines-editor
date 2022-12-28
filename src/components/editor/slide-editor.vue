@@ -26,7 +26,11 @@
                             @change="currentSlide.panel[panelIndex].type = $event.target.value"
                             v-model="currentSlide.panel[panelIndex].type"
                         >
-                            <option v-for="thing in Object.keys(editors)" :key="thing" :value="thing">
+                            <option
+                                v-for="thing in Object.keys(editors).filter((editor) => editor !== 'slideshow')"
+                                :key="thing"
+                                :value="thing"
+                            >
                                 {{ thing }}
                             </option>
                         </select>
@@ -76,6 +80,7 @@ export default class SlideEditorV extends Vue {
     editors = {
         text: 'text-editor',
         image: 'image-editor',
+        slideshow: 'image-editor',
         chart: 'chart-editor'
     };
 }

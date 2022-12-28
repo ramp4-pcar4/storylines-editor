@@ -15,8 +15,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { ChartConfig, DQVChartConfig, SeriesData } from '@/definitions';
-import { Chart } from 'highcharts-vue';
 
+import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
 import exporting from 'highcharts/modules/exporting';
@@ -56,7 +56,8 @@ export default class ChartV extends Vue {
             this.chartOptions = this.config.config;
             this.title = this.chartOptions.title.text;
             this.loading = false;
-        } else {
+            this.$emit('loaded', this.chartOptions);
+        } else if (this.config.src) {
             // get input given by src path
             const extension = this.config.src.split('.').pop();
             if (extension === 'json') {
@@ -67,6 +68,7 @@ export default class ChartV extends Vue {
                             this.chartOptions = res;
                             this.title = this.chartOptions.title.text;
                             this.loading = false;
+                            this.$emit('loaded', this.chartOptions);
                         },
                         (err) => {
                             console.error(`Error fetching chart JSON file: ${err}`);
@@ -172,6 +174,7 @@ export default class ChartV extends Vue {
             plotOptions: plotOptions,
             series: series
         };
+        this.$emit('loaded', this.chartOptions);
     }
 
     /**
@@ -209,6 +212,7 @@ export default class ChartV extends Vue {
                 }
             }
         };
+        this.$emit('loaded', this.chartOptions);
     }
 
     // /**

@@ -180,7 +180,8 @@ export interface ChartPanel extends BasePanel {
 export interface ChartConfig {
     src: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config: any;
+    config?: any;
+    name?: string;
     options?: DQVOptions;
 }
 
@@ -190,10 +191,4 @@ export interface ImageFile {
     altText: string;
     width?: number;
     height?: number;
-}
-
-export interface ChartFile {
-    name: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config: any;
 }

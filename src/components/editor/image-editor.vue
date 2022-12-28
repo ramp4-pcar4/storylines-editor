@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ImageFile } from '@/definitions';
+import { ImagePanel, ImageFile } from '@/definitions';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
 @Component({
@@ -48,10 +48,30 @@ export default class ImageEditorV extends Vue {
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
 
-    imageURLs = [] as Array<string>;
     imageFiles = [] as Array<ImageFile>;
     dragging = false;
     // TODO: add file saving mechanism once user save storylines task complete #227
+
+    mounted(): void {
+        // load image files from existing storylines product
+        if (this.panel.type === 'slideshow' && this.panel.images.length) {
+            this.imageFiles = this.panel.images.map((image: ImagePanel) => {
+                const path = image.src.match(/.*\/(.*)$/);
+                return {
+                    id: path ? path[-1] : image.src,
+                    src: image.src,
+                    altText: image.altText
+                };
+            });
+        } else if (this.panel.src !== undefined) {
+            const path = this.panel.src.match(/.*\/(.*)$/);
+            this.imageFiles.push({
+                id: path ? path[-1] : this.panel.src,
+                src: this.panel.src,
+                altText: this.panel.altText
+            });
+        }
+    }
 
     get isDragging(): boolean {
         return this.dragging;
@@ -60,7 +80,6 @@ export default class ImageEditorV extends Vue {
     onFileChange(e: Event): void {
         // create object URL(s) to display image(s)
         const filelist = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>);
-        this.imageURLs = filelist.map((file: File) => URL.createObjectURL(file));
         this.imageFiles.push(
             ...filelist.map((file: File) => {
                 // Add the uploaded images to the product ZIP file.
@@ -129,8 +148,9 @@ export default class ImageEditorV extends Vue {
 }
 
 .alt-label {
-    width: 25% !important;
-    margin: 0 0.5rem !important;
+    width: 12% !important;
+    margin-right: 0.5rem !important;
+    text-align: left !important;
 }
 
 .dragging {
