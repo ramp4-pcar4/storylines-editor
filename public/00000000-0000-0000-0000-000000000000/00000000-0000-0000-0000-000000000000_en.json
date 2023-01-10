@@ -164,7 +164,7 @@
             ]
         },
         {
-            "title": "Reported mine tailings from oil sands surface mining facilities",
+            "title": "Chart gallery sample test",
             "panel": [
                 {
                     "title": "Reported mine tailings from oil sands surface mining facilities",
@@ -175,7 +175,7 @@
                     "type": "chart",
                     "charts": [
                         {
-                            "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/1.Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings.csv",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/Criteria air contaminant releases from oil sands mines_3.csv",
                             "options": {
                                 "title": "Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings (Tonnes)",
                                 "subtitle": "",
@@ -183,7 +183,7 @@
                             }
                         },
                         {
-                            "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/2.Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings.csv",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/Mine tailings reported.csv",
                             "options": {
                                 "title": "Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)",
                                 "subtitle": "",
@@ -191,7 +191,7 @@
                             }
                         },
                         {
-                            "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/en/tailings/3.Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings.csv",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/NPRI releases from thermal in-situ facilities_1.csv",
                             "options": {
                                 "title": "Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes)",
                                 "subtitle": "",

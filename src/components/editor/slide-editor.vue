@@ -23,9 +23,13 @@
                     <div v-if="panelIndex === 1" class="flex flex-col">
                         <label class="text-left text-xl">Content type:</label>
                         <select
-                            @change="currentSlide.panel[panelIndex].type = $event.target.value"
+                            @change="changePanelType($event.target.value)"
                             v-model="currentSlide.panel[panelIndex].type"
                         >
+                            <!-- <select
+                            @change="currentSlide.panel[panelIndex].type = $event.target.value"
+                            v-model="currentSlide.panel[panelIndex].type"
+                        > -->
                             <option
                                 v-for="thing in Object.keys(editors).filter((editor) => editor !== 'slideshow')"
                                 :key="thing"
@@ -37,6 +41,7 @@
                     </div>
                 </div>
                 <component
+                    ref="editor"
                     :is="editors[currentSlide.panel[panelIndex].type]"
                     :key="panelIndex + currentSlide.panel[panelIndex].type"
                     :panel="currentSlide.panel[panelIndex]"
@@ -53,8 +58,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Route } from 'vue-router';
-import { StoryRampConfig } from '@/definitions';
+import { StoryRampConfig, DefaultConfigs, PanelType } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
@@ -79,10 +83,34 @@ export default class SlideEditorV extends Vue {
 
     editors = {
         text: 'text-editor',
-        image: 'image-editor',
         slideshow: 'image-editor',
         chart: 'chart-editor'
     };
+
+    changePanelType(type: string): void {
+        const startingConfig: DefaultConfigs = {
+            text: {
+                type: PanelType.Text,
+                title: '',
+                content: ''
+            },
+            image: {
+                type: PanelType.Slideshow,
+                images: []
+            },
+            chart: {
+                type: PanelType.Chart,
+                charts: []
+            }
+        };
+        this.currentSlide.panel[this.panelIndex] = startingConfig[type as keyof DefaultConfigs];
+    }
+
+    saveChanges(final: boolean): void {
+        if (this.$refs.editor !== undefined && typeof (this.$refs.editor as any).saveChanges === 'function') {
+            (this.$refs.editor as any).saveChanges(final);
+        }
+    }
 }
 </script>
 
