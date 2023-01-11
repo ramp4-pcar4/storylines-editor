@@ -27,7 +27,9 @@
                             v-model="currentSlide.panel[panelIndex].type"
                         >
                             <option
-                                v-for="thing in Object.keys(editors).filter((editor) => editor !== 'slideshow')"
+                                v-for="thing in Object.keys(editors).filter(
+                                    (editor) => editor !== 'slideshow' && editor !== 'loading'
+                                )"
                                 :key="thing"
                                 :value="thing"
                             >
@@ -60,13 +62,15 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
+import LoadingPageV from './helpers/loading-page.vue';
 
 @Component({
     components: {
         spinner: Circle2,
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,
-        'text-editor': TextEditorV
+        'text-editor': TextEditorV,
+        'loading-page': LoadingPageV
     }
 })
 export default class SlideEditorV extends Vue {
@@ -81,7 +85,8 @@ export default class SlideEditorV extends Vue {
         text: 'text-editor',
         image: 'image-editor',
         slideshow: 'image-editor',
-        chart: 'chart-editor'
+        chart: 'chart-editor',
+        loading: 'loading-page'
     };
 }
 </script>
