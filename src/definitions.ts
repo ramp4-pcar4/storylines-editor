@@ -142,6 +142,7 @@ export interface ImagePanel extends BasePanel {
     src: string;
     width?: number;
     height?: number;
+    temp?: string;
     class?: string;
     fullscreen?: boolean;
     altText?: string;
@@ -195,6 +196,6 @@ export interface ImageFile {
 
 export interface DefaultConfigs {
     text: TextPanel;
-    image: SlideshowPanel;
+    slideshow: SlideshowPanel;
     chart: ChartPanel;
 }

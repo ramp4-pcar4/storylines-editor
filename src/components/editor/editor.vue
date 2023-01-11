@@ -163,7 +163,7 @@ export default class EditorV extends Vue {
                                     type: 'slideshow',
                                     images: [slide.panel[1]]
                                 };
-                                slide.panel[1] = newSlide;
+                                slide.panel[1] = Object.assign({}, newSlide);
                             }
                         });
 
@@ -226,7 +226,7 @@ export default class EditorV extends Vue {
 
     generateConfig(): StoryRampConfig {
         // save current slide final changes before generating config file
-        (this.$refs.slide as any).saveChanges(true);
+        (this.$refs.slide as any).saveChanges();
 
         const configFile = {
             title: this.title,

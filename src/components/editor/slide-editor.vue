@@ -33,7 +33,7 @@
                             <option
                                 v-for="thing in Object.keys(editors).filter((editor) => editor !== 'slideshow')"
                                 :key="thing"
-                                :value="thing"
+                                :value="thing === 'image' ? 'slideshow' : thing"
                             >
                                 {{ thing }}
                             </option>
@@ -83,32 +83,36 @@ export default class SlideEditorV extends Vue {
 
     editors = {
         text: 'text-editor',
+        image: 'image-editor',
         slideshow: 'image-editor',
         chart: 'chart-editor'
     };
 
     changePanelType(type: string): void {
-        const startingConfig: DefaultConfigs = {
-            text: {
-                type: PanelType.Text,
-                title: '',
-                content: ''
-            },
-            image: {
-                type: PanelType.Slideshow,
-                images: []
-            },
-            chart: {
-                type: PanelType.Chart,
-                charts: []
-            }
-        };
-        this.currentSlide.panel[this.panelIndex] = startingConfig[type as keyof DefaultConfigs];
+        if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
+            const startingConfig: DefaultConfigs = {
+                text: {
+                    type: PanelType.Text,
+                    title: '',
+                    content: ''
+                },
+                slideshow: {
+                    type: PanelType.Slideshow,
+                    images: []
+                },
+                chart: {
+                    type: PanelType.Chart,
+                    charts: []
+                }
+            };
+            this.currentSlide.panel[this.panelIndex] = Object.assign({}, startingConfig[type as keyof DefaultConfigs]);
+            // this.currentSlide.panel[this.panelIndex].type = type;)
+        }
     }
 
-    saveChanges(final: boolean): void {
+    saveChanges(): void {
         if (this.$refs.editor !== undefined && typeof (this.$refs.editor as any).saveChanges === 'function') {
-            (this.$refs.editor as any).saveChanges(final);
+            (this.$refs.editor as any).saveChanges();
         }
     }
 }

@@ -56,14 +56,16 @@ export default class ImageEditorV extends Vue {
     }
 
     mounted(): void {
-        this.imagePreviews = this.panel.images.map((image: ImagePanel) => {
-            const filename = image.src.replace(/^.*[\\/]/, '');
-            return {
-                ...image,
-                id: filename ? filename : image.src
-            };
-        });
-        // console.log('MOUNTED IMAGE EDITOR: ', this.imagePreviews, this.panel.images);
+        if (this.panel.images !== undefined && this.panel.images.length) {
+            this.imagePreviews = this.panel.images.map((image: ImagePanel) => {
+                const filename = image.src.replace(/^.*[\\/]/, '');
+                return {
+                    ...image,
+                    id: filename ? filename : image.src,
+                    src: image.temp ? image.temp : image.src
+                };
+            });
+        }
     }
 
     onFileChange(e: Event): void {
@@ -112,14 +114,14 @@ export default class ImageEditorV extends Vue {
         }
     }
 
-    saveChanges(final: boolean): void {
+    saveChanges(): void {
         this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
             return {
                 ...imageFile,
-                src: final ? `${this.configFileStructure.uuid}/assets/en/${imageFile.id}` : imageFile.src
+                src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`,
+                temp: imageFile.src // TODO: can and should remove this property on final config save
             };
         });
-        // console.log('FINALIZING IMAGE CHANGES: ', this.panel.images, this.imagePreviews);
     }
 }
 </script>
