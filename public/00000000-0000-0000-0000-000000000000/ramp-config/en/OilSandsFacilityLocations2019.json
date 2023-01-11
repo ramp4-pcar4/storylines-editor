@@ -84,6 +84,7 @@
                 "id": "OilSandsFacilityLocations2019",
                 "name": "Oil Sands Facility Locations - 2019",
                 "layerType": "esriFeature",
+                "layerChoice": "esriFeature",
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/00000000_0000_0000_0000_000000000000/MapServer/1"
             }
         ],

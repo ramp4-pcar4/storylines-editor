@@ -84,6 +84,7 @@
                 "id": "TailingsfromMiningFacilities2019",
                 "name": "Tailings from Mining Facilities in 2019",
                 "layerType": "esriFeature",
+                "layerChoice": "esriFeature",
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/00000000_0000_0000_0000_000000000000/MapServer/3"
             }
         ],

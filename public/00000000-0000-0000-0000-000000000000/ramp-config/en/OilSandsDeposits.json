@@ -197,6 +197,7 @@
         "layers": [
             {
                 "id": "polys",
+                "layerChoice": "esriDynamic",
                 "layerType": "esriDynamic",
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/410b88da_0ed1_4749_903f_5e76c24e2e5f/MapServer/",
                 "singleEntryCollapse": true,
@@ -204,12 +205,10 @@
                 "layerEntries": [
                     {
                         "index": 18,
-                        "disabledControls": [
-                            "query"
-                        ],
+                        "disabledControls": ["query"],
                         "state": {
                             "opacity": 0.5
-                        }                               
+                        }
                     }
                 ]
             }

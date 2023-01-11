@@ -42,6 +42,7 @@
                     :panel="currentSlide.panel[panelIndex]"
                     :configFileStructure="configFileStructure"
                     :lang="lang"
+                    :uid="uid"
                 ></component>
             </div>
         </div>
@@ -60,13 +61,15 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
+import MapEditorV from './map-editor.vue';
 
 @Component({
     components: {
         spinner: Circle2,
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,
-        'text-editor': TextEditorV
+        'text-editor': TextEditorV,
+        'map-editor': MapEditorV
     }
 })
 export default class SlideEditorV extends Vue {
@@ -74,6 +77,7 @@ export default class SlideEditorV extends Vue {
     @Prop() currentSlide!: any;
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
+    @Prop() uid!: string;
 
     panelIndex = 0;
 
@@ -81,7 +85,8 @@ export default class SlideEditorV extends Vue {
         text: 'text-editor',
         image: 'image-editor',
         slideshow: 'image-editor',
-        chart: 'chart-editor'
+        chart: 'chart-editor',
+        map: 'map-editor'
     };
 }
 </script>

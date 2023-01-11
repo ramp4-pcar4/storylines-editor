@@ -84,6 +84,7 @@
                 "id": "ReleasesandDisposalsbyMiningFacilitiesin2019(satellite)",
                 "name": "Releases and Disposals by Mining Facilities in 2019 (satellite)",
                 "layerType": "esriFeature",
+                "layerChoice": "esriFeature",
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/00000000_0000_0000_0000_000000000000/MapServer/2"
             }
         ],

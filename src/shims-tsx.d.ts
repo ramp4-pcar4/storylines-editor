@@ -11,6 +11,11 @@ declare global {
         }
     }
 
+    interface Window {
+        config: string;
+        configname: string;
+    }
+
     const RAMP: any;
 
     const highed: any;
