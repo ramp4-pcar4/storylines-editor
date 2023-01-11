@@ -88,7 +88,7 @@ export default class EditorV extends Vue {
     contextLabel = '';
     dateModified = '';
     slides: any[] = [];
-    currentSlide = '';
+    currentSlide: any = '';
     slideIndex: number | undefined = undefined;
 
     created(): void {
@@ -108,9 +108,16 @@ export default class EditorV extends Vue {
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as any).saveChanges();
         }
-        this.currentSlide = this.slides[index];
-        this.slideIndex = index;
-        // console.log('NEW SELECTED SLIDE: ', this.currentSlide);
+
+        // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
+        this.currentSlide = {
+            panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
+        };
+
+        setTimeout(() => {
+            this.currentSlide = this.slides[index];
+            this.slideIndex = index;
+        }, 5);
     }
 
     newConfig(): void {
