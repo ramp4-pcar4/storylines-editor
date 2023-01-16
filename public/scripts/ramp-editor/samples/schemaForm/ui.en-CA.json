@@ -5,25 +5,23 @@
     "type": "object",
     "properties": {
         "fullscreen": {
-          "type": "boolean",
-          "default": false,
-          "description": "Indicates viewer takes up entire viewport.",
-          "title": "Fullscreen"
+            "type": "boolean",
+            "default": false,
+            "description": "Indicates viewer takes up entire viewport.",
+            "title": "Fullscreen"
         },
         "theme": {
-          "type": "string",
-          "enum": [
-            "default"
-          ],
-          "default": "default",
-          "description": "UI theme of the viewer.",
-          "title": "Theme"
+            "type": "string",
+            "enum": ["default"],
+            "default": "default",
+            "description": "UI theme of the viewer.",
+            "title": "Theme"
         },
         "logoUrl": {
-          "type": "string",
-          "description": "An optional image to be used in the place of the default viewer logo.",
-          "title": "Logo URL",
-          "default": ""
+            "type": "string",
+            "description": "An optional image to be used in the place of the default viewer logo.",
+            "title": "Logo URL",
+            "default": ""
         },
         "failureFeedback": {
             "type": "object",
@@ -47,7 +45,6 @@
             "type": "string",
             "description": "An optional title to be used in the place of the default viewer title.",
             "title": "Title",
-            "maxLength": 20,
             "default": ""
         },
         "appBar": {
@@ -56,28 +53,28 @@
             "properties": {
                 "sideMenu": {
                     "type": "boolean",
-                      "default": true,
-                      "description": "Shows the side menu button in the main app toolbar.",
-                      "title": "Side Menu"
-                    },
-                    "geoSearch": {
-                      "type": "boolean",
-                      "default": true,
-                      "description": "Shows the geosearch button in the main app toolbar. The button will be hidden if geosearch component is disabled or no search service URLs are provided.",
-                      "title": "Geo Search"
-                    },
-                    "basemap": {
-                      "type": "boolean",
-                      "default": true,
-                      "description": "Shows the basemap selector button in the main app toolbar when the layers menu is open.",
-                      "title": "Basemap Selector"
-                    },
-                    "layers": {
-                      "type": "boolean",
-                      "default": true,
-                      "description": "Shows the layers button in the main app toolbar.",
-                      "title": "Layers Selector"
-                    }
+                    "default": true,
+                    "description": "Shows the side menu button in the main app toolbar.",
+                    "title": "Side Menu"
+                },
+                "geoSearch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Shows the geosearch button in the main app toolbar. The button will be hidden if geosearch component is disabled or no search service URLs are provided.",
+                    "title": "Geo Search"
+                },
+                "basemap": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Shows the basemap selector button in the main app toolbar when the layers menu is open.",
+                    "title": "Basemap Selector"
+                },
+                "layers": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Shows the layers button in the main app toolbar.",
+                    "title": "Layers Selector"
+                }
             },
             "default": { "sideMenu": true, "geoSearch": true, "layers": true },
             "additionalProperties": false,
@@ -89,18 +86,27 @@
             "properties": {
                 "zoom": {
                     "type": "string",
-                    "enum": ["all","buttons","slider"],
+                    "enum": ["all", "buttons", "slider"],
                     "default": "buttons",
                     "title": "Zoom"
                 },
                 "extra": {
-                    "default": ["fullscreen","geoLocator","home","help"],
+                    "default": ["fullscreen", "geoLocator", "home", "help"],
                     "title": "Extra Navigation Components",
                     "type": "array",
                     "items": {
                         "type": "string",
-                        "enum": ["geoLocator","home","basemap","help","fullscreen","geoSearch","sideMenu","layers"],
-                        "default": ["geoLocator","home","help","fullscreen"]
+                        "enum": [
+                            "geoLocator",
+                            "home",
+                            "basemap",
+                            "help",
+                            "fullscreen",
+                            "geoSearch",
+                            "sideMenu",
+                            "layers"
+                        ],
+                        "default": ["geoLocator", "home", "help", "fullscreen"]
                     }
                 }
             },
@@ -119,24 +125,29 @@
                 },
                 "items": {
                     "type": "array",
-                    "default": [["layers","basemap"],["fullscreen","export","share","touch","help","about"],["language"],["plugins"]],
+                    "default": [
+                        ["layers", "basemap"],
+                        ["fullscreen", "export", "share", "touch", "help", "about"],
+                        ["language"],
+                        ["plugins"]
+                    ],
                     "items": {
                         "type": "array",
                         "title": "Items",
                         "items": {
                             "type": "string",
                             "enum": [
-                              "layers",
-                              "basemap",
-                              "geoSearch",
-                              "about",
-                              "fullscreen",
-                              "export",
-                              "share",
-                              "touch",
-                              "help",
-                              "language",
-                              "plugins"
+                                "layers",
+                                "basemap",
+                                "geoSearch",
+                                "about",
+                                "fullscreen",
+                                "export",
+                                "share",
+                                "touch",
+                                "help",
+                                "language",
+                                "plugins"
                             ]
                         }
                     },
@@ -163,54 +174,52 @@
                     "title": "Folder Name",
                     "default": "default"
                 }
-          },
-          "required": [
-            "folderName"
-          ],
-          "additionalProperties": false,
-          "title": "Help File"
+            },
+            "required": ["folderName"],
+            "additionalProperties": false,
+            "title": "Help File"
         },
         "legend": {
             "type": "object",
             "title": "Layers Panel (Legend)",
             "properties": {
                 "reorderable": {
-                  "type": "boolean",
-                  "default": true,
-                  "description": "Specifies if the items in the layers panel (legend) can be reordered; structured legend ignores this property.",
-                  "title": "Is Reorderable"
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Specifies if the items in the layers panel (legend) can be reordered; structured legend ignores this property.",
+                    "title": "Is Reorderable"
                 },
                 "allowImport": {
-                  "type": "boolean",
-                  "default": true,
-                  "description": "Specifies if the user-added layers are allowed.",
-                  "title": "Allow Layers Import"
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Specifies if the user-added layers are allowed.",
+                    "title": "Allow Layers Import"
                 },
                 "isOpen": {
                     "type": "object",
                     "description": "Specifies whether the layers panel (legend) is opened by default on initial loading of the map for small, medium, and large viewports.",
                     "properties": {
                         "large": {
-                              "type": "boolean",
-                              "default": false,
-                              "description": "Whether the layers panel (legend) is opened by default on initial loading of the map for large viewports.",
-                              "title": "Open by default in large display"
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Whether the layers panel (legend) is opened by default on initial loading of the map for large viewports.",
+                            "title": "Open by default in large display"
                         },
                         "medium": {
-                              "type": "boolean",
-                              "default": false,
-                              "description": "Whether the layers panel (legend) is opened by default on initial loading of the map for medium viewports.",
-                              "title": "Open by default in medium display"
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Whether the layers panel (legend) is opened by default on initial loading of the map for medium viewports.",
+                            "title": "Open by default in medium display"
                         },
                         "small": {
-                              "type": "boolean",
-                              "default": false,
-                              "description": "Whether the layers panel (legend) is opened by default on initial loading of the map for small viewports.",
-                              "title": "Open by default in small display"
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Whether the layers panel (legend) is opened by default on initial loading of the map for small viewports.",
+                            "title": "Open by default in small display"
                         }
                     },
-                "additionalProperties": false,
-                "title": "Layers Panel (Legend) Opening Options"
+                    "additionalProperties": false,
+                    "title": "Layers Panel (Legend) Opening Options"
                 }
             }
         },
@@ -220,29 +229,29 @@
             "type": "object",
             "subtype": "oneof",
             "properties": {
-              "content": {
-                  "description": "About properties from string content.",
-                  "title": "Content",
-                  "type": "string",
-                  "required": true
-              },
-              "folderName": {
-                  "description": "About properties from configuration file or Markdown folder. IMPORTANT: Can not be tested in preview mode. Opening the about will generate an error.",
-                  "title": "Folder Name",
-                  "type": "string",
-                  "required": true
-              },
-              "aboutChoice": {
-                  "description": "",
-                  "type": "enum",
-                  "enum": ["string", "folder"],
-                  "title": "About source",
-                  "default": "string",
-                  "required": true
-              },
-              "additionalProperties": false
-              }
-          },
+                "content": {
+                    "description": "About properties from string content.",
+                    "title": "Content",
+                    "type": "string",
+                    "required": false
+                },
+                "folderName": {
+                    "description": "About properties from configuration file or Markdown folder. IMPORTANT: Can not be tested in preview mode. Opening the about will generate an error.",
+                    "title": "Folder Name",
+                    "type": "string",
+                    "required": false
+                },
+                "aboutChoice": {
+                    "description": "",
+                    "type": "enum",
+                    "enum": ["string", "folder"],
+                    "title": "About source",
+                    "default": "string",
+                    "required": false
+                },
+                "additionalProperties": false
+            }
+        },
         "tableIsOpen": {
             "type": "object",
             "description": "Specifies whether the table panel is opened by default on initial loading of the map for small, medium, and large viewports.",

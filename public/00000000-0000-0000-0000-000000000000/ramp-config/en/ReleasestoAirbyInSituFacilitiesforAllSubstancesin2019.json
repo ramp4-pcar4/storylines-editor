@@ -84,6 +84,7 @@
                 "id": "ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019",
                 "name": "Releases to Air by In Situ Facilities for All Substances in 2019",
                 "layerType": "esriFeature",
+                "layerChoice": "esriFeature",
                 "url": "https://section917.canadacentral.cloudapp.azure.com/arcgis/rest/services/StoryRAMP/00000000_0000_0000_0000_000000000000/MapServer/5"
             }
         ],

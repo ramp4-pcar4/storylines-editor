@@ -355,7 +355,12 @@
                 },
                 {
                     "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019(timeslider).json",
-                    "type": "map"
+                    "type": "map",
+                    "timeSlider": {
+                        "range": [2010, 2019],
+                        "start": [2010, 2019],
+                        "attribute": "Reporting_Year___Année"
+                    }
                 }
             ]
         },
