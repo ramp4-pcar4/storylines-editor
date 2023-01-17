@@ -1,5 +1,8 @@
 <template>
-    <div class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
+    <div v-if="config.images.length === 1">
+        <image-panel :config="config.images[0]"></image-panel>
+    </div>
+    <div v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <full-screen :expandable="config.fullscreen" :type="config.type">
             <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
                 <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
@@ -29,6 +32,7 @@ import MarkdownIt from 'markdown-it';
 
 import { SlideshowPanel } from '@/definitions';
 import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
+import ImagePanelV from '@/components/panels/image-panel.vue';
 
 @Component({
     components: {
@@ -36,7 +40,8 @@ import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
         Slide,
         'full-screen': FullscreenV,
         HooperNavigation,
-        HooperPagination
+        HooperPagination,
+        'image-panel': ImagePanelV
     }
 })
 export default class SlideshowPanelV extends Vue {

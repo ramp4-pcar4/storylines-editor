@@ -22,11 +22,11 @@
         </div>
 
         <!-- Gallery preview of all images -->
-        <ul class="flex flex-wrap list-none" v-show="imageFiles.length">
-            <ImagePreview v-for="(image, idx) in imageFiles" :key="idx" :imageFile="image" @delete="deleteImage">
+        <ul class="flex flex-wrap list-none" v-show="imagePreviews.length">
+            <ImagePreview v-for="(image, idx) in imagePreviews" :key="idx" :imageFile="image" @delete="deleteImage">
                 <div class="flex mt-4 items-center">
                     <label class="alt-label">Alt tag:</label>
-                    <input type="text" />
+                    <input type="text" v-model="image.altText" />
                 </div>
             </ImagePreview>
         </ul>
@@ -48,47 +48,38 @@ export default class ImageEditorV extends Vue {
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
 
-    imageFiles = [] as Array<ImageFile>;
     dragging = false;
-    // TODO: add file saving mechanism once user save storylines task complete #227
-
-    mounted(): void {
-        // load image files from existing storylines product
-        if (this.panel.type === 'slideshow' && this.panel.images.length) {
-            this.imageFiles = this.panel.images.map((image: ImagePanel) => {
-                const path = image.src.match(/.*\/(.*)$/);
-                return {
-                    id: path ? path[-1] : image.src,
-                    src: image.src,
-                    altText: image.altText
-                };
-            });
-        } else if (this.panel.src !== undefined) {
-            const path = this.panel.src.match(/.*\/(.*)$/);
-            this.imageFiles.push({
-                id: path ? path[-1] : this.panel.src,
-                src: this.panel.src,
-                altText: this.panel.altText
-            });
-        }
-    }
+    imagePreviews = [] as Array<ImageFile>;
 
     get isDragging(): boolean {
         return this.dragging;
     }
 
+    mounted(): void {
+        if (this.panel.images !== undefined && this.panel.images.length) {
+            this.imagePreviews = this.panel.images.map((image: ImagePanel) => {
+                const filename = image.src.replace(/^.*[\\/]/, '');
+                return {
+                    ...image,
+                    id: filename ? filename : image.src,
+                    src: image.temp ? image.temp : image.src
+                };
+            });
+        }
+    }
+
     onFileChange(e: Event): void {
         // create object URL(s) to display image(s)
         const filelist = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>);
-        this.imageFiles.push(
+        this.imagePreviews.push(
             ...filelist.map((file: File) => {
                 // Add the uploaded images to the product ZIP file.
                 this.configFileStructure.assets[this.lang].file(file.name, file);
 
                 return {
                     id: file.name,
-                    src: URL.createObjectURL(file),
-                    altText: ''
+                    altText: '',
+                    src: URL.createObjectURL(file)
                 };
             })
         );
@@ -97,15 +88,15 @@ export default class ImageEditorV extends Vue {
     dropImages(e: DragEvent): void {
         if (e.dataTransfer !== null) {
             const files = [...e.dataTransfer.files];
-            this.imageFiles.push(
+            this.imagePreviews.push(
                 ...files.map((file: File) => {
                     // Add the uploaded images to the product ZIP file.
                     this.configFileStructure.assets[this.lang].file(file.name, file);
 
                     return {
                         id: file.name,
-                        src: URL.createObjectURL(file),
-                        altText: ''
+                        altText: '',
+                        src: URL.createObjectURL(file)
                     };
                 })
             );
@@ -114,16 +105,23 @@ export default class ImageEditorV extends Vue {
     }
 
     deleteImage(img: ImageFile): void {
-        const idx = this.imageFiles.findIndex((file: ImageFile) => file.id === img.id);
+        const idx = this.imagePreviews.findIndex((file: ImageFile) => file.id === img.id);
         if (idx !== -1) {
             // Remove the image from the product ZIP file.
-            this.configFileStructure.assets[this.lang].remove(this.imageFiles[idx].id);
-            this.imageFiles.splice(idx, 1);
+            this.configFileStructure.assets[this.lang].remove(this.imagePreviews[idx].id);
+            URL.revokeObjectURL(this.imagePreviews[idx].src);
+            this.imagePreviews.splice(idx, 1);
         }
     }
 
     saveChanges(): void {
-        // TODO - save all alt texts, image files, final config, etc.
+        this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
+            return {
+                ...imageFile,
+                src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`,
+                temp: imageFile.src // TODO: can and should remove this property on final config save
+            };
+        });
     }
 }
 </script>

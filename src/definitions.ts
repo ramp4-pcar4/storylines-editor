@@ -106,7 +106,7 @@ export interface BasePanel {
 export interface TextPanel extends BasePanel {
     type: PanelType.Text;
     title: string;
-    titleTag: string;
+    titleTag?: string;
     content: string; // in md format
 }
 
@@ -127,7 +127,7 @@ export interface TimeSliderConfig {
 export interface DynamicPanel extends BasePanel {
     type: PanelType.Dynamic;
     title: string;
-    titleTag: string;
+    titleTag?: string;
     content: string;
     children: DynamicChildItem[];
 }
@@ -142,6 +142,7 @@ export interface ImagePanel extends BasePanel {
     src: string;
     width?: number;
     height?: number;
+    temp?: string;
     class?: string;
     fullscreen?: boolean;
     altText?: string;
@@ -191,4 +192,10 @@ export interface ImageFile {
     altText: string;
     width?: number;
     height?: number;
+}
+
+export interface DefaultConfigs {
+    text: TextPanel;
+    slideshow: SlideshowPanel;
+    chart: ChartPanel;
 }

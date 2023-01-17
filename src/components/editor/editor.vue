@@ -43,6 +43,7 @@
                     <slide-toc :slides="slides" @slide-change="selectSlide"></slide-toc>
                 </div>
                 <slide-editor
+                    ref="slide"
                     :configFileStructure="configFileStructure"
                     :currentSlide="currentSlide"
                     :lang="lang"
@@ -56,7 +57,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Route } from 'vue-router';
-import { StoryRampConfig } from '@/definitions';
+import { StoryRampConfig, Slide } from '@/definitions';
 import { saveAs } from 'file-saver';
 
 const JSZip = require('jszip');
@@ -103,8 +104,13 @@ export default class EditorV extends Vue {
     }
 
     selectSlide(index: number): void {
+        // save changes to current slide before changing slides
+        if (this.$refs.slide !== undefined) {
+            (this.$refs.slide as any).saveChanges();
+        }
         this.currentSlide = this.slides[index];
         this.slideIndex = index;
+        // console.log('NEW SELECTED SLIDE: ', this.currentSlide);
     }
 
     newConfig(): void {
@@ -145,11 +151,23 @@ export default class EditorV extends Vue {
                 res.json().then((config: StoryRampConfig) => {
                     this.config = config;
                     this.loadStatus = 'loaded';
+                    this.configFileStructure.uuid = this.uuid;
 
                     // Load in form values from the config file.
                     if (this.config) {
                         this.title = this.config.title;
                         this.slides = this.config.slides;
+                        // conversion for individual image panels (see proposal on PR to clean up this process with small refactor)
+                        this.slides.forEach((slide: Slide) => {
+                            if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
+                                const newSlide = {
+                                    type: 'slideshow',
+                                    images: [slide.panel[1]]
+                                };
+                                slide.panel[1] = Object.assign({}, newSlide);
+                            }
+                        });
+
                         this.logo = this.config.introSlide.logo.src;
                         this.contextLink = this.config.contextLink;
                         this.contextLabel = this.config.contextLabel;
@@ -181,7 +199,7 @@ export default class EditorV extends Vue {
      * Generates a new ZIP file and creates required project folders.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper() {
+    configFileStructureHelper(): any {
         // Create a new ZIP file with our configuration structure.
         this.configFileStructure = new JSZip();
 
@@ -208,6 +226,9 @@ export default class EditorV extends Vue {
     }
 
     generateConfig(): StoryRampConfig {
+        // save current slide final changes before generating config file
+        (this.$refs.slide as any).saveChanges();
+
         const configFile = {
             title: this.title,
             lang: this.lang,

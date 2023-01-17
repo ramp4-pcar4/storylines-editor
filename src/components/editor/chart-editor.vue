@@ -81,7 +81,7 @@ export default class ChartEditorV extends Vue {
         });
 
         // load charts from existing storylines product
-        if (this.panel.charts && this.panel.charts.length) {
+        if (this.panel.charts !== undefined && this.panel.charts.length) {
             this.chartConfigs = this.panel.charts.map((chart: ChartConfig) => {
                 let chartName = '';
                 // extract chart name
@@ -116,7 +116,7 @@ export default class ChartEditorV extends Vue {
         } else {
             const chartConfig = {
                 name: chart.title.text,
-                src: '',
+                src: `${this.configFileStructure.uuid}/charts/en/${chart.title.text}.json`,
                 config: chart
             };
 
@@ -148,6 +148,10 @@ export default class ChartEditorV extends Vue {
             this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
             this.chartConfigs.splice(idx, 1);
         }
+    }
+
+    saveChanges(): void {
+        this.panel.charts = this.chartConfigs; // option to delete config property as is redundant
     }
 }
 </script>

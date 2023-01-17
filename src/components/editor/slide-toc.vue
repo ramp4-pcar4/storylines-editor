@@ -48,8 +48,6 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Route } from 'vue-router';
-import { StoryRampConfig } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
@@ -94,7 +92,7 @@ export default class SlideTocV extends Vue {
                 this.slideIndex = undefined;
                 this.$emit('slide-change', this.slideIndex);
             }
-            const removedSlide = this.slides.splice(index, 1) as any;
+            this.slides.splice(index, 1) as any;
         }
     }
 
