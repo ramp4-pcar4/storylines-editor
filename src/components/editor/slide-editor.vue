@@ -31,7 +31,9 @@
                             v-model="currentSlide.panel[panelIndex].type"
                         > -->
                             <option
-                                v-for="thing in Object.keys(editors).filter((editor) => editor !== 'slideshow')"
+                                v-for="thing in Object.keys(editors).filter(
+                                    (editor) => editor !== 'slideshow' && editor !== 'loading'
+                                )"
                                 :key="thing"
                                 :value="thing === 'image' ? 'slideshow' : thing"
                             >
@@ -66,6 +68,7 @@ import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
+import LoadingPageV from './helpers/loading-page.vue';
 
 @Component({
     components: {
@@ -73,7 +76,8 @@ import MapEditorV from './map-editor.vue';
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
-        'map-editor': MapEditorV
+        'map-editor': MapEditorV,
+        'loading-page': LoadingPageV
     }
 })
 export default class SlideEditorV extends Vue {
@@ -90,7 +94,8 @@ export default class SlideEditorV extends Vue {
         image: 'image-editor',
         slideshow: 'image-editor',
         chart: 'chart-editor',
-        map: 'map-editor'
+        map: 'map-editor',
+        loading: 'loading-page'
     };
 
     changePanelType(type: string): void {
