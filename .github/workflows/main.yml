@@ -1,0 +1,21 @@
+on:
+    pull_request_target:
+        types: [opened, synchronize]
+
+    push:
+        branches:
+            - main
+            - develop
+
+permissions:
+    contents: write
+
+jobs:
+    build:
+        name: Install dependencies and build demo files
+        uses: ./.github/workflows/build.yml
+
+    deploy:
+        needs: [build]
+        name: Deploy files
+        uses: ./.github/workflows/pages.yml
