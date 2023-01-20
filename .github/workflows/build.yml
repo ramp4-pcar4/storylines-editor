@@ -36,6 +36,11 @@ jobs:
                   ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
                   repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
+            - name: Setup Node version
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 14.15.4
+
             - name: Install and build
               run: |
                   npm ci
