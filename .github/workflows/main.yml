@@ -14,8 +14,11 @@ jobs:
     build:
         name: Install dependencies and build
         uses: ./.github/workflows/build.yml
+        with:
+            cache_sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
     deploy:
-        needs: [build]
         name: Deploy files
         uses: ./.github/workflows/pages.yml
+        with:
+            cache_sha: ${{ github.event.pull_request.head.sha || github.sha }}
