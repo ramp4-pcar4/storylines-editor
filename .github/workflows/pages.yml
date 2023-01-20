@@ -2,6 +2,10 @@ name: Publish to GitHub pages
 
 on:
     workflow_call:
+        inputs:
+            cache_sha:
+                type: string
+                required: true
 
 jobs:
     deploy-to-pages:
@@ -10,6 +14,12 @@ jobs:
         steps:
             - name: Checkout 🛎️
               uses: actions/checkout@v3
+
+            - name: Get dist files
+              uses: actions/cache@v3
+              with:
+                  path: dist
+                  key: dist-${{ inputs.cache_sha }}
 
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@v4
