@@ -1,0 +1,14 @@
+{
+    "schema": "intentions",
+    "title": "Intentions",
+    "description": "Activer/désactiver les intentions ou remplacer avec votre propre implémentation.",
+    "type": "object",
+    "properties": {
+        "epsg": {
+            "description": "Intention pour la recherche de code EPSG.",
+            "type": "string",
+            "default": "none"
+        }
+    },
+    "additionalProperties": false
+}
