@@ -12,7 +12,7 @@ permissions:
 
 jobs:
     build:
-        name: Install dependencies and build demo files
+        name: Install dependencies and build
         uses: ./.github/workflows/build.yml
 
     deploy:
