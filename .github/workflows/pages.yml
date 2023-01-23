@@ -7,9 +7,11 @@ on:
                 type: string
                 required: true
 
+permissions:
+    pull-requests: write
+
 jobs:
     deploy-to-pages:
-        permissions: write
         name: Deploy to GitHub pages
         runs-on: ubuntu-latest
         steps:
