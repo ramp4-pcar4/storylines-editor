@@ -17,6 +17,8 @@ jobs:
             - name: Delete files
               shell: bash
               run: |
+                  git config --global user.email "fengyilei1@gmail.com"
+                  git config --global user.name "Yi Lei Feng"
                   git rm -r ${{ github.head_ref }}/*
                   git commit -a -m 'Delete PR demo from GH pages ${{ github.head_ref }}'
                   git push origin HEAD:gh-pages
