@@ -7,9 +7,6 @@ on:
             - main
             - develop
 
-permissions:
-    contents: write
-
 jobs:
     build:
         name: Install dependencies and build
