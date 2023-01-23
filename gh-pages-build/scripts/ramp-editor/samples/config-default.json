@@ -1,0 +1,146 @@
+{
+    "map": {
+        "components": {
+            "mouseInfo": {
+                "enabled": true,
+                "spatialReference": {
+                    "wkid": 4326,
+                    "vcsWkid": null,
+                    "latestWkid": null,
+                    "latestVcsWkid": null,
+                    "wkt": ""
+                }
+            },
+            "northArrow": {
+                "enabled": true
+            },
+            "basemap": {
+                "enabled": true
+            },
+            "overviewMap": {
+                "enabled": true,
+                "expandFactor": 4,
+                "initiallyExpanded": true
+            },
+            "scaleBar": {
+                "enabled": true
+            }
+        },
+        "initialBasemapId": "",
+        "extentSets": [],
+        "lodSets": [],
+        "tileSchemas": [],
+        "baseMaps": [],
+        "layers": [],
+        "legend": {
+            "legendChoice": "autopopulate",
+            "type": "autopopulate",
+            "root": {
+                "name": "root",
+                "children": []
+            }
+        }
+    },
+    "ui": {
+        "sideMenu": {
+            "items": [],
+            "logo": true
+        },
+        "about": {
+            "aboutChoice": "string"
+        },
+        "fullscreen": false,
+        "theme": "default",
+        "logoUrl": "",
+        "failureFeedback": {
+            "failureMessage": "",
+            "failureImageUrl": ""
+        },
+        "title": "",
+        "appBar": {
+            "sideMenu": true,
+            "geoSearch": true,
+            "basemap": true,
+            "layers": true
+        },
+        "navBar": {
+            "zoom": "buttons",
+            "extra": ["fullscreen", "geoLocator", "home", "help"]
+        },
+        "restrictNavigation": false,
+        "help": {
+            "folderName": "default"
+        },
+        "legend": {
+            "reorderable": true,
+            "allowImport": true,
+            "isOpen": {
+                "large": false,
+                "medium": false,
+                "small": false
+            }
+        },
+        "tableIsOpen": {
+            "id": "",
+            "large": false,
+            "medium": false,
+            "small": false
+        },
+        "widgetsWidget": ""
+    },
+    "services": {
+        "proxyUrl": "https://maps.canada.ca/wmsproxy/ws/wmsproxy/executeFromProxy",
+        "geometryUrl": "https://webservices.maps.canada.ca/arcgis/rest/services/Utilities/Geometry/GeometryServer",
+        "exportMapUrl": "https://webservices.maps.canada.ca/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+        "search": {
+            "serviceUrls": {
+                "geoNames": "https://geogratis.gc.ca/services/geoname/en/geonames.json",
+                "geoLocation": "https://geogratis.gc.ca/services/geolocation/en/locate?q=",
+                "geoSuggest": "https://geogratis.gc.ca/services/geolocation/en/suggest?q=",
+                "provinces": "https://geogratis.gc.ca/services/geoname/en/codes/province.json",
+                "types": "https://geogratis.gc.ca/services/geoname/en/codes/concise.json"
+            },
+            "disabledSearches": ["NTS", "FSA", "SCALE", "LAT/LNG"]
+        },
+        "export": {
+            "title": {
+                "isSelected": true,
+                "isSelectable": true,
+                "value": ""
+            },
+            "footnote": {
+                "isSelected": true,
+                "isSelectable": true,
+                "value": ""
+            },
+            "map": {
+                "isSelected": true,
+                "isSelectable": false,
+                "value": ""
+            },
+            "mapElements": {
+                "isSelected": true,
+                "isSelectable": true,
+                "value": ""
+            },
+            "legend": {
+                "isSelected": true,
+                "isSelectable": true,
+                "value": "",
+                "showInfoSymbology": false,
+                "showControlledSymbology": false
+            },
+            "timestamp": {
+                "isSelected": true,
+                "isSelectable": true,
+                "value": ""
+            }
+        },
+        "googleAPIKey": "",
+        "geolocation": "",
+        "coordInfo": "",
+        "print": ""
+    },
+    "version": "3.3.2",
+    "language": "en"
+}

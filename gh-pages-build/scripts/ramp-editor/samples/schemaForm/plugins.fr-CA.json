@@ -1,0 +1,743 @@
+{
+    "schema": "plugins",
+    "title": "Plugins",
+    "description": "Les plugins du schéma à utiliser. Chaque plugin sera dans son propre onglet.",
+    "type": "object",
+    "properties": {
+        "rangeSlider": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                },
+                "open": {
+                    "type": "boolean",
+                    "title": "Ouvert par défaut",
+                    "default": true
+                },
+                "autorun": {
+                    "type": "boolean",
+                    "title": "Démarrer l'animation au chargement",
+                    "defaul": false
+                },
+                "loop": {
+                    "type": "boolean",
+                    "title": "Jouer l'animation en boucle",
+                    "default": false
+                },
+                "controls": {
+                    "type": "array",
+                    "default": ["lock", "delay"],
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                             "lock",
+                            "loop",
+                            "delay",
+                            "export",
+                            "refresh"
+                        ]
+                    },
+                    "title": "Contrôles de la barre de défilement"
+                },
+                "params": {
+                    "type": "object",
+                    "title": "Paramètres",
+                    "properties": {
+                        "type": {
+                            "title": "Type de curseur",
+                            "type": "string",
+                            "enum": [
+                                "number",
+                                "date",
+                                "wmst"
+                            ],
+                            "description": "Si la valeur 'Date' ou 'WMS-T' est sélectionnée, la valeur de la plage et de la limite est en millisecondes. Note: Date est pour les couche esri et WMS-T est pour les couches ogc WMS-T.",
+                            "default": "number"
+                        },
+                        "rangeType": {
+                            "title": "Type d'étendue",
+                            "type": "string",
+                            "enum": [
+                                "single",
+                                "dual"
+                            ],
+                            "description": "Type d'étendue (simple pour une poignée ou double pour 2 poignées).",
+                            "default": "dual"
+                        },
+                        "stepType": {
+                            "title": "Type de limite",
+                            "type": "string",
+                            "enum": [
+                                "dynamic",
+                                "static"
+                            ],
+                            "description": "Type de limite (dynamique pour les valeurs ouvertes ou statique à partir d'une liste de valeurs).",
+                            "default": "dynamic"
+                        },
+                        "precision": {
+                            "title": "Précision",
+                            "type": "string",
+                            "enum": [
+                                "0",
+                                "1",
+                                "2",
+                                "date",
+                                "hour"
+                            ],
+                            "description": "Précision des données numériques (0, 1, 2) ou de la date (date, heure).",
+                            "default": "0"
+                        },
+                        "delay": {
+                            "title": "Délais de l'animation",
+                            "type": "string",
+                            "enum": [
+                                "3000",
+                                "4000",
+                                "5000",
+                                "6000",
+                                "7000"
+                            ],
+                            "description": "Délais entre les animations.",
+                            "default": "3000"
+                        },
+                        "range": {
+                            "type": "object",
+                            "title": "Valeurs par défault de la plage",
+                            "properties": {
+                                "min": {
+                                    "type": "number",
+                                    "title": "Plage min",
+                                    "description": "La valeur minimale pour la plage. Si non défini, la limite minimale sera utilisée. Doit être définie pour les couches WMS.",
+                                    "default": 0
+                                },
+                                "max": {
+                                    "type": "number",
+                                    "title": "Plage max",
+                                    "description": "La valeur maximale pour la plage. Si non défini, la limite maximale sera utilisée. Doit être définie pour les couches WMS.",
+                                    "default": 1
+                                }
+                            }
+                        },
+                        "limit": {
+                            "type": "object",
+                            "title": "Valeurs par défault de la limite",
+                            "properties": {
+                                "min": {
+                                    "type": "number",
+                                    "title": "Limite min",
+                                    "description": "La valeur minimale pour la limite. Si non défini, le valeur sera trouvée à l'aide des valeurs de la couche. Note: Doit être définie pour les couches WMS.",
+                                    "default": 0
+                                },
+                                "max": {
+                                    "type": "number",
+                                    "title": "Limite max",
+                                    "description": "La valeur maximale pour la limite. Si non défini, le valeur sera trouvée à l'aide des valeurs de la couche. Note: Doit être définie pour les couches WMS.",
+                                    "default": 1
+                                },
+                                "staticItems": {
+                                    "type": "array",
+                                    "title": "Valeurs limite statique",
+                                    "items": {
+                                        "title": "Valeur",
+                                        "type": "number"
+                                    },
+                                    "default": [],
+                                    "description": "Les valeurs de la limite statique. Remarque: Utilisez les limites Limite min et Limite max pour définir les limites inférieure et supérieure."
+                                }
+                            }
+                        },
+                        "units": {
+                            "type": "string",
+                            "title": "Unités",
+                            "description": "Montré à droite de l'axe du temps. Soyez bref pour améliorer la lisibilité.",
+                            "default": ""
+                        },
+                        "description": {
+                            "type": "string",
+                            "title": "Description",
+                            "description": "Description à ajouter dans la section sous le curseur."
+                        }
+                    },
+                    "required": ["type"]
+                },
+                "layers": {
+                    "type": "array",
+                    "title": "Couches",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "description": "L'identifiant de la couche pour le référencement dans le visualiseur (ne concerne pas directement un service externe).",
+                                "title": "ID"
+                            },
+                            "field": {
+                                "type": "string",
+                                "description": "Le nom du champ à utiliser.",
+                                "title": "Nom du champ",
+                                "default": ""
+                            }
+                        },
+                        "required": ["id", "field"]
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": ["params", "layers"]
+        },
+        "coordInfo": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                }
+            }
+        },
+        "areasOfInterest": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                },
+                "areas": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "title-en-CA": {
+                                "type": "string",
+                                "title": "Titre anglais"
+                            },
+                            "title-fr-CA": {
+                                "type": "string",
+                                "title": "Titre français"
+                            },
+                            "xmin": {
+                                "type": "number",
+                                "title": "Valeur minimum x",
+                                "default": -4844430
+                            },
+                            "ymin": {
+                                "type": "number",
+                                "title": "Valeur minimum x y",
+                                "default": -1052774
+                            },
+                            "xmax": {
+                                "type": "number",
+                                "title": "Valeur maximal x x",
+                                "default": 5666163
+                            },
+                            "ymax": {
+                                "type": "number",
+                                "title": "Valeur maximal x y",
+                                "default": 4170111
+                            },
+                            "wkid": {
+                                "type": "number",
+                                "title": "Spatial Reference",
+                                "default": 3978
+                            },
+                            "thumbnailUrl": {
+                                "type": "string",
+                                "title": "URL de la vignette"
+                            }
+                        },
+                        "required": ["title-en-CA", "title-fr-CA"]
+                    }
+                }
+            }
+        },
+        "chart": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                },
+                "type": {
+                    "title": "Type de graphique",
+                    "type": "string",
+                    "enum": [
+                        "pie",
+                        "bar",
+                        "line"
+                    ],
+                    "description": "",
+                    "default": "pie"
+                },
+                "title": {
+                    "title": "Titre",
+                    "type": "string",
+                    "default": ""
+                },
+                "labelsPie": {
+                        "type": "object",
+                        "title": "Étiquettes",
+                        "properties": {
+                            "type": {
+                                "title": "Type",
+                                "type": "string",
+                                "enum": [
+                                    "field",
+                                    "config"
+                                ],
+                                "description": "Récupérer les étiquettes d'un champ ou de la configuration.",
+                                "default": "config"
+                            },
+                            "values": {
+                                "title": "Valeurs",
+                                "type": "string",
+                                "description": "Valeurs séparées par un point-virgule ou un nom de champ.",
+                                "default": ""
+                            },
+                            "split": {
+                                "title": "Caractère de division",
+                                "type": "string",
+                                "description": "Caractère à utiliser pour scinder une liste de valeurs.",
+                                "default": ";"
+                            }
+                        },
+                        "required": ["type", "values", "split"]
+                },
+                "options": {
+                    "title": "Options",
+                    "type": "object",
+                    "properties": {
+                        "colors": {
+                            "title": "Couleurs des jeux de données",
+                            "type": "string",
+                            "description": "Code de couleur hexadécimal séparé par un point-virgule. Si non fourni, les couleurs par défaut seront utilisées.",
+                            "default": ""
+                        },
+                        "cutOut": {
+                            "title": "Pourcentage de découpe",
+                            "type": "number",
+                            "description": "Pourcentage de découpe pour donner un effet de beigne.",
+                            "default": 0,
+                            "minimum": 0,
+                            "maximum": 80
+                        }
+                    },
+                    "required": ["cutOut"]
+                },
+                "axis": {
+                    "type": "object",
+                    "title": "Labels",
+                    "properties": {
+                        "xAxis": {
+                            "title": "Axe des X",
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "title": "Titre",
+                                    "type": "string",
+                                    "default": ""
+                                },
+                                "type": {
+                                    "title": "Type",
+                                    "type": "string",
+                                    "enum": [
+                                        "field",
+                                        "config",
+                                        "linear",
+                                        "date"
+                                    ],
+                                    "description": "Récupérer les étiquettes d'un champ ou de la configuration pour un graphique de type bar ou bien par valeurs (date ou linéaire) pour un grpahique de type ligne.",
+                                    "default": "config"
+                                },
+                                "values": {
+                                    "title": "Valeurs",
+                                    "type": "string",
+                                    "description": "Valeurs séparées par un point-virgule ou un nom de champ.",
+                                    "default": ""
+                                },
+                                "split": {
+                                    "title": "Caractère de division",
+                                    "type": "string",
+                                    "description": "Caractère à utiliser pour scinder une liste de valeurs.",
+                                    "default": ";"
+                                }
+                            },
+                            "required": ["type", "values", "split"]
+                        },
+                        "yAxis": {
+                            "title": "Y Axis",
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "title": "Titre",
+                                    "type": "string",
+                                    "default": ""
+                                },
+                                "type": {
+                                    "title": "Type",
+                                    "type": "string",
+                                    "enum": [
+                                        "field",
+                                        "config",
+                                        "linear",
+                                        "date"
+                                    ],
+                                    "description": "Récupérer les étiquettes d'un champ ou de la configuration pour un graphique de type bar ou bien par valeurs (date ou linéaire) pour un grpahique de type ligne.",
+                                    "default": "config"
+                                },
+                                "values": {
+                                    "title": "Valeurs",
+                                    "type": "string",
+                                    "description": "Valeurs séparées par un point-virgule ou un nom de champ.",
+                                    "default": ""
+                                },
+                                "split": {
+                                    "title": "Caractère de division",
+                                    "type": "string",
+                                    "description": "Caractère à utiliser pour scinder une liste de valeurs.",
+                                    "default": ";"
+                                }
+                            },
+                            "required": ["type", "values", "split"]
+                        },
+                        "required": ["xAxis", "yAxis"]
+                    }
+                },
+                "layers": {
+                    "type": "array",
+                    "title": "Couches",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "title": "identifiant de la Couche",
+                                "type": "string",
+                                "description": ""
+                            },
+                            "nameField": {
+                                "type": "string",
+                                "title": "Champ nommé",
+                                "description": "Nom du champ à utiliser pour la zone de liste déroulante pour la sélection de graphique lorsque qu'il y a plusieurs graphiques."
+                            },
+                            "type": {
+                                "title": "Type de données du graphique",
+                                "type": "string",
+                                "enum": [
+                                    "inline",
+                                    "link"
+                                ],
+                                "description": "Type de données (interne pour les éléments à l'intérieur de la couche ou lié pour les éléments à l'intérieur d'une table de liens).",
+                                "default": "inline"
+                            },
+                            "linkUrl": {
+                                "type": "string",
+                                "title": "URL table de liens",
+                                "description": "URL de la table de liens."
+                            },
+                            "linkField": {
+                                "type": "string",
+                                "title": "Champ lié",
+                                "description": "Nom du champ pour le lien entre la couche et la table."
+                            },
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "title": "Type de données à l'intérieur du champ",
+                                            "type": "string",
+                                            "enum": [
+                                                "single",
+                                                "combine"
+                                            ],
+                                            "description": "Unique s'il n'y a qu'une seule valeur dans le champ. Combinez si vous utilisez l’axe temps et que le temps et la valeur font partie du champ.",
+                                            "default": "single"
+                                        },
+                                        "linkType": {
+                                            "title": "Type de lien",
+                                            "type": "string",
+                                            "enum": [
+                                                "single",
+                                                "multi"
+                                            ],
+                                            "description": "La structure des données à l'intérieur de la table de liens (unique pour un champ pour la valeur et un pour la date OU multi s'il y a plusieurs ensembles de données dans un champ et que le graphique doit analyser).",
+                                            "default": "single"
+                                        },
+                                        "link": {
+                                            "title": "Champ Lien",
+                                            "type": "string",
+                                            "description": "Champs lien entre la table et la couche."
+                                        },
+                                        "date": {
+                                            "title": "Champ date",
+                                            "type": "string",
+                                            "description": "Champs à utiliser pour la date."
+                                        },
+                                        "measure": {
+                                            "title": "Champ de mesure",
+                                            "type": "string"
+                                        },
+                                        "values": {
+                                            "title": "Valeurs étiquettes",
+                                            "type": "string",
+                                            "description": "Nom du champs pour obtenir les étiquettes dans un type de lien multi."
+                                        },
+                                        "label": {
+                                            "type": "object",
+                                            "title": "Étiquettes des jeux de données",
+                                            "properties": {
+                                                "type": {
+                                                    "title": "Type",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "field",
+                                                        "config"
+                                                    ],
+                                                    "description": "Récupérer les étiquettes d'un champ ou de la configuration.",
+                                                    "default": "config"
+                                                },
+                                                "values": {
+                                                    "title": "Valeurs",
+                                                    "type": "string",
+                                                    "description": "Valeurs séparées par un point-virgule ou un nom de champ.",
+                                                    "default": ""
+                                                },
+                                                "split": {
+                                                    "title": "Caractère de division",
+                                                    "type": "string",
+                                                    "description": "Caractère à utiliser pour scinder une liste de valeurs.",
+                                                    "default": ";"
+                                                }
+                                            },
+                                            "required": ["type", "values", "split"]
+                                        },
+                                        "regex": {
+                                            "title": "Séparateur de données",
+                                            "type": "string",
+                                            "description": "<p>Valeur regex pour fractionner les jeux de donn&eacute;es &agrave; l'int&eacute;rieur du champ <br /><br /> Ce champ sert &agrave; g&eacute;rer lorsque vous avez plusieurs jeux de donn&eacute;es ou que vous combinez des valeurs dans un m&ecirc;me champ. Pour pouvoir s&eacute;parer les jeux de donn&eacute;es des valeurs, nous devons utiliser une expression r&eacute;guli&egrave;re. Nous vous encourageons &agrave; utiliser vos donn&eacute;es et &agrave; tester votre expression sur un site en ligne tel que https://regex101.com. <br /> <br /> Vous trouverez ci-dessous une liste d&rsquo;&eacute;chantillons de jeux de donn&eacute;es et de regex:</p><ul><li>Exemple 1<ul><li>Donn&eacute;es: [255; 255; 255];[120; 232; 23];[32; 44; 134]</li><li>Regex: \\\\[|\\\\];\\\\[|\\\\]</li><li>Sortie: 3 jeux de donn&eacute;es (par exemple 255;255;255). Les valeurs &agrave; l'int&eacute;rieur du jeu de donn&eacute;es seront divis&eacute;es par le champ 'S&eacute;parateur de valeurs'.</li></ul></li><li>Exemple 2</li><ul><li>Donn&eacute;es: (2011-03-28, 0.511),(2011-04-04,0.421)</li><li>Regex: \\\\(|\\\\),\\\\(|\\\\)</li><li>Sortie: 1 jeu de donn&eacute;es, 2 paires de valeurs (par exemple 2011-03-28,0.511). Les valeurs sont combin&eacute;es (axes y et x) et seront divis&eacute;es par le champ 'S&eacute;parateur de valeurs'.</li></ul></ul><p><em>Remarque: nous devons doubler le caract&egrave;re '\\'</em></p>"
+                                        },
+                                        "split": {
+                                            "title": "Séparateur de valeurs",
+                                            "type": "string",
+                                            "default": ";",
+                                            "description": "Caractère à utiliser pour scinder des valeurs dans un champ. Par exemple, un champ contient '10;20;30' signifie qu'il y a 3 valeurs divisées par ';' ou [1,2,3];[4,5,6] signifie qu'il y a 2 jeux de données avec 3 valeurs, chacunes divisée par ','."
+                                        },
+                                        "prefix": {
+                                            "title": "Préfixe",
+                                            "type": "string",
+                                            "default": "",
+                                            "description": "Préfixe à ajouter au survol de données."
+                                        },
+                                        "suffix": {
+                                            "title": "Suffixe",
+                                            "type": "string",
+                                            "default": "",
+                                            "description": "Suffixe à ajouter au survol de données."
+                                        }
+                                    },
+                                    "required": ["type", "measure", "split"]
+                                }
+                            },
+                            "details": {
+                                "type": "object",
+                                "title": "Détails",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "title": "Activer"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "title": "Valeur",
+                                        "description": "Chaîne de texte avec les détails personnalisés en notation markdown."
+                                    }
+                                }
+                            }
+                        },
+                        "required": ["id", "nameField", "type", "data"]
+                    }
+                },
+                "required": ["type", "layers"]
+            }
+        },
+        "swiper": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                },
+                "type": {
+                    "type": "string",
+                    "title": "Type",
+                    "enum": [
+                        "vertical"
+                    ],
+                    "default": "vertical"
+                },
+                "keyboardOffset": {
+                    "type": "number",
+                    "title": "Déplacement clavier",
+                    "description": "Valeur en pixel du déplacement du glisseur.",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 100
+                },
+                "layers": {
+                    "type": "array",
+                    "title": "Couches",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "description": "L'identifiant de la couche pour le référencement dans le visualiseur (ne concerne pas directement un service externe).",
+                                "title": "ID"
+                            }
+                        },
+                        "required": ["id"]
+                    }
+                },
+                "required": ["type", "keyboardOffset", "layers"]
+            }
+        },
+        "draw": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                },
+                "open": {
+                    "type": "boolean",
+                    "title": "Ouvert par défaut",
+                    "default": true
+                },
+                "tools": {
+                    "type": "array",
+                    "title": "Outils",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "picker", "point", "polyline", "polygon", "edit", "measure", "extent", "write", "read"
+                        ]
+                    },
+                    "description": "Outils à ajouter à la barre d'outils de dessin.",
+                    "default": ["picker", "point", "polyline", "polygon", "edit", "measure", "extent", "write", "read"]
+                }
+            }
+        },
+        "thematicSlider": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "title": "Activer"
+                },
+                "open": {
+                    "type": "boolean",
+                    "title": "Ouvert par défaut",
+                    "default": true
+                },
+                "autorun": {
+                    "type": "boolean",
+                    "title": "Démarrer l'animation au chargement",
+                    "defaul": false
+                },
+                "loop": {
+                    "type": "boolean",
+                    "title": "Jouer l'animation en boucle",
+                    "default": false
+                },
+                "slider": {
+                    "type": "boolean",
+                    "title": "Activer la barre de défilement",
+                    "default": true
+                },
+                "stack": {
+                    "type": "boolean",
+                    "title": "Empiler la visibilité des couches",
+                    "default": false
+                },
+                "legendStack": {
+                    "type": "boolean",
+                    "title": "Empiler les éléments de la légende (utile avec l'option de pile pour voir tous les éléments actifs de la légende)",
+                    "default": true
+                },
+                "layers": {
+                    "type": "array",
+                    "title": "Couches",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "description": "L'identifiant de la couche pour le référencement dans le visualiseur (ne concerne pas directement un service externe).",
+                                "title": "ID"
+                            },
+                            "duration": {
+                                "type": "number",
+                                "title": "Durée de l'animation en millisecondes",
+                                "minimum": 3000,
+                                "default": 3000
+                            },
+                            "title": {
+                                "type": "string",
+                                "title": "Titre de l'animation de cette couche"
+                            },
+                            "description": {
+                                "type": "string",
+                                "title": "Description de l'animation de cette coyche"
+                            },
+                            "legend": {
+                                "type": "array",
+                                "title": "Légende",
+                                "description": "Ajouter des éléments pour une légende personnalisée, laissez ce champ vide pour utiliser la légende par défaut.",
+                                "default": [],
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "label": {
+                                            "type": "string",
+                                            "title": "Étiquette"
+                                        },
+                                        "image": {
+                                            "type": "object",
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string",
+                                                    "title": "URL",
+                                                    "default": ""
+                                                },
+                                                "width": {
+                                                    "type": "number",
+                                                    "title": "Largeur",
+                                                    "minimum": 25,
+                                                    "maximum": 150,
+                                                    "default": 150
+                                                },
+                                                "height": {
+                                                    "type": "number",
+                                                    "title": "Hauteur",
+                                                    "minimum": 25,
+                                                    "maximum": 150,
+                                                    "default": 150
+                                                }
+                                            },
+                                            "required": ["url", "width", "height"]
+                                        },
+                                        "required": ["image"]
+                                    }
+                                }
+                            }
+                        },
+                        "required": ["id", "duration"]
+                    }
+                },
+                "required": ["layers"]
+            }
+        }
+    }
+}
+
