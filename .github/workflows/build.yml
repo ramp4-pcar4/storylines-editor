@@ -10,7 +10,6 @@ on:
 jobs:
     install-build:
         name: Install and build
-        concurrency: ci-${{ github.ref }}
         runs-on: ubuntu-latest
         steps:
             - name: Check if contributor is an org member
