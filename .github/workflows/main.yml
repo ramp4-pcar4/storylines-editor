@@ -9,6 +9,8 @@ on:
 
 permissions:
     pull-requests: write
+    contents: write
+    repository-projects: write
 
 jobs:
     build:
