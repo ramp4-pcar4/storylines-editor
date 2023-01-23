@@ -9,6 +9,7 @@ on:
 
 jobs:
     deploy-to-pages:
+        permissions: write-all
         name: Deploy to GitHub pages
         runs-on: ubuntu-latest
         steps:
