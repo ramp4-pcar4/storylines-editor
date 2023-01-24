@@ -1,0 +1,37 @@
+name: Publish to GitHub pages
+
+on:
+    workflow_call:
+
+jobs:
+    deploy-to-pages:
+        name: Deploy to GitHub pages
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout 🛎️
+              uses: actions/checkout@v3
+
+            - name: Get dist files
+              uses: actions/cache@v3
+              with:
+                  path: dist
+                  key: dist-${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Deploy 🚀
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                  branch: gh-pages
+                  folder: dist
+                  target-folder: ${{ github.head_ref || github.ref_name }}
+
+            - name: Post demo link comment
+              uses: actions/github-script@v6
+              if: github.event_name == 'pull_request_target' && github.event.action == 'opened'
+              with:
+                  script: |
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `Your demo site is ready! 🚀 Visit it here: https://${{github.repository_owner}}.github.io/storylines-editor/${{github.head_ref}}/#/en/editor`
+                      })
