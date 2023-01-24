@@ -23,7 +23,7 @@
             <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
             <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
 
-            <button v-on:click="newConfig">TESTING CONFIG</button>
+            <button v-on:click="newConfig">TEST CONFIG</button>
         </template>
 
         <!-- If config is loading, display a small spinner. -->
@@ -58,7 +58,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { StoryRampConfig, Slide } from '@/definitions';
-import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
