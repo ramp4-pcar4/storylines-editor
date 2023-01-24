@@ -198,4 +198,6 @@ export interface DefaultConfigs {
     text: TextPanel;
     slideshow: SlideshowPanel;
     chart: ChartPanel;
+    dynamic: DynamicPanel;
+    map: MapPanel;
 }

@@ -118,6 +118,10 @@ export default class EditorV extends Vue {
             this.currentSlide = this.slides[index];
             this.slideIndex = index;
         }, 5);
+
+        if (this.slides[index].panel[0].type === 'dynamic') {
+            (this.$refs.slide as any).panelIndex = 0;
+        }
     }
 
     newConfig(): void {
@@ -264,13 +268,13 @@ export default class EditorV extends Vue {
             formData.append('data', content, `${this.uuid}.zip`);
             const headers = { 'Content-Type': 'multipart/form-data' };
 
-            axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
-                res.data.files; // binary representation of the file
-                res.status; // HTTP status
-            });
+            // axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
+            //     res.data.files; // binary representation of the file
+            //     res.status; // HTTP status
+            // });
 
             // Temporarily: download the ZIP file to browser instead of uploading to server.
-            //saveAs(content, `${this.uuid}.zip`);
+            saveAs(content, `${this.uuid}.zip`);
         });
 
         return this.configFileStructure;
