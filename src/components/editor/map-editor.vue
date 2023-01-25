@@ -71,7 +71,6 @@ export default class MapEditorV extends Vue {
     @Prop() panel!: any;
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
-    @Prop() uid!: string;
 
     // For creating new files.
     newFileName = '';
@@ -94,7 +93,7 @@ export default class MapEditorV extends Vue {
     createNewConfig() {
         // Update the path to the new file.
         // TODO: ensure that this is not a name already in use?
-        this.panel.config = `${this.uid}/ramp-config/${this.lang}/${this.newFileName}.json`;
+        this.panel.config = `${this.configFileStructure.uuid}/ramp-config/${this.lang}/${this.newFileName}.json`;
         this.strippedFileName = this.panel.config.split('/')[3].split('.')[0];
 
         // Create the new map configuration file in the ZIP folder. Copies the `config-default.json` file from the `ramp-editor` folder and renames it.
