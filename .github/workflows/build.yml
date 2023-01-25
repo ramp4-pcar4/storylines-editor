@@ -1,0 +1,52 @@
+name: Install and build
+
+on:
+    workflow_call:
+
+jobs:
+    install-build:
+        name: Install and build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check if contributor is an org member
+              id: is_organization_member
+              if: github.event_name == 'pull_request_target'
+              uses: JamesSingleton/is-organization-member@1.0.1
+              with:
+                  organization: ramp4-pcar4
+                  username: ${{ github.event.pull_request.head.user.login }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Output comment and end build if not org member
+              if: github.event_name == 'pull_request_target'
+              run: |
+                  result=${{ steps.is_organization_member.outputs.result }}
+                  if [ $result == false ]; then
+                    user=${{ github.event.pull_request.head.user.login }}
+                    echo Either ${user} is not part of the ramp4-pcar4 organization
+                    echo or ${user} has its Organization Visibility set to Private at
+                    echo https://github.com/orgs/ramp4-pcar4/people?query=${user}
+                    exit 1
+                  fi
+
+            - name: Checkout 🛎️
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+            - name: Setup Node version
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 14.15.4
+
+            - name: Install and build
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Cache dist files
+              uses: actions/cache@v3
+              with:
+                  path: dist
+                  key: dist-${{ github.event.pull_request.head.sha || github.sha }}
