@@ -175,7 +175,7 @@ export default class EditorV extends Vue {
                                     type: 'slideshow',
                                     images: [slide.panel[1]]
                                 };
-                                slide.panel[1] = Object.assign({}, newSlide);
+                                Vue.set(slide.panel, 1, newSlide);
                             }
                         });
 

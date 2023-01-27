@@ -35,10 +35,6 @@
                             @change="changePanelType(currentSlide.panel[panelIndex].type, $event.target.value)"
                             :value="currentSlide.panel[panelIndex].type"
                         >
-                            <!-- <select
-                            @change="currentSlide.panel[panelIndex].type = $event.target.value"
-                            v-model="currentSlide.panel[panelIndex].type"
-                        > -->
                             <option
                                 v-for="thing in Object.keys(editors).filter(
                                     (editor) => editor !== 'slideshow' && editor !== 'loading'
@@ -111,8 +107,6 @@ export default class SlideEditorV extends Vue {
     };
 
     changePanelType(prevType: string, newType: string): void {
-        this.currentSlide.panel[this.panelIndex].type = newType;
-
         if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
             const startingConfig: DefaultConfigs = {
                 text: {
@@ -146,20 +140,17 @@ export default class SlideEditorV extends Vue {
             // When switching to a dynamic panel, remove the secondary panel.
             if (newType === 'dynamic') {
                 this.panelIndex = 0;
-                this.currentSlide.panel = [Object.assign({}, startingConfig[newType as keyof DefaultConfigs])];
+                Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
             } else {
                 // When switching from a dynamic panel, add back the secondary panel.
                 if (prevType === 'dynamic') {
-                    this.currentSlide.panel = [
+                    Vue.set(this.currentSlide, 'panel', [
                         Object.assign({}, startingConfig['text' as keyof DefaultConfigs]),
                         Object.assign({}, startingConfig[newType as keyof DefaultConfigs])
-                    ];
+                    ]);
                 } else {
                     // Switching panel type when dynamic panels are not involved.
-                    this.currentSlide.panel[this.panelIndex] = Object.assign(
-                        {},
-                        startingConfig[newType as keyof DefaultConfigs]
-                    );
+                    Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
                 }
             }
         }
