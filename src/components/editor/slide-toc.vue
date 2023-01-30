@@ -92,7 +92,7 @@ export default class SlideTocV extends Vue {
                 this.slideIndex = undefined;
                 this.$emit('slide-change', this.slideIndex);
             }
-            this.slides.splice(index, 1) as any;
+            this.slides.splice(index, 1);
         }
     }
 
