@@ -36,6 +36,7 @@
                 v-for="(chart, idx) in chartConfigs"
                 :key="idx"
                 :chart="chart"
+                :configFileStructure="configFileStructure"
                 @delete="deleteChart"
                 @edit="editChart"
             ></ChartPreview>
@@ -116,8 +117,7 @@ export default class ChartEditorV extends Vue {
         } else {
             const chartConfig = {
                 name: chart.title.text,
-                src: `${this.configFileStructure.uuid}/charts/en/${chart.title.text}.json`,
-                config: chart
+                src: `${this.configFileStructure.uuid}/charts/en/${chart.title.text}.json`
             };
 
             // Add chart config to ZIP file.
@@ -137,6 +137,7 @@ export default class ChartEditorV extends Vue {
                 JSON.stringify(chartInfo.newChart.config, null, 4)
             );
 
+            chartInfo.newChart.src = `${this.configFileStructure.uuid}/charts/en/${chartInfo.newChart.name}.json`;
             this.chartConfigs[idx] = chartInfo.newChart;
         }
     }

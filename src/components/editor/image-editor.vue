@@ -22,7 +22,7 @@
         </div>
 
         <!-- Gallery preview of all images -->
-        <ul class="flex flex-wrap list-none" v-show="imagePreviews.length">
+        <ul class="flex flex-wrap list-none" v-show="!imagePreviewsLoading && imagePreviews.length">
             <ImagePreview v-for="(image, idx) in imagePreviews" :key="idx" :imageFile="image" @delete="deleteImage">
                 <div class="flex mt-4 items-center">
                     <label class="alt-label">Alt tag:</label>
@@ -49,6 +49,9 @@ export default class ImageEditorV extends Vue {
     @Prop() lang!: string;
 
     dragging = false;
+
+    imagePreviewsLoading = true;
+    imagePreviewPromises = [] as Array<Promise<ImageFile>>;
     imagePreviews = [] as Array<ImageFile>;
 
     get isDragging(): boolean {
@@ -57,13 +60,29 @@ export default class ImageEditorV extends Vue {
 
     mounted(): void {
         if (this.panel.images !== undefined && this.panel.images.length) {
-            this.imagePreviews = this.panel.images.map((image: ImagePanel) => {
+            this.panel.images.map((image: ImagePanel) => {
+                // Check if the config file exists in the ZIP folder first.
+                const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');
-                return {
-                    ...image,
-                    id: filename ? filename : image.src,
-                    src: image.temp ? image.temp : image.src
-                };
+
+                this.imagePreviewPromises.push(
+                    this.configFileStructure.config
+                        .file(assetSrc)
+                        .async('blob')
+                        .then((res: any) => {
+                            return {
+                                ...image,
+                                id: filename ? filename : image.src,
+                                src: URL.createObjectURL(res)
+                            };
+                        })
+                );
+            });
+
+            // Once all images have been retrieved, display them.
+            Promise.all(this.imagePreviewPromises).then((res) => {
+                this.imagePreviews = res;
+                this.imagePreviewsLoading = false;
             });
         }
     }
@@ -109,6 +128,7 @@ export default class ImageEditorV extends Vue {
         if (idx !== -1) {
             // Remove the image from the product ZIP file.
             this.configFileStructure.assets[this.lang].remove(this.imagePreviews[idx].id);
+
             URL.revokeObjectURL(this.imagePreviews[idx].src);
             this.imagePreviews.splice(idx, 1);
         }
@@ -118,8 +138,7 @@ export default class ImageEditorV extends Vue {
         this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
             return {
                 ...imageFile,
-                src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`,
-                temp: imageFile.src // TODO: can and should remove this property on final config save
+                src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`
             };
         });
     }

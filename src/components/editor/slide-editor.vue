@@ -12,9 +12,24 @@
             </div>
             <br />
             <div class="flex">
-                <button @click="panelIndex = 0" :class="panelIndex == 0 ? 'font-extrabold' : ''">Left Panel</button>
                 <button
-                    @click="panelIndex = 1"
+                    @click="
+                        () => {
+                            panelIndex = 0;
+                            saveChanges();
+                        }
+                    "
+                    :class="panelIndex == 0 ? 'font-extrabold' : ''"
+                >
+                    Left Panel
+                </button>
+                <button
+                    @click="
+                        () => {
+                            panelIndex = 1;
+                            saveChanges();
+                        }
+                    "
                     :class="panelIndex == 1 ? 'font-extrabold' : ''"
                     v-if="currentSlide.panel[panelIndex].type !== 'dynamic'"
                 >
