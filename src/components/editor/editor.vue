@@ -11,19 +11,24 @@
                 </button>
             </div>
 
-            <label>{{ $t('editor.uuid') }}:</label> <input type="text" v-model="uuid" />
-            <button v-on:click="fetchConfig">{{ $t('editor.load') }}</button>
+            <label>{{ $t('editor.uuid') }}:</label>
+            <input type="text" @input="uidError = false" v-model="uuid" :class="uidError ? 'input-error' : ''" />
+            <button v-on:click="generateRemoteConfig" :class="uidError ? 'input-error' : ''">
+                {{ $t('editor.load') }}
+            </button>
+            <span v-if="uidError">The requested UID "{{ uuid }}" does not exist.</span>
+
             <br />
 
             <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
             <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
-            <button v-on:click="fetchConfig">{{ $t('editor.browse') }}</button>
+            <button v-on:click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
             <br />
             <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
             <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
             <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
 
-            <button v-on:click="newConfig">TESTING CONFIG</button>
+            <button v-on:click="generateNewConfig">TESTING CONFIG</button>
         </template>
 
         <!-- If config is loading, display a small spinner. -->
@@ -78,6 +83,7 @@ export default class EditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
     configFileStructure: any = undefined;
     loadStatus = 'waiting';
+    uidError = false; // true if the user requested to load a UID that does not exist.
     lang = 'en';
 
     // Form properties.
@@ -95,12 +101,172 @@ export default class EditorV extends Vue {
         this.uuid = this.$route.params.uid ?? undefined;
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
 
+        // Initialize Storylines config and the configuration structure.
         this.config = undefined;
-        this.configFileStructure = this.configFileStructureHelper();
+        this.configFileStructure = undefined;
 
+        // If a product UUID is provided, fetch the contents from the server.
         if (this.uuid) {
-            this.fetchConfig();
+            this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Generates a new product file for brand new products.
+     */
+    generateNewConfig(): void {
+        const configZip = new JSZip();
+
+        // Generate a new configuration file and populate required fields.
+        this.config = this.configHelper();
+        this.config.title = this.title;
+        this.config.slides = this.slides;
+        this.config.introSlide.logo.src = this.logo;
+
+        // Add the newly generated Storylines configuration file to the ZIP file.
+        const fileName = `${this.uuid}_${this.lang}.json`;
+        const formattedConfigFile = JSON.stringify(this.config, null, 4);
+
+        configZip.file(fileName, formattedConfigFile);
+
+        // Generate the file structure.
+        this.configFileStructureHelper(configZip);
+    }
+
+    configHelper(): StoryRampConfig {
+        return {
+            title: 'Test Config',
+            lang: 'en',
+            introSlide: {
+                logo: {
+                    src: ''
+                },
+                title: 'Test Config Intro Slide'
+            },
+            slides: [],
+            contextLabel: this.contextLabel,
+            contextLink: this.contextLink,
+            dateModified: this.dateModified
+        };
+    }
+
+    /**
+     * Provided with a UID, retrieve the project contents from the file server.
+     */
+    generateRemoteConfig(): void {
+        this.loadStatus = 'loading';
+
+        // Attempt to fetch the project from the server.
+        fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
+            if (res.status === 404) {
+                // Product not found.
+                this.uidError = true;
+                this.loadStatus = 'waiting';
+            } else {
+                const configZip = new JSZip();
+                // Files retrieved. Convert them into a JSZip object.
+                res.blob().then((file: any) => {
+                    configZip.loadAsync(file).then(() => {
+                        this.configFileStructureHelper(configZip);
+                    });
+                });
+            }
+        });
+    }
+
+    /**
+     * Generates or loads a ZIP file and creates required project folders if needed.
+     * Returns an object that makes it easy to access any specific folder.
+     */
+    configFileStructureHelper(configZip: any): any {
+        const assetsFolder = configZip.folder('assets');
+        const chartsFolder = configZip.folder('charts');
+        const rampConfigFolder = configZip.folder('ramp-config');
+
+        this.configFileStructure = {
+            uuid: this.uuid,
+            config: configZip,
+            assets: {
+                en: assetsFolder.folder('en'),
+                fr: assetsFolder.folder('fr')
+            },
+            charts: {
+                en: chartsFolder.folder('en'),
+                fr: chartsFolder.folder('fr')
+            },
+            rampConfig: {
+                en: rampConfigFolder.folder('en'),
+                fr: rampConfigFolder.folder('fr')
+            }
+        };
+
+        this.loadConfig();
+    }
+
+    /**
+     * Loads a configuration file from the product folder, and sets application data
+     * as needed.
+     */
+    loadConfig() {
+        const configPath = `${this.uuid}_${this.lang}.json`;
+
+        this.configFileStructure.config
+            .file(configPath)
+            .async('string')
+            .then((res: any) => {
+                this.config = JSON.parse(res);
+                this.loadStatus = 'loaded';
+
+                // Load in project data.
+                if (this.config) {
+                    this.title = this.config.title;
+                    this.logo = this.config.introSlide.logo.src;
+                    this.contextLink = this.config.contextLink;
+                    this.contextLabel = this.config.contextLabel;
+                    this.dateModified = this.config.dateModified;
+
+                    this.slides = this.config.slides;
+                    // conversion for individual image panels (see proposal on PR to clean up this process with small refactor)
+                    this.slides.forEach((slide: Slide) => {
+                        if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
+                            const newSlide = {
+                                type: 'slideshow',
+                                images: [slide.panel[1]]
+                            };
+                            Vue.set(slide.panel, 1, newSlide);
+                        }
+                    });
+                }
+            });
+    }
+
+    /**
+     * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
+     * with the new changes, then generates and submits the product file to the server.
+     */
+    generateConfig(): StoryRampConfig {
+        // save current slide final changes before generating config file
+        (this.$refs.slide as any).saveChanges();
+
+        // Update the configuration file.
+        const fileName = `${this.uuid}_${this.lang}.json`;
+        const formattedConfigFile = JSON.stringify(this.config, null, 4);
+
+        this.configFileStructure.config.file(fileName, formattedConfigFile);
+
+        // Upload the ZIP file.
+        this.configFileStructure.config.generateAsync({ type: 'blob' }).then((content: any) => {
+            const formData = new FormData();
+            formData.append('data', content, `${this.uuid}.zip`);
+            const headers = { 'Content-Type': 'multipart/form-data' };
+
+            axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
+                res.data.files; // binary representation of the file
+                res.status; // HTTP status
+            });
+        });
+
+        return this.configFileStructure;
     }
 
     selectSlide(index: number): void {
@@ -124,160 +290,9 @@ export default class EditorV extends Vue {
         }
     }
 
-    newConfig(): void {
-        this.config = this.configHelper();
-
-        this.title = this.config.title;
-        this.slides = this.config.slides;
-        this.logo = this.config.introSlide.logo.src;
-        this.contextLink = this.config.contextLink;
-        this.contextLabel = this.config.contextLabel;
-        this.dateModified = this.config.dateModified;
-
-        this.loadStatus = 'loaded';
-    }
-
-    configHelper(): StoryRampConfig {
-        return {
-            title: 'Test Config',
-            lang: 'en',
-            introSlide: {
-                logo: {
-                    src: ''
-                },
-                title: 'Test Config Intro Slide'
-            },
-            slides: [],
-            contextLabel: this.contextLabel,
-            contextLink: this.contextLink,
-            dateModified: this.dateModified
-        };
-    }
-
-    fetchConfig(): void {
-        this.loadStatus = 'loading';
-
-        fetch(`${this.uuid}/${this.uuid}_${this.lang}.json`)
-            .then((res) => {
-                res.json().then((config: StoryRampConfig) => {
-                    this.config = config;
-                    this.loadStatus = 'loaded';
-                    this.configFileStructure.uuid = this.uuid;
-
-                    // Load in form values from the config file.
-                    if (this.config) {
-                        this.title = this.config.title;
-                        this.slides = this.config.slides;
-                        // conversion for individual image panels (see proposal on PR to clean up this process with small refactor)
-                        this.slides.forEach((slide: Slide) => {
-                            if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
-                                const newSlide = {
-                                    type: 'slideshow',
-                                    images: [slide.panel[1]]
-                                };
-                                Vue.set(slide.panel, 1, newSlide);
-                            }
-                        });
-
-                        this.logo = this.config.introSlide.logo.src;
-                        this.contextLink = this.config.contextLink;
-                        this.contextLabel = this.config.contextLabel;
-                        this.dateModified = this.config.dateModified;
-                    }
-                });
-            })
-            .catch((err) => {
-                if (err.code === 'MODULE_NOT_FOUND') {
-                    console.error(`There exists no config given by the URL params: ${err}`);
-                    this.loadStatus = 'error';
-                } else {
-                    // Some unknown error, possibly a build error that could indicate an error in the
-                    // configuration file.
-                    this.loadStatus = 'error';
-
-                    // Print out the error stack.
-                    console.error(err.stack);
-                }
-            });
-    }
-
     swapLang(): void {
         this.lang = this.lang === 'en' ? 'fr' : 'en';
-        this.fetchConfig();
-    }
-
-    /**
-     * Generates a new ZIP file and creates required project folders.
-     * Returns an object that makes it easy to access any specific folder.
-     */
-    configFileStructureHelper(): any {
-        // Create a new ZIP file with our configuration structure.
-        this.configFileStructure = new JSZip();
-
-        const assetsFolder = this.configFileStructure.folder('assets');
-        const chartsFolder = this.configFileStructure.folder('charts');
-        const rampConfigFolder = this.configFileStructure.folder('ramp-config');
-
-        return {
-            uuid: this.uuid,
-            config: this.configFileStructure,
-            assets: {
-                en: assetsFolder.folder('en'),
-                fr: assetsFolder.folder('fr')
-            },
-            charts: {
-                en: chartsFolder.folder('en'),
-                fr: chartsFolder.folder('fr')
-            },
-            rampConfig: {
-                en: rampConfigFolder.folder('en'),
-                fr: rampConfigFolder.folder('fr')
-            }
-        };
-    }
-
-    generateConfig(): StoryRampConfig {
-        // save current slide final changes before generating config file
-        (this.$refs.slide as any).saveChanges();
-
-        const configFile = {
-            title: this.title,
-            lang: this.lang,
-            introSlide: {
-                logo: {
-                    src: this.logo
-                },
-                title: this.title
-            },
-            slides: this.slides,
-            contextLabel: this.contextLabel,
-            contextLink: this.contextLink,
-            dateModified: this.dateModified
-        };
-
-        // Add the Storylines configuration file to the ZIP file.
-        const fileName = `${this.uuid}_${this.lang}.json`;
-        const formattedConfigFile = JSON.stringify(configFile, null, 4);
-
-        this.configFileStructure.config.file(fileName, formattedConfigFile);
-
-        // Generate the ZIP file.
-        this.configFileStructure.config.generateAsync({ type: 'blob' }).then((content: any) => {
-            // Upload the ZIP file.
-            const formData = new FormData();
-            formData.append('data', content, `${this.uuid}.zip`);
-            const headers = { 'Content-Type': 'multipart/form-data' };
-
-            // axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
-            //     res.data.files; // binary representation of the file
-            //     res.status; // HTTP status
-            // });
-
-            // Temporarily: download the ZIP file to browser instead of uploading to server.
-            saveAs(content, `${this.uuid}.zip`);
-        });
-
-        return this.configFileStructure;
+        this.generateRemoteConfig();
     }
 
     // react to param changes in URL
@@ -287,7 +302,7 @@ export default class EditorV extends Vue {
         this.$i18n.locale = this.lang;
 
         if (this.uuid) {
-            this.fetchConfig();
+            this.generateRemoteConfig();
         }
 
         next();
@@ -332,6 +347,10 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 2px;
         border: 1px solid black;
         width: 20vw;
+    }
+
+    .editor-container .input-error {
+        border: 1px solid red;
     }
 
     .editor-container button {
