@@ -40,7 +40,12 @@
             <div class="flex">
                 <div class="w-60 flex-shrink-0">
                     <button>Edit Project Metadata</button>
-                    <slide-toc :slides="slides" @slide-change="selectSlide"></slide-toc>
+                    <slide-toc
+                        :slides="slides"
+                        :configFileStructure="configFileStructure"
+                        :lang="lang"
+                        @slide-change="selectSlide"
+                    ></slide-toc>
                 </div>
                 <slide-editor
                     ref="slide"
@@ -48,6 +53,7 @@
                     :currentSlide="currentSlide"
                     :lang="lang"
                     :uid="uuid"
+                    :sourceCounts="sourceCounts"
                 ></slide-editor>
             </div>
         </template>
@@ -90,6 +96,7 @@ export default class EditorV extends Vue {
     slides: any[] = [];
     currentSlide: any = '';
     slideIndex: number | undefined = undefined;
+    sourceCounts: any = {};
 
     created(): void {
         this.uuid = this.$route.params.uid ?? undefined;
@@ -183,6 +190,8 @@ export default class EditorV extends Vue {
                         this.contextLink = this.config.contextLink;
                         this.contextLabel = this.config.contextLabel;
                         this.dateModified = this.config.dateModified;
+
+                        this.findSources(this.config);
                     }
                 });
             })
@@ -199,6 +208,54 @@ export default class EditorV extends Vue {
                     console.error(err.stack);
                 }
             });
+    }
+
+    findSources(config: StoryRampConfig) {
+        this.incrementSourceCount(config.introSlide.logo.src);
+
+        config.slides.forEach((slide) => {
+            slide.panel.forEach((panel) => {
+                this.panelSourceHelper(panel);
+            });
+        });
+    }
+
+    panelSourceHelper(panel: any) {
+        switch (panel.type) {
+            case 'dynamic':
+                panel.children.forEach((subPanel: any) => {
+                    this.panelSourceHelper(subPanel);
+                });
+                break;
+            case 'slideshow':
+                panel.images.forEach((image: any) => {
+                    this.incrementSourceCount(image.src);
+                });
+                break;
+            case 'chart':
+                panel.charts.forEach((chart: any) => {
+                    this.incrementSourceCount(chart.src);
+                });
+                break;
+            case 'image':
+            case 'video':
+            case 'audio':
+                this.incrementSourceCount(panel.src);
+                break;
+            case 'map':
+                this.incrementSourceCount(panel.config);
+                break;
+            default:
+                break;
+        }
+    }
+
+    incrementSourceCount(src: string) {
+        if (this.sourceCounts[src]) {
+            this.sourceCounts[src] += 1;
+        } else {
+            this.sourceCounts[src] = 1;
+        }
     }
 
     swapLang(): void {

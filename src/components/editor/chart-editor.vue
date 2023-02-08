@@ -59,6 +59,7 @@ export default class ChartEditorV extends Vue {
     @Prop() panel!: any;
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
+    @Prop() sourceCounts!: any;
 
     chartConfigs = [] as Array<ChartConfig>;
     modalEditor = {} as any;
@@ -114,11 +115,18 @@ export default class ChartEditorV extends Vue {
         if (this.chartConfigs.some((chartConfig) => chartConfig.name === chart.title.text)) {
             alert('Existing chart already has the same chart name.');
         } else {
+            const chartSrc = `${this.configFileStructure.uuid}/charts/en/${chart.title.text}.json`;
             const chartConfig = {
                 name: chart.title.text,
-                src: `${this.configFileStructure.uuid}/charts/en/${chart.title.text}.json`,
+                src: chartSrc,
                 config: chart
             };
+
+            if (this.sourceCounts[chartSrc]) {
+                this.sourceCounts[chartSrc] += 1;
+            } else {
+                this.sourceCounts[chartSrc] = 1;
+            }
 
             // Add chart config to ZIP file.
             this.configFileStructure.charts[this.lang].file(`${chart.title.text}.json`, JSON.stringify(chart, null, 4));
@@ -131,7 +139,16 @@ export default class ChartEditorV extends Vue {
         const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chartInfo.oldChart.name);
         if (idx !== -1) {
             // Remove old chart config from ZIP file and add in new one.
-            this.configFileStructure.charts[this.lang].remove(`${chartInfo.oldChart.name}.json`);
+            this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chartInfo.oldChart.name}.json`] -= 1;
+            if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chartInfo.oldChart.name}.json`] === 0) {
+                this.configFileStructure.charts[this.lang].remove(`${chartInfo.oldChart.name}.json`);
+            }
+
+            if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chartInfo.newChart.name}.json`]) {
+                this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chartInfo.newChart.name}.json`] += 1;
+            } else {
+                this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chartInfo.newChart.name}.json`] = 1;
+            }
             this.configFileStructure.charts[this.lang].file(
                 `${chartInfo.newChart.name}.json`,
                 JSON.stringify(chartInfo.newChart.config, null, 4)
@@ -145,7 +162,10 @@ export default class ChartEditorV extends Vue {
         const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
         if (idx !== -1) {
             // Remove the chart from the config file.
-            this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
+            this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chart.name}.json`] -= 1;
+            if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chart.name}.json`] === 0) {
+                this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
+            }
             this.chartConfigs.splice(idx, 1);
         }
     }
