@@ -16,6 +16,7 @@
                 class="w-full h-full"
                 :config="chartConfig"
                 :key="chartIdx"
+                :configFileStructure="configFileStructure"
                 @loaded="loadChart"
                 v-if="!loading"
             ></dqv-chart>
@@ -54,6 +55,7 @@ import ChartV from '@/components/panels/helpers/chart.vue';
 })
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
+    @Prop() configFileStructure!: any;
 
     loading = true;
     chartIdx = 0;

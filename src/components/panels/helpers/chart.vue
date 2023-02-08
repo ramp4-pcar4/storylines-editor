@@ -33,6 +33,7 @@ exportData(Highcharts);
 })
 export default class ChartV extends Vue {
     @Prop() config!: ChartConfig;
+    @Prop() configFileStructure!: any;
 
     chartOptions: DQVChartConfig = {} as DQVChartConfig;
     title = '';
@@ -60,24 +61,53 @@ export default class ChartV extends Vue {
         } else if (this.config.src) {
             // get input given by src path
             const extension = this.config.src.split('.').pop();
+            const assetSrc = `${this.config.src.substring(this.config.src.indexOf('/') + 1)}`;
+
             if (extension === 'json') {
-                fetch(this.config.src).then((data) => {
-                    // parse JSON data
-                    data.json().then(
-                        (res: DQVChartConfig) => {
-                            this.chartOptions = res;
+                if (this.configFileStructure.config.file(assetSrc)) {
+                    // First attempt to fetch the configuration file from the ZIP folder.
+                    this.configFileStructure.config
+                        .file(assetSrc)
+                        .async('string')
+                        .then((res: any) => {
+                            let configuration = JSON.parse(res);
+                            this.chartOptions = configuration;
                             this.title = this.chartOptions.title.text;
                             this.loading = false;
                             this.$emit('loaded', this.chartOptions);
-                        },
-                        (err) => {
-                            console.error(`Error fetching chart JSON file: ${err}`);
-                        }
-                    );
-                });
+                        });
+                } else {
+                    // Otherwise, attempt to fetch from the server.
+                    fetch(this.config.src).then((data) => {
+                        // parse JSON data
+                        data.json().then(
+                            (res: DQVChartConfig) => {
+                                this.chartOptions = res;
+                                this.title = this.chartOptions.title.text;
+                                this.loading = false;
+                                this.$emit('loaded', this.chartOptions);
+                            },
+                            (err) => {
+                                console.error(`Error fetching chart JSON file: ${err}`);
+                            }
+                        );
+                    });
+                }
             } else if (extension === 'csv') {
-                // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
-                this.parseCSVFile();
+                if (this.configFileStructure.config.file(assetSrc)) {
+                    // First attempt to fetch the configuration file from the ZIP folder.
+                    this.configFileStructure.config
+                        .file(assetSrc)
+                        .async('blob')
+                        .then((res: any) => {
+                            this.parseCSVFile(res);
+                        });
+                } else {
+                    // if data is hosted on server can simply be passed into chartOptions under csvUrl (local file needs to be parsed)
+                    fetch(this.config.src).then((data) => {
+                        this.parseCSVFile(data);
+                    });
+                }
             }
         }
 
@@ -87,57 +117,55 @@ export default class ChartV extends Vue {
     /**
      * Parse and process CSV file contents and return a properly configured highcharts options object.
      */
-    parseCSVFile(): void {
-        fetch(this.config.src).then((data) => {
-            const dqvOptions = this.config.options;
+    parseCSVFile(data: any): void {
+        const dqvOptions = this.config.options;
 
-            // export options displayed on hamburger menu
-            const exportOptions = {
-                buttons: {
-                    contextButton: {
-                        menuItems: this.menuOptions
-                    }
-                },
-                enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
-            };
-
-            // extract general chart options that applies to all chart types
-            const defaultOptions = {
-                chart: {
-                    renderTo: 'dv-chart-container',
-                    type: dqvOptions?.type,
-                    ...(dqvOptions?.height &&
-                        this.$el.clientHeight >= dqvOptions.height && {
-                            height: dqvOptions.height
-                        }),
-                    ...(dqvOptions?.width && this.$el.clientWidth >= dqvOptions.width && { width: dqvOptions.width })
-                },
-                ...(dqvOptions?.title && { title: { text: dqvOptions?.title } }),
-                ...(dqvOptions?.subtitle && { subtitle: { text: dqvOptions?.subtitle } }),
-                ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
-                exporting: exportOptions,
-                credits: {
-                    enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
+        // export options displayed on hamburger menu
+        const exportOptions = {
+            buttons: {
+                contextButton: {
+                    menuItems: this.menuOptions
                 }
-            };
+            },
+            enabled: dqvOptions?.export !== undefined ? dqvOptions?.export : true
+        };
 
-            // download: true needed for local files which is treated as an URL
-            this.$papa.parse(data.url, {
-                header: dqvOptions?.type === 'pie' ? false : true,
-                dynamicTyping: true,
-                download: true,
-                complete: (res: any) => {
-                    // construct highcharts objects based on chart type
-                    if (dqvOptions?.type === 'pie') {
-                        this.makePieChart(res.data, defaultOptions);
-                    } else {
-                        this.makeLineChart(res.meta.fields, res.data, defaultOptions);
-                    }
+        // extract general chart options that applies to all chart types
+        const defaultOptions = {
+            chart: {
+                renderTo: 'dv-chart-container',
+                type: dqvOptions?.type,
+                ...(dqvOptions?.height &&
+                    this.$el.clientHeight >= dqvOptions.height && {
+                        height: dqvOptions.height
+                    }),
+                ...(dqvOptions?.width && this.$el.clientWidth >= dqvOptions.width && { width: dqvOptions.width })
+            },
+            ...(dqvOptions?.title && { title: { text: dqvOptions?.title } }),
+            ...(dqvOptions?.subtitle && { subtitle: { text: dqvOptions?.subtitle } }),
+            ...(dqvOptions?.colours && { colors: dqvOptions?.colours }),
+            exporting: exportOptions,
+            credits: {
+                enabled: dqvOptions?.credits !== undefined ? dqvOptions?.credits : false
+            }
+        };
+
+        // download: true needed for local files which is treated as an URL
+        this.$papa.parse(data.url ? data.url : data, {
+            header: dqvOptions?.type === 'pie' ? false : true,
+            dynamicTyping: true,
+            download: !!data.url,
+            complete: (res: any) => {
+                // construct highcharts objects based on chart type
+                if (dqvOptions?.type === 'pie') {
+                    this.makePieChart(res.data, defaultOptions);
+                } else {
+                    this.makeLineChart(res.meta.fields, res.data, defaultOptions);
                 }
-            });
-
-            this.loading = false;
+            }
         });
+
+        this.loading = false;
     }
 
     /**
