@@ -56,6 +56,7 @@ export default class ImageEditorV extends Vue {
     @Prop() panel!: any;
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
+    @Prop() sourceCounts!: any;
 
     dragging = false;
 
@@ -108,10 +109,17 @@ export default class ImageEditorV extends Vue {
                 // Add the uploaded images to the product ZIP file.
                 this.configFileStructure.assets[this.lang].file(file.name, file);
 
+                let imageSrc = URL.createObjectURL(file);
+                if (this.sourceCounts[imageSrc]) {
+                    this.sourceCounts[imageSrc] += 1;
+                } else {
+                    this.sourceCounts[imageSrc] = 1;
+                }
+
                 return {
                     id: file.name,
                     altText: '',
-                    src: URL.createObjectURL(file)
+                    src: imageSrc
                 };
             })
         );
@@ -124,11 +132,17 @@ export default class ImageEditorV extends Vue {
                 ...files.map((file: File) => {
                     // Add the uploaded images to the product ZIP file.
                     this.configFileStructure.assets[this.lang].file(file.name, file);
+                    let imageSrc = URL.createObjectURL(file);
+                    if (this.sourceCounts[imageSrc]) {
+                        this.sourceCounts[imageSrc] += 1;
+                    } else {
+                        this.sourceCounts[imageSrc] = 1;
+                    }
 
                     return {
                         id: file.name,
                         altText: '',
-                        src: URL.createObjectURL(file)
+                        src: imageSrc
                     };
                 })
             );
@@ -140,9 +154,11 @@ export default class ImageEditorV extends Vue {
         const idx = this.imagePreviews.findIndex((file: ImageFile) => file.id === img.id);
         if (idx !== -1) {
             // Remove the image from the product ZIP file.
-            this.configFileStructure.assets[this.lang].remove(this.imagePreviews[idx].id);
-
-            URL.revokeObjectURL(this.imagePreviews[idx].src);
+            this.sourceCounts[this.imagePreviews[idx].src] -= 1;
+            if (this.sourceCounts[this.imagePreviews[idx].src] === 0) {
+                this.configFileStructure.assets[this.lang].remove(this.imagePreviews[idx].id);
+                URL.revokeObjectURL(this.imagePreviews[idx].src);
+            }
             this.imagePreviews.splice(idx, 1);
         }
     }
