@@ -45,14 +45,22 @@
             <div class="flex">
                 <div class="w-60 flex-shrink-0">
                     <button>Edit Project Metadata</button>
-                    <slide-toc :slides="slides" @slide-change="selectSlide"></slide-toc>
+                    <slide-toc
+                        :slides="slides"
+                        :slideIndex="slideIndex"
+                        @slide-change="selectSlide"
+                        @slides-updated="updateSlides"
+                    ></slide-toc>
                 </div>
                 <slide-editor
                     ref="slide"
                     :configFileStructure="configFileStructure"
                     :currentSlide="currentSlide"
                     :lang="lang"
+                    :slideIndex="slideIndex"
+                    :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
+                    @slide-change="selectSlide"
                 ></slide-editor>
             </div>
         </template>
@@ -95,7 +103,7 @@ export default class EditorV extends Vue {
     dateModified = '';
     slides: any[] = [];
     currentSlide: any = '';
-    slideIndex: number | undefined = undefined;
+    slideIndex = -1;
 
     created(): void {
         this.uuid = this.$route.params.uid ?? undefined;
@@ -281,13 +289,18 @@ export default class EditorV extends Vue {
         };
 
         setTimeout(() => {
-            this.currentSlide = this.slides[index];
+            this.currentSlide = index === -1 ? '' : this.slides[index];
             this.slideIndex = index;
         }, 5);
 
-        if (this.slides[index].panel[0].type === 'dynamic') {
+        if (index !== -1 && this.slides[index].panel[0].type === 'dynamic') {
             (this.$refs.slide as any).panelIndex = 0;
         }
+    }
+
+    updateSlides(slides: any[]): void {
+        this.slides = slides;
+        this.slideIndex = this.slides.indexOf(this.currentSlide);
     }
 
     swapLang(): void {
@@ -357,6 +370,12 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         padding: 5px 10px;
         margin: 2px;
         border: 1px solid black;
+    }
+
+    .editor-container button:disabled {
+        border: 1px solid gray;
+        color: gray;
+        cursor: not-allowed;
     }
 }
 </style>
