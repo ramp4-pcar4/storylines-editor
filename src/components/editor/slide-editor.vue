@@ -7,8 +7,8 @@
                     <input type="text" v-model="currentSlide.title" />
                 </div>
                 <span class="ml-auto"></span>
-                <button>Previous Slide</button>
-                <button>Next Slide</button>
+                <button @click.stop="selectSlide(slideIndex - 1)" :disabled="slideIndex === 0">Previous Slide</button>
+                <button @click.stop="selectSlide(slideIndex + 1)" :disabled="isLast">Next Slide</button>
             </div>
             <br />
             <div class="flex">
@@ -108,6 +108,8 @@ export default class SlideEditorV extends Vue {
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
     @Prop() uid!: string;
+    @Prop() slideIndex!: number;
+    @Prop() isLast!: number;
 
     panelIndex = 0;
 
@@ -175,6 +177,10 @@ export default class SlideEditorV extends Vue {
         if (this.$refs.editor !== undefined && typeof (this.$refs.editor as any).saveChanges === 'function') {
             (this.$refs.editor as any).saveChanges();
         }
+    }
+
+    selectSlide(index: number): void {
+        this.$emit('slide-change', index);
     }
 }
 </script>
