@@ -7,7 +7,11 @@
         </div>
         <ul>
             <li class="flex toc-slide" v-for="(slide, index) in slides" :key="slide.title + index">
-                <div class="flex" @click="selectSlide(index)">
+                <div
+                    class="flex cursor-pointer pl-1"
+                    :class="{ 'bg-gray-400': index === slideIndex }"
+                    @click="selectSlide(index)"
+                >
                     <span class="self-center w-44 overflow-ellipsis whitespace-nowrap overflow-hidden flex-shrink-0"
                         >Slide {{ index + 1 }}: {{ slide.title | '' }}</span
                     >
@@ -60,12 +64,10 @@ import SlideEditorV from './slide-editor.vue';
 })
 export default class SlideTocV extends Vue {
     @Prop() slides!: any[];
-
-    slideIndex: number | undefined = undefined;
+    @Prop() slideIndex!: number;
 
     selectSlide(index: number): void {
-        this.slideIndex = index;
-        this.$emit('slide-change', this.slideIndex);
+        this.$emit('slide-change', index);
     }
 
     addNewSlide(): void {
@@ -84,15 +86,16 @@ export default class SlideTocV extends Vue {
                 }
             ]
         });
+        this.$emit('slides-updated', this.slides);
     }
 
     removeSlide(index: number): void {
         if (confirm(this.$t('editor.slides.deleteSlide.confirm') as string)) {
             if (index === this.slideIndex) {
-                this.slideIndex = undefined;
-                this.$emit('slide-change', this.slideIndex);
+                this.$emit('slide-change', -1);
             }
             this.slides.splice(index, 1);
+            this.$emit('slides-updated', this.slides);
         }
     }
 
@@ -102,6 +105,7 @@ export default class SlideTocV extends Vue {
 
     moveDown(index: number): void {
         this.slides.splice(index + 1, 0, this.slides.splice(index, 1)[0]);
+        this.$emit('slides-updated', this.slides);
     }
 }
 </script>
