@@ -1,46 +1,99 @@
 <template>
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
-        <template v-if="(loadStatus === 'waiting') | 'error'">
+        <template v-if="loadStatus === 'waiting' || loadStatus === 'loading'">
             <div class="flex">
                 <div class="flex text-2xl font-bold mb-5">
-                    {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                    {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
                 </div>
                 <button v-if="config" @click="swapLang">
                     {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                 </button>
             </div>
 
-            <label>{{ $t('editor.uuid') }}:</label>
-            <input type="text" @input="uidError = false" v-model="uuid" :class="uidError ? 'input-error' : ''" />
-            <button v-on:click="generateRemoteConfig" :class="uidError ? 'input-error' : ''">
-                {{ $t('editor.load') }}
-            </button>
-            <span v-if="uidError">The requested UID "{{ uuid }}" does not exist.</span>
+            <div class="flex">
+                <div class="inline-flex">
+                    <label class="m-auto">{{ $t('editor.uuid') }}:</label>
+                </div>
+                <input
+                    type="text"
+                    @input="errorMessage = ''"
+                    v-model="uuid"
+                    :class="errorMessage ? 'input-error' : ''"
+                />
+                <button @click="generateRemoteConfig" :class="errorMessage ? 'input-error' : ''" v-if="editExisting">
+                    {{ $t('editor.load') }}
+                </button>
+                <!-- If config is loading, display a small spinner. -->
+                <div class="inline-flex" v-if="loadStatus === 'loading'">
+                    <spinner
+                        size="20px"
+                        background="#00D2D3"
+                        color="#009cd1"
+                        stroke="2px"
+                        class="mx-2 my-auto"
+                    ></spinner>
+                </div>
+                <div class="inline-flex">
+                    <span v-if="errorMessage" class="mx-2 m-auto">{{ errorMessage }}</span>
+                </div>
+            </div>
 
-            <br />
+            <div class="flex">
+                <div class="inline-flex">
+                    <label class="m-auto">{{ $t('editor.title') }}:</label>
+                </div>
+                <input type="text" v-model="title" />
+            </div>
 
-            <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
-            <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
-            <button v-on:click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
-            <br />
-            <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
-            <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
-            <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
+            <div class="flex">
+                <div class="inline-flex">
+                    <label class="m-auto">{{ $t('editor.logo') }}:</label>
+                </div>
+                <input type="text" v-model="logo" />
+                <button @click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
+            </div>
 
-            <button v-on:click="generateNewConfig">TESTING CONFIG</button>
+            <div class="flex">
+                <div class="inline-flex">
+                    <label class="m-auto">{{ $t('editor.contextLink') }}:</label>
+                </div>
+                <input type="text" v-model="contextLink" />
+            </div>
+
+            <div class="flex">
+                <div class="inline-flex">
+                    <label class="m-auto">{{ $t('editor.contextLabel') }}:</label>
+                </div>
+                <input type="text" v-model="contextLabel" />
+            </div>
+
+            <div class="flex">
+                <div class="inline-flex">
+                    <label class="m-auto">{{ $t('editor.dateModified') }}:</label>
+                </div>
+                <input type="date" v-model="dateModified" />
+            </div>
+
+            <div class="flex mt-8">
+                <button @click="saveMetadata" class="pl-8">Save Changes</button>
+                <div class="ml-auto">
+                    <router-link :to="{ name: 'home' }" target>
+                        <button>{{ $t('editor.back') }}</button>
+                    </router-link>
+                    <button @click="continueToEditor" class="bg-black text-white px-8">
+                        {{ $t('editor.next') }}
+                    </button>
+                </div>
+            </div>
         </template>
-
-        <!-- If config is loading, display a small spinner. -->
-        <div v-if="loadStatus === 'loading'" class="inline m-3">
-            <spinner size="20px" background="#00D2D3" color="#009cd1" stroke="2px" class="inline-block"></spinner>
-        </div>
 
         <template v-if="loadStatus === 'loaded'">
             <div class="flex">
-                <span>{{ config.title }}</span
-                ><span class="ml-auto"></span><button>Preview</button
-                ><button @click="generateConfig">Save Changes</button>
+                <span>{{ config.title }}</span>
+                <span class="ml-auto"></span>
+                <button>Preview</button>
+                <button @click="generateConfig">Save Changes</button>
             </div>
             <div class="flex">
                 <div class="w-60 flex-shrink-0">
@@ -60,10 +113,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { StoryRampConfig, Slide } from '@/definitions';
-import { saveAs } from 'file-saver';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
@@ -80,10 +132,12 @@ import SlideTocV from './slide-toc.vue';
     }
 })
 export default class EditorV extends Vue {
+    @Prop({ default: true }) editExisting!: boolean; // true if editing existing storylines product, false if new product
+
     config: StoryRampConfig | undefined = undefined;
     configFileStructure: any = undefined;
     loadStatus = 'waiting';
-    uidError = false; // true if the user requested to load a UID that does not exist.
+    errorMessage = ''; // error message if the user requested to load a UID that does not exist or tried to load editor without UID.
     lang = 'en';
 
     // Form properties.
@@ -134,6 +188,7 @@ export default class EditorV extends Vue {
     }
 
     configHelper(): StoryRampConfig {
+        // TODO: require user to input these fields instead of defaulting (speeds up testing purposes for now)
         return {
             title: 'Test Config',
             lang: 'en',
@@ -160,7 +215,7 @@ export default class EditorV extends Vue {
         fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
             if (res.status === 404) {
                 // Product not found.
-                this.uidError = true;
+                this.errorMessage = `The requested UID ${this.uuid} does not exist.`;
                 this.loadStatus = 'waiting';
             } else {
                 const configZip = new JSZip();
@@ -207,7 +262,7 @@ export default class EditorV extends Vue {
      * Loads a configuration file from the product folder, and sets application data
      * as needed.
      */
-    loadConfig() {
+    loadConfig(): void {
         const configPath = `${this.uuid}_${this.lang}.json`;
 
         this.configFileStructure.config
@@ -215,7 +270,7 @@ export default class EditorV extends Vue {
             .async('string')
             .then((res: any) => {
                 this.config = JSON.parse(res);
-                this.loadStatus = 'loaded';
+                this.editExisting ? (this.loadStatus = 'waiting') : (this.loadStatus = 'loaded');
 
                 // Load in project data.
                 if (this.config) {
@@ -226,7 +281,7 @@ export default class EditorV extends Vue {
                     this.dateModified = this.config.dateModified;
 
                     this.slides = this.config.slides;
-                    // conversion for individual image panels (see proposal on PR to clean up this process with small refactor)
+                    // conversion for individual image panels to slideshow for gallery display
                     this.slides.forEach((slide: Slide) => {
                         if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
                             const newSlide = {
@@ -269,6 +324,24 @@ export default class EditorV extends Vue {
         return this.configFileStructure;
     }
 
+    /**
+     * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
+     * to config file. TODO: decide whether to upload file to server (e.g. call generateConfig).
+     */
+    saveMetadata(): void {
+        // update metadata content to existing config only if it has been successfully loaded
+        if (this.config !== undefined) {
+            this.config.title = this.title;
+            // TODO: rebase logo feature when merged #74
+            this.config.contextLink = this.contextLink;
+            this.config.contextLabel = this.contextLabel;
+            this.config.dateModified = this.dateModified;
+        }
+    }
+
+    /**
+     * Change current slide to selected slide.
+     */
     selectSlide(index: number): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
@@ -290,12 +363,31 @@ export default class EditorV extends Vue {
         }
     }
 
+    /**
+     * Called when 'next' button is pressed on metadata page to continue to main editor.
+     */
+    continueToEditor(): void {
+        if (this.editExisting) {
+            this.config !== undefined
+                ? (this.loadStatus = 'loaded')
+                : (this.errorMessage = 'No config loaded for existing Storylines product!');
+        } else {
+            // TODO: check for non-empty required metadata fields
+            this.generateNewConfig();
+        }
+    }
+
+    /**
+     * Language toggle.
+     */
     swapLang(): void {
         this.lang = this.lang === 'en' ? 'fr' : 'en';
         this.generateRemoteConfig();
     }
 
-    // react to param changes in URL
+    /**
+     * React to param changes in URL.
+     */
     beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
         this.lang = to.params.lang;
         this.uuid = to.params.uid;
@@ -304,7 +396,6 @@ export default class EditorV extends Vue {
         if (this.uuid) {
             this.generateRemoteConfig();
         }
-
         next();
     }
 }
