@@ -21,9 +21,17 @@
             <br />
 
             <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
-            <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
-            <button v-on:click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
+
+            <!-- only display an image preview if one is provided.-->
+            <div v-if="!!logoPreview">
+                <label>{{ $t('editor.logoPreview') }}:</label
+                ><img :src="logoPreview" v-if="!!logoPreview" class="image-preview" />
+            </div>
+
+            <label>{{ $t('editor.logo') }}:</label>
+            <input type="file" @change="onFileChange" />
             <br />
+
             <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
             <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
             <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
@@ -90,6 +98,8 @@ export default class EditorV extends Vue {
     uuid = '';
     title = '';
     logo = '';
+    logoImage: undefined | File = undefined;
+    logoPreview = ''; // for display purposes only
     contextLink = '';
     contextLabel = '';
     dateModified = '';
@@ -121,7 +131,9 @@ export default class EditorV extends Vue {
         this.config = this.configHelper();
         this.config.title = this.title;
         this.config.slides = this.slides;
-        this.config.introSlide.logo.src = this.logo;
+
+        // Set the source of the product logo.
+        this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
 
         // Add the newly generated Storylines configuration file to the ZIP file.
         const fileName = `${this.uuid}_${this.lang}.json`;
@@ -129,8 +141,8 @@ export default class EditorV extends Vue {
 
         configZip.file(fileName, formattedConfigFile);
 
-        // Generate the file structure.
-        this.configFileStructureHelper(configZip);
+        // Generate the file structure, defer uploading the image until the structure is created.
+        this.configFileStructureHelper(configZip, this.logoImage);
     }
 
     configHelper(): StoryRampConfig {
@@ -178,7 +190,7 @@ export default class EditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: any): any {
+    configFileStructureHelper(configZip: any, uploadLogo?: File | undefined): any {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -199,6 +211,11 @@ export default class EditorV extends Vue {
                 fr: rampConfigFolder.folder('fr')
             }
         };
+
+        // If uploadLogo is set, upload the logo to the directory.
+        if (uploadLogo !== undefined) {
+            this.configFileStructure.assets[this.lang].file(uploadLogo?.name, uploadLogo);
+        }
 
         this.loadConfig();
     }
@@ -307,6 +324,15 @@ export default class EditorV extends Vue {
 
         next();
     }
+
+    onFileChange(e: Event): void {
+        // Retrieve the uploaded file.
+        const uploadedFile = ((e.target as HTMLInputElement).files as any)[0];
+        this.logoImage = uploadedFile;
+
+        // Generate an image preview.
+        this.logoPreview = URL.createObjectURL(uploadedFile);
+    }
 }
 </script>
 
@@ -347,6 +373,7 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 2px;
         border: 1px solid black;
         width: 20vw;
+        display: inline;
     }
 
     .editor-container .input-error {
@@ -357,6 +384,12 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         padding: 5px 10px;
         margin: 2px;
         border: 1px solid black;
+    }
+
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        display: inline;
     }
 }
 </style>
