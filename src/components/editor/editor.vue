@@ -1,40 +1,79 @@
 <template>
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
-        <template v-if="(loadStatus === 'waiting') | 'error'">
+        <template v-if="loadStatus === 'waiting' || loadStatus === 'loading'">
             <div class="flex">
                 <div class="flex text-2xl font-bold mb-5">
-                    {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                    {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
                 </div>
                 <button v-if="config" @click="swapLang">
                     {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                 </button>
             </div>
 
-            <label>{{ $t('editor.uuid') }}:</label>
-            <input type="text" @input="uidError = false" v-model="uuid" :class="uidError ? 'input-error' : ''" />
-            <button v-on:click="generateRemoteConfig" :class="uidError ? 'input-error' : ''">
-                {{ $t('editor.load') }}
-            </button>
-            <span v-if="uidError">The requested UID "{{ uuid }}" does not exist.</span>
+            <div class="flex" v-if="editExisting">
+                <label>{{ $t('editor.uuid') }}:</label>
+                <input
+                    type="text"
+                    @input="errorMessage = ''"
+                    v-model="uuid"
+                    :class="errorMessage ? 'input-error' : ''"
+                />
+                <button @click="generateRemoteConfig" :class="errorMessage ? 'input-error' : ''">
+                    {{ $t('editor.load') }}
+                </button>
+                <!-- If config is loading, display a small spinner. -->
+                <div class="inline-flex" v-if="loadStatus === 'loading'">
+                    <spinner
+                        size="20px"
+                        background="#00D2D3"
+                        color="#009cd1"
+                        stroke="2px"
+                        class="mx-2 my-auto"
+                    ></spinner>
+                </div>
+                <div class="inline-flex">
+                    <span v-if="errorMessage" class="mx-2 m-auto">{{ errorMessage }}</span>
+                </div>
+            </div>
 
-            <br />
+            <div class="flex">
+                <label>{{ $t('editor.title') }}:</label>
+                <input type="text" v-model="title" />
+            </div>
 
-            <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
-            <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
-            <button v-on:click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
-            <br />
-            <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
-            <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
-            <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
+            <div class="flex">
+                <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
+                <button @click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
+            </div>
 
-            <button v-on:click="generateNewConfig">TESTING CONFIG</button>
+            <div class="flex">
+                <label>{{ $t('editor.contextLink') }}:</label>
+                <input type="text" v-model="contextLink" />
+            </div>
+
+            <div class="flex">
+                <label>{{ $t('editor.contextLabel') }}:</label>
+                <input type="text" v-model="contextLabel" />
+            </div>
+
+            <div class="flex">
+                <label>{{ $t('editor.dateModified') }}:</label>
+                <input type="date" v-model="dateModified" />
+            </div>
+
+            <div class="flex mt-8">
+                <button @click="generateConfig" class="pl-8">Save Changes</button>
+                <div class="ml-auto">
+                    <router-link :to="{ name: 'home' }" target>
+                        <button>{{ $t('editor.back') }}</button>
+                    </router-link>
+                    <button @click="continueToEditor" class="bg-black text-white px-8">
+                        {{ $t('editor.next') }}
+                    </button>
+                </div>
+            </div>
         </template>
-
-        <!-- If config is loading, display a small spinner. -->
-        <div v-if="loadStatus === 'loading'" class="inline m-3">
-            <spinner size="20px" background="#00D2D3" color="#009cd1" stroke="2px" class="inline-block"></spinner>
-        </div>
 
         <template v-if="loadStatus === 'loaded'">
             <div class="flex">
@@ -60,10 +99,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { StoryRampConfig, Slide } from '@/definitions';
-import { saveAs } from 'file-saver';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
@@ -80,10 +118,12 @@ import SlideTocV from './slide-toc.vue';
     }
 })
 export default class EditorV extends Vue {
+    @Prop({ default: true }) editExisting!: boolean; // true if editing existing storylines product, false if new product
+
     config: StoryRampConfig | undefined = undefined;
     configFileStructure: any = undefined;
     loadStatus = 'waiting';
-    uidError = false; // true if the user requested to load a UID that does not exist.
+    errorMessage = ''; // error message if the user requested to load a UID that does not exist or tried to load editor without UID.
     lang = 'en';
 
     // Form properties.
@@ -134,6 +174,7 @@ export default class EditorV extends Vue {
     }
 
     configHelper(): StoryRampConfig {
+        // TODO: require user to input these fields instead of defaulting (speeds up testing purposes for now)
         return {
             title: 'Test Config',
             lang: 'en',
@@ -160,7 +201,7 @@ export default class EditorV extends Vue {
         fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
             if (res.status === 404) {
                 // Product not found.
-                this.uidError = true;
+                this.errorMessage = `The requested UID ${this.uuid} does not exist.`;
                 this.loadStatus = 'waiting';
             } else {
                 const configZip = new JSZip();
@@ -207,7 +248,7 @@ export default class EditorV extends Vue {
      * Loads a configuration file from the product folder, and sets application data
      * as needed.
      */
-    loadConfig() {
+    loadConfig(): void {
         const configPath = `${this.uuid}_${this.lang}.json`;
 
         this.configFileStructure.config
@@ -215,7 +256,7 @@ export default class EditorV extends Vue {
             .async('string')
             .then((res: any) => {
                 this.config = JSON.parse(res);
-                this.loadStatus = 'loaded';
+                this.editExisting ? (this.loadStatus = 'waiting') : (this.loadStatus = 'loaded');
 
                 // Load in project data.
                 if (this.config) {
@@ -287,6 +328,17 @@ export default class EditorV extends Vue {
 
         if (this.slides[index].panel[0].type === 'dynamic') {
             (this.$refs.slide as any).panelIndex = 0;
+        }
+    }
+
+    continueToEditor(): void {
+        if (this.editExisting) {
+            this.config !== undefined
+                ? (this.loadStatus = 'loaded')
+                : (this.errorMessage = 'No config loaded for existing Storylines product!');
+        } else {
+            // TODO: check for non-empty required metadata fields
+            this.generateNewConfig();
         }
     }
 
