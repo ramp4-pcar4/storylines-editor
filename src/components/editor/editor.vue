@@ -57,10 +57,22 @@
 
                 <label class="mb-5">{{ $t('editor.title') }}:</label>
                 <input type="text" v-model="title" class="w-1/3" /> <br />
-                <label class="mb-5">{{ $t('editor.logo') }}:</label><input type="text" v-model="logo" class="w-1/4" />
-                <button v-on:click="generateRemoteConfig" class="bg-black text-white hover:bg-gray-800">
+
+                <!-- only display an image preview if one is provided.-->
+                <div v-if="!!logoPreview">
+                    <label>{{ $t('editor.logoPreview') }}:</label>
+                    <img :src="logoPreview" v-if="!!logoPreview" class="image-preview" />
+                </div>
+
+                <label class="mb-5 inline">{{ $t('editor.logo') }}:</label>
+                <input type="text" :value="logoName" class="w-1/4" />
+                <button v-on:click="openFileSelector" class="bg-black text-white hover:bg-gray-800">
                     {{ $t('editor.browse') }}
                 </button>
+
+                <!-- hide the actual file input -->
+                <input type="file" @change="onFileChange" id="logoUpload" class="w-1/4 hidden" />
+
                 <br />
                 <label>{{ $t('editor.contextLink') }}:</label>
                 <input type="text" v-model="contextLink" class="w-2/3" />
@@ -184,6 +196,9 @@ export default class EditorV extends Vue {
     uuid = '';
     title = '';
     logo = '';
+    logoImage: undefined | File = undefined;
+    logoPreview = ''; // for display purposes only
+    logoName = '';
     contextLink = '';
     contextLabel = '';
     dateModified = '';
@@ -215,7 +230,9 @@ export default class EditorV extends Vue {
         this.config = this.configHelper();
         this.config.title = this.title;
         this.config.slides = this.slides;
-        this.config.introSlide.logo.src = this.logo;
+
+        // Set the source of the product logo.
+        this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
 
         // Add the newly generated Storylines configuration file to the ZIP file.
         const fileName = `${this.uuid}_${this.lang}.json`;
@@ -223,8 +240,8 @@ export default class EditorV extends Vue {
 
         configZip.file(fileName, formattedConfigFile);
 
-        // Generate the file structure.
-        this.configFileStructureHelper(configZip);
+        // Generate the file structure, defer uploading the image until the structure is created.
+        this.configFileStructureHelper(configZip, this.logoImage);
     }
 
     configHelper(): StoryRampConfig {
@@ -273,7 +290,7 @@ export default class EditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: any): any {
+    configFileStructureHelper(configZip: any, uploadLogo?: File | undefined): any {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -294,6 +311,11 @@ export default class EditorV extends Vue {
                 fr: rampConfigFolder.folder('fr')
             }
         };
+
+        // If uploadLogo is set, upload the logo to the directory.
+        if (uploadLogo !== undefined) {
+            this.configFileStructure.assets[this.lang].file(uploadLogo?.name, uploadLogo);
+        }
 
         this.loadConfig();
     }
@@ -319,6 +341,21 @@ export default class EditorV extends Vue {
                     this.contextLink = this.config.contextLink;
                     this.contextLabel = this.config.contextLabel;
                     this.dateModified = this.config.dateModified;
+
+                    // Fetch the logo from the folder (if it exists).
+                    const logoSrc = `${this.logo.substring(this.logo.indexOf('/') + 1)}`;
+                    const logoName = `${this.logo.split('/')[this.logo.split('/').length - 1]}`;
+
+                    if (this.configFileStructure.config.file(logoSrc)) {
+                        this.configFileStructure.config
+                            .file(logoSrc)
+                            .async('blob')
+                            .then((img: any) => {
+                                this.logoImage = new File([img], logoName);
+                                this.logoPreview = URL.createObjectURL(img);
+                                this.logoName = logoName;
+                            });
+                    }
 
                     this.slides = this.config.slides;
                     // conversion for individual image panels to slideshow for gallery display
@@ -372,10 +409,12 @@ export default class EditorV extends Vue {
         // update metadata content to existing config only if it has been successfully loaded
         if (this.config !== undefined) {
             this.config.title = this.title;
-            // TODO: rebase logo feature when merged #74
             this.config.contextLink = this.contextLink;
             this.config.contextLabel = this.contextLabel;
             this.config.dateModified = this.dateModified;
+
+            this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+            this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
         }
     }
 
@@ -433,6 +472,10 @@ export default class EditorV extends Vue {
         this.generateRemoteConfig();
     }
 
+    openFileSelector(): void {
+        document.getElementById('logoUpload')?.click();
+    }
+
     /**
      * React to param changes in URL.
      */
@@ -445,6 +488,16 @@ export default class EditorV extends Vue {
             this.generateRemoteConfig();
         }
         next();
+    }
+
+    onFileChange(e: Event): void {
+        // Retrieve the uploaded file.
+        const uploadedFile = ((e.target as HTMLInputElement).files as any)[0];
+        this.logoImage = uploadedFile;
+
+        // Generate an image preview.
+        this.logoPreview = URL.createObjectURL(uploadedFile);
+        this.logoName = uploadedFile.name;
     }
 }
 </script>
@@ -489,6 +542,7 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         padding: 5px 10px;
         margin-top: 5px;
         border: 1px solid black;
+        display: inline;
     }
 
     .editor-container .input-error {
@@ -519,6 +573,12 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         border: none !important;
         transition-duration: 0.2s;
         padding: 0.25 0.25em !important;
+    }
+
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        display: inline;
     }
 }
 </style>
