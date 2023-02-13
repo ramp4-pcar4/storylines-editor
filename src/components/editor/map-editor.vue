@@ -4,32 +4,25 @@
         <input type="text" v-model="panel.title" />
 
         <div v-if="status === 'editing'">
-            <label class="text-left">Enable Scrollguard:</label>
-            <select @change="panel.scrollguard = $event.target.value" v-model="panel.scrollguard" selected="true">
-                <option>true</option>
-                <option>false</option>
-            </select>
+            <label class="mt-2">Enable Scrollguard:</label>
+            <input type="checkbox" @change="panel.scrollguard = $event.target.value" v-model="panel.scrollguard" />
+            <span class="ml-6"></span>
+            <label class="mt-2">Enable Time Slider:</label>
+            <input type="checkbox" @change="usingTimeSlider = $event.target.value" v-model="usingTimeSlider" />
             <br />
 
-            <label>Time Slider Enabled:</label>
-            <select @change="usingTimeSlider = $event.target.value" v-model="usingTimeSlider">
-                <option>true</option>
-                <option>false</option>
-            </select>
-            <br />
-
-            <label>Map Editor:</label>
-
-            <div
-                style="width: 70vw"
-                class="text-right cursor-pointer"
-                @click="
-                    () => {
-                        status = 'default';
-                    }
-                "
-            >
-                Cancel Editing
+            <div class="flex justify-between mb-4">
+                <label class="mt-2">Map Editor:</label>
+                <button
+                    class="border border-black hover:bg-gray-100"
+                    @click="
+                        () => {
+                            status = 'default';
+                        }
+                    "
+                >
+                    Cancel Editing
+                </button>
             </div>
             <iframe
                 src="scripts/ramp-editor/samples/fgpv-author.html"
@@ -38,10 +31,10 @@
             ></iframe>
         </div>
         <div v-if="status === 'creating'">
-            <label class="text-left">Map config name*:</label>
+            <label class="text-left mt-2">Map config name*:</label>
             <div class="flex flex-row items-center"><input type="text" v-model="newFileName" />.json</div>
 
-            <ul class="flex flex-wrap list-none" v-if="newFileName != ''">
+            <ul class="flex flex-wrap list-none justify-center" v-if="newFileName != ''">
                 <li class="map-item items-center my-8 mx-5 overflow-hidden" @click="createNewConfig">
                     <div class="add-map"></div>
                     {{ $t('editor.map.label.create') }}
@@ -49,8 +42,8 @@
             </ul>
         </div>
         <div v-if="status === 'default'">
-            <label class="text-left">Map Editor:</label>
-            <ul class="flex flex-wrap list-none">
+            <label class="text-left mt-2">Map Editor:</label>
+            <ul class="flex flex-wrap list-none justify-center">
                 <li class="map-item items-center my-8 mx-5 overflow-hidden" @click="openEditor">
                     <div class="edit-map"></div>
                     {{ $t('editor.map.label.edit') }}
@@ -162,6 +155,13 @@ export default class MapEditorV extends Vue {
 <style lang="scss" scoped>
 label {
     text-align: left !important;
+    width: fit-content !important;
+}
+
+select {
+    border: 1px black solid;
+    background: white;
+    padding: 0.25rem 0.5rem;
 }
 .map-item {
     width: 300px;

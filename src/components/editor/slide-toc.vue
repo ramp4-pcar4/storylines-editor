@@ -1,29 +1,37 @@
 <template>
     <div>
-        <div class="flex">
-            <span>{{ $t('editor.slides.title') }}</span>
+        <div class="flex toc-header p-2 mt-10">
+            <span class="flex items-center justify-center font-bold"> {{ $t('editor.slides.title') }}</span>
+            <span class="flex-1"></span>
             <span class="ml-auto"></span>
-            <button v-on:click="addNewSlide">{{ $t('editor.slides.addSlide') }}</button>
+            <button v-on:click="addNewSlide">
+                <span class="align-middle inline-block px-1"
+                    ><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
+                        <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
+                    </svg>
+                </span>
+                <span class="align-middle inline-block">{{ $t('editor.slides.addSlide') }}</span>
+            </button>
         </div>
         <ul>
-            <li class="flex toc-slide" v-for="(slide, index) in slides" :key="slide.title + index">
+            <li class="flex toc-slide border-t" v-for="(slide, index) in slides" :key="slide.title + index">
                 <div
-                    class="flex cursor-pointer pl-1"
-                    :class="{ 'bg-gray-400 font-bold': index === slideIndex }"
+                    class="flex px-2 cursor-pointer hover:bg-gray-100"
+                    :class="currentSlide === slide ? 'bg-gray-100' : ''"
                     @click="selectSlide(index)"
                 >
-                    <span class="self-center w-44 overflow-ellipsis whitespace-nowrap overflow-hidden flex-shrink-0"
-                        >Slide {{ index + 1 }}: {{ slide.title | '' }}</span
+                    <span class="self-center overflow-ellipsis whitespace-nowrap overflow-hidden flex-shrink-0 ml-2"
+                        >Slide {{ index + 1 }}: <span class="font-bold">{{ slide.title || '' }}</span></span
                     >
                     <span class="ml-auto flex-grow"></span>
                     <button @click.stop="removeSlide(index)">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                             <path
-                                d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21Zm2-4h2V8H9Zm4 0h2V8h-2Z"
+                                d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
                             />
                         </svg>
                     </button>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col mr-2 ml-1 my-1">
                         <button
                             :class="index == 0 ? 'text-gray-500 cursor-not-allowed' : ''"
                             @click.stop="moveUp(index)"
@@ -64,7 +72,9 @@ import SlideEditorV from './slide-editor.vue';
 })
 export default class SlideTocV extends Vue {
     @Prop() slides!: any[];
+    @Prop() currentSlide!: any;
     @Prop() slideIndex!: number;
+    total = 0;
 
     selectSlide(index: number): void {
         this.$emit('slide-change', index);
@@ -72,7 +82,7 @@ export default class SlideTocV extends Vue {
 
     addNewSlide(): void {
         this.slides.push({
-            title: 'New Slide',
+            title: `Untitled${this.total ? '(' + this.total + ')' : ''}`,
             panel: [
                 {
                     type: 'text',
@@ -87,6 +97,7 @@ export default class SlideTocV extends Vue {
             ]
         });
         this.$emit('slides-updated', this.slides);
+        this.total++;
     }
 
     removeSlide(index: number): void {
@@ -113,6 +124,12 @@ export default class SlideTocV extends Vue {
 <style lang="scss" scoped>
 .toc-slide button {
     border: none !important;
+    background: none !important;
     padding: 0 !important;
+    margin: 0 !important;
+}
+
+.toc-slide button:hover {
+    background: none !important;
 }
 </style>

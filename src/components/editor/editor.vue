@@ -2,33 +2,76 @@
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
         <template v-if="(loadStatus === 'waiting') | 'error'">
-            <div class="flex">
-                <div class="flex text-2xl font-bold mb-5">
-                    {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+            <div class="px-20 py-5">
+                <div class="flex">
+                    <div class="flex text-2xl font-bold mb-5">
+                        {{ config ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                    </div>
+                    <button v-if="config" @click="swapLang">
+                        {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                    </button>
                 </div>
-                <button v-if="config" @click="swapLang">
-                    {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+
+                <div class="border py-5 w-5/6">
+                    <label>{{ $t('editor.uuid') }}:</label>
+                    <input
+                        type="text"
+                        @input="uidError = false"
+                        v-model="uuid"
+                        class="w-1/3"
+                        :class="uidError ? 'input-error' : ''"
+                    />
+                    <button
+                        v-on:click="generateRemoteConfig"
+                        class="bg-gray-500 text-white hover:bg-gray-600"
+                        :class="uidError ? 'input-error' : ''"
+                    >
+                        {{ $t('editor.load') }}
+                    </button>
+                    <span v-if="uidError">The requested UID "{{ uuid }}" does not exist.</span>
+                </div>
+
+                <br />
+
+                <div class="mb-4">
+                    <h3>Storylines product details</h3>
+                    <p>
+                        Fill in metadata details about your new Storyline. Use the “Preview” button to see what your
+                        slides will look like.
+                    </p>
+                </div>
+
+                <label class="mb-5">{{ $t('editor.title') }}:</label>
+                <input type="text" v-model="title" class="w-1/3" /> <br />
+                <label class="mb-5">{{ $t('editor.logo') }}:</label><input type="text" v-model="logo" class="w-1/4" />
+                <button v-on:click="generateRemoteConfig" class="bg-black text-white hover:bg-gray-800">
+                    {{ $t('editor.browse') }}
                 </button>
+                <br />
+                <label>{{ $t('editor.contextLink') }}:</label>
+                <input type="text" v-model="contextLink" class="w-2/3" />
+                <br />
+                <label class="mb-5"></label>
+                <p class="inline-block">
+                    <i>
+                        Context link shows up at the bottom of the page to provide additional resources for interested
+                        users
+                    </i>
+                </p>
+                <br />
+                <label>{{ $t('editor.contextLabel') }}:</label>
+                <input type="text" v-model="contextLabel" class="w-2/3" />
+                <br />
+                <label class="mb-5"></label>
+                <p class="inline-block">
+                    <i> Context label shows up before the context link to explain what the link is for </i>
+                </p>
+                <br />
+                <label class="mb-5">{{ $t('editor.dateModified') }}:</label>
+                <input type="date" v-model="dateModified" /> <br /><br />
+
+                <button v-on:click="generateNewConfig">TESTING CONFIG</button>
             </div>
-
-            <label>{{ $t('editor.uuid') }}:</label>
-            <input type="text" @input="uidError = false" v-model="uuid" :class="uidError ? 'input-error' : ''" />
-            <button v-on:click="generateRemoteConfig" :class="uidError ? 'input-error' : ''">
-                {{ $t('editor.load') }}
-            </button>
-            <span v-if="uidError">The requested UID "{{ uuid }}" does not exist.</span>
-
-            <br />
-
-            <label>{{ $t('editor.title') }}:</label> <input type="text" v-model="title" /> <br />
-            <label>{{ $t('editor.logo') }}:</label> <input type="text" v-model="logo" />
-            <button v-on:click="generateRemoteConfig">{{ $t('editor.browse') }}</button>
-            <br />
-            <label>{{ $t('editor.contextLink') }}:</label> <input type="text" v-model="contextLink" /> <br />
-            <label>{{ $t('editor.contextLabel') }}:</label> <input type="text" v-model="contextLabel" /> <br />
-            <label>{{ $t('editor.dateModified') }}:</label> <input type="date" v-model="dateModified" /> <br /><br />
-
-            <button v-on:click="generateNewConfig">TESTING CONFIG</button>
         </template>
 
         <!-- If config is loading, display a small spinner. -->
@@ -37,16 +80,39 @@
         </div>
 
         <template v-if="loadStatus === 'loaded'">
-            <div class="flex">
-                <span>{{ config.title }}</span
-                ><span class="ml-auto"></span><button>Preview</button
-                ><button @click="generateConfig">Save Changes</button>
+            <div class="flex border-b border-black bg-gray-200 py-2 px-2">
+                <span class="m-1 font-semibold text-lg">{{ config.title }}</span>
+                <span class="ml-auto"></span>
+                <button class="bg-white border border-black hover:bg-gray-100">Preview</button>
+                <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900">Save Changes</button>
             </div>
             <div class="flex">
-                <div class="w-60 flex-shrink-0">
-                    <button>Edit Project Metadata</button>
+                <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
+                    <div class="flex items-center justify-center border-b p-2">
+                        <button>
+                            <span class="align-middle inline-block px-1"
+                                ><svg
+                                    clip-rule="evenodd"
+                                    fill-rule="evenodd"
+                                    width="16"
+                                    height="16"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
+                                        fill-rule="nonzero"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="align-middle inline-block">Edit Project Metadata</span>
+                        </button>
+                    </div>
                     <slide-toc
                         :slides="slides"
+                        :currentSlide="currentSlide"
                         :slideIndex="slideIndex"
                         @slide-change="selectSlide"
                         @slides-updated="updateSlides"
@@ -349,17 +415,20 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .editor-container label {
-        width: 10vw;
+        width: 8vw;
         text-align: right;
         margin-right: 15px;
         display: inline-block;
     }
 
+    .editor-container h3 {
+        font-size: larger;
+    }
+
     .editor-container input {
         padding: 5px 10px;
-        margin: 2px;
+        margin-top: 5px;
         border: 1px solid black;
-        width: 20vw;
     }
 
     .editor-container .input-error {
@@ -367,15 +436,29 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .editor-container button {
-        padding: 5px 10px;
-        margin: 2px;
-        border: 1px solid black;
+        padding: 5px 12px;
+        margin: 0px 10px;
+        font-weight: 600;
+        transition-duration: 0.2s;
+    }
+
+    .editor-container button:hover:enabled {
+        background-color: #dbdbdb;
+        color: black;
     }
 
     .editor-container button:disabled {
         border: 1px solid gray;
         color: gray;
         cursor: not-allowed;
+    }
+
+    .editor-toc button {
+        background-color: #f3f4f6;
+        color: black;
+        border: none !important;
+        transition-duration: 0.2s;
+        padding: 0.25 0.25em !important;
     }
 }
 </style>

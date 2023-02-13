@@ -1,8 +1,8 @@
 <template>
-    <li class="chart-item items-center my-8 mx-5 overflow-hidden">
+    <li class="chart-item items-center mt-8 mx-5 overflow-hidden">
         <div class="relative border-solid border-2 items-center justify-center text-center w-full">
             <button
-                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 left-0 z-10 cursor-pointer"
+                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-0 z-10 cursor-pointer"
                 @click="() => $emit('delete', chart)"
             >
                 <svg height="22px" width="22px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
@@ -99,9 +99,5 @@ export default class ChartPreviewV extends Vue {
 <style lang="scss" scoped>
 .chart-item {
     width: 46%;
-
-    button {
-        padding: 0 !important;
-    }
 }
 </style>

@@ -1,17 +1,31 @@
 <template>
-    <div class="flex-grow mx-5">
+    <div class="flex-grow m-5">
         <div v-if="currentSlide !== ''">
             <div class="flex">
                 <div class="flex flex-col">
                     <label>Slide title:</label>
-                    <input type="text" v-model="currentSlide.title" />
+                    <div class="flex">
+                        <input type="text" v-model="currentSlide.title" class="w-2/3" />
+                        <span class="ml-auto"></span>
+                        <button
+                            @click.stop="selectSlide(slideIndex - 1)"
+                            :disabled="slideIndex === 0"
+                            class="border border-black"
+                        >
+                            Previous Slide
+                        </button>
+                        <button
+                            @click.stop="selectSlide(slideIndex + 1)"
+                            :disabled="isLast"
+                            class="border border-black"
+                        >
+                            Next Slide
+                        </button>
+                    </div>
                 </div>
-                <span class="ml-auto"></span>
-                <button @click.stop="selectSlide(slideIndex - 1)" :disabled="slideIndex === 0">Previous Slide</button>
-                <button @click.stop="selectSlide(slideIndex + 1)" :disabled="isLast">Next Slide</button>
             </div>
             <br />
-            <div class="flex">
+            <div class="flex border-b border-black">
                 <button
                     @click="
                         () => {
@@ -19,9 +33,44 @@
                             saveChanges();
                         }
                     "
-                    :class="panelIndex == 0 ? 'font-extrabold' : ''"
+                    class="border-t border-l border-r"
+                    :class="panelIndex == 0 ? 'border-black' : 'border-white'"
                 >
-                    Left Panel
+                    <span class="align-middle inline-block">
+                        <svg
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                            width="15"
+                            height="15"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1z"
+                                fill-rule="nonzero"
+                            />
+                        </svg>
+                    </span>
+                    <span class="align-middle inline-block">
+                        <svg
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                            width="15"
+                            height="15"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1zm-16.5.5h15v15h-15z"
+                                fill-rule="nonzero"
+                            />
+                        </svg>
+                    </span>
+                    <span class="align-middle inline-block pl-1">Left Panel</span>
                 </button>
                 <button
                     @click="
@@ -30,22 +79,57 @@
                             saveChanges();
                         }
                     "
-                    :class="panelIndex == 1 ? 'font-extrabold' : ''"
+                    class="border-t border-l border-r"
+                    :class="panelIndex == 1 ? 'border-black' : 'border-white'"
                     v-if="currentSlide.panel[panelIndex].type !== 'dynamic'"
                 >
-                    Right Panel
+                    <span class="align-middle inline-block">
+                        <svg
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                            width="15"
+                            height="15"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1zm-16.5.5h15v15h-15z"
+                                fill-rule="nonzero"
+                            />
+                        </svg>
+                    </span>
+                    <span class="align-middle inline-block">
+                        <svg
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                            width="15"
+                            height="15"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1z"
+                                fill-rule="nonzero"
+                            />
+                        </svg>
+                    </span>
+
+                    <span class="align-middle inline-block pl-1">Right Panel</span>
                 </button>
             </div>
-            <br />
             <div>
-                <div class="flex">
+                <div class="flex mt-4">
                     <span class="font-bold text-xl">Content:</span>
                     <span class="ml-auto flex-grow"></span>
                     <div
                         v-if="panelIndex === 1 || currentSlide.panel[panelIndex].type === 'dynamic'"
-                        class="flex flex-col"
+                        class="flex flex-col mr-8"
                     >
-                        <label class="text-left text-xl">Content type:</label>
+                        <label class="text-left text-lg">Content type:</label>
                         <select
                             @change="changePanelType(currentSlide.panel[panelIndex].type, $event.target.value)"
                             :value="currentSlide.panel[panelIndex].type"
@@ -73,7 +157,7 @@
                 ></component>
             </div>
         </div>
-        <div v-else>
+        <div v-else class="flex h-full mt-4 justify-center text-gray-600 text-xl">
             <span>Please select a slide to edit.</span>
         </div>
     </div>
@@ -188,6 +272,13 @@ export default class SlideEditorV extends Vue {
 <style lang="scss" scoped>
 label {
     text-align: left !important;
+    margin-left: 0.5rem;
+}
+
+select {
+    border: 1px black solid;
+    background: white;
+    padding: 0.25rem 0.5rem;
 }
 
 .table-of-contents-slide button {

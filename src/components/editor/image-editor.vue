@@ -2,22 +2,31 @@
     <div class="block">
         <!-- Upload images area -->
         <div
-            class="upload-image text-center m-5 p-12 bg-blue-100"
+            class="upload-image text-center m-5 p-12 bg-blue-100 border-4 border-dashed border-blue-300"
             :class="{ dragging: isDragging }"
             @dragover.prevent="() => (dragging = true)"
             @dragleave.prevent="() => (dragging = false)"
             @drop.prevent="dropImages($event)"
         >
-            <label class="drag-label cursor-pointer">
-                <span>
-                    <div>{{ $t('editor.image.label.drag') }}</div>
-                    <div>
-                        {{ $t('editor.image.label.or') }}
-                        <span class="text-blue-400 font-bold">{{ $t('editor.image.label.browse') }}</span>
-                        {{ $t('editor.image.label.upload') }}
-                    </div>
+            <label class="flex drag-label cursor-pointer">
+                <span class="align-middle inline-block pr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+                        <path
+                            d="M14 9l-2.519 4-2.481-1.96-5 6.96h16l-6-9zm8-5v16h-20v-16h20zm2-2h-24v20h24v-20zm-20 6c0-1.104.896-2 2-2s2 .896 2 2c0 1.105-.896 2-2 2s-2-.895-2-2z"
+                        />
+                    </svg>
                 </span>
-                <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
+                <span class="align-middle inline-block">
+                    <span>
+                        <div>{{ $t('editor.image.label.drag') }}</div>
+                        <div>
+                            {{ $t('editor.image.label.or') }}
+                            <span class="text-blue-400 font-bold">{{ $t('editor.image.label.browse') }}</span>
+                            {{ $t('editor.image.label.upload') }}
+                        </div>
+                    </span>
+                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
+                </span>
             </label>
         </div>
 
