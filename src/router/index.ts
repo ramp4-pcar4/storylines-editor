@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import StoryV from '@/components/story/story.vue';
+import LandingV from '@/components/editor/landing.vue';
 import EditorV from '@/components/editor/editor.vue';
 import Router, { Route } from 'vue-router';
 
@@ -12,10 +13,18 @@ const routes = [
     },
     {
         path: '/:lang/editor',
-        component: EditorV
+        name: 'home',
+        component: LandingV
+    },
+    {
+        path: '/:lang/editor-metadata',
+        name: 'metadata',
+        component: EditorV,
+        props: true
     },
     {
         path: '/:lang/editor/:uid',
+        name: 'editor',
         component: EditorV
     },
     {
