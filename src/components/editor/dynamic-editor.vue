@@ -2,14 +2,21 @@
     <div class="block">
         <!-- left and right panel buttons for dynamic panels -->
         <div class="flex">
-            <button @click="() => changePanel('text')" :class="editingStatus === 'text' ? 'font-extrabold' : ''">
+            <button
+                @click="() => changePanel('text')"
+                class="border hover:bg-gray-100"
+                :class="editingStatus === 'text' ? 'border-black' : 'border-gray-300'"
+            >
                 Text Section
             </button>
-            <button @click="() => changePanel('panels')" :class="editingStatus !== 'text' ? 'font-extrabold' : ''">
+            <button
+                @click="() => changePanel('panels')"
+                class="border hover:bg-gray-100"
+                :class="editingStatus !== 'text' ? 'border-black' : 'border-gray-300'"
+            >
                 Panel Collection
             </button>
         </div>
-        <br />
         <!-- Text Section -->
         <div v-if="editingStatus === 'text'">
             <component
@@ -21,7 +28,7 @@
             ></component>
         </div>
         <div v-if="editingStatus === 'panels'">
-            <table class="w-2/3">
+            <table class="w-2/3 mt-5">
                 <tr class="table-header">
                     <th>Panel ID</th>
                     <th>Panel Type</th>
