@@ -50,7 +50,7 @@ export default class ImageEditorV extends Vue {
 
     dragging = false;
 
-    imagePreviewsLoading = true;
+    imagePreviewsLoading = false;
     imagePreviewPromises = [] as Array<Promise<ImageFile>>;
     imagePreviews = [] as Array<ImageFile>;
 
@@ -60,6 +60,10 @@ export default class ImageEditorV extends Vue {
 
     mounted(): void {
         if (this.panel.images !== undefined && this.panel.images.length) {
+            // Set images as loading until they are all loaded and resolve.
+            this.imagePreviewsLoading = true;
+
+            // Process each existing image.
             this.panel.images.map((image: ImagePanel) => {
                 // Check if the config file exists in the ZIP folder first.
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
