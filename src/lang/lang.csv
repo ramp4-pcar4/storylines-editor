@@ -17,6 +17,7 @@ editor.editProduct,Edit Existing Storylines Product,1,Modifier le produit Storyl
 editor.uuid,UUID,1,UUID,0
 editor.title,Title,1,Titre,0
 editor.logo,Logo,1,Logo,0
+editor.logoPreview,Logo Preview,1,Logo Preview,0
 editor.contextLink,Context Link,1,Lien contextuel,0
 editor.contextLabel,Context Label,1,Libellé de contexte,0
 editor.dateModified,Date Modified,1,Date modifiée,0
