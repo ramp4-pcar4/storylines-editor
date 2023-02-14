@@ -147,6 +147,7 @@ import { StoryRampConfig, Slide } from '@/definitions';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
+const { v4: uuidv4 } = require('uuid');
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
@@ -187,7 +188,8 @@ export default class EditorV extends Vue {
     };
 
     created(): void {
-        this.uuid = this.$route.params.uid ?? undefined;
+        // Generate UUID for new product
+        this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
 
         // Initialize Storylines config and the configuration structure.
@@ -195,7 +197,7 @@ export default class EditorV extends Vue {
         this.configFileStructure = undefined;
 
         // If a product UUID is provided, fetch the contents from the server.
-        if (this.uuid) {
+        if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
     }
@@ -252,7 +254,7 @@ export default class EditorV extends Vue {
         fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
             if (res.status === 404) {
                 // Product not found.
-                this.errorMessage = `The requested UID ${this.uuid} does not exist.`;
+                this.errorMessage = `The requested UID ${this.uuid ?? ''} does not exist.`;
                 this.loadStatus = 'waiting';
             } else {
                 const configZip = new JSZip();
