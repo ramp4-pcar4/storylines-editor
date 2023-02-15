@@ -30,26 +30,36 @@
             </label>
         </div>
 
+        <span v-show="!imagePreviewsLoading && imagePreviews.length" class="flex justify-center">
+            <i>Click and drag to reorder images</i>
+        </span>
+
         <!-- Gallery preview of all images -->
-        <ul class="flex flex-wrap list-none" v-show="!imagePreviewsLoading && imagePreviews.length">
+        <draggable
+            v-model="imagePreviews"
+            v-show="!imagePreviewsLoading && imagePreviews.length"
+            class="flex flex-wrap list-none"
+        >
             <ImagePreview v-for="(image, idx) in imagePreviews" :key="idx" :imageFile="image" @delete="deleteImage">
                 <div class="flex mt-4 items-center">
                     <label class="alt-label">Alt tag:</label>
                     <input type="text" v-model="image.altText" />
                 </div>
             </ImagePreview>
-        </ul>
+        </draggable>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 import { ImagePanel, ImageFile } from '@/definitions';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
 @Component({
     components: {
-        ImagePreview: ImagePreviewV
+        ImagePreview: ImagePreviewV,
+        draggable
     }
 })
 export default class ImageEditorV extends Vue {
