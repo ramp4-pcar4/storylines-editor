@@ -59,6 +59,7 @@
                     :metadata="metadata"
                     @metadata-changed="updateMetadata"
                     @logo-changed="onFileChange"
+                    @logo-source-changed="onLogoSourceInput"
                 ></metadata-editor>
             </div>
 
@@ -135,6 +136,7 @@
                 :metadata="metadata"
                 @metadata-changed="updateMetadata"
                 @logo-changed="onFileChange"
+                @logo-source-changed="onLogoSourceInput"
             ></metadata-editor>
             <div class="w-full flex justify-end">
                 <button class="bg-black text-white hover:bg-gray-800" @click="saveMetadata">Done</button>
@@ -217,8 +219,12 @@ export default class EditorV extends Vue {
         this.config.title = this.metadata.title;
         this.config.slides = this.slides;
 
-        // Set the source of the product logo.
-        this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+        // Set the source of the product logo
+        if (!this.metadata.logoName.includes('http')) {
+            this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+        } else {
+            this.config.introSlide.logo.src = this.metadata.logoName;
+        }
 
         // Add the newly generated Storylines configuration file to the ZIP file.
         const fileName = `${this.uuid}_${this.lang}.json`;
@@ -389,6 +395,17 @@ export default class EditorV extends Vue {
                                 this.metadata.logoPreview = URL.createObjectURL(img);
                                 this.metadata.logoName = logoName;
                             });
+                    } else {
+                        // If it doesn't exist, maybe it's a remote file?
+                        fetch(logo).then((data: any) => {
+                            if (data.status !== 404) {
+                                this.logoImage = new File([data], logoName);
+                                this.metadata.logoPreview = logo;
+                            }
+                        });
+
+                        // Fill in the field with this value whether it exists or not.
+                        this.metadata.logoName = logo;
                     }
 
                     this.slides = this.config.slides;
@@ -453,8 +470,13 @@ export default class EditorV extends Vue {
             this.config.contextLabel = this.metadata.contextLabel;
             this.config.dateModified = this.metadata.dateModified;
 
-            this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
-            this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+            // If the logo doesn't include HTTP, assume it's a local file.
+            if (!this.metadata.logoName.includes('http')) {
+                this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+                this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+            } else {
+                this.config.introSlide.logo.src = this.metadata.logoName;
+            }
         }
         if (this.$modals.isActive('metadata-edit-modal')) {
             this.$modals.hide('metadata-edit-modal');
@@ -527,6 +549,24 @@ export default class EditorV extends Vue {
             this.generateRemoteConfig();
         }
         next();
+    }
+
+    onLogoSourceInput(e: InputEvent) {
+        this.metadata.logoName = (e.target as HTMLInputElement).value;
+
+        fetch(this.metadata.logoName)
+            .then((data: any) => {
+                if (data.status !== 404) {
+                    this.metadata.logoPreview = this.metadata.logoName;
+                } else {
+                    // If the image doesn't exist, display nothing.
+                    this.metadata.logoPreview = 'error';
+                }
+            })
+            .catch((err: any) => {
+                // If an error occurs (maybe CORS), then display nothing.
+                this.metadata.logoPreview = 'error';
+            });
     }
 
     onFileChange(e: Event): void {
