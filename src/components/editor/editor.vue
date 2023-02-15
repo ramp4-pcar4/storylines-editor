@@ -65,7 +65,7 @@
                 </div>
 
                 <label class="mb-5 inline">{{ $t('editor.logo') }}:</label>
-                <input type="text" :value="logoName" class="w-1/4" />
+                <input type="text" @change="onLogoSourceInput" :value="logoName" class="w-1/4" />
                 <button v-on:click="openFileSelector" class="bg-black text-white hover:bg-gray-800">
                     {{ $t('editor.browse') }}
                 </button>
@@ -355,6 +355,17 @@ export default class EditorV extends Vue {
                                 this.logoPreview = URL.createObjectURL(img);
                                 this.logoName = logoName;
                             });
+                    } else {
+                        // If it doesn't exist, maybe it's a remote file?
+                        fetch(this.logo).then((data: any) => {
+                            if (data.status !== 404) {
+                                this.logoImage = new File([data], logoName);
+                                this.logoPreview = this.logo;
+                            }
+                        });
+
+                        // Fill in the field with this value whether it exists or not.
+                        this.logoName = this.logo;
                     }
 
                     this.slides = this.config.slides;
@@ -413,8 +424,13 @@ export default class EditorV extends Vue {
             this.config.contextLabel = this.contextLabel;
             this.config.dateModified = this.dateModified;
 
-            this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
-            this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+            // If the logo doesn't include HTTP, assume it's a local file.
+            if (!this.logoName.includes('http')) {
+                this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+                this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+            } else {
+                this.config.introSlide.logo.src = this.logoName;
+            }
         }
     }
 
@@ -488,6 +504,10 @@ export default class EditorV extends Vue {
             this.generateRemoteConfig();
         }
         next();
+    }
+
+    onLogoSourceInput(e: InputEvent) {
+        this.logoName = this.logo = (e.target as HTMLInputElement).value;
     }
 
     onFileChange(e: Event): void {
