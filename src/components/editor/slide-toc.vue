@@ -14,16 +14,18 @@
             </button>
         </div>
         <ul>
-            <li class="flex toc-slide border-t" v-for="(slide, index) in slides" :key="slide.title + index">
-                <div
-                    class="flex px-2 cursor-pointer hover:bg-gray-100"
-                    :class="currentSlide === slide ? 'bg-gray-100' : ''"
-                    @click="selectSlide(index)"
-                >
-                    <span class="self-center overflow-ellipsis whitespace-nowrap overflow-hidden flex-shrink-0 ml-2"
-                        >Slide {{ index + 1 }}: <span class="font-bold">{{ slide.title || '' }}</span></span
-                    >
-                    <span class="ml-auto flex-grow"></span>
+            <li
+                class="toc-slide border-t flex px-2 cursor-pointer hover:bg-gray-100"
+                :class="currentSlide === slide ? 'bg-gray-100' : ''"
+                @click="selectSlide(index)"
+                v-for="(slide, index) in slides"
+                :key="slide.title + index"
+            >
+                <tippy delay="200" placement="right">{{ slide.title }}</tippy>
+                <div class="self-center overflow-ellipsis whitespace-nowrap overflow-hidden flex-grow ml-2">
+                    Slide {{ index + 1 }}: <span class="font-bold overflow-hidden">{{ slide.title || '' }}</span>
+                </div>
+                <div class="flex">
                     <button @click.stop="removeSlide(index)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                             <path
