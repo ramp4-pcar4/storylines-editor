@@ -23,7 +23,7 @@
                     />
                     <button
                         @click="generateRemoteConfig"
-                        class="bg-gray-500 text-white hover:bg-gray-600"
+                        class="bg-black text-white hover:bg-gray-800"
                         :class="errorMessage ? 'input-error' : ''"
                         v-if="editExisting"
                     >
@@ -55,46 +55,11 @@
                     </p>
                 </div>
 
-                <label class="mb-5">{{ $t('editor.title') }}:</label>
-                <input type="text" v-model="title" class="w-1/3" /> <br />
-
-                <!-- only display an image preview if one is provided.-->
-                <div v-if="!!logoPreview">
-                    <label>{{ $t('editor.logoPreview') }}:</label>
-                    <img :src="logoPreview" v-if="!!logoPreview" class="image-preview" />
-                </div>
-
-                <label class="mb-5 inline">{{ $t('editor.logo') }}:</label>
-                <input type="text" :value="logoName" class="w-1/4" />
-                <button v-on:click="openFileSelector" class="bg-black text-white hover:bg-gray-800">
-                    {{ $t('editor.browse') }}
-                </button>
-
-                <!-- hide the actual file input -->
-                <input type="file" @change="onFileChange" id="logoUpload" class="w-1/4" style="display: none" />
-
-                <br />
-                <label>{{ $t('editor.contextLink') }}:</label>
-                <input type="text" v-model="contextLink" class="w-2/3" />
-                <br />
-                <label class="mb-5"></label>
-                <p class="inline-block">
-                    <i>
-                        Context link shows up at the bottom of the page to provide additional resources for interested
-                        users
-                    </i>
-                </p>
-                <br />
-                <label>{{ $t('editor.contextLabel') }}:</label>
-                <input type="text" v-model="contextLabel" class="w-2/3" />
-                <br />
-                <label class="mb-5"></label>
-                <p class="inline-block">
-                    <i> Context label shows up before the context link to explain what the link is for </i>
-                </p>
-                <br />
-                <label class="mb-5">{{ $t('editor.dateModified') }}:</label>
-                <input type="date" v-model="dateModified" /> <br /><br />
+                <metadata-editor
+                    :metadata="metadata"
+                    @metadata-changed="updateMetadata"
+                    @logo-changed="onFileChange"
+                ></metadata-editor>
             </div>
 
             <div class="flex mt-8">
@@ -120,7 +85,7 @@
             <div class="flex">
                 <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
                     <div class="flex items-center justify-center border-b p-2">
-                        <button>
+                        <button @click.stop="$modals.show('metadata-edit-modal')">
                             <span class="align-middle inline-block px-1"
                                 ><svg
                                     clip-rule="evenodd"
@@ -161,6 +126,17 @@
                 ></slide-editor>
             </div>
         </template>
+        <vue-modal name="metadata-edit-modal" :outer-close="false" :hide-close-btn="true" size="xlg">
+            <h2 slot="header" class="text-lg font-bold">Edit Project Metadata</h2>
+            <metadata-editor
+                :metadata="metadata"
+                @metadata-changed="updateMetadata"
+                @logo-changed="onFileChange"
+            ></metadata-editor>
+            <div class="w-full flex justify-end">
+                <button class="bg-black text-white hover:bg-gray-800" @click="saveMetadata">Done</button>
+            </div>
+        </vue-modal>
     </div>
 </template>
 
@@ -175,9 +151,11 @@ const axios = require('axios').default;
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
+import MetadataEditorV from './metadata-editor.vue';
 
 @Component({
     components: {
+        'metadata-editor': MetadataEditorV,
         spinner: Circle2,
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV
@@ -194,17 +172,19 @@ export default class EditorV extends Vue {
 
     // Form properties.
     uuid = '';
-    title = '';
-    logo = '';
     logoImage: undefined | File = undefined;
-    logoPreview = ''; // for display purposes only
-    logoName = '';
-    contextLink = '';
-    contextLabel = '';
-    dateModified = '';
     slides: any[] = [];
     currentSlide: any = '';
     slideIndex = -1;
+    $modals: any;
+    metadata = {
+        title: '',
+        logoPreview: '',
+        logoName: '',
+        contextLink: '',
+        contextLabel: '',
+        dateModified: ''
+    };
 
     created(): void {
         this.uuid = this.$route.params.uid ?? undefined;
@@ -228,7 +208,7 @@ export default class EditorV extends Vue {
 
         // Generate a new configuration file and populate required fields.
         this.config = this.configHelper();
-        this.config.title = this.title;
+        this.config.title = this.metadata.title;
         this.config.slides = this.slides;
 
         // Set the source of the product logo.
@@ -256,9 +236,9 @@ export default class EditorV extends Vue {
                 title: 'Test Config Intro Slide'
             },
             slides: [],
-            contextLabel: this.contextLabel,
-            contextLink: this.contextLink,
-            dateModified: this.dateModified
+            contextLabel: this.metadata.contextLabel,
+            contextLink: this.metadata.contextLink,
+            dateModified: this.metadata.dateModified
         };
     }
 
@@ -336,15 +316,15 @@ export default class EditorV extends Vue {
 
                 // Load in project data.
                 if (this.config) {
-                    this.title = this.config.title;
-                    this.logo = this.config.introSlide.logo.src;
-                    this.contextLink = this.config.contextLink;
-                    this.contextLabel = this.config.contextLabel;
-                    this.dateModified = this.config.dateModified;
+                    this.metadata.title = this.config.title;
+                    this.metadata.contextLink = this.config.contextLink;
+                    this.metadata.contextLabel = this.config.contextLabel;
+                    this.metadata.dateModified = this.config.dateModified;
+                    const logo = this.config.introSlide.logo.src;
 
                     // Fetch the logo from the folder (if it exists).
-                    const logoSrc = `${this.logo.substring(this.logo.indexOf('/') + 1)}`;
-                    const logoName = `${this.logo.split('/')[this.logo.split('/').length - 1]}`;
+                    const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
+                    const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
 
                     if (this.configFileStructure.config.file(logoSrc)) {
                         this.configFileStructure.config
@@ -352,8 +332,8 @@ export default class EditorV extends Vue {
                             .async('blob')
                             .then((img: any) => {
                                 this.logoImage = new File([img], logoName);
-                                this.logoPreview = URL.createObjectURL(img);
-                                this.logoName = logoName;
+                                this.metadata.logoPreview = URL.createObjectURL(img);
+                                this.metadata.logoName = logoName;
                             });
                     }
 
@@ -401,6 +381,10 @@ export default class EditorV extends Vue {
         return this.configFileStructure;
     }
 
+    updateMetadata(key: 'title' | 'contextLink' | 'contextLabel' | 'dateModified', value: string): void {
+        this.metadata[key] = value;
+    }
+
     /**
      * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
      * to config file. TODO: decide whether to upload file to server (e.g. call generateConfig).
@@ -408,13 +392,16 @@ export default class EditorV extends Vue {
     saveMetadata(): void {
         // update metadata content to existing config only if it has been successfully loaded
         if (this.config !== undefined) {
-            this.config.title = this.title;
-            this.config.contextLink = this.contextLink;
-            this.config.contextLabel = this.contextLabel;
-            this.config.dateModified = this.dateModified;
+            this.config.title = this.metadata.title;
+            this.config.contextLink = this.metadata.contextLink;
+            this.config.contextLabel = this.metadata.contextLabel;
+            this.config.dateModified = this.metadata.dateModified;
 
             this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
             this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+        }
+        if (this.$modals.isActive('metadata-edit-modal')) {
+            this.$modals.hide('metadata-edit-modal');
         }
     }
 
@@ -472,10 +459,6 @@ export default class EditorV extends Vue {
         this.generateRemoteConfig();
     }
 
-    openFileSelector(): void {
-        document.getElementById('logoUpload')?.click();
-    }
-
     /**
      * React to param changes in URL.
      */
@@ -496,8 +479,8 @@ export default class EditorV extends Vue {
         this.logoImage = uploadedFile;
 
         // Generate an image preview.
-        this.logoPreview = URL.createObjectURL(uploadedFile);
-        this.logoName = uploadedFile.name;
+        this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
+        this.metadata.logoName = uploadedFile.name;
     }
 }
 </script>
@@ -528,7 +511,7 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .editor-container label {
-        width: 8vw;
+        width: 10vw;
         text-align: right;
         margin-right: 15px;
         display: inline-block;

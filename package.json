@@ -31,7 +31,8 @@
         "vue-property-decorator": "^9.1.2",
         "vue-router": "^3.5.3",
         "vue-scrollama": "^2.0.2",
-        "vue-tippy": "^4.10.0"
+        "vue-tippy": "^4.10.0",
+        "vue2-modal": "^1.5.1"
     },
     "devDependencies": {
         "@types/file-saver": "^2.0.5",

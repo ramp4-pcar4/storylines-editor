@@ -18,7 +18,6 @@ VueMarkdownEditor.use(githubTheme, {
 Vue.use(VueMarkdownEditor);
 
 import { i18n } from './lang';
-
 import VueTippy, { TippyComponent } from 'vue-tippy';
 
 Vue.use(VueTippy);
@@ -35,6 +34,10 @@ Vue.use(VueProgressiveImage);
 
 import VueFullScreen from 'vue-fullscreen';
 Vue.use(VueFullScreen);
+
+// @ts-expect-error: module does not have TS support :(
+import VueModal from 'vue2-modal';
+Vue.use(VueModal);
 
 Vue.config.productionTip = false;
 
