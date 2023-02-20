@@ -21299,9 +21299,9 @@ The fix is based on the following hack: https://codepen.io/mkstix6/pen/pRbErK
     height: 140px;
     overflow: scroll;
     position: absolute;
-    top: -13986px; }
+    top: -rem(999); }
   .fgpa .av-save-dialog {
-    height: 240px;
+    height: 160px;
     width: 600px;
     border-radius: 0; }
   .fgpa .av-agol-dialog {
