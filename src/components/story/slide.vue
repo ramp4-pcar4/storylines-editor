@@ -4,6 +4,7 @@
             v-for="(panel, idx) in config.panel"
             :key="idx"
             :config="panel"
+            :configFileStructure="configFileStructure"
             :index="idx"
             :ratio="defaultRatio"
             :slideIdx="slideIdx"
@@ -25,6 +26,7 @@ import { PanelType, Slide } from '@/definitions';
 })
 export default class SlideV extends Vue {
     @Prop() config!: Slide;
+    @Prop() configFileStructure!: any;
     @Prop() slideIdx!: number;
     @Prop() lang!: string;
 

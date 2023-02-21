@@ -1,6 +1,6 @@
 <template>
     <div v-if="config.images.length === 1">
-        <image-panel :config="config.images[0]"></image-panel>
+        <image-panel :config="config.images[0]" :configFileStructure="configFileStructure"></image-panel>
     </div>
     <div v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <full-screen :expandable="config.fullscreen" :type="config.type">
@@ -46,6 +46,7 @@ import ImagePanelV from '@/components/panels/image-panel.vue';
 })
 export default class SlideshowPanelV extends Vue {
     @Prop() config!: SlideshowPanel;
+    @Prop() configFileStructure!: any;
 
     width = -1;
 
@@ -55,6 +56,21 @@ export default class SlideshowPanelV extends Vue {
         setTimeout(() => {
             this.width = this.$el.clientWidth;
         }, 100);
+
+        // obtain image files from ZIP folder in editor preview mode
+        if (this.configFileStructure) {
+            this.config.images.forEach((image) => {
+                const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
+                if (this.configFileStructure.config.file(assetSrc)) {
+                    this.configFileStructure.config
+                        .file(assetSrc)
+                        .async('blob')
+                        .then((res: any) => {
+                            image.src = URL.createObjectURL(res);
+                        });
+                }
+            });
+        }
     }
 }
 </script>

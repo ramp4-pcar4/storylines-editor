@@ -8,7 +8,13 @@
         class="flex-col relative"
     >
         <slot></slot>
-        <component :is="getTemplate()" :config="config" :slideIdx="slideIdx" :lang="lang"></component>
+        <component
+            :is="getTemplate()"
+            :config="config"
+            :configFileStructure="configFileStructure"
+            :slideIdx="slideIdx"
+            :lang="lang"
+        ></component>
     </div>
 </template>
 
@@ -33,6 +39,7 @@ import LoadingPanelV from './loading-panel.vue';
 })
 export default class PanelV extends Vue {
     @Prop() config!: BasePanel;
+    @Prop() configFileStructure!: any;
     @Prop() ratio!: boolean;
     @Prop() slideIdx!: number;
     @Prop() lang!: string;

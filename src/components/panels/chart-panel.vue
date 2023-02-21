@@ -12,7 +12,7 @@
                 :index="index"
                 class="self-center"
             >
-                <dqv-chart :config="chartConfig" />
+                <dqv-chart :config="chartConfig" :configFileStructure="configFileStructure" />
             </slide>
 
             <hooper-navigation slot="hooper-addons"></hooper-navigation>
@@ -20,7 +20,7 @@
         </hooper>
 
         <div v-else-if="width !== -1">
-            <dqv-chart :config="config.charts[0]" />
+            <dqv-chart :config="config.charts[0]" :configFileStructure="configFileStructure" />
         </div>
     </div>
 </template>
@@ -44,6 +44,7 @@ import ChartV from '@/components/panels/helpers/chart.vue';
 })
 export default class ChartPanelV extends Vue {
     @Prop() config!: ChartPanel;
+    @Prop() configFileStructure!: any;
 
     width = -1;
 

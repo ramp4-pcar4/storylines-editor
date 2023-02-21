@@ -9,7 +9,39 @@
             {{ config.subtitle }}
         </p>
 
-        <router-link :to="{ hash: '#story' }" class="inline-block mt-10 scroll-arrow" title="scroll to story" target>
+        <!-- using router-link causes a page refresh which breaks editor preview mode -->
+        <button @click="scrollToStory" v-if="!!configFileStructure">
+            <svg
+                class="w-auto h-24 m-auto"
+                width="90"
+                height="104.84"
+                viewBox="0 0 90 104.83"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="m89.51 77.659-44.51 25.698-44.51-25.698 3.86e-4 -51.395 44.51-25.698 44.51 25.698z"
+                    fill="#fff"
+                    stroke="#00d2d3"
+                    stroke-dasharray="4.8960465, 4.8960465"
+                    stroke-dashoffset="2.7"
+                    stroke-width=".5"
+                />
+                <path
+                    d="m45 104.27-44.51-25.697v-10.646l44.51 25.697 44.51-25.697v10.646z"
+                    fill="#00d2d3"
+                    stroke="#00d2d3"
+                    stroke-width=".97921"
+                />
+            </svg>
+        </button>
+
+        <router-link
+            :to="{ hash: '#story' }"
+            class="inline-block mt-10 scroll-arrow"
+            title="scroll to story"
+            target
+            v-else
+        >
             <svg
                 class="w-auto h-24 m-auto"
                 width="90"
@@ -43,6 +75,30 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 @Component({})
 export default class IntroV extends Vue {
     @Prop() config!: Intro;
+    @Prop() configFileStructure!: any;
+
+    mounted(): void {
+        // obtain logo from ZIP file if it exists
+        if (this.configFileStructure) {
+            const logoSrc = `${this.config.logo.src.substring(this.config.logo.src.indexOf('/') + 1)}`;
+            if (this.configFileStructure.config.file(logoSrc)) {
+                this.configFileStructure.config
+                    .file(logoSrc)
+                    .async('blob')
+                    .then((res: any) => {
+                        this.config.logo.src = URL.createObjectURL(res);
+                        this.$forceUpdate();
+                    });
+            }
+        }
+    }
+
+    scrollToStory(): void {
+        const el = document.getElementById('story');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
 }
 </script>
 
