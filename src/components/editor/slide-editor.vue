@@ -154,6 +154,7 @@
                     :configFileStructure="configFileStructure"
                     :lang="lang"
                     :uid="uid"
+                    :sourceCounts="sourceCounts"
                 ></component>
             </div>
         </div>
@@ -194,6 +195,7 @@ export default class SlideEditorV extends Vue {
     @Prop() uid!: string;
     @Prop() slideIndex!: number;
     @Prop() isLast!: number;
+    @Prop() sourceCounts!: any;
 
     panelIndex = 0;
 

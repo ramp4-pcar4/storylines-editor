@@ -112,6 +112,8 @@
                         :slideIndex="slideIndex"
                         @slide-change="selectSlide"
                         @slides-updated="updateSlides"
+                        :configFileStructure="configFileStructure"
+                        :lang="lang"
                     ></slide-toc>
                 </div>
                 <slide-editor
@@ -123,6 +125,7 @@
                     :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
                     @slide-change="selectSlide"
+                    :sourceCounts="sourceCounts"
                 ></slide-editor>
             </div>
         </template>
@@ -186,6 +189,7 @@ export default class EditorV extends Vue {
         contextLabel: '',
         dateModified: ''
     };
+    sourceCounts: any = {};
 
     created(): void {
         // Generate UUID for new product
@@ -266,6 +270,54 @@ export default class EditorV extends Vue {
                 });
             }
         });
+    }
+
+    findSources(config: StoryRampConfig) {
+        this.incrementSourceCount(config.introSlide.logo.src);
+
+        config.slides.forEach((slide) => {
+            slide.panel.forEach((panel) => {
+                this.panelSourceHelper(panel);
+            });
+        });
+    }
+
+    panelSourceHelper(panel: any) {
+        switch (panel.type) {
+            case 'dynamic':
+                panel.children.forEach((subPanel: any) => {
+                    this.panelSourceHelper(subPanel);
+                });
+                break;
+            case 'slideshow':
+                panel.images.forEach((image: any) => {
+                    this.incrementSourceCount(image.src);
+                });
+                break;
+            case 'chart':
+                panel.charts.forEach((chart: any) => {
+                    this.incrementSourceCount(chart.src);
+                });
+                break;
+            case 'image':
+            case 'video':
+            case 'audio':
+                this.incrementSourceCount(panel.src);
+                break;
+            case 'map':
+                this.incrementSourceCount(panel.config);
+                break;
+            default:
+                break;
+        }
+    }
+
+    incrementSourceCount(src: string) {
+        if (this.sourceCounts[src]) {
+            this.sourceCounts[src] += 1;
+        } else {
+            this.sourceCounts[src] = 1;
+        }
     }
 
     /**
@@ -350,6 +402,8 @@ export default class EditorV extends Vue {
                             Vue.set(slide.panel, 1, newSlide);
                         }
                     });
+
+                    this.findSources(this.config);
                 }
             });
     }

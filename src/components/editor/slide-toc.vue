@@ -26,13 +26,22 @@
                     Slide {{ index + 1 }}: <span class="font-bold overflow-hidden">{{ slide.title || '' }}</span>
                 </div>
                 <div class="flex">
-                    <button @click.stop="removeSlide(index)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                            <path
-                                d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
-                            />
-                        </svg>
-                    </button>
+                    <div class="flex flex-col">
+                        <button @click.stop="removeSlide(index)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
+                                />
+                            </svg>
+                        </button>
+                        <button @click.stop="copySlide(index)">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                                <path
+                                    d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
                     <div class="flex flex-col mr-2 ml-1 my-1">
                         <button
                             :class="index == 0 ? 'text-gray-500 cursor-not-allowed' : ''"
@@ -62,6 +71,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import cloneDeep from 'clone-deep';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
@@ -76,6 +86,9 @@ export default class SlideTocV extends Vue {
     @Prop() slides!: any[];
     @Prop() currentSlide!: any;
     @Prop() slideIndex!: number;
+    @Prop() configFileStructure!: any;
+    @Prop() lang!: string;
+
     total = 0;
 
     selectSlide(index: number): void {
@@ -100,6 +113,10 @@ export default class SlideTocV extends Vue {
         });
         this.$emit('slides-updated', this.slides);
         this.total++;
+    }
+
+    copySlide(index: number): void {
+        this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
     }
 
     removeSlide(index: number): void {
