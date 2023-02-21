@@ -14,6 +14,7 @@ fullscreen.activate,Enter Fullscreen,1,Entrer en plein écran,0
 fullscreen.deactivate,Exit Fullscreen,1,Sortie plein écran,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit Storylines,0
 editor.editProduct,Edit Existing Storylines Product,1,Modifier le produit Storylines existant,0
+editor.editMetadata,Edit Project Metadata,1,Modifier les Métadonnées du Projet,0
 editor.uuid,UUID,1,UUID,0
 editor.title,Title,1,Titre,0
 editor.logo,Logo,1,Logo,0
@@ -25,6 +26,8 @@ editor.load,Load,1,Charger,0
 editor.browse,Browse,1,Parcourir,0
 editor.back,Back,1,Retour,1
 editor.next,Next,1,Suivant,1
+editor.preview,Preview,1,Aperçu,0
+editor.saveChanges,Save Changes,1,Sauvegarder les Modifications,0
 editor.frenchConfig,View French Config,1,Afficher la configuration française,0
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0
 editor.image.delete,Delete Image,1,Supprimer l'image,0

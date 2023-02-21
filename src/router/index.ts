@@ -2,6 +2,7 @@ import Vue from 'vue';
 import StoryV from '@/components/story/story.vue';
 import LandingV from '@/components/editor/landing.vue';
 import EditorV from '@/components/editor/editor.vue';
+import StoryPreviewV from '@/components/editor/preview.vue';
 import Router, { Route } from 'vue-router';
 
 Vue.use(Router);
@@ -26,6 +27,12 @@ const routes = [
         path: '/:lang/editor/:uid',
         name: 'editor',
         component: EditorV
+    },
+    {
+        path: '/:lang/editor-preview',
+        component: StoryPreviewV,
+        name: 'preview',
+        props: true
     },
     {
         path: '/:uid',

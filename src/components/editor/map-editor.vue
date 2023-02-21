@@ -75,7 +75,7 @@ export default class MapEditorV extends Vue {
     status = this.panel.config !== '' ? 'default' : 'creating';
     strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[3].split('.')[0] : '';
 
-    mounted() {
+    mounted(): void {
         // If a message is received, it means the map save button was pressed.
         window.addEventListener('message', (event) => {
             if (event.data === 'mapSaved') {
@@ -84,7 +84,7 @@ export default class MapEditorV extends Vue {
         });
     }
 
-    createNewConfig() {
+    createNewConfig(): void {
         // Update the path to the new file.
         // TODO: ensure that this is not a name already in use?
         this.panel.config = `${this.configFileStructure.uuid}/ramp-config/${this.lang}/${this.newFileName}.json`;
@@ -106,7 +106,7 @@ export default class MapEditorV extends Vue {
         this.status = 'default';
     }
 
-    openEditor() {
+    openEditor(): void {
         if (this.panel.config === '') {
             return;
         }
@@ -123,10 +123,11 @@ export default class MapEditorV extends Vue {
                     .async('string')
                     .then((res: any) => {
                         window.config = res;
-                        (document.getElementById('RAMPeditorframe') as HTMLIFrameElement).contentWindow!.config = res;
-                        (document.getElementById(
-                            'RAMPeditorframe'
-                        ) as HTMLIFrameElement).contentWindow!.configname = this.strippedFileName;
+                        const iframe = document.getElementById('RAMPeditorframe') as HTMLIFrameElement;
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.config = res;
+                            iframe.contentWindow.configname = this.strippedFileName;
+                        }
                     });
             } else {
                 // If it does not exist in the ZIP folder, try and fetch from server.
@@ -135,19 +136,18 @@ export default class MapEditorV extends Vue {
                         let stringResponse = JSON.stringify(res);
 
                         window.config = stringResponse;
-                        (document.getElementById(
-                            'RAMPeditorframe'
-                        ) as HTMLIFrameElement).contentWindow!.config = stringResponse;
-                        (document.getElementById(
-                            'RAMPeditorframe'
-                        ) as HTMLIFrameElement).contentWindow!.configname = this.strippedFileName;
+                        const iframe = document.getElementById('RAMPeditorframe') as HTMLIFrameElement;
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.config = stringResponse;
+                            iframe.contentWindow.configname = this.strippedFileName;
+                        }
                     });
                 });
             }
         }
     }
 
-    saveEditor() {
+    saveEditor(): void {
         this.status = 'default';
 
         // Add chart config to ZIP file.

@@ -32,8 +32,24 @@ import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
 })
 export default class ImagePanelV extends Vue {
     @Prop() config!: ImagePanel;
+    @Prop() configFileStructure!: any;
 
     md = new MarkdownIt({ html: true });
+
+    mounted(): void {
+        // obtain image file from ZIP folder in editor preview mode
+        if (this.configFileStructure) {
+            const assetSrc = `${this.config.src.substring(this.config.src.indexOf('/') + 1)}`;
+            if (this.configFileStructure.config.file(assetSrc)) {
+                this.configFileStructure.config
+                    .file(assetSrc)
+                    .async('blob')
+                    .then((res: any) => {
+                        this.config.src = URL.createObjectURL(res);
+                    });
+            }
+        }
+    }
 }
 </script>
 
