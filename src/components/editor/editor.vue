@@ -229,6 +229,8 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
+        window.addEventListener('beforeunload', this.beforeWindowUnload);
+
         // Generate UUID for new product
         this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
@@ -241,6 +243,10 @@ export default class EditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    beforeDestroy() {
+        window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }
 
     /**
@@ -616,6 +622,14 @@ export default class EditorV extends Vue {
         // Generate an image preview.
         this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
         this.metadata.logoName = uploadedFile.name;
+    }
+
+    beforeWindowUnload(e: any) {
+        // show popup if when leaving page with unsaved changes
+        if (this.unsavedChanges && !window.confirm()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
     }
 }
 </script>
