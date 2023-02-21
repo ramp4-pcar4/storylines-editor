@@ -12,10 +12,17 @@
         <!-- only display an image preview if one is provided.-->
         <div v-if="!!metadata.logoPreview">
             <label>{{ $t('editor.logoPreview') }}:</label>
-            <img :src="metadata.logoPreview" v-if="!!metadata.logoPreview" class="image-preview" />
+            <img
+                :src="metadata.logoPreview"
+                v-if="!!metadata.logoPreview && metadata.logoPreview != 'error'"
+                class="image-preview"
+            />
+            <p v-if="metadata.logoPreview == 'error'" class="image-preview">
+                An error occurred when trying to load image.
+            </p>
         </div>
         <label class="mb-5">{{ $t('editor.logo') }}:</label>
-        <input type="text" :value="metadata.logoName" disabled class="w-1/4" />
+        <input type="text" @change="$emit('logo-source-changed', $event)" :value="metadata.logoName" class="w-1/4" />
         <button @click.stop="openFileSelector" class="bg-black text-white hover:bg-gray-800">
             {{ $t('editor.browse') }}
         </button>
