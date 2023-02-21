@@ -155,6 +155,8 @@ export default class MapEditorV extends Vue {
             `${this.strippedFileName}.json`,
             JSON.stringify(JSON.parse(localStorage.RAMPconfig), null, 4)
         );
+
+        this.$parent.$emit('slide-edit');
     }
 }
 </script>

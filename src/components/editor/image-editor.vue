@@ -39,6 +39,7 @@
             v-model="imagePreviews"
             v-show="!imagePreviewsLoading && imagePreviews.length"
             class="flex flex-wrap list-none"
+            @update="onImagesEdited"
         >
             <ImagePreview v-for="(image, idx) in imagePreviews" :key="idx" :imageFile="image" @delete="deleteImage">
                 <div class="flex mt-4 items-center">
@@ -69,6 +70,7 @@ export default class ImageEditorV extends Vue {
     @Prop() sourceCounts!: any;
 
     dragging = false;
+    edited = false;
 
     imagePreviewsLoading = false;
     imagePreviewPromises = [] as Array<Promise<ImageFile>>;
@@ -133,6 +135,7 @@ export default class ImageEditorV extends Vue {
                 };
             })
         );
+        this.onImagesEdited();
     }
 
     dropImages(e: DragEvent): void {
@@ -158,6 +161,7 @@ export default class ImageEditorV extends Vue {
             );
             this.dragging = false;
         }
+        this.onImagesEdited();
     }
 
     deleteImage(img: ImageFile): void {
@@ -171,15 +175,24 @@ export default class ImageEditorV extends Vue {
             }
             this.imagePreviews.splice(idx, 1);
         }
+        this.onImagesEdited();
     }
 
     saveChanges(): void {
-        this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
-            return {
-                ...imageFile,
-                src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`
-            };
-        });
+        if (this.edited) {
+            this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
+                return {
+                    ...imageFile,
+                    src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`
+                };
+            });
+        }
+        this.edited = false;
+    }
+
+    onImagesEdited() {
+        this.edited = true;
+        this.$parent.$emit('slide-edit');
     }
 }
 </script>
