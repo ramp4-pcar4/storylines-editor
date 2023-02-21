@@ -34,7 +34,8 @@
         "vue-router": "^3.5.3",
         "vue-scrollama": "^2.0.2",
         "vue-tippy": "^4.10.0",
-        "vue2-modal": "^1.5.1"
+        "vue2-modal": "^1.5.1",
+        "vuedraggable": "^2.24.3"
     },
     "devDependencies": {
         "@types/clone-deep": "^4.0.1",
