@@ -28,6 +28,7 @@
         "vue-fullscreen": "^2.6.1",
         "vue-i18n": "^8.27.2",
         "vue-loading-spinner": "^1.0.11",
+        "vue-m-message": "^3.1.0",
         "vue-papa-parse": "^3.0.4",
         "vue-progressive-image": "^3.2.0",
         "vue-property-decorator": "^9.1.2",
