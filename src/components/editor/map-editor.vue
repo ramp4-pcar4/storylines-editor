@@ -55,7 +55,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import defaultConfig from '../../../public/scripts/ramp-editor/samples/config-default.json';
+import defaultConfigEn from '../../../public/scripts/ramp-editor/samples/map_en.json';
+import defaultConfigFr from '../../../public/scripts/ramp-editor/samples/map_fr.json';
 
 @Component({
     components: {}
@@ -99,7 +100,7 @@ export default class MapEditorV extends Vue {
         // Create the new map configuration file in the ZIP folder. Copies the `config-default.json` file from the `ramp-editor` folder and renames it.
         this.configFileStructure.rampConfig[this.lang].file(
             `${this.strippedFileName}.json`,
-            JSON.stringify(defaultConfig, null, 4)
+            JSON.stringify(this.lang === 'en' ? defaultConfigEn : defaultConfigFr, null, 4)
         );
 
         // Display the normal edit page now.
