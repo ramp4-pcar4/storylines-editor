@@ -39,6 +39,10 @@ Vue.use(VueFullScreen);
 import VueModal from 'vue2-modal';
 Vue.use(VueModal);
 
+import Message from 'vue-m-message';
+import 'vue-m-message/dist/index.css';
+Vue.use(Message);
+
 Vue.config.productionTip = false;
 
 new Vue({
