@@ -27,7 +27,7 @@
                 </div>
                 <div class="flex">
                     <div class="flex flex-col">
-                        <button @click.stop="removeSlide(index)">
+                        <button @click.stop="$modals.show(`delete-slide-${index}`)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                 <path
                                     d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
@@ -64,6 +64,11 @@
                         </button>
                     </div>
                 </div>
+                <confirmation-modal
+                    :name="`delete-slide-${index}`"
+                    :message="$t('editor.slides.deleteSlide.confirm', { title: slide.title })"
+                    @Ok="removeSlide(index)"
+                />
             </li>
         </ul>
     </div>
@@ -75,11 +80,13 @@ import cloneDeep from 'clone-deep';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Component({
     components: {
         spinner: Circle2,
-        'slide-editor': SlideEditorV
+        'slide-editor': SlideEditorV,
+        'confirmation-modal': ConfirmationModalV
     }
 })
 export default class SlideTocV extends Vue {
@@ -90,6 +97,7 @@ export default class SlideTocV extends Vue {
     @Prop() lang!: string;
 
     total = 0;
+    $modals: any;
 
     selectSlide(index: number): void {
         this.$emit('slide-change', index);
@@ -120,13 +128,11 @@ export default class SlideTocV extends Vue {
     }
 
     removeSlide(index: number): void {
-        if (confirm(this.$t('editor.slides.deleteSlide.confirm') as string)) {
-            if (index === this.slideIndex) {
-                this.$emit('slide-change', -1);
-            }
-            this.slides.splice(index, 1);
-            this.$emit('slides-updated', this.slides);
+        if (index === this.slideIndex) {
+            this.$emit('slide-change', -1);
         }
+        this.slides.splice(index, 1);
+        this.$emit('slides-updated', this.slides);
     }
 
     moveUp(index: number): void {

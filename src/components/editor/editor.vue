@@ -16,15 +16,15 @@
                     <label>{{ $t('editor.uuid') }}:</label>
                     <input
                         type="text"
-                        @input="errorMessage = ''"
+                        @input="error = false"
                         v-model="uuid"
                         class="w-1/3"
-                        :class="errorMessage ? 'input-error' : ''"
+                        :class="error ? 'input-error' : ''"
                     />
                     <button
                         @click="generateRemoteConfig"
                         class="bg-black text-white hover:bg-gray-800"
-                        :class="errorMessage ? 'input-error' : ''"
+                        :class="error ? 'input-error' : ''"
                         v-if="editExisting"
                     >
                         {{ $t('editor.load') }}
@@ -39,9 +39,6 @@
                             stroke="2px"
                             class="mx-2 my-auto"
                         ></spinner>
-                    </div>
-                    <div class="inline-flex">
-                        <span v-if="errorMessage" class="mx-2 m-auto">{{ errorMessage }}</span>
                     </div>
                 </div>
 
@@ -197,7 +194,7 @@ export default class EditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
     configFileStructure: any = undefined;
     loadStatus = 'waiting';
-    errorMessage = ''; // error message if the user requested to load a UID that does not exist or tried to load editor without UID.
+    error = false; // whether an error has occurred
     lang = 'en';
     unsavedChanges = false;
 
@@ -307,7 +304,8 @@ export default class EditorV extends Vue {
         fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
             if (res.status === 404) {
                 // Product not found.
-                this.errorMessage = `The requested UID ${this.uuid ?? ''} does not exist.`;
+                this.$message.error(`The requested UUID ${this.uuid ?? ''} does not exist.`);
+                this.error = true;
                 this.loadStatus = 'waiting';
             } else {
                 const configZip = new JSZip();
@@ -315,6 +313,7 @@ export default class EditorV extends Vue {
                 res.blob().then((file: any) => {
                     configZip.loadAsync(file).then(() => {
                         this.configFileStructureHelper(configZip);
+                        this.$message.success('Successfully loaded storyline!');
                     });
                 });
             }
@@ -488,11 +487,17 @@ export default class EditorV extends Vue {
             formData.append('data', content, `${this.uuid}.zip`);
             const headers = { 'Content-Type': 'multipart/form-data' };
 
-            axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
-                res.data.files; // binary representation of the file
-                res.status; // HTTP status
-                this.unsavedChanges = false;
-            });
+            axios
+                .post('http://localhost:6040/upload', formData, { headers })
+                .then((res: any) => {
+                    res.data.files; // binary representation of the file
+                    res.status; // HTTP status
+                    this.unsavedChanges = false;
+                    this.$message.success('Successfully saved changes!');
+                })
+                .catch(() => {
+                    this.$message.error('Failed to save changes.');
+                });
         });
 
         return this.configFileStructure;
@@ -566,7 +571,7 @@ export default class EditorV extends Vue {
         if (this.editExisting) {
             this.config !== undefined
                 ? (this.loadStatus = 'loaded')
-                : (this.errorMessage = 'No config loaded for existing Storylines product!');
+                : this.$message.error('No config exists for storylines product.');
             this.unsavedChanges = false;
         } else {
             // TODO: check for non-empty required metadata fields
@@ -597,21 +602,26 @@ export default class EditorV extends Vue {
     }
 
     onLogoSourceInput(e: InputEvent) {
+        const isImgUrl = (url: string) => {
+            const img = new Image();
+            img.src = url;
+            return new Promise((resolve) => {
+                img.onerror = () => resolve(false);
+                img.onload = () => resolve(true);
+            });
+        };
+
         this.metadata.logoName = (e.target as HTMLInputElement).value;
 
-        fetch(this.metadata.logoName)
-            .then((data: any) => {
-                if (data.status !== 404) {
-                    this.metadata.logoPreview = this.metadata.logoName;
-                } else {
-                    // If the image doesn't exist, display nothing.
-                    this.metadata.logoPreview = 'error';
-                }
-            })
-            .catch((err: any) => {
-                // If an error occurs (maybe CORS), then display nothing.
+        isImgUrl(this.metadata.logoName).then((res) => {
+            if (res) {
+                this.metadata.logoPreview = this.metadata.logoName;
+                this.$message.success('Successfully loaded logo image.');
+            } else {
                 this.metadata.logoPreview = 'error';
-            });
+                this.$message.error('Failed to load logo image.');
+            }
+        });
     }
 
     onFileChange(e: Event): void {
@@ -702,7 +712,7 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     .editor-toc button {
         background-color: #f3f4f6;
         color: black;
-        border: none !important;
+        border: none;
         transition-duration: 0.2s;
         padding: 0.25 0.25em !important;
     }
