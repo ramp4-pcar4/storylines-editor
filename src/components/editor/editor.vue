@@ -292,7 +292,7 @@ export default class EditorV extends Vue {
         switch (panel.type) {
             case 'dynamic':
                 panel.children.forEach((subPanel: any) => {
-                    this.panelSourceHelper(subPanel);
+                    this.panelSourceHelper(subPanel.panel);
                 });
                 break;
             case 'slideshow':
