@@ -22,10 +22,20 @@
                             Next Slide
                         </button>
                     </div>
+                    <div class="flex mt-3">
+                        <span class="mx-2 font-bold">Make the right panel the full slide</span>
+                        <input
+                            type="checkbox"
+                            class="rounded-none cursor-pointer w-4 h-4"
+                            v-model="rightOnly"
+                            :disabled="rightOnly && currentSlide.panel[panelIndex].type === 'dynamic'"
+                            @change.stop="toggleRightOnly()"
+                        />
+                    </div>
                 </div>
             </div>
             <br />
-            <div class="flex border-b border-black">
+            <div class="flex border-b border-black" v-if="currentSlide.panel.length === 2">
                 <button
                     @click="
                         () => {
@@ -81,7 +91,6 @@
                     "
                     class="border-t border-l border-r"
                     :class="panelIndex == 1 ? 'border-black' : 'border-white'"
-                    v-if="currentSlide.panel[panelIndex].type !== 'dynamic'"
                 >
                     <span class="align-middle inline-block">
                         <svg
@@ -121,14 +130,58 @@
                     <span class="align-middle inline-block pl-1">Right Panel</span>
                 </button>
             </div>
+            <div v-else class="border-b border-black">
+                <button
+                    @click="
+                        () => {
+                            saveChanges();
+                        }
+                    "
+                    class="border-t border-l border-r border-black"
+                >
+                    <span class="align-middle inline-block">
+                        <svg
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                            width="15"
+                            height="15"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1z"
+                                fill-rule="nonzero"
+                            />
+                        </svg>
+                    </span>
+                    <span class="align-middle inline-block">
+                        <svg
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                            width="15"
+                            height="15"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1z"
+                                fill-rule="nonzero"
+                            />
+                        </svg>
+                    </span>
+
+                    <span class="align-middle inline-block pl-1">Fullscreen Panel</span>
+                </button>
+            </div>
             <div>
                 <div class="flex mt-4">
                     <span class="font-bold text-xl">Content:</span>
                     <span class="ml-auto flex-grow"></span>
-                    <div
-                        v-if="panelIndex === 1 || currentSlide.panel[panelIndex].type === 'dynamic'"
-                        class="flex flex-col mr-8"
-                    >
+                    <div v-if="panelIndex === 1 || rightOnly" class="flex flex-col mr-8">
                         <label class="text-left text-lg">Content type:</label>
                         <select
                             @change="changePanelType(currentSlide.panel[panelIndex].type, $event.target.value)"
@@ -165,7 +218,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { StoryRampConfig, DefaultConfigs, PanelType } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
@@ -198,6 +251,7 @@ export default class SlideEditorV extends Vue {
     @Prop() sourceCounts!: any;
 
     panelIndex = 0;
+    rightOnly = false;
 
     editors = {
         text: 'text-editor',
@@ -208,6 +262,11 @@ export default class SlideEditorV extends Vue {
         loading: 'loading-page',
         dynamic: 'dynamic-editor'
     };
+
+    @Watch('currentSlide', { deep: true })
+    onSlideChange() {
+        this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
+    }
 
     changePanelType(prevType: string, newType: string): void {
         if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
@@ -245,16 +304,8 @@ export default class SlideEditorV extends Vue {
                 this.panelIndex = 0;
                 Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
             } else {
-                // When switching from a dynamic panel, add back the secondary panel.
-                if (prevType === 'dynamic') {
-                    Vue.set(this.currentSlide, 'panel', [
-                        Object.assign({}, startingConfig['text' as keyof DefaultConfigs]),
-                        Object.assign({}, startingConfig[newType as keyof DefaultConfigs])
-                    ]);
-                } else {
-                    // Switching panel type when dynamic panels are not involved.
-                    Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
-                }
+                // Switching panel type when dynamic panels are not involved.
+                Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
             }
         }
     }
@@ -268,6 +319,28 @@ export default class SlideEditorV extends Vue {
     selectSlide(index: number): void {
         this.$emit('slide-change', index);
     }
+
+    toggleRightOnly(): void {
+        this.saveChanges();
+        if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
+            if (this.rightOnly) {
+                this.panelIndex = 0;
+                Vue.set(this.currentSlide, 'panel', [this.currentSlide.panel[1]]);
+            } else {
+                Vue.set(this.currentSlide, 'panel', [
+                    Object.assign(
+                        {},
+                        {
+                            type: PanelType.Text,
+                            title: '',
+                            content: ''
+                        }
+                    ),
+                    Object.assign({}, this.currentSlide.panel[0])
+                ]);
+            }
+        }
+    }
 }
 </script>
 
@@ -275,6 +348,11 @@ export default class SlideEditorV extends Vue {
 label {
     text-align: left !important;
     margin-left: 0.5rem;
+}
+
+input[type='checkbox']:checked {
+    accent-color: black;
+    color: white;
 }
 
 select {
