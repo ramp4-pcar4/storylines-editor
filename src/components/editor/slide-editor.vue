@@ -22,6 +22,16 @@
                             Next Slide
                         </button>
                     </div>
+                    <div class="flex mt-3">
+                        <span class="mx-2 font-bold">Make the right panel the full slide</span>
+                        <input
+                            type="checkbox"
+                            class="rounded-none cursor-pointer w-4 h-4"
+                            v-model="rightOnly"
+                            :disabled="rightOnly && currentSlide.panel[panelIndex].type === 'dynamic'"
+                            @change.stop="toggleRightOnly()"
+                        />
+                    </div>
                 </div>
             </div>
             <br />
@@ -81,7 +91,7 @@
                     "
                     class="border-t border-l border-r"
                     :class="panelIndex == 1 ? 'border-black' : 'border-white'"
-                    v-if="currentSlide.panel[panelIndex].type !== 'dynamic'"
+                    v-if="currentSlide.panel.length === 2"
                 >
                     <span class="align-middle inline-block">
                         <svg
@@ -125,10 +135,7 @@
                 <div class="flex mt-4">
                     <span class="font-bold text-xl">Content:</span>
                     <span class="ml-auto flex-grow"></span>
-                    <div
-                        v-if="panelIndex === 1 || currentSlide.panel[panelIndex].type === 'dynamic'"
-                        class="flex flex-col mr-8"
-                    >
+                    <div v-if="panelIndex === 1 || rightOnly" class="flex flex-col mr-8">
                         <label class="text-left text-lg">Content type:</label>
                         <select
                             @change="changePanelType(currentSlide.panel[panelIndex].type, $event.target.value)"
@@ -165,7 +172,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { StoryRampConfig, DefaultConfigs, PanelType } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
@@ -198,6 +205,7 @@ export default class SlideEditorV extends Vue {
     @Prop() sourceCounts!: any;
 
     panelIndex = 0;
+    rightOnly = false;
 
     editors = {
         text: 'text-editor',
@@ -208,6 +216,11 @@ export default class SlideEditorV extends Vue {
         loading: 'loading-page',
         dynamic: 'dynamic-editor'
     };
+
+    @Watch('currentSlide', { deep: true })
+    onSlideChange() {
+        this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
+    }
 
     changePanelType(prevType: string, newType: string): void {
         if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
@@ -245,16 +258,8 @@ export default class SlideEditorV extends Vue {
                 this.panelIndex = 0;
                 Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
             } else {
-                // When switching from a dynamic panel, add back the secondary panel.
-                if (prevType === 'dynamic') {
-                    Vue.set(this.currentSlide, 'panel', [
-                        Object.assign({}, startingConfig['text' as keyof DefaultConfigs]),
-                        Object.assign({}, startingConfig[newType as keyof DefaultConfigs])
-                    ]);
-                } else {
-                    // Switching panel type when dynamic panels are not involved.
-                    Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
-                }
+                // Switching panel type when dynamic panels are not involved.
+                Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
             }
         }
     }
@@ -268,6 +273,27 @@ export default class SlideEditorV extends Vue {
     selectSlide(index: number): void {
         this.$emit('slide-change', index);
     }
+
+    toggleRightOnly(): void {
+        if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
+            if (this.rightOnly) {
+                this.panelIndex = 0;
+                Vue.set(this.currentSlide, 'panel', [this.currentSlide.panel[1]]);
+            } else {
+                Vue.set(this.currentSlide, 'panel', [
+                    Object.assign(
+                        {},
+                        {
+                            type: PanelType.Text,
+                            title: '',
+                            content: ''
+                        }
+                    ),
+                    Object.assign({}, this.currentSlide.panel[0])
+                ]);
+            }
+        }
+    }
 }
 </script>
 
@@ -275,6 +301,11 @@ export default class SlideEditorV extends Vue {
 label {
     text-align: left !important;
     margin-left: 0.5rem;
+}
+
+input[type='checkbox']:checked {
+    accent-color: black;
+    color: white;
 }
 
 select {
