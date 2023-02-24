@@ -34,7 +34,7 @@
         <ul class="flex flex-wrap list-none" v-show="chartConfigs.length">
             <ChartPreview
                 v-for="(chart, idx) in chartConfigs"
-                :key="idx"
+                :key="`${chart.name}-${idx}`"
                 :chart="chart"
                 :configFileStructure="configFileStructure"
                 @delete="deleteChart"

@@ -41,7 +41,12 @@
             class="flex flex-wrap list-none"
             @update="onImagesEdited"
         >
-            <ImagePreview v-for="(image, idx) in imagePreviews" :key="idx" :imageFile="image" @delete="deleteImage">
+            <ImagePreview
+                v-for="(image, idx) in imagePreviews"
+                :key="`${image.id}-${idx}`"
+                :imageFile="image"
+                @delete="deleteImage"
+            >
                 <div class="flex mt-4 items-center">
                     <label class="alt-label">Alt tag:</label>
                     <input type="text" v-model="image.altText" />
