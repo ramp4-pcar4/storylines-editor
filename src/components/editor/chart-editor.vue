@@ -34,7 +34,7 @@
         <ul class="flex flex-wrap list-none" v-show="chartConfigs.length">
             <ChartPreview
                 v-for="(chart, idx) in chartConfigs"
-                :key="idx"
+                :key="`${chart.name}-${idx}`"
                 :chart="chart"
                 :configFileStructure="configFileStructure"
                 @delete="deleteChart"
@@ -167,16 +167,18 @@ export default class ChartEditorV extends Vue {
     }
 
     deleteChart(chart: ChartConfig): void {
-        const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
-        if (idx !== -1) {
-            // Remove the chart from the config file.
-            this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chart.name}.json`] -= 1;
-            if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chart.name}.json`] === 0) {
-                this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
+        if (confirm(this.$t('editor.chart.delete.confirm', { name: chart.name }).toString())) {
+            const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
+            if (idx !== -1) {
+                // Remove the chart from the config file.
+                this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chart.name}.json`] -= 1;
+                if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/en/${chart.name}.json`] === 0) {
+                    this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
+                }
+                this.chartConfigs.splice(idx, 1);
             }
-            this.chartConfigs.splice(idx, 1);
+            this.onChartsEdited();
         }
-        this.onChartsEdited();
     }
 
     saveChanges(): void {

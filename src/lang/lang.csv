@@ -37,6 +37,7 @@ editor.chart.label.edit,Edit,1,Éditer,1
 editor.chart.label.empty,Empty,1,Vide,1
 editor.chart.label.create,Add new chart,1,Add new chart,0
 editor.chart.label.info,Interactive charts ({num}),1,Interactive charts ({num}),0
+editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Are you sure you want to delete the chart {name}?,0
 editor.map.label.create,Create New Configuration File,1,Create New Configuration File,0
 editor.map.label.edit,Edit Map Configuration,1,Edit Map Configuration,0
 editor.slides.title,SLIDES,1,SLIDES,0
