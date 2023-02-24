@@ -62,6 +62,8 @@ export default class ChartEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: any;
 
+    edited = false;
+
     chartConfigs = [] as Array<ChartConfig>;
     modalEditor = {} as any;
 
@@ -134,6 +136,7 @@ export default class ChartEditorV extends Vue {
 
             this.chartConfigs.push(chartConfig);
         }
+        this.onChartsEdited();
     }
 
     editChart(chartInfo: { oldChart: ChartConfig; newChart: ChartConfig }): void {
@@ -160,6 +163,7 @@ export default class ChartEditorV extends Vue {
             chartInfo.newChart.src = `${this.configFileStructure.uuid}/charts/en/${chartInfo.newChart.name}.json`;
             this.chartConfigs[idx] = chartInfo.newChart;
         }
+        this.onChartsEdited();
     }
 
     deleteChart(chart: ChartConfig): void {
@@ -172,10 +176,19 @@ export default class ChartEditorV extends Vue {
             }
             this.chartConfigs.splice(idx, 1);
         }
+        this.onChartsEdited();
     }
 
     saveChanges(): void {
-        this.panel.charts = this.chartConfigs; // option to delete config property as is redundant
+        if (this.edited) {
+            this.panel.charts = this.chartConfigs; // option to delete config property as is redundant
+        }
+        this.edited = false;
+    }
+
+    onChartsEdited() {
+        this.edited = true;
+        this.$parent.$emit('slide-edit');
     }
 }
 </script>

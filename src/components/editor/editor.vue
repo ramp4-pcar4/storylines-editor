@@ -77,9 +77,32 @@
         </template>
 
         <template v-if="loadStatus === 'loaded'">
-            <div class="flex border-b border-black bg-gray-200 py-2 px-2">
+            <div class="sticky top-0 z-50 flex border-b border-black bg-gray-200 py-2 px-2">
                 <span class="m-1 font-semibold text-lg">{{ config.title }}</span>
                 <span class="ml-auto"></span>
+                <transition name="fade">
+                    <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
+                        <span class="align-middle inline-block mr-1 pb-1 fill-current"
+                            ><svg
+                                clip-rule="evenodd"
+                                fill-rule="evenodd"
+                                class="fill-red-600"
+                                width="18"
+                                height="18"
+                                stroke-linejoin="round"
+                                stroke-miterlimit="2"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="m12.002 21.534c5.518 0 9.998-4.48 9.998-9.998s-4.48-9.997-9.998-9.997c-5.517 0-9.997 4.479-9.997 9.997s4.48 9.998 9.997 9.998zm0-1.5c-4.69 0-8.497-3.808-8.497-8.498s3.807-8.497 8.497-8.497 8.498 3.807 8.498 8.497-3.808 8.498-8.498 8.498zm0-6.5c-.414 0-.75-.336-.75-.75v-5.5c0-.414.336-.75.75-.75s.75.336.75.75v5.5c0 .414-.336.75-.75.75zm-.002 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"
+                                    fill-rule="nonzero"
+                                />
+                            </svg>
+                        </span>
+                        <span class="align-center inline-block select-none">Unsaved Changes</span>
+                    </span>
+                </transition>
                 <button class="bg-white border border-black hover:bg-gray-100">Preview</button>
                 <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900">Save Changes</button>
             </div>
@@ -126,6 +149,7 @@
                     :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
                     @slide-change="selectSlide"
+                    @slide-edit="onSlidesEdited"
                     :sourceCounts="sourceCounts"
                 ></slide-editor>
             </div>
@@ -146,7 +170,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { StoryRampConfig, Slide } from '@/definitions';
 
@@ -175,6 +199,7 @@ export default class EditorV extends Vue {
     loadStatus = 'waiting';
     errorMessage = ''; // error message if the user requested to load a UID that does not exist or tried to load editor without UID.
     lang = 'en';
+    unsavedChanges = false;
 
     // Form properties.
     uuid = '';
@@ -193,7 +218,19 @@ export default class EditorV extends Vue {
     };
     sourceCounts: any = {};
 
+    @Watch('slides', { deep: true })
+    onSlidesEdited() {
+        this.unsavedChanges = true;
+    }
+
+    @Watch('metadata', { deep: true })
+    onMetadataEdited() {
+        this.unsavedChanges = true;
+    }
+
     created(): void {
+        window.addEventListener('beforeunload', this.beforeWindowUnload);
+
         // Generate UUID for new product
         this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
@@ -206,6 +243,10 @@ export default class EditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    beforeDestroy() {
+        window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }
 
     /**
@@ -234,6 +275,8 @@ export default class EditorV extends Vue {
 
         // Generate the file structure, defer uploading the image until the structure is created.
         this.configFileStructureHelper(configZip, this.logoImage);
+
+        this.unsavedChanges = false;
     }
 
     configHelper(): StoryRampConfig {
@@ -448,6 +491,7 @@ export default class EditorV extends Vue {
             axios.post('http://localhost:6040/upload', formData, { headers }).then((res: any) => {
                 res.data.files; // binary representation of the file
                 res.status; // HTTP status
+                this.unsavedChanges = false;
             });
         });
 
@@ -523,6 +567,7 @@ export default class EditorV extends Vue {
             this.config !== undefined
                 ? (this.loadStatus = 'loaded')
                 : (this.errorMessage = 'No config loaded for existing Storylines product!');
+            this.unsavedChanges = false;
         } else {
             // TODO: check for non-empty required metadata fields
             this.generateNewConfig();
@@ -577,6 +622,14 @@ export default class EditorV extends Vue {
         // Generate an image preview.
         this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
         this.metadata.logoName = uploadedFile.name;
+    }
+
+    beforeWindowUnload(e: any) {
+        // show popup if when leaving page with unsaved changes
+        if (this.unsavedChanges && !window.confirm()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
     }
 }
 </script>
@@ -658,6 +711,16 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         max-width: 150px;
         max-height: 150px;
         display: inline;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.2s;
+    }
+
+    .fade-enter,
+    .fade-leave-to {
+        opacity: 0;
     }
 }
 </style>
