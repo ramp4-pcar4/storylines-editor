@@ -76,6 +76,7 @@
                     :panel="panel.children[editingSlide].panel"
                     :configFileStructure="configFileStructure"
                     :lang="lang"
+                    :sourceCounts="sourceCounts"
                 ></component>
             </div>
         </div>
@@ -103,6 +104,7 @@ export default class DynamicEditorV extends Vue {
     @Prop() panel!: any;
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
+    @Prop() sourceCounts!: any;
 
     editors = {
         text: 'text-editor',
@@ -167,6 +169,37 @@ export default class DynamicEditorV extends Vue {
     }
 
     removeSlide(item: any) {
+        const panel = this.panel.children.find((panel: any, idx: number) => idx === item).panel;
+
+        // Update source counts based on which panel is removed.
+        switch (panel.type) {
+            case 'map':
+                this.sourceCounts[panel.config] -= 1;
+                if (this.sourceCounts[panel.config] === 0) {
+                    this.configFileStructure.config.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+                }
+                break;
+
+            case 'chart':
+                panel.charts.forEach((chart: any) => {
+                    this.sourceCounts[chart.src] -= 1;
+                    if (this.sourceCounts[chart.src] === 0) {
+                        this.configFileStructure.config.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'slideshow':
+                panel.images.forEach((image: any) => {
+                    this.sourceCounts[image.src] -= 1;
+                    if (this.sourceCounts[image.src] === 0) {
+                        this.configFileStructure.config.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+        }
+
+        // Remove the panel itself.
         this.panel.children = this.panel.children.filter((panel: any, idx: number) => idx !== item);
 
         // If the slide being removed is the currently selected slide, unselect it.
