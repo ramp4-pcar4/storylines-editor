@@ -210,6 +210,8 @@ export default class EditorV extends Vue {
     $modals: any;
     metadata = {
         title: '',
+        introTitle: '',
+        introSubtitle: '',
         logoPreview: '',
         logoName: '',
         contextLink: '',
@@ -258,10 +260,14 @@ export default class EditorV extends Vue {
         // Generate a new configuration file and populate required fields.
         this.config = this.configHelper();
         this.config.title = this.metadata.title;
+        this.config.introSlide.title = this.metadata.introTitle;
+        this.config.introSlide.subtitle = this.metadata.introSubtitle;
         this.config.slides = this.slides;
 
         // Set the source of the product logo
-        if (!this.metadata.logoName.includes('http')) {
+        if (!this.metadata.logoName) {
+            this.config.introSlide.logo.src = '';
+        } else if (!this.metadata.logoName.includes('http')) {
             this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
         } else {
             this.config.introSlide.logo.src = this.metadata.logoName;
@@ -288,7 +294,8 @@ export default class EditorV extends Vue {
                 logo: {
                     src: ''
                 },
-                title: 'Test Config Intro Slide'
+                title: 'Test Config Intro Slide',
+                subtitle: ''
             },
             slides: [],
             contextLabel: this.metadata.contextLabel,
@@ -420,6 +427,8 @@ export default class EditorV extends Vue {
                 // Load in project data.
                 if (this.config) {
                     this.metadata.title = this.config.title;
+                    this.metadata.introTitle = this.config.introSlide.title;
+                    this.metadata.introSubtitle = this.config.introSlide.subtitle;
                     this.metadata.contextLink = this.config.contextLink;
                     this.metadata.contextLabel = this.config.contextLabel;
                     this.metadata.dateModified = this.config.dateModified;
@@ -510,12 +519,16 @@ export default class EditorV extends Vue {
         // update metadata content to existing config only if it has been successfully loaded
         if (this.config !== undefined) {
             this.config.title = this.metadata.title;
+            this.config.introSlide.title = this.metadata.introTitle;
+            this.config.introSlide.subtitle = this.metadata.introSubtitle;
             this.config.contextLink = this.metadata.contextLink;
             this.config.contextLabel = this.metadata.contextLabel;
             this.config.dateModified = this.metadata.dateModified;
 
             // If the logo doesn't include HTTP, assume it's a local file.
-            if (!this.metadata.logoName.includes('http')) {
+            if (!this.metadata.logoName) {
+                this.config.introSlide.logo.src = '';
+            } else if (!this.metadata.logoName.includes('http')) {
                 this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
                 this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
             } else {

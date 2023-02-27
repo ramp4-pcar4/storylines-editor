@@ -9,6 +9,23 @@
             class="w-1/3"
         />
         <br />
+        <label class="mb-5">Intro Title:</label>
+        <input
+            type="text"
+            name="introTitle"
+            :value="metadata.introTitle"
+            @change="$emit('metadata-changed', $event.target.name, $event.target.value)"
+            class="w-1/4"
+        />
+        <label class="mb-5">Intro Subtitle:</label>
+        <input
+            type="text"
+            name="introSubtitle"
+            :value="metadata.introSubtitle"
+            @change="$emit('metadata-changed', $event.target.name, $event.target.value)"
+            class="w-1/4"
+        />
+        <br />
         <!-- only display an image preview if one is provided.-->
         <div v-if="!!metadata.logoPreview">
             <label>{{ $t('editor.logoPreview') }}:</label>
@@ -25,6 +42,9 @@
         <input type="text" @change="$emit('logo-source-changed', $event)" :value="metadata.logoName" class="w-1/4" />
         <button @click.stop="openFileSelector" class="bg-black text-white hover:bg-gray-800">
             {{ $t('editor.browse') }}
+        </button>
+        <button v-if="metadata.logoName || metadata.logoPreview" @click.stop="removeLogo" class="border border-black">
+            Remove
         </button>
         <!-- hide the actual file input -->
         <input
@@ -85,6 +105,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class MetadataEditorV extends Vue {
     @Prop() metadata!: {
         title: string;
+        introTitle: string;
+        introSubtitle: string;
         logoName: string;
         logoPreview: string;
         contextLink: string;
@@ -94,6 +116,11 @@ export default class MetadataEditorV extends Vue {
 
     openFileSelector(): void {
         document.getElementById('logoUpload')?.click();
+    }
+
+    removeLogo(): void {
+        this.metadata.logoName = '';
+        this.metadata.logoPreview = '';
     }
 }
 </script>
