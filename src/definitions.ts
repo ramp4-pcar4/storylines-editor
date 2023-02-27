@@ -75,7 +75,7 @@ export interface Intro {
         altText?: string;
     };
     title: string;
-    subtitle?: string;
+    subtitle: string;
     blurb?: string;
 }
 

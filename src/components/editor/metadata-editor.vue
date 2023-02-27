@@ -1,12 +1,17 @@
 <template>
     <div>
         <label class="mb-5">{{ $t('editor.title') }}:</label>
+        <input type="text" name="title" :value="metadata.title" @change="metadataChanged" class="w-1/3" />
+        <br />
+        <label class="mb-5">Intro Title:</label>
+        <input type="text" name="introTitle" :value="metadata.introTitle" @change="metadataChanged" class="w-1/4" />
+        <label class="mb-5">Intro Subtitle:</label>
         <input
             type="text"
-            name="title"
-            :value="metadata.title"
-            @change="$emit('metadata-changed', $event.target.name, $event.target.value)"
-            class="w-1/3"
+            name="introSubtitle"
+            :value="metadata.introSubtitle"
+            @change="metadataChanged"
+            class="w-1/4"
         />
         <br />
         <!-- only display an image preview if one is provided.-->
@@ -26,6 +31,9 @@
         <button @click.stop="openFileSelector" class="bg-black text-white hover:bg-gray-800">
             {{ $t('editor.browse') }}
         </button>
+        <button v-if="metadata.logoName || metadata.logoPreview" @click.stop="removeLogo" class="border border-black">
+            Remove
+        </button>
         <!-- hide the actual file input -->
         <input
             type="file"
@@ -36,13 +44,7 @@
         />
         <br />
         <label>{{ $t('editor.contextLink') }}:</label>
-        <input
-            type="text"
-            name="contextLink"
-            :value="metadata.contextLink"
-            @change="$emit('metadata-changed', $event.target.name, $event.target.value)"
-            class="w-2/3"
-        />
+        <input type="text" name="contextLink" :value="metadata.contextLink" @change="metadataChanged" class="w-2/3" />
         <br />
         <label class="mb-5"></label>
         <p class="inline-block">
@@ -52,13 +54,7 @@
         </p>
         <br />
         <label>{{ $t('editor.contextLabel') }}:</label>
-        <input
-            type="text"
-            name="contextLabel"
-            :value="metadata.contextLabel"
-            @change="$emit('metadata-changed', $event.target.name, $event.target.value)"
-            class="w-2/3"
-        />
+        <input type="text" name="contextLabel" :value="metadata.contextLabel" @change="metadataChanged" class="w-2/3" />
         <br />
         <label class="mb-5"></label>
         <p class="inline-block">
@@ -66,12 +62,7 @@
         </p>
         <br />
         <label class="mb-5">{{ $t('editor.dateModified') }}:</label>
-        <input
-            type="date"
-            name="dateModified"
-            :value="metadata.dateModified"
-            @change="$emit('metadata-changed', $event.target.name, $event.target.value)"
-        />
+        <input type="date" name="dateModified" :value="metadata.dateModified" @change="metadataChanged" />
         <br /><br />
     </div>
 </template>
@@ -85,6 +76,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class MetadataEditorV extends Vue {
     @Prop() metadata!: {
         title: string;
+        introTitle: string;
+        introSubtitle: string;
         logoName: string;
         logoPreview: string;
         contextLink: string;
@@ -94,6 +87,15 @@ export default class MetadataEditorV extends Vue {
 
     openFileSelector(): void {
         document.getElementById('logoUpload')?.click();
+    }
+
+    metadataChanged(event: any): void {
+        this.$emit('metadata-changed', event.target.name, event.target.value);
+    }
+
+    removeLogo(): void {
+        this.metadata.logoName = '';
+        this.metadata.logoPreview = '';
     }
 }
 </script>
