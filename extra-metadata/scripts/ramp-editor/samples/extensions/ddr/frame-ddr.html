@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <link rel="stylesheet" href="./ddr.css"></link>
+</head>
+
+<body>
+    <!-- login  -->
+    <div class="av-login-section">
+        <label id="avFMEUser"></label>
+        <input id="avTokenUser" type="text" name="username" autocomplete="on" placeholder="Enter Username" required></input>
+        <br>
+        <label id="avFMEPass"></label>
+        <input id="avTokenPass" type="password" name="password" placeholder="Enter Password" required></input>
+        <br>
+        <input id="avFMELogin" class="av-button" type="button"></input>
+        <div class="av-register">
+            <span id="avRegister"></span>
+            <a href="mailto:nrcan.ddrsupport.rncan@canada.ca?Subject=DDR%20Subscription/Inscription">nrcan.ddrsupport.rncan@canada.ca</a>
+        </div>
+        <p class="av-error-connect hidden"></p>
+        <p class="av-error-validatePublisher hidden"></p>
+    </div>
+
+    <!--  functions -->
+    <div class="av-function-section hidden">
+        <input id="avUpload" class="av-button" type="button" onclick="selectUpload()"></input>
+        <input id="avDelete" class="av-button" type="button" onclick="selectDelete()"></input>
+        <input id="avPublish" class="av-button" type="button" onclick="selectPublish()"></input>
+    </div>
+
+    <!-- package upload -->
+    <div class="av-upload-section hidden">
+        <div id="fme_params">
+            <label id="avUploaded"></label>
+            <div class="av-file-list"></div>
+            <hr>
+            <form id="options" class="form-group"></form>
+        </div>
+        <input id="avUpdate" type="checkbox"></input>
+        <label id="avUpdateLabel" for="avUpdate"></label>
+        <hr>
+        <input id="avRunUpload" class="av-button" type="button" onclick="runUpdate()" disabled></input>
+        <input id="avCancelUpload" class="av-button" type="button" onclick="returnMainMenu('upload')"></input>
+    </div>
+
+    <!-- package delete -->
+    <div class="av-delete-section hidden">
+        <span id="avDeleteList"></span>
+        <fieldset class="av-deletelist-private av-checkbox-list">
+            <legend id="avDeletePrivate"></legend>
+        </fieldset>
+        <fieldset class="av-deletelist-internal av-checkbox-list">
+            <legend id="avDeleteInternal"></legend>
+        </fieldset>
+        <fieldset class="av-deletelist-external av-checkbox-list">
+            <legend id="avDeleteExternal"></legend>
+        </fieldset>
+        <input id="avRunDelete" class="av-button" type="button" onclick="deleteList()"></input>
+        <input id="avCancelDelete" class="av-button" type="button" onclick="returnMainMenu('delete')"></input>
+    </div>
+
+    <!-- package publish -->
+    <div class="av-publish-section hidden">
+        <fieldset class="av-publishlist-private av-checkbox-list">
+            <legend id="avPublishPrivate"></legend>
+        </fieldset>
+        <fieldset class="av-publishlist-env av-checkbox-list">
+            <legend id="avPublishEnv"></legend>
+        </fieldset>
+        <div>
+            <input id="avUpdatePublish" type="checkbox"></input>
+            <label id="avUpdatePublishLabel" for="avUpdatePublish"></label>
+        </div>
+        <input id="avRunPublish" class="av-button" type="button" onclick="publish()"></input>
+        <input id="avCancelPublish" class="av-button" type="button" onclick="returnMainMenu('publish')"></input>
+    </div>
+
+    <!-- progress -->
+    <div class="av-progress-section hidden">
+        <div class="center">
+            <div>
+                <p id="avProgress" class="websocket"></p>
+                <p id="avWait" class="websocket"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- report -->
+    <div class="av-report-section hidden">
+        <div>
+            <p class="av-service-name"></p>
+            <p class="av-report-title"></p>
+        </div>
+        <div class="container">
+            <label id="avMessTypeLbl" for="avMessageType"></label>
+            <select id="avMessageType" onchange="filterMessType()"></select>
+            <label id="avMessSevLbl" for="avMessageSev"></label>
+            <select id="avMessageSev" onchange="filterMessSev()"></select>
+        </div>
+        <hr>
+        <div class="panel">
+            <h4 id="avJobId"></h4>
+        </div>
+        <table id="avReportTable" class="reportTable">
+            <thead>
+                <tr>
+                    <th id="avTime"></th>
+                    <th id="avSev"></th>
+                    <th id="avMess"></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <input id="avCancelReport" class="av-button" type="button" onclick="returnMainMenu('report')"></input>
+    </div>
+
+<!-- <script src="https://api.fmeserver.com/js/v1.1/FMEServer.js"></script> -->
+<script src="https://geoappext.nrcan.gc.ca/fgpv/FME/FMEServer.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous">
+</script>
+<script src="./ddr-tools.js"></script>
+<script src="./ddr_registry.js"></script>
+
+</body>
+</html>
