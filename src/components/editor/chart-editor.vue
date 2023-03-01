@@ -34,13 +34,20 @@
         <ul class="flex flex-wrap list-none" v-show="chartConfigs.length">
             <ChartPreview
                 v-for="(chart, idx) in chartConfigs"
-                :key="idx"
+                :key="`${chart.name}-${idx}`"
                 :chart="chart"
                 :configFileStructure="configFileStructure"
-                @delete="deleteChart"
+                @delete="$modals.show(`${chart.name}-${idx}`)"
                 @edit="editChart"
             ></ChartPreview>
         </ul>
+        <confirmation-modal
+            v-for="(chart, idx) in chartConfigs"
+            :key="`${chart.name}-${idx}`"
+            :name="`${chart.name}-${idx}`"
+            :message="$t('editor.chart.delete.confirm', { name: chart.name })"
+            @Ok="deleteChart(chart)"
+        ></confirmation-modal>
     </div>
 </template>
 
@@ -49,11 +56,13 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { ChartConfig } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
+import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
 
 @Component({
     components: {
         'chart-panel': ChartPanelV,
-        ChartPreview: ChartPreviewV
+        ChartPreview: ChartPreviewV,
+        'confirmation-modal': ConfirmationModalV
     }
 })
 export default class ChartEditorV extends Vue {
@@ -61,6 +70,8 @@ export default class ChartEditorV extends Vue {
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
     @Prop() sourceCounts!: any;
+
+    $modals: any;
 
     edited = false;
 
