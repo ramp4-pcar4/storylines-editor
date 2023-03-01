@@ -131,7 +131,11 @@
                     >
                         <label class="text-left text-lg">Content type:</label>
                         <select
-                            @change="changePanelType(currentSlide.panel[panelIndex].type, $event.target.value)"
+                            ref="typeSelector"
+                            @input="
+                                newType = $event.target.value;
+                                $modals.show(`change-slide-${slideIndex}`);
+                            "
                             :value="currentSlide.panel[panelIndex].type"
                         >
                             <option
@@ -161,6 +165,12 @@
         <div v-else class="flex h-full mt-4 justify-center text-gray-600 text-xl">
             <span>Please select a slide to edit.</span>
         </div>
+        <confirmation-modal
+            :name="`change-slide-${slideIndex}`"
+            :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
+            @Ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
+            @Cancel="cancelTypeChange"
+        />
     </div>
 </template>
 
@@ -175,6 +185,7 @@ import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Component({
     components: {
@@ -184,7 +195,8 @@ import DynamicEditorV from './dynamic-editor.vue';
         'text-editor': TextEditorV,
         'map-editor': MapEditorV,
         'loading-page': LoadingPageV,
-        'dynamic-editor': DynamicEditorV
+        'dynamic-editor': DynamicEditorV,
+        'confirmation-modal': ConfirmationModalV
     }
 })
 export default class SlideEditorV extends Vue {
@@ -197,7 +209,10 @@ export default class SlideEditorV extends Vue {
     @Prop() isLast!: number;
     @Prop() sourceCounts!: any;
 
+    $modals: any;
+
     panelIndex = 0;
+    newType = '';
 
     editors = {
         text: 'text-editor',
@@ -210,51 +225,49 @@ export default class SlideEditorV extends Vue {
     };
 
     changePanelType(prevType: string, newType: string): void {
-        if (confirm(this.$t('editor.slides.changeSlide.confirm') as string)) {
-            const startingConfig: DefaultConfigs = {
-                text: {
-                    type: PanelType.Text,
-                    title: '',
-                    content: ''
-                },
-                dynamic: {
-                    type: PanelType.Dynamic,
-                    title: '',
-                    titleTag: '',
-                    content: '',
-                    children: []
-                },
-                slideshow: {
-                    type: PanelType.Slideshow,
-                    images: []
-                },
-                chart: {
-                    type: PanelType.Chart,
-                    charts: []
-                },
-                map: {
-                    type: PanelType.Map,
-                    config: '',
-                    title: '',
-                    scrollguard: false
-                }
-            };
+        const startingConfig: DefaultConfigs = {
+            text: {
+                type: PanelType.Text,
+                title: '',
+                content: ''
+            },
+            dynamic: {
+                type: PanelType.Dynamic,
+                title: '',
+                titleTag: '',
+                content: '',
+                children: []
+            },
+            slideshow: {
+                type: PanelType.Slideshow,
+                images: []
+            },
+            chart: {
+                type: PanelType.Chart,
+                charts: []
+            },
+            map: {
+                type: PanelType.Map,
+                config: '',
+                title: '',
+                scrollguard: false
+            }
+        };
 
-            // When switching to a dynamic panel, remove the secondary panel.
-            if (newType === 'dynamic') {
-                this.panelIndex = 0;
-                Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
+        // When switching to a dynamic panel, remove the secondary panel.
+        if (newType === 'dynamic') {
+            this.panelIndex = 0;
+            Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
+        } else {
+            // When switching from a dynamic panel, add back the secondary panel.
+            if (prevType === 'dynamic') {
+                Vue.set(this.currentSlide, 'panel', [
+                    Object.assign({}, startingConfig['text' as keyof DefaultConfigs]),
+                    Object.assign({}, startingConfig[newType as keyof DefaultConfigs])
+                ]);
             } else {
-                // When switching from a dynamic panel, add back the secondary panel.
-                if (prevType === 'dynamic') {
-                    Vue.set(this.currentSlide, 'panel', [
-                        Object.assign({}, startingConfig['text' as keyof DefaultConfigs]),
-                        Object.assign({}, startingConfig[newType as keyof DefaultConfigs])
-                    ]);
-                } else {
-                    // Switching panel type when dynamic panels are not involved.
-                    Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
-                }
+                // Switching panel type when dynamic panels are not involved.
+                Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
             }
         }
     }
@@ -267,6 +280,10 @@ export default class SlideEditorV extends Vue {
 
     selectSlide(index: number): void {
         this.$emit('slide-change', index);
+    }
+
+    cancelTypeChange() {
+        (this.$refs.typeSelector as HTMLSelectElement).value = this.currentSlide.panel[this.panelIndex].type;
     }
 }
 </script>
