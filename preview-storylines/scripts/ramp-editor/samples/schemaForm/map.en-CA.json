@@ -1,0 +1,1401 @@
+{
+    "schema": "map",
+    "title": "Map",
+    "type": "object",
+    "description": "Core map properties (extent sets, levels of detail)",
+    "properties": {
+        "extentSets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "title": "ID",
+                        "default": ""
+                    },
+                    "spatialReference": {
+                        "description": "The projection for the given extents",
+                        "title": "Spatial reference",
+                        "type": "object",
+                        "properties": {
+                            "wkid": {
+                                "type": "number",
+                                "title": "WKID",
+                                "description": "ESRI well known id denoting a projection (WKID)",
+                                "default": 3978,
+                                "minimum": 0
+                            },
+                            "vcsWkid": {
+                                "type": "number",
+                                "title": "VcsWKID",
+                                "description": "ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property",
+                                "default": ""
+                            },
+                            "latestWkid": {
+                                "type": "number",
+                                "title": "Latest WKID",
+                                "description": "ESRI well known id denoting a projection (WKID)",
+                                "default": ""
+                            },
+                            "latestVcsWkid": {
+                                "type": "number",
+                                "title": "Latest VcsWKID",
+                                "description": "ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property",
+                                "default": ""
+                            },
+                            "wkt": {
+                                "type": "string",
+                                "title": "WKT",
+                                "description": "Well known type projection definition",
+                                "default": ""
+                            }
+                        },
+                        "required": ["wkid"],
+                        "additionalProperties": false
+                    },
+                    "default": {
+                        "description": "The default extent is the extent the map uses when first loaded.",
+                        "title": "Default Extent",
+                        "type": "object",
+                        "properties": {
+                            "xmin": {
+                                "type": "number",
+                                "title": "",
+                                "default": ""
+                            },
+                            "ymin": {
+                                "type": "number",
+                                "title": "",
+                                "default": ""
+                            },
+                            "xmax": {
+                                "type": "number",
+                                "title": "",
+                                "default": ""
+                            },
+                            "ymax": {
+                                "type": "number",
+                                "title": "",
+                                "default": ""
+                            }
+                        },
+                        "required": ["xmin", "ymin", "xmax", "ymax"],
+                        "additionalProperties": false
+                    },
+                    "full": {
+                        "description": "The full extent is the extent to be used when the user clicks on the Home button. The default extent will be used if no full extent is supplied.",
+                        "title": "Full Extent",
+                        "type": "object",
+                        "properties": {
+                            "xmin": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            },
+                            "ymin": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            },
+                            "xmax": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            },
+                            "ymax": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "maximum": {
+                        "description": "The maximum extent can be set to limit how far out and away the user is allowed to zoom and pan. The default or full extent will be used if no maximum extent is supplied.",
+                        "title": "Maximum Extent",
+                        "type": "object",
+                        "properties": {
+                            "xmin": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            },
+                            "ymin": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            },
+                            "xmax": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            },
+                            "ymax": {
+                                "type": "number",
+                                "title": "",
+                                "default": 0
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "required": ["id", "default", "spatialReference"],
+                "additionalProperties": false,
+                "title": "Spatial extents set"
+            },
+            "description": "The default, full and maximum extents of the map",
+            "title": "Spatial Extents sets",
+            "minItems": 1
+        },
+        "lodSets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "title": "ID",
+                        "default": ""
+                    },
+                    "lods": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "level": {
+                                    "type": "number",
+                                    "title": "Level"
+                                },
+                                "resolution": {
+                                    "type": "number",
+                                    "title": "Resolution"
+                                },
+                                "scale": {
+                                    "type": "number",
+                                    "title": "Scale"
+                                }
+                            },
+                            "required": ["level", "resolution", "scale"],
+                            "additionalProperties": false
+                        },
+                        "description": "Level of detail for a specific tile schema",
+                        "title": "Level of Detail set",
+                        "minItems": 1
+                    }
+                },
+                "required": ["id", "lods"],
+                "additionalProperties": false,
+                "title": "Level of Detail sets"
+            },
+            "description": "The levels of detail (zoom scales) available for the map",
+            "title": "Levels of detail sets",
+            "minItems": 1
+        },
+        "tileSchemas": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "A unique id identifying a tile schema (combination of an extent set and a zoom scale)",
+                        "title": "ID",
+                        "default": ""
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name to display in the basemap selector for the set of basemaps referencing this schema",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "extentSetId": {
+                        "type": "string",
+                        "description": "The extent set to be used for this basemap (should reference map.extentSets.id)",
+                        "title": "Extent set ID",
+                        "default": ""
+                    },
+                    "lodSetId": {
+                        "type": "string",
+                        "description": "Optional.  The Level of detail set to be used for this basemap (should reference map.lod.id)",
+                        "title": "LODs ID",
+                        "default": ""
+                    },
+                    "overviewUrl": {
+                        "type": "object",
+                        "title": "Static Overview Map",
+                        "Description": "If not set, overview map will be tha same as the selected basemap",
+                        "properties": {
+                            "layerType": {
+                                "title": "Layer Type",
+                                "type": "string",
+                                "enum": ["esriImage", "esriTile"],
+                                "default": "esriTile"
+                            },
+                            "url": {
+                                "type": "string",
+                                "description": "The service endpoint of the layer. It should match the type provided in layerType.",
+                                "default": "",
+                                "title": "URL"
+                            }
+                        }
+                    },
+                    "hasNorthPole": {
+                        "type": "boolean",
+                        "title": "Has North Pole",
+                        "version": "2.4",
+                        "default": false,
+                        "description": "Indicates if the map projection includes a north pole. Defaults to false to avoid errors."
+                    }
+                },
+                "required": ["extentSetId", "lodSetId", "id", "name"],
+                "additionalProperties": false,
+                "title": ""
+            },
+            "minItems": 1,
+            "description": "A unique combination of an LoD and an extent set (each basemap must fit into a tile schema)",
+            "title": "Tile Schemas"
+        },
+        "components": {
+            "type": "object",
+            "properties": {
+                "mouseInfo": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "title": "Enabled",
+                            "default": true
+                        },
+                        "spatialReference": {
+                            "title": "Spatial reference",
+                            "description": "The projection for the given extents",
+                            "type": "object",
+                            "properties": {
+                                "wkid": {
+                                    "type": "number",
+                                    "title": "WKID",
+                                    "description": "ESRI well known id denoting a projection (WKID)",
+                                    "default": 3978,
+                                    "minimum": 0
+                                },
+                                "vcsWkid": {
+                                    "type": "number",
+                                    "title": "VcsWKID",
+                                    "description": "ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property",
+                                    "default": ""
+                                },
+                                "latestWkid": {
+                                    "type": "number",
+                                    "title": "Latest WKID",
+                                    "description": "ESRI well known id denoting a projection (WKID)",
+                                    "default": ""
+                                },
+                                "latestVcsWkid": {
+                                    "type": "number",
+                                    "title": "Latest VcsWKID",
+                                    "description": "ESRI well known id denoting a vertical co-ordinate system. RAMP currently does not support this property",
+                                    "default": ""
+                                },
+                                "wkt": {
+                                    "type": "string",
+                                    "title": "WKT",
+                                    "description": "Well known type projection definition",
+                                    "default": ""
+                                }
+                            },
+                            "required": ["wkid"],
+                            "additionalProperties": false
+                        }
+                    },
+                    "title": "Mouse Coordinates"
+                },
+                "northArrow": {
+                    "type": "object",
+                    "title": "North arrow",
+                    "properties": {
+                        "enabled": { "type": "boolean", "title": "Enabled", "default": true },
+                        "arrowIcon": {
+                            "type": "string",
+                            "title": "Arrow icon",
+                            "description": "The graphical icon url/data url of the north arrow to replace the default one."
+                        },
+                        "poleIcon": {
+                            "type": "string",
+                            "title": "North pole icon",
+                            "description": "The graphical icon url/data url of the north pole that replaces north arrow when it's on north pole (will replace the default one)."
+                        }
+                    }
+                },
+                "overviewMap": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "title": "Enabled",
+                            "default": true
+                        },
+                        "expandFactor": {
+                            "type": "number",
+                            "description": "The ratio between the size of the overview map and the extent rectangle displayed on the overview map. The default value is 2, meaning the overview map will be at least twice the size of the extent rectangle.",
+                            "default": 2,
+                            "minimum": 0,
+                            "title": "Expand Factor"
+                        },
+                        "initiallyExpanded": {
+                            "type": "boolean",
+                            "title": "Initially Expanded",
+                            "default": true
+                        }
+                    },
+                    "title": "Overview Map"
+                },
+                "scaleBar": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "title": "Enabled",
+                            "default": true
+                        },
+                        "default": true
+                    },
+                    "title": "Scale Bar"
+                }
+            },
+            "title": "Map Components",
+            "additionalProperties": false
+        },
+        "initialBasemapId": {
+            "type": "string",
+            "description": "Initial basemap to load. If not supplied viewer will select any basemap.",
+            "title": "Initial Basemap ID",
+            "default": ""
+        },
+        "baseMaps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "A unique identifier for the basemap",
+                        "title": "Basemap ID",
+                        "default": ""
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the basemap used for labeling",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description of the basemap. Will be visible when basemap selector is expanded.",
+                        "title": "Description",
+                        "default": ""
+                    },
+                    "typeSummary": {
+                        "type": "string",
+                        "description": "Optional base map type. This is descriptive only, and will be shown in the basemap selector.",
+                        "title": "Type Summary",
+                        "default": ""
+                    },
+                    "altText": {
+                        "type": "string",
+                        "description": "Alt text for the basemap thumbnail image.",
+                        "title": "Alternate Text",
+                        "default": ""
+                    },
+                    "thumbnailUrl": {
+                        "type": "string",
+                        "description": "Path to image file to display in the basemap selector.",
+                        "title": "Thumbnail URL",
+                        "default": ""
+                    },
+                    "tileSchemaId": {
+                        "type": "string",
+                        "description": "The tile schema for this basemap (should reference map.tileSchemas.id)",
+                        "title": "Tile Schema ID",
+                        "default": ""
+                    },
+                    "layers": {
+                        "type": "array",
+                        "title": "Layers",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "ID"
+                                },
+                                "layerType": {
+                                    "type": "string",
+                                    "default": "esriFeature",
+                                    "title": "Layer type"
+                                },
+                                "url": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "URL"
+                                },
+                                "opacity": {
+                                    "type": "number",
+                                    "title": "Opacity",
+                                    "version": "2.4",
+                                    "default": 1,
+                                    "minimum": 0,
+                                    "maximum": 1,
+                                    "description": "Initial opacity"
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": ["id", "layerType", "url"]
+                        },
+                        "minItems": 1,
+                        "description": "A set of URLs which should be composited to form a basemap entry"
+                    },
+                    "attribution": {
+                        "title": "Attribution",
+                        "type": "object",
+                        "properties": {
+                            "text": {
+                                "type": "object",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "title": "Enabled"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Optional. Contains the attribution value. If empty, it will use copyright text from the server.",
+                                        "title": "Description",
+                                        "default": ""
+                                    }
+                                },
+                                "required": ["enabled"],
+                                "additionalProperties": false,
+                                "title": "Text"
+                            },
+                            "logo": {
+                                "type": "object",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "title": "Enabled"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "URL for the image.",
+                                        "title": "Image URL",
+                                        "default": ""
+                                    },
+                                    "altText": {
+                                        "type": "string",
+                                        "title": "Alternate text",
+                                        "version": "2.4",
+                                        "description": "Alternate text for the image."
+                                    },
+                                    "link": {
+                                        "type": "string",
+                                        "description": "URL to go to when clicked.",
+                                        "title": "URL",
+                                        "default": ""
+                                    }
+                                },
+                                "required": ["enabled"],
+                                "additionalProperties": false,
+                                "title": "Logo"
+                            }
+                        },
+                        "required": ["text", "logo"],
+                        "additionalProperties": false
+                    },
+                    "zoomLevels": {
+                        "type": "object",
+                        "title": "Authorized zoom levels",
+                        "properties": {
+                            "min": {
+                                "type": "number",
+                                "title": "Minimum",
+                                "version": "2.5"
+                            },
+                            "max": {
+                                "type": "number",
+                                "title": "Maximum",
+                                "version": "2.5"
+                            }
+                        }
+                    }
+                },
+                "required": ["id", "name", "description", "layers", "altText", "tileSchemaId", "url"],
+                "additionalProperties": false,
+                "title": ""
+            },
+            "minItems": 1,
+            "description": "A list of basemaps to be made available via the basemap selector.",
+            "title": "Basemaps Collection"
+        },
+        "layers": {
+            "description": "A list of layers to be added to the viewer.",
+            "title": "Layers Collection",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "layerChoice": {
+                        "description": "",
+                        "type": "string",
+                        "enum": ["esriDynamic", "esriFeature", "esriImage", "esriTile", "ogcWms", "ogcWfs", "file"],
+                        "title": "Layer type selector",
+                        "default": "esriDynamic",
+                        "required": true
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "The id of the layer for referencing within the viewer (does not relate directly to any external service)",
+                        "title": "ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The display name of the layer. If it is not present the viewer will make an attempt to scrape this information.",
+                        "title": "Name",
+                        "required": false
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "The service endpoint of the layer. It should match the type provided in layerType.",
+                        "title": "URL"
+                    },
+                    "layerType": {
+                        "type": "string",
+                        "default": "esriDynamic",
+                        "title": "Layer type"
+                    },
+                    "fileType": {
+                        "type": "string",
+                        "enum": ["csv", "geojson", "shapefile"],
+                        "title": "File type",
+                        "default": "csv",
+                        "required": true
+                    },
+                    "colour": {
+                        "type": "string",
+                        "description": "The hexadecimal code representing the layer symbology colour (e.g. #ff0000 = red).",
+                        "title": "Colour",
+                        "default": "#ff0000"
+                    },
+                    "latField": {
+                        "type": "string",
+                        "description": "The latitude field of the layer (only for CSVs).",
+                        "title": "Latitude Field"
+                    },
+                    "longField": {
+                        "type": "string",
+                        "description": "The longitude field of the layer (only for CSVs).",
+                        "title": "Longitude Field"
+                    },
+                    "toggleSymbology": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Allows individual symbols to have visibility toggled on/off.",
+                        "title": "Toggle symbology"
+                    },
+                    "refreshInterval": {
+                        "type": "number",
+                        "title": "Refresh interval",
+                        "default": 0,
+                        "minimum": 0,
+                        "maximum": 100,
+                        "description": "The automatic refresh interval of the layer in minutes. Maximum interval is 100 minutes."
+                    },
+                    "expectedResponseTime": {
+                        "type": "number",
+                        "title": "Expected Response Time",
+                        "default": 4000,
+                        "description": "The time span after which a 'slow-to-respond' notification is shown for any loading or refreshing layer.",
+                        "version": "2.5"
+                    },
+                    "metadataUrl": {
+                        "type": "string",
+                        "description": "The metadata url of the layer service",
+                        "title": "Metadata URL"
+                    },
+                    "catalogueUrl": {
+                        "type": "string",
+                        "description": "The catalogue url of the layer service",
+                        "title": "Catalogue URL"
+                    },
+                    "suppressGetCapabilities": {
+                        "for": "ogcwms",
+                        "title": "Suppress Get Capabilities",
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Prevents a getCapabilities request, instead relying on info provided in layerEntries",
+                        "version": "2.5"
+                    },
+                    "xyInAttribs": {
+                        "for": "ogcWfs",
+                        "title": "X & Y",
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Indicates if the point co-ords should be copied to the feature attributes. Ignored for lines and polygons.",
+                        "version": "2.5"
+                    },
+                    "tolerance": {
+                        "for": "esriDynamic, esriFeature",
+                        "type": "number",
+                        "default": 5,
+                        "minimum": 0,
+                        "description": "Specifies the tolerance in pixels when determining if a feature was clicked. Should be non-negative integer",
+                        "title": "Tolerance"
+                    },
+                    "nameField": {
+                        "for": "esriFeature",
+                        "title": "Name Field",
+                        "type": "string",
+                        "description": "The display field of the layer.  If it is not present the viewer will make an attempt to scrape this information.",
+                        "version": "2.5"
+                    },
+                    "tooltipField": {
+                        "for": "esriFeature",
+                        "title": "Tooltip Field",
+                        "type": "string",
+                        "description": "The field to be used for tooltips.  If it is not present the viewer will use nameField (if provided).",
+                        "version": "2.5"
+                    },
+                    "outfields": {
+                        "type": "string",
+                        "default": "*",
+                        "description": "A comma separated list of attribute names that should be requested on query.",
+                        "version": "3.3"
+                    },
+                    "customRenderer": {
+                        "for": "esriFeature",
+                        "title": "Custom Renderer",
+                        "type": "string",
+                        "additionalProperties": true,
+                        "description": "Optional renderer object to apply to the layer. Follows ESRI ArcGIS Server json convention",
+                        "version": "2.5"
+                    },
+                    "imageFormat": {
+                        "for": "esriDynamic",
+                        "type": "string",
+                        "title": "Map image format",
+                        "description": "The format of the layer image output. It should only be in one of png, png8, png28, png32, jpg, pdf, bmp, gif, svg.  Defaults to png32 if not provided",
+                        "enum": ["png", "png8", "png24", "png32", "jpg", "pdf", "bmp", "gif", "svg"],
+                        "default": "png32"
+                    },
+                    "singleEntryCollapse": {
+                        "for": "esriDynamic",
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Indicates that the dynamic layer with a single layer entry should be rendered without the root group.",
+                        "title": "Single entry collapse"
+                    },
+                    "featureInfoMimeType": {
+                        "for": "ogcwms",
+                        "type": "string",
+                        "enum": ["text/html;fgpv=summary", "text/html", "text/plain", "application/json"],
+                        "description": "If specified indicates that GetFeatureInfo should be enabled for this WMS and indicates the format that should be requested.",
+                        "title": "Feature info MIME type"
+                    },
+                    "legendMimeType": {
+                        "for": "ogcwms",
+                        "type": "string",
+                        "enum": ["image/png", "image/gif", "image/jpeg", "image/svg", "image/svg+xml"],
+                        "description": "If specified indicates that GetLegendGraphic should be enabled for this WMS and indicates the format that should be requested.  FIXME check legendUrl for additional requirements",
+                        "title": "Legend MIME type"
+                    },
+                    "controls": {
+                        "title": "Controls",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "opacity",
+                                "visibility",
+                                "boundingBox",
+                                "query",
+                                "snapshot",
+                                "metadata",
+                                "boundaryZoom",
+                                "refresh",
+                                "reload",
+                                "remove",
+                                "settings",
+                                "data",
+                                "styles"
+                            ]
+                        },
+                        "uniqueItems": true,
+                        "description": "A list of all controls to be enabled on the specified layer",
+                        "default": [
+                            "opacity",
+                            "visibility",
+                            "boundingBox",
+                            "query",
+                            "snapshot",
+                            "metadata",
+                            "boundaryZoom",
+                            "refresh",
+                            "reload",
+                            "remove",
+                            "settings",
+                            "data",
+                            "styles"
+                        ]
+                    },
+                    "disabledControls": {
+                        "description": "A list of controls which are visible, but disabled for user modification",
+                        "title": "Disabled controls",
+                        "default": [],
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "opacity",
+                                "visibility",
+                                "boundingBox",
+                                "query",
+                                "snapshot",
+                                "metadata",
+                                "boundaryZoom",
+                                "refresh",
+                                "reload",
+                                "remove",
+                                "settings",
+                                "data",
+                                "styles"
+                            ]
+                        },
+                        "uniqueItems": true
+                    },
+                    "enableStructuredDelete": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Allows Remove menu control on any layer in a structured legend. Caution: may allow users to delete layers and break legend",
+                        "version": "3.3"
+                    },
+                    "state": {
+                        "title": "State",
+                        "type": "object",
+                        "properties": {
+                            "opacity": {
+                                "type": "number",
+                                "default": 1,
+                                "minimum": 0,
+                                "maximum": 1,
+                                "description": "Initial opacity. Value must be between 0 and 1.",
+                                "title": "Initial opacity"
+                            },
+                            "visibility": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Initial visibility setting",
+                                "title": "Visibility"
+                            },
+                            "boundingBox": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Display bounding box",
+                                "title": "Bounding box"
+                            },
+                            "query": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Allow querying",
+                                "title": "Query"
+                            },
+                            "snapshot": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Retrieve all feature data immediately on load",
+                                "title": "Snapshot"
+                            },
+                            "hovertips": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Disable hover tips",
+                                "title": "Hovertips"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "details": {
+                        "type": "object",
+                        "title": "Details panel",
+                        "properties": {
+                            "parser": {
+                                "type": "string",
+                                "title": "Parser",
+                                "description": "A path to a javascript file with a function for parsing the layers identify output. Only needed if a custom template is being used."
+                            },
+                            "template": {
+                                "type": "string",
+                                "title": "template",
+                                "description": "A path to an html template that will override default identify output. The template can contain Angular bindings, directives, etc."
+                            }
+                        },
+                        "required": [],
+                        "additionalProperties": false,
+                        "version": "2.5"
+                    },
+                    "table": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "default": "",
+                                "description": "Specifies the table title to apply.",
+                                "title": "Title"
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Specifies the additional information to display in the setting panel to give more information about a table.",
+                                "title": "Description"
+                            },
+                            "maximize": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Specifies the default table size when first open. True: maximize view; False: split view.",
+                                "title": "Maximize"
+                            },
+                            "search": {
+                                "title": "Search",
+                                "enabled": { "type": "boolean", "default": true, "title": "Enabled" },
+                                "value": {
+                                    "type": "string",
+                                    "default": null,
+                                    "description": "Specifies the default filter to apply to a table (for global search).",
+                                    "title": "Value"
+                                }
+                            },
+                            "lazyFilter": {
+                                "type": "boolean",
+                                "title": "Lazy Filter",
+                                "default": false,
+                                "description": "Specifies if simple filtering is on. If true, we match any substring of text entered. If false, search field accepts regex expressions. Note: Only effects text fields.",
+                                "version": "2.5"
+                            },
+                            "applyMap": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Specifies if the default filters (from fields filter) are apply to the map (definition query). True: it is applied; False: it is not applied.",
+                                "title": "Apply map"
+                            },
+                            "showFilter": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Specifies if the column filters should be displayed on the table.",
+                                "title": "Show Filter",
+                                "version": "3.1"
+                            },
+                            "filterByExtent": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Specifies if the table should filter rows by extent by default. If true, the table will filter by extent when it is opened.",
+                                "title": "Filter by Extent",
+                                "version": "3.1"
+                            },
+                            "searchStrictMatch": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Specifies if text must match identical (including accents) when filtering and searching. Defaults to false allowing for accents and such to be ignored. Used in table plugins (if applicable). Else has no effect.",
+                                "title": "Strict match search enabled",
+                                "version": "3.0"
+                            },
+                            "printEnabled": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Specifies if print button is available on the datatable. Defaults to false.",
+                                "title": "Print enabled",
+                                "version": "3.0"
+                            },
+                            "columns": {
+                                "type": "array",
+                                "title": "Fields",
+                                "default": [],
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string",
+                                            "description": "Specifies the field name (data) to use to link to the layer column. Must exist in the layer.",
+                                            "title": "Data"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "default": "",
+                                            "description": "Specifies the column title, uses the layer column name or alias if missing.",
+                                            "title": "Title"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "description": "Specifies the additional information to display in the setting panel to give more information about a column. Do not add description if missing.",
+                                            "title": "Description"
+                                        },
+                                        "visible": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "description": "Specifies if column is visible by default. True: column is visible; False: column is hidden.",
+                                            "title": "Visible"
+                                        },
+                                        "width": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "description": "Specifies the column width. The minimum column width is set to 100px. If missing, calculated column width will be use.",
+                                            "title": "Width"
+                                        },
+                                        "sort": {
+                                            "type": "string",
+                                            "enum": ["asc", "desc"],
+                                            "description": "Specifies if column is sort. If missing, no sort is applied.",
+                                            "title": "Sort"
+                                        },
+                                        "searchable": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "description": "Specifies if column can be filter. True: column can be filter; False: no filter can be applied from global search or filter. If this is false, do not set a filter because it will not be use.",
+                                            "title": "Searchable"
+                                        },
+                                        "filter": {
+                                            "type": "object",
+                                            "title": "Filter",
+                                            "description": "Specifies the filter information for a column.",
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string",
+                                                    "enum": ["string", "number", "date", "selector"],
+                                                    "description": "Specifies the filter type to use. If type is not specified, data field type will be use. String filter can be string or selector. Other filter must be the same type. If not, apply on map will fails.",
+                                                    "title": "Type"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "default": "",
+                                                    "description": "Specifies the filter value. For date and number values are split by ',' (e.g. 0,100 or for date 2005-02-22,2005-04-30). The date format is YYYY-MM-DD. For selector it needs an array like [\"Fire\", \"Fatality\"]",
+                                                    "title": "Value"
+                                                },
+                                                "static": {
+                                                    "type": "boolean",
+                                                    "default": false,
+                                                    "description": "Specifies if filter is modifiable. True: filter value can't be modified; False: filter value can be modified.",
+                                                    "title": "Static"
+                                                }
+                                            },
+                                            "required": ["type"],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                },
+                                "description": "Specifies the array of fields for the table. When there is an item in this array, it will be use to define wich and how column will be set for the table. If a column is not in the array it will be assume as disabled."
+                            }
+                        },
+                        "description": "Specifies how layers fields and global search are set",
+                        "additionalProperties": false
+                    },
+                    "layerEntries": {
+                        "type": "array",
+                        "title": "Layer Entries",
+                        "default": [],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "index": {
+                                    "for": "esriDynamic",
+                                    "type": "number",
+                                    "title": "Index",
+                                    "minimum": 0,
+                                    "description": "The index of the layer in the map service."
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "title": "Name",
+                                    "description": "A descriptive name for the layer, can override the name coming from the service."
+                                },
+                                "nameField": {
+                                    "for": "esriDynamic",
+                                    "title": "Name Field",
+                                    "type": "string",
+                                    "description": "The display field of the layer.  If it is not present the viewer will make an attempt to scrape this information.",
+                                    "version": "2.5"
+                                },
+                                "outfields": {
+                                    "for": "esriDynamic",
+                                    "type": "string",
+                                    "default": "*",
+                                    "title": "Out fields",
+                                    "description": "A comma separated list of attribute names that should be requested on query."
+                                },
+                                "stateOnly": {
+                                    "for": "esriDynamic",
+                                    "type": "boolean",
+                                    "title": "State only",
+                                    "default": false,
+                                    "description": "A flag indicating this entry is only for state tracking (i.e. it should not be displayed on the UI and all of the controls will be ignored, but the layer itself will be displayed on the map with the given state settings)."
+                                },
+                                "fieldMetadata": {
+                                    "for": "esriDynamic",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "title": "Field",
+                                        "description": "Specifies options for a field in a layer.",
+                                        "properties": {
+                                            "data": {
+                                                "type": "string",
+                                                "title": "Data",
+                                                "description": "Specifies the field name (data) to use to link to the identifier. Must exist in the layer."
+                                            },
+                                            "alias": {
+                                                "type": "string",
+                                                "title": "Alias",
+                                                "description": "Specifies the field title. If missing, attempts to use the service alias, then defaults to the field name."
+                                            }
+                                        },
+                                        "required": ["data"]
+                                    },
+                                    "description": "Specifies options for the fields of a layer."
+                                },
+                                "id": {
+                                    "for": "ogcwms",
+                                    "type": "string",
+                                    "title": "ID",
+                                    "description": "The id of the layer entry in the WMS. The value between the &lt;Name>...&lt;Name> tag of the layer (e.g. &lt;Name>roads&lt;/Name> where roads is the ID)."
+                                },
+                                "allStyles": {
+                                    "for": "ogcwms",
+                                    "type": "array",
+                                    "title": "All styles",
+                                    "description": "All the styles for the layer entry in the WMS",
+                                    "items": { "type": "string" }
+                                },
+                                "currentStyle": {
+                                    "for": "ogcwms",
+                                    "type": "string",
+                                    "title": "Current style",
+                                    "description": "The current style for the layer entry in the WMS"
+                                },
+                                "table": {
+                                    "type": "object",
+                                    "title": "Table",
+                                    "properties": {
+                                        "title": {
+                                            "type": "string",
+                                            "default": "",
+                                            "title": "Title",
+                                            "description": "Specifies the table title to apply."
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "title": "Description",
+                                            "description": "Specifies the additional information to display in the setting panel to give more information about a table."
+                                        },
+                                        "maximize": {
+                                            "type": "boolean",
+                                            "title": "Maximize",
+                                            "default": false,
+                                            "description": "Specifies the default table size when first open. True: maximize view; False: split view."
+                                        },
+                                        "search": {
+                                            "enabled": { "type": "boolean", "default": true },
+                                            "title": "Search",
+                                            "value": {
+                                                "type": "string",
+                                                "title": "Value",
+                                                "default": null,
+                                                "description": "Specifies the default filter to apply to a table (for global search)."
+                                            }
+                                        },
+                                        "lazyFilter": {
+                                            "type": "boolean",
+                                            "title": "Lazy Filter",
+                                            "default": false,
+                                            "description": "Specifies if simple filtering is on. If true, we match any substring of text entered. If false, search field accepts regex expressions. Note: Only effects text fields.",
+                                            "version": "2.5"
+                                        },
+                                        "applyMap": {
+                                            "type": "boolean",
+                                            "title": "Apply map",
+                                            "default": false,
+                                            "description": "Specifies if the default filters (from fields filter) are apply to the map (definition query). True: it is applied; False: it is not applied."
+                                        },
+                                        "showFilter": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "description": "Specifies if the column filters should be displayed on the table.",
+                                            "title": "Show Filter",
+                                            "version": "3.1"
+                                        },
+                                        "filterByExtent": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "description": "Specifies if the table should filter rows by extent by default. If true, the table will filter by extent when it is opened.",
+                                            "title": "Filter by Extent",
+                                            "version": "3.1"
+                                        },
+                                        "searchStrictMatch": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "description": "Specifies if text must match identical (including accents) when filtering and searching. Defaults to false allowing for accents and such to be ignored. Used in table plugins (if applicable). Else has no effect.",
+                                            "title": "Strict match search enabled",
+                                            "version": "3.0"
+                                        },
+                                        "printEnabled": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "description": "Specifies if print button is available on the datatable. Defaults to false.",
+                                            "title": "Print enabled",
+                                            "version": "3.0"
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "title": "Fields",
+                                            "default": [],
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "data": {
+                                                        "type": "string",
+                                                        "title": "Data",
+                                                        "description": "Specifies the field name (data) to use to link to the layer column. Must exist in the layer."
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "title": "Title",
+                                                        "description": "Specifies the column title, uses the layer column name or alias if missing."
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "title": "Description",
+                                                        "description": "Specifies the additional information to display in the setting panel to give more information about a column. Do not add description if missing."
+                                                    },
+                                                    "visible": {
+                                                        "type": "boolean",
+                                                        "title": "Visible",
+                                                        "default": true,
+                                                        "description": "Specifies if column is visible by default. True: column is visible; False: column is hidden."
+                                                    },
+                                                    "width": {
+                                                        "type": "number",
+                                                        "title": "Width",
+                                                        "minimum": 0,
+                                                        "description": "Specifies the column width. If missing, calculated column width will be use."
+                                                    },
+                                                    "sort": {
+                                                        "type": "string",
+                                                        "title": "Sort",
+                                                        "enum": ["asc", "desc"],
+                                                        "description": "Specifies if column is sort. If missing, no sort is applied."
+                                                    },
+                                                    "searchable": {
+                                                        "type": "boolean",
+                                                        "title": "Searchable",
+                                                        "default": true,
+                                                        "description": "Specifies if column can be filter. True: column can be filter; False: no filter can be applied from global search or filter. If this is false, do not set a filter because it will not be use."
+                                                    },
+                                                    "filter": {
+                                                        "type": "object",
+                                                        "title": "Filter",
+                                                        "description": "Specifies the filter information for a column.",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string",
+                                                                "title": "Type",
+                                                                "enum": ["string", "number", "date", "selector"],
+                                                                "description": "Specifies the filter type to use. If type is not specified, data field type will be use. String filter can be string or selector. Other filter must be the same type. If not, apply on map will fails."
+                                                            },
+                                                            "value": {
+                                                                "type": "string",
+                                                                "title": "Value",
+                                                                "default": "",
+                                                                "description": "Specifies the filter value. For date and number values are split by ',' (e.g. 0,100 or for date 2005-02-22,2005-04-30). The date format is YYYY-MM-DD. For selector it needs an array like [\"Fire\", \"Fatality\"]"
+                                                            },
+                                                            "static": {
+                                                                "type": "boolean",
+                                                                "title": "Static",
+                                                                "default": false,
+                                                                "description": "Specifies if filter is modifiable. True: filter value can't be modified; False: filter value can be modified."
+                                                            }
+                                                        },
+                                                        "required": ["type"],
+                                                        "additionalProperties": false
+                                                    }
+                                                }
+                                            },
+                                            "description": "Specifies the array of fields for the table. When there is an item in this array, it will be use to define wich and how column will be set for the table. If a column is not in the array it will be assume as disabled."
+                                        }
+                                    },
+                                    "description": "Specifies how layers fields and global search are set",
+                                    "additionalProperties": false
+                                },
+                                "controls": {
+                                    "title": "Controls",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "opacity",
+                                            "visibility",
+                                            "boundingBox",
+                                            "query",
+                                            "snapshot",
+                                            "metadata",
+                                            "boundaryZoom",
+                                            "refresh",
+                                            "reload",
+                                            "remove",
+                                            "settings",
+                                            "data",
+                                            "styles"
+                                        ]
+                                    },
+                                    "uniqueItems": true,
+                                    "description": "A list of all controls to be enabled on the specified layer",
+                                    "default": [
+                                        "opacity",
+                                        "visibility",
+                                        "boundingBox",
+                                        "query",
+                                        "snapshot",
+                                        "metadata",
+                                        "boundaryZoom",
+                                        "refresh",
+                                        "reload",
+                                        "remove",
+                                        "settings",
+                                        "data",
+                                        "styles"
+                                    ]
+                                },
+                                "disabledControls": {
+                                    "description": "A list of controls which are visible, but disabled for user modification",
+                                    "title": "Disabled controls",
+                                    "default": [],
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "opacity",
+                                            "visibility",
+                                            "boundingBox",
+                                            "query",
+                                            "snapshot",
+                                            "metadata",
+                                            "boundaryZoom",
+                                            "refresh",
+                                            "reload",
+                                            "remove",
+                                            "settings",
+                                            "data",
+                                            "styles"
+                                        ]
+                                    },
+                                    "uniqueItems": true
+                                },
+                                "state": {
+                                    "title": "State",
+                                    "type": "object",
+                                    "properties": {
+                                        "opacity": {
+                                            "type": "number",
+                                            "default": 1,
+                                            "minimum": 0,
+                                            "maximum": 1,
+                                            "description": "Initial opacity. Value must be between 0 and 1.",
+                                            "title": ""
+                                        },
+                                        "visibility": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "description": "Initial visibility setting",
+                                            "title": "Visibility"
+                                        },
+                                        "boundingBox": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "description": "Display bounding box",
+                                            "title": "Bounding box"
+                                        },
+                                        "query": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "description": "Allow querying",
+                                            "title": "Query"
+                                        },
+                                        "snapshot": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "description": "Retrieve all feature data immediately on load",
+                                            "title": "Snapshot"
+                                        },
+                                        "hovertips": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "description": "Disable hover tips",
+                                            "title": "Hovertips"
+                                        }
+                                    },
+                                    "additionalProperties": false
+                                }
+                            },
+                            "minItems": 1,
+                            "required": ["index", "id"]
+                        }
+                    },
+                    "fieldMetadata": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Field",
+                            "description": "Specifies options for a field in a layer.",
+                            "properties": {
+                                "data": {
+                                    "type": "string",
+                                    "title": "Data",
+                                    "description": "Specifies the field name (data) to use to link to the identifier. Must exist in the layer."
+                                },
+                                "alias": {
+                                    "type": "string",
+                                    "title": "Alias",
+                                    "description": "Specifies the field title. If missing, attempts to use the service alias, then defaults to the field name."
+                                }
+                            },
+                            "required": ["data"]
+                        },
+                        "description": "Specifies options for the fields of a layer."
+                    }
+                },
+                "required": ["id", "name", "url", "layerType"]
+            }
+        },
+        "legend": {
+            "type": "object",
+            "title": "Legend",
+            "properties": {
+                "legendChoice": {
+                    "description": "",
+                    "type": "string",
+                    "enum": ["autopopulate", "structured"],
+                    "title": "Legend type selector",
+                    "default": "autopopulate",
+                    "required": true
+                },
+                "type": {
+                    "type": "string",
+                    "title": "Type",
+                    "default": "autopopulate"
+                },
+                "root": {
+                    "type": "string",
+                    "default": "{\"name\": \"root\", \"children\": []}",
+                    "additionalProperties": false
+                }
+            }
+        }
+    },
+    "required": ["tileSchemas", "baseMaps"]
+}
