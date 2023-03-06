@@ -78,11 +78,11 @@ export default class MapEditorV extends Vue {
 
     mounted() {
         // If a message is received, it means the map save button was pressed.
-        window.addEventListener('message', (event) => {
-            if (event.data === 'mapSaved') {
-                this.saveEditor();
-            }
-        });
+        window.addEventListener('message', this.saveEditor);
+    }
+
+    beforeDestroy() {
+        window.removeEventListener('message', this.saveEditor);
     }
 
     createNewConfig() {
@@ -148,16 +148,18 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    saveEditor() {
-        this.status = 'default';
+    saveEditor(e: any) {
+        if (e.data === 'mapSaved') {
+            this.status = 'default';
 
-        // Add chart config to ZIP file.
-        this.configFileStructure.rampConfig[this.lang].file(
-            `${this.strippedFileName}.json`,
-            JSON.stringify(JSON.parse(localStorage.RAMPconfig), null, 4)
-        );
+            // Add chart config to ZIP file.
+            this.configFileStructure.rampConfig[this.lang].file(
+                `${this.strippedFileName}.json`,
+                JSON.stringify(JSON.parse(localStorage.RAMPconfig), null, 4)
+            );
 
-        this.$parent.$emit('slide-edit');
+            this.$parent.$emit('slide-edit');
+        }
     }
 }
 </script>
