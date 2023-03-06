@@ -287,6 +287,7 @@ export default class SlideEditorV extends Vue {
     @Watch('currentSlide', { deep: true })
     onSlideChange() {
         this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
+        this.rightOnly ? (this.panelIndex = 0) : false;
     }
 
     changePanelType(prevType: string, newType: string): void {
