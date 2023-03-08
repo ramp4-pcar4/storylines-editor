@@ -27,6 +27,7 @@ editor.back,Back,1,Retour,1
 editor.next,Next,1,Suivant,1
 editor.frenchConfig,View French Config,1,Afficher la configuration française,0
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0
+editor.returnToLanding,Return to Landing,1,Return to Landing,0
 editor.image.delete,Delete Image,1,Supprimer l'image,0
 editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,0
 editor.image.label.or,or,1,ou,1
