@@ -61,6 +61,7 @@ export default class ChartPreviewV extends Vue {
     chartIdx = 0;
     chartConfig = {};
     chartName = '';
+    modalEditor: any = undefined;
 
     mounted(): void {
         this.chartConfig = this.chart;
@@ -70,7 +71,11 @@ export default class ChartPreviewV extends Vue {
 
     loadChart(chartOptions: DQVChartConfig): void {
         // initialize higcharts editor and link to edit summoner node
-        const modalEditor = highed.ModalEditor(
+        if (this.modalEditor) {
+            return;
+        }
+
+        this.modalEditor = highed.ModalEditor(
             `edit-${this.chartName}-btn`,
             {
                 allowDone: true,
@@ -90,7 +95,7 @@ export default class ChartPreviewV extends Vue {
             }
         );
 
-        modalEditor.editor.chart.options.setAll(chartOptions);
+        this.modalEditor.editor.chart.options.setAll(chartOptions);
         // modalEditor.editor.chart.loadProject(chartOptions);
     }
 }
