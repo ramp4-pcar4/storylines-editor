@@ -43,7 +43,10 @@
                     </td>
                 </tr>
                 <tr class="table-add-row">
-                    <th><input type="text" placeholder="Enter Panel ID" v-model="newSlideName" /></th>
+                    <th class="flex flex-col items-center">
+                        <input type="text" placeholder="Enter Panel ID" v-model="newSlideName" />
+                        <p v-if="idUsed">⚠ Panel ID is already taken.</p>
+                    </th>
                     <th>
                         <select v-model="newSlideType">
                             <option
@@ -54,7 +57,7 @@
                             </option>
                         </select>
                     </th>
-                    <th><button @click="createNewSlide">Add New</button></th>
+                    <th><button @click="createNewSlide" :disabled="idUsed">Add New</button></th>
                 </tr>
             </table>
 
@@ -84,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
@@ -148,6 +151,10 @@ export default class DynamicEditorV extends Vue {
 
     newSlideName = '';
     newSlideType = 'text';
+
+    get idUsed() {
+        return this.panel.children.some((ch: any) => ch.id === this.newSlideName);
+    }
 
     changePanel(target: string) {
         this.saveChanges();
@@ -243,6 +250,7 @@ export default class DynamicEditorV extends Vue {
     cursor: pointer;
 }
 .table-add-row th {
+    vertical-align: top;
     text-align: center;
     border-top: 1px solid #ddd;
     padding: 5px;
@@ -255,5 +263,6 @@ export default class DynamicEditorV extends Vue {
     font-weight: normal;
     border: 1px solid black;
     padding: 2px !important;
+    margin-top: 0 !important;
 }
 </style>
