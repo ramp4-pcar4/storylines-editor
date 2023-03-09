@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartConfig, DQVChartConfig, SeriesData } from '@/definitions';
+import { ChartConfig, DQVChartConfig, PieSeriesData, LineSeriesData } from '@/definitions';
 
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
@@ -171,11 +171,13 @@ export default class ChartV extends Vue {
     /**
      * Parse chart data content and return a highcharts formatted series object for a pie chart.
      */
-    makePieChart(data: any, defaultOptions: any): void {
-        let series: { data: SeriesData[] } = { data: [] };
+    makePieChart(csvData: any, defaultOptions: any): void {
+        let series: PieSeriesData = { name: '', data: [] };
 
         // construct series data
-        data.forEach((slice: any) => {
+        series.name = csvData[0][0];
+        const ylabel = csvData[0][1];
+        csvData.slice(1).forEach((slice: any) => {
             series.data.push({
                 name: slice[0],
                 // in case of strings being passed in such as '10%'
@@ -200,7 +202,12 @@ export default class ChartV extends Vue {
         this.chartOptions = {
             ...defaultOptions,
             plotOptions: plotOptions,
-            series: series
+            series: series,
+            yAxis: {
+                title: {
+                    text: ylabel
+                }
+            }
         };
         this.$emit('loaded', this.chartOptions);
     }
@@ -208,7 +215,7 @@ export default class ChartV extends Vue {
     /**
      * Parse chart data content and return a highcharts formatted series object for a line/bar chart.
      */
-    makeLineChart(fields: string[], data: any, defaultOptions: any): void {
+    makeLineChart(fields: string[], csvData: any, defaultOptions: any): void {
         const dqvOptions = this.config.options;
         // find xAxis categories for line/bar charts
         const cato = fields.shift() as string;
@@ -216,13 +223,13 @@ export default class ChartV extends Vue {
             title: {
                 text: dqvOptions?.xAxisLabel ? dqvOptions?.xAxisLabel : ''
             },
-            categories: data.map((row: any) => row[cato])
+            categories: csvData.map((row: any) => row[cato])
         };
 
         // construct series data
-        let series: SeriesData[] = [];
+        let series: LineSeriesData[] = [];
         fields.forEach((f: string) => {
-            const colData = data.map((row: any) => row[f]);
+            const colData = csvData.map((row: any) => row[f]);
             series.push({
                 name: f,
                 data: colData
