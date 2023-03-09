@@ -85,11 +85,13 @@ export default class ChartEditorV extends Vue {
                 'modal-btn',
                 {
                     allowDone: true,
-                    features: 'import templates customize'
+                    features: 'import templates customize done',
+                    importer: {
+                        options: 'plugins csv json'
+                    }
                 },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (chart: any) => {
-                    // const saved = this.modalEditor.editor.chart.saveProject();
                     this.createNewChart(chart.toString());
                 }
             );
@@ -115,12 +117,16 @@ export default class ChartEditorV extends Vue {
     }
 
     clearEditor(): void {
+        // reset to clear modal editor options
+        this.modalEditor.chartOptions = {};
         this.modalEditor.editor.chart.options.setAll({
             title: {
                 text: `Chart ${this.chartConfigs.length + 1}`
             }
         });
-        this.modalEditor.editor.chart.data.clear();
+
+        // clear data section
+        this.modalEditor.editor.dataTable.clear();
     }
 
     createNewChart(chartInfo: string): void {
@@ -197,7 +203,7 @@ export default class ChartEditorV extends Vue {
         this.edited = false;
     }
 
-    onChartsEdited() {
+    onChartsEdited(): void {
         this.edited = true;
         this.$parent.$emit('slide-edit');
     }
