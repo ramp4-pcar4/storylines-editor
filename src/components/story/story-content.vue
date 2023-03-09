@@ -4,6 +4,7 @@
             class="side-menu"
             :active-chapter-index="activeChapterIndex"
             :slides="config.slides"
+            :editor="!!configFileStructure"
             :lang="lang"
         />
 
@@ -16,7 +17,7 @@
                 :id="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
                 :name="`${idx}-${slide.title.toLowerCase().replaceAll(' ', '-')}`"
             >
-                <slide :config="slide" :slideIdx="idx" :lang="lang"></slide>
+                <slide :config="slide" :configFileStructure="configFileStructure" :slideIdx="idx" :lang="lang"></slide>
             </div>
         </Scrollama>
     </div>
@@ -40,6 +41,7 @@ import { StoryRampConfig } from '@/definitions';
 })
 export default class StoryContentV extends Vue {
     @Prop() config!: StoryRampConfig;
+    @Prop() configFileStructure!: any;
     @Prop() lang!: string;
 
     activeChapterIndex = -1;

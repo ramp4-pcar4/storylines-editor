@@ -105,6 +105,29 @@ app.route('/retrieve/:id').get(function (req, res, next) {
     );
 });
 
+// GET requests made to /retrieve/ID/LANG will be handled here.
+app.route('/retrieve/:id/:lang').get(function (req, res) {
+    const CONFIG_PATH = `${TARGET_PATH}/${req.params.id}/${req.params.id}_${req.params.lang}.json`;
+    // obtain requested config file if it exists
+    if (
+        fs.access(CONFIG_PATH, (error) => {
+            if (!error) {
+                fs.readFile(CONFIG_PATH, (err, data) => {
+                    if (!err) {
+                        // return JSON config file as response
+                        const configJson = JSON.parse(data.toString());
+                        res.json(configJson);
+                    } else {
+                        res.status(err.status);
+                    }
+                });
+            } else {
+                res.status(404).send({ status: 'Not Found' });
+            }
+        })
+    );
+});
+
 /*
  * Verifies that the file has a valid extension. If it's not valid, the file is removed.
  *

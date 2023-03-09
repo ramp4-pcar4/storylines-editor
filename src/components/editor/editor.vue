@@ -61,7 +61,7 @@
             </div>
 
             <div class="flex mt-8">
-                <button @click="saveMetadata" class="pl-8">Save Changes</button>
+                <button @click="saveMetadata" class="pl-8">{{ $t('editor.saveChanges') }}</button>
                 <div class="ml-auto">
                     <router-link :to="{ name: 'home' }" target>
                         <button>{{ $t('editor.back') }}</button>
@@ -100,8 +100,27 @@
                         <span class="align-center inline-block select-none">Unsaved Changes</span>
                     </span>
                 </transition>
-                <button class="bg-white border border-black hover:bg-gray-100">Preview</button>
-                <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900">Save Changes</button>
+                <router-link
+                    :to="{
+                        name: 'preview',
+                        params: { conf: config, configFileStructure: configFileStructure }
+                    }"
+                >
+                    <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
+                        {{ $t('editor.preview') }}
+                    </button>
+                </router-link>
+                <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900">
+                    {{ $t('editor.saveChanges') }}
+                </button>
+                <router-link
+                    :to="{
+                        path: `editor-preview/${uuid}`
+                    }"
+                    target="_blank"
+                >
+                    <button class="bg-white border border-black hover:bg-gray-100">View Saved Product</button>
+                </router-link>
             </div>
             <div class="flex">
                 <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
@@ -201,7 +220,7 @@ export default class EditorV extends Vue {
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
-    slides: any[] = [];
+    slides: Slide[] = [];
     currentSlide: any = '';
     slideIndex = -1;
     $modals: any;
@@ -218,12 +237,12 @@ export default class EditorV extends Vue {
     sourceCounts: any = {};
 
     @Watch('slides', { deep: true })
-    onSlidesEdited() {
+    onSlidesEdited(): void {
         this.unsavedChanges = true;
     }
 
     @Watch('metadata', { deep: true })
-    onMetadataEdited() {
+    onMetadataEdited(): void {
         this.unsavedChanges = true;
     }
 
@@ -244,7 +263,7 @@ export default class EditorV extends Vue {
         }
     }
 
-    beforeDestroy() {
+    beforeDestroy(): void {
         window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }
 
@@ -327,7 +346,7 @@ export default class EditorV extends Vue {
         });
     }
 
-    findSources(config: StoryRampConfig) {
+    findSources(config: StoryRampConfig): void {
         this.incrementSourceCount(config.introSlide.logo.src);
 
         config.slides.forEach((slide) => {
@@ -337,7 +356,7 @@ export default class EditorV extends Vue {
         });
     }
 
-    panelSourceHelper(panel: any) {
+    panelSourceHelper(panel: any): void {
         switch (panel.type) {
             case 'dynamic':
                 panel.children.forEach((subPanel: any) => {
@@ -367,7 +386,7 @@ export default class EditorV extends Vue {
         }
     }
 
-    incrementSourceCount(src: string) {
+    incrementSourceCount(src: string): void {
         if (this.sourceCounts[src]) {
             this.sourceCounts[src] += 1;
         } else {
@@ -379,7 +398,7 @@ export default class EditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: any, uploadLogo?: File | undefined): any {
+    configFileStructureHelper(configZip: any, uploadLogo?: File | undefined): void {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -482,7 +501,9 @@ export default class EditorV extends Vue {
      */
     generateConfig(): StoryRampConfig {
         // save current slide final changes before generating config file
-        (this.$refs.slide as any).saveChanges();
+        if (this.$refs.slide !== undefined) {
+            (this.$refs.slide as any).saveChanges();
+        }
 
         // Update the configuration file.
         const fileName = `${this.uuid}_${this.lang}.json`;
@@ -604,6 +625,16 @@ export default class EditorV extends Vue {
     }
 
     /**
+     * Open current editor config as a new Storylines product in new tab.
+     */
+    preview(): void {
+        // save current slide final changes before previewing product
+        if (this.$refs.slide !== undefined) {
+            (this.$refs.slide as any).saveChanges();
+        }
+    }
+
+    /**
      * React to param changes in URL.
      */
     beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
@@ -650,7 +681,7 @@ export default class EditorV extends Vue {
         this.metadata.logoName = uploadedFile.name;
     }
 
-    beforeWindowUnload(e: any) {
+    beforeWindowUnload(e: any): void {
         // show popup if when leaving page with unsaved changes
         if (this.unsavedChanges && !window.confirm()) {
             e.preventDefault();

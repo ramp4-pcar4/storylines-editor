@@ -32,12 +32,24 @@ export default class MapPanelV extends Vue {
     @Prop() config!: MapPanel;
     @Prop() slideIdx!: number;
     @Prop() lang!: string;
+    @Prop() configFileStructure!: any;
 
     intersectTimeoutHandle = -1;
     scrollguardOpen = false;
     mapComponent: Element | undefined = undefined;
 
     mounted(): void {
+        // Check if the config file exists in the ZIP folder first
+        const assetSrc = `${this.config.config.substring(this.config.config.indexOf('/') + 1)}`;
+        if (this.configFileStructure && this.configFileStructure.config.file(assetSrc)) {
+            this.configFileStructure.config
+                .file(assetSrc)
+                .async('string')
+                .then((res: any) => {
+                    this.config.config = res;
+                });
+        }
+
         const observer = new IntersectionObserver(
             ([e]) => {
                 if (e.isIntersecting) {
