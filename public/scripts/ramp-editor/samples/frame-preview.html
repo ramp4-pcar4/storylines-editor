@@ -74,7 +74,14 @@
     </head>
 
     <body>
-        <div id="fgpmap" is="rv-map" class="myMap" data-rv-config="config" data-rv-langs="" rv-plugins="">
+        <div
+            id="fgpmap"
+            is="rv-map"
+            class="myMap"
+            data-rv-config="config"
+            data-rv-langs='["en-CA", "fr-CA"]'
+            rv-plugins=""
+        >
             <noscript>
                 <p>
                     This interactive map requires JavaScript. To view this content please enable JavaScript in your
@@ -95,7 +102,8 @@
             window.config = JSON.parse(localStorage.getItem('configpreview'));
 
             // set viewer array of languages
-            document.getElementById('fgpmap').setAttribute('data-rv-langs', localStorage.getItem('configlangs'));
+            // NOTE: There is a bug that just sets languages to null for some reason, so setting manually for now
+            // document.getElementById('fgpmap').setAttribute('data-rv-langs', localStorage.getItem('configlangs'));
 
             // set viewer array of plugin
             document.getElementById('fgpmap').setAttribute('rv-plugins', localStorage.getItem('configplugins'));
