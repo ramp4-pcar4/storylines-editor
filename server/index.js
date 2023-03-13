@@ -81,23 +81,36 @@ app.route('/upload').post(function (req, res, next) {
 app.route('/retrieve/:id').get(function (req, res, next) {
     var archive = archiver('zip');
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
+    const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
 
     // Check if the product exists.
     if (
         fs.access(PRODUCT_PATH, (error) => {
             if (!error) {
-                // Tell the browser that this is a zip file.
-                res.writeHead(200, {
-                    'Content-Type': 'application/zip',
-                    'Content-disposition': `attachment; filename=${req.params.id}.zip`
+                const output = fs.createWriteStream(uploadLocation);
+
+                // This event listener is fired when the write stream has finished. This means that the
+                // ZIP file should be correctly populated. Now, we can set the correct headers and send the
+                // ZIP file to the client.
+                output.on('close', () => {
+                    res.writeHead(200, {
+                        'Content-Type': 'application/zip',
+                        'Content-disposition': `attachment; filename=${req.params.id}.zip`,
+                        'Content-Length': archive.pointer()
+                    });
+
+                    const result = fs.createReadStream(uploadLocation).pipe(res);
+
+                    // When the piping is finished, delete the stream.
+                    result.on('finish', () => {
+                        fs.rm(uploadLocation);
+                    });
                 });
 
-                // Send the ZIP contents to the client.
-                archive.pipe(res);
+                // Write the product data to the ZIP file.
+                archive.pipe(output);
                 archive.directory(PRODUCT_PATH, false);
-                archive.finalize().then(() => {
-                    res.end();
-                });
+                archive.finalize();
             } else {
                 res.status(404).send({ status: 'Not Found' });
             }
