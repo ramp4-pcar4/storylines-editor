@@ -124,15 +124,16 @@ export default class ImageEditorV extends Vue {
         this.imagePreviews.push(
             ...filelist.map((file: File) => {
                 // Add the uploaded images to the product ZIP file.
+                const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
                 this.configFileStructure.assets[this.lang].file(file.name, file);
 
-                let imageSrc = URL.createObjectURL(file);
-                if (this.sourceCounts[imageSrc]) {
-                    this.sourceCounts[imageSrc] += 1;
+                if (this.sourceCounts[uploadSource]) {
+                    this.sourceCounts[uploadSource] += 1;
                 } else {
-                    this.sourceCounts[imageSrc] = 1;
+                    this.sourceCounts[uploadSource] = 1;
                 }
 
+                let imageSrc = URL.createObjectURL(file);
                 return {
                     id: file.name,
                     altText: '',
@@ -149,14 +150,16 @@ export default class ImageEditorV extends Vue {
             this.imagePreviews.push(
                 ...files.map((file: File) => {
                     // Add the uploaded images to the product ZIP file.
+                    const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
                     this.configFileStructure.assets[this.lang].file(file.name, file);
-                    let imageSrc = URL.createObjectURL(file);
-                    if (this.sourceCounts[imageSrc]) {
-                        this.sourceCounts[imageSrc] += 1;
+
+                    if (this.sourceCounts[uploadSource]) {
+                        this.sourceCounts[uploadSource] += 1;
                     } else {
-                        this.sourceCounts[imageSrc] = 1;
+                        this.sourceCounts[uploadSource] = 1;
                     }
 
+                    let imageSrc = URL.createObjectURL(file);
                     return {
                         id: file.name,
                         altText: '',
@@ -172,9 +175,11 @@ export default class ImageEditorV extends Vue {
     deleteImage(img: ImageFile): void {
         const idx = this.imagePreviews.findIndex((file: ImageFile) => file.id === img.id);
         if (idx !== -1) {
+            const fileSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${this.imagePreviews[idx].id}`;
+
             // Remove the image from the product ZIP file.
-            this.sourceCounts[this.imagePreviews[idx].src] -= 1;
-            if (this.sourceCounts[this.imagePreviews[idx].src] === 0) {
+            this.sourceCounts[fileSource] -= 1;
+            if (this.sourceCounts[fileSource] === 0) {
                 this.configFileStructure.assets[this.lang].remove(this.imagePreviews[idx].id);
                 URL.revokeObjectURL(this.imagePreviews[idx].src);
             }

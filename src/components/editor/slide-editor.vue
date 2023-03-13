@@ -320,6 +320,9 @@ export default class SlideEditorV extends Vue {
             }
         };
 
+        // Before swapping panel type, update sources from the to-be-deleted config.
+        this.currentSlide.panel.forEach((panel: any) => this.removeSourceCounts(panel));
+
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
             this.panelIndex = 0;
@@ -327,6 +330,42 @@ export default class SlideEditorV extends Vue {
         } else {
             // Switching panel type when dynamic panels are not involved.
             Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
+        }
+    }
+
+    removeSourceCounts(panel: any): void {
+        // The provided panel is being removed. Update source counts accordingly.
+        switch (panel.type) {
+            case 'map':
+                this.sourceCounts[panel.config] -= 1;
+                if (this.sourceCounts[panel.config] === 0) {
+                    this.configFileStructure.config.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+                }
+                break;
+
+            case 'chart':
+                panel.charts.forEach((chart: any) => {
+                    this.sourceCounts[chart.src] -= 1;
+                    if (this.sourceCounts[chart.src] === 0) {
+                        this.configFileStructure.config.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'slideshow':
+                panel.images.forEach((image: any) => {
+                    this.sourceCounts[image.src] -= 1;
+                    if (this.sourceCounts[image.src] === 0) {
+                        this.configFileStructure.config.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'dynamic':
+                panel.children.forEach((subPanel: any) => {
+                    this.removeSourceCounts(subPanel.panel);
+                });
+                break;
         }
     }
 
