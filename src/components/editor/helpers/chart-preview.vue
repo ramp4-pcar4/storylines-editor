@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartConfig, DQVChartConfig } from '@/definitions';
+import { ChartConfig, DQVChartConfig, PieSeriesData, PieDataRow, LineSeriesData } from '@/definitions';
 import ChartV from '@/components/panels/helpers/chart.vue';
 
 @Component({
@@ -68,13 +68,20 @@ export default class ChartPreviewV extends Vue {
         this.loading = false;
     }
 
+    /**
+     * Save initial set of chart options used to create chart.
+     */
     loadChart(chartOptions: DQVChartConfig): void {
         // initialize higcharts editor and link to edit summoner node
         const modalEditor = highed.ModalEditor(
             `edit-${this.chartName}-btn`,
             {
                 allowDone: true,
-                features: 'import templates customize'
+                features: 'import templates customize done',
+                importer: {
+                    options: 'plugins csv json'
+                },
+                defaultChartOptions: chartOptions
             },
             (newChart: any) => {
                 const chart = JSON.parse(newChart);
@@ -90,8 +97,56 @@ export default class ChartPreviewV extends Vue {
             }
         );
 
+        // restore CSV data if exists
+        if (chartOptions.data?.csv !== undefined) {
+            const csvData = chartOptions.data.csv;
+            modalEditor.editor.dataTable.loadCSV({ csv: csvData });
+        } else {
+            this.convertSeriesToCSV(chartOptions, modalEditor);
+        }
+
         modalEditor.editor.chart.options.setAll(chartOptions);
-        // modalEditor.editor.chart.loadProject(chartOptions);
+    }
+
+    /*
+     * Convert series data into formatted csvData string for charts created without using editor
+     * so that the datatable when re-opening modal is properly populated.
+     */
+    convertSeriesToCSV(chartOptions: DQVChartConfig, modalEditor: any): void {
+        if (chartOptions.chart?.type === 'pie') {
+            const seriesData = (chartOptions?.series as PieSeriesData).data;
+            if (seriesData) {
+                // pie charts only have one set of series data with the name;y format
+                const csvData = [
+                    // first row is attempt to extract data labels if exists
+                    `${(chartOptions?.series as PieSeriesData).name};${chartOptions?.yAxis?.title.text}`,
+                    ...seriesData.map((row: PieDataRow) => `${row.name};${row.y}`)
+                ];
+
+                // load formatted CSV string into datatable
+                modalEditor.editor.dataTable.loadCSV({ csv: csvData.join('\n') });
+            }
+        } else {
+            if (chartOptions?.series && (chartOptions?.series as LineSeriesData[]).length) {
+                // other chart types may have multiple sets of series data along with x-axis categories
+                // append series data name to its data set
+                let seriesData = (chartOptions?.series as LineSeriesData[]).map((series: LineSeriesData) => [
+                    series.name,
+                    ...series.data
+                ]);
+                if (chartOptions.xAxis !== undefined) {
+                    // add xAxis categories to series data if it exists
+                    const catoData = [chartOptions.xAxis?.title?.text].concat(chartOptions.xAxis?.categories);
+                    seriesData.unshift(catoData);
+                }
+
+                // join series data together
+                let csvData = seriesData[0].map((_, idx) => seriesData.map((data) => data[idx]).join(';'));
+
+                // load formatted CSV string into datatable
+                modalEditor.editor.dataTable.loadCSV({ csv: csvData.join('\n') });
+            }
+        }
     }
 }
 </script>

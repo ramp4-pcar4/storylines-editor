@@ -21,11 +21,19 @@ export interface DQVOptions {
     type: string;
 }
 
-export interface SeriesData {
+export interface PieSeriesData {
+    name: string;
+    data: PieDataRow[];
+}
+
+export interface PieDataRow {
     name: string;
     y?: number;
-    data?: number[];
-    type?: string;
+}
+
+export interface LineSeriesData {
+    name: string;
+    data: number[];
 }
 
 export interface DQVChartConfig {
@@ -55,6 +63,7 @@ export interface DQVChartConfig {
     data?: {
         csvURL: string;
         enablePolling: boolean;
+        csv?: string;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     plotOptions?: any;
@@ -66,7 +75,7 @@ export interface DQVChartConfig {
         };
         enabled: boolean;
     };
-    series?: SeriesData[] | { data: SeriesData[] };
+    series?: PieSeriesData | LineSeriesData[];
 }
 
 export interface Intro {
