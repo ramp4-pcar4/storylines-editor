@@ -87,7 +87,10 @@
                         <tippy delay="200" placement="right">{{ $t('editor.returnToLanding') }}</tippy>
                     </router-link>
                 </span>
-                <span class="m-1 font-semibold text-lg">{{ config.title }}</span>
+                <div class="ml-3 flex flex-col">
+                    <span class="font-semibold text-lg">{{ metadata.title }}</span>
+                    <span>UUID: {{ uuid }}</span>
+                </div>
                 <span class="ml-auto"></span>
                 <transition name="fade">
                     <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">

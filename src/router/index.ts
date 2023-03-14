@@ -10,41 +10,49 @@ Vue.use(Router);
 const routes = [
     {
         path: '/',
-        component: StoryV
+        component: StoryV,
+        meta: { title: 'story.window.title' }
     },
     {
         path: '/:lang/editor',
         name: 'home',
-        component: LandingV
+        component: LandingV,
+        meta: { title: 'editor.window.title' }
     },
     {
         path: '/:lang/editor-metadata',
         name: 'metadata',
         component: EditorV,
-        props: true
+        props: true,
+        meta: { title: 'editor.window.title' }
     },
     {
         path: '/:lang/editor/:uid',
         name: 'editor',
-        component: EditorV
+        component: EditorV,
+        meta: { title: 'editor.window.title' }
     },
     {
         path: '/:lang/editor-preview',
         component: StoryPreviewV,
         name: 'preview',
-        props: true
+        props: true,
+        meta: { title: 'story.window.title' }
     },
     {
         path: '/:lang/editor-preview/:uid',
-        component: StoryPreviewV
+        component: StoryPreviewV,
+        meta: { title: 'story.window.title' }
     },
     {
         path: '/:uid',
-        component: StoryV
+        component: StoryV,
+        meta: { title: 'story.window.title' }
     },
     {
         path: '/:lang/:uid',
-        component: StoryV
+        component: StoryV,
+        meta: { title: 'story.window.title' }
     }
 ];
 
