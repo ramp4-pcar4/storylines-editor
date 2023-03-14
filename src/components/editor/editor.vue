@@ -122,8 +122,19 @@
                         {{ $t('editor.preview') }}
                     </button>
                 </router-link>
-                <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900">
-                    {{ $t('editor.saveChanges') }}
+                <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
+                    <span class="inline-block">{{
+                        saving ? $t('editor.savingChanges') : $t('editor.saveChanges')
+                    }}</span>
+                    <span v-if="saving" class="align-middle inline-block px-1"
+                        ><spinner
+                            size="16px"
+                            background="#6B7280"
+                            color="#FFFFFF"
+                            stroke="2px"
+                            class="ml-1 mb-1"
+                        ></spinner>
+                    </span>
                 </button>
                 <router-link
                     :to="{
@@ -228,6 +239,7 @@ export default class EditorV extends Vue {
     error = false; // whether an error has occurred
     lang = 'en';
     unsavedChanges = false;
+    saving = false;
 
     // Form properties.
     uuid = '';
@@ -512,6 +524,7 @@ export default class EditorV extends Vue {
      * with the new changes, then generates and submits the product file to the server.
      */
     generateConfig(): StoryRampConfig {
+        this.saving = true;
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as any).saveChanges();
@@ -539,6 +552,12 @@ export default class EditorV extends Vue {
                 })
                 .catch(() => {
                     this.$message.error('Failed to save changes.');
+                })
+                .finally(() => {
+                    // padding to prevent save button from being clicked rapidly
+                    setTimeout(() => {
+                        this.saving = false;
+                    }, 500);
                 });
         });
 
@@ -598,11 +617,8 @@ export default class EditorV extends Vue {
         setTimeout(() => {
             this.currentSlide = index === -1 ? '' : this.slides[index];
             this.slideIndex = index;
-        }, 5);
-
-        if (index !== -1 && this.slides[index].panel[0].type === 'dynamic') {
             (this.$refs.slide as any).panelIndex = 0;
-        }
+        }, 5);
     }
 
     /**

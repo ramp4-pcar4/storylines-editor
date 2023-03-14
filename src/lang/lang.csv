@@ -28,6 +28,7 @@ editor.back,Back,1,Retour,1
 editor.next,Next,1,Suivant,1
 editor.preview,Preview,1,Aperçu,0
 editor.saveChanges,Save Changes,1,Sauvegarder les Modifications,0
+editor.savingChanges,Saving...,1,Sauver...,0
 editor.frenchConfig,View French Config,1,Afficher la configuration française,0
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0
 editor.returnToLanding,Return to Landing,1,Return to Landing,0
