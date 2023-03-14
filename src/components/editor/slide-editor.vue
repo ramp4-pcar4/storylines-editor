@@ -299,9 +299,9 @@ export default class SlideEditorV extends Vue {
             },
             dynamic: {
                 type: PanelType.Dynamic,
-                title: '',
+                title: this.currentSlide.panel[0] ? this.currentSlide.panel[0].title : '',
                 titleTag: '',
-                content: '',
+                content: this.currentSlide.panel[0] ? this.currentSlide.panel[0].content : '',
                 children: []
             },
             slideshow: {
