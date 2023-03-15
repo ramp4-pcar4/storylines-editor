@@ -41,8 +41,8 @@ export default class MapPanelV extends Vue {
     mounted(): void {
         // Check if the config file exists in the ZIP folder first
         const assetSrc = `${this.config.config.substring(this.config.config.indexOf('/') + 1)}`;
-        if (this.configFileStructure && this.configFileStructure.config.file(assetSrc)) {
-            this.configFileStructure.config
+        if (this.configFileStructure && this.configFileStructure.zip.file(assetSrc)) {
+            this.configFileStructure.zip
                 .file(assetSrc)
                 .async('string')
                 .then((res: any) => {

@@ -81,8 +81,8 @@ export default class IntroV extends Vue {
         // obtain logo from ZIP file if it exists
         if (this.configFileStructure) {
             const logoSrc = `${this.config.logo.src.substring(this.config.logo.src.indexOf('/') + 1)}`;
-            if (this.configFileStructure.config.file(logoSrc)) {
-                this.configFileStructure.config
+            if (this.configFileStructure.zip.file(logoSrc)) {
+                this.configFileStructure.zip
                     .file(logoSrc)
                     .async('blob')
                     .then((res: any) => {

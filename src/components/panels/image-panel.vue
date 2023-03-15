@@ -40,8 +40,8 @@ export default class ImagePanelV extends Vue {
         // obtain image file from ZIP folder in editor preview mode
         if (this.configFileStructure) {
             const assetSrc = `${this.config.src.substring(this.config.src.indexOf('/') + 1)}`;
-            if (this.configFileStructure.config.file(assetSrc)) {
-                this.configFileStructure.config
+            if (this.configFileStructure.zip.file(assetSrc)) {
+                this.configFileStructure.zip
                     .file(assetSrc)
                     .async('blob')
                     .then((res: any) => {
