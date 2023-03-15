@@ -122,6 +122,12 @@ export default class ChartEditorV extends Vue {
         this.modalEditor.editor.chart.options.setAll({
             title: {
                 text: `Chart ${this.chartConfigs.length + 1}`
+            },
+            subtitle: {
+                text: ''
+            },
+            credits: {
+                enabled: false
             }
         });
 

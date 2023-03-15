@@ -36,6 +36,7 @@ editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,0
 editor.image.label.or,or,1,ou,1
 editor.image.label.browse,browse,1,feuilleter,0
 editor.image.label.upload,to upload,1,télécharger,0
+editor.chart.delete,Delete Chart,1,Supprimer le graphique,0
 editor.chart.label.name,Name,1,Nom,1
 editor.chart.label.edit,Edit,1,Éditer,1
 editor.chart.label.empty,Empty,1,Vide,1
