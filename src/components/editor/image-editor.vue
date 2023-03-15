@@ -97,7 +97,7 @@ export default class ImageEditorV extends Vue {
                 const filename = image.src.replace(/^.*[\\/]/, '');
 
                 this.imagePreviewPromises.push(
-                    this.configFileStructure.config
+                    this.configFileStructure.zip
                         .file(assetSrc)
                         .async('blob')
                         .then((res: any) => {

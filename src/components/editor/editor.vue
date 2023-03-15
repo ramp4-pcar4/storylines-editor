@@ -7,7 +7,7 @@
                     <div class="flex text-2xl font-bold mb-5">
                         {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
                     </div>
-                    <button v-if="config" @click="swapLang">
+                    <button @click="swapLang">
                         {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                 </div>
@@ -87,7 +87,7 @@
                         <tippy delay="200" placement="right">{{ $t('editor.returnToLanding') }}</tippy>
                     </router-link>
                 </span>
-                <span class="m-1 font-semibold text-lg">{{ config.title }}</span>
+                <span class="m-1 font-semibold text-lg">{{ configs[lang].title }}</span>
                 <span class="ml-auto"></span>
                 <transition name="fade">
                     <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
@@ -112,10 +112,14 @@
                         <span class="align-center inline-block select-none">Unsaved Changes</span>
                     </span>
                 </transition>
+                <button @click.stop="unsavedChanges ? $modals.show(`change-lang`) : swapLang()">
+                    {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                </button>
+                <confirmation-modal :name="`change-lang`" :message="$t('editor.changeLang.modal')" @Ok="swapLang()" />
                 <router-link
                     :to="{
                         name: 'preview',
-                        params: { conf: config, configFileStructure: configFileStructure }
+                        params: { conf: configs[lang], configFileStructure: configFileStructure }
                     }"
                 >
                     <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
@@ -210,9 +214,11 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataEditorV from './metadata-editor.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Component({
     components: {
+        'confirmation-modal': ConfirmationModalV,
         'metadata-editor': MetadataEditorV,
         spinner: Circle2,
         'slide-editor': SlideEditorV,
@@ -222,7 +228,9 @@ import MetadataEditorV from './metadata-editor.vue';
 export default class EditorV extends Vue {
     @Prop({ default: true }) editExisting!: boolean; // true if editing existing storylines product, false if new product
 
-    config: StoryRampConfig | undefined = undefined;
+    configs: {
+        [key: string]: StoryRampConfig | undefined;
+    } = { en: undefined, fr: undefined };
     configFileStructure: any = undefined;
     loadStatus = 'waiting';
     error = false; // whether an error has occurred
@@ -266,7 +274,7 @@ export default class EditorV extends Vue {
         this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
 
         // Initialize Storylines config and the configuration structure.
-        this.config = undefined;
+        this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
 
         // If a product UUID is provided, fetch the contents from the server.
@@ -286,26 +294,33 @@ export default class EditorV extends Vue {
         const configZip = new JSZip();
 
         // Generate a new configuration file and populate required fields.
-        this.config = this.configHelper();
-        this.config.title = this.metadata.title;
-        this.config.introSlide.title = this.metadata.introTitle;
-        this.config.introSlide.subtitle = this.metadata.introSubtitle;
-        this.config.slides = this.slides;
+        this.configs[this.lang] = this.configHelper();
+        this.configs[this.lang]!.title = this.metadata.title;
+        this.configs[this.lang]!.introSlide.title = this.metadata.introTitle;
+        this.configs[this.lang]!.introSlide.subtitle = this.metadata.introSubtitle;
+        this.configs[this.lang]!.slides = this.slides;
 
         // Set the source of the product logo
         if (!this.metadata.logoName) {
-            this.config.introSlide.logo.src = '';
+            this.configs[this.lang]!.introSlide.logo.src = '';
         } else if (!this.metadata.logoName.includes('http')) {
-            this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+            this.configs[this.lang]!.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
         } else {
-            this.config.introSlide.logo.src = this.metadata.logoName;
+            this.configs[this.lang]!.introSlide.logo.src = this.metadata.logoName;
         }
+
+        const otherLang = this.lang === 'en' ? 'fr' : 'en';
+
+        this.configs[otherLang] = this.configs[this.lang];
+        this.configs[otherLang]!.lang = otherLang;
 
         // Add the newly generated Storylines configuration file to the ZIP file.
         const fileName = `${this.uuid}_${this.lang}.json`;
-        const formattedConfigFile = JSON.stringify(this.config, null, 4);
+        const formattedConfigFile = JSON.stringify(this.configs[this.lang], null, 4);
+        const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
 
         configZip.file(fileName, formattedConfigFile);
+        configZip.file(`${this.uuid}_${otherLang}.json`, formattedOtherLangConfig);
 
         // Generate the file structure, defer uploading the image until the structure is created.
         this.configFileStructureHelper(configZip, this.logoImage);
@@ -358,12 +373,13 @@ export default class EditorV extends Vue {
         });
     }
 
-    findSources(config: StoryRampConfig): void {
-        this.incrementSourceCount(config.introSlide.logo.src);
-
-        config.slides.forEach((slide) => {
-            slide.panel.forEach((panel) => {
-                this.panelSourceHelper(panel);
+    findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
+        ['en', 'fr'].forEach((lang) => {
+            this.incrementSourceCount(configs[lang]!.introSlide.logo.src);
+            configs[lang]!.slides.forEach((slide) => {
+                slide.panel.forEach((panel) => {
+                    this.panelSourceHelper(panel);
+                });
             });
         });
     }
@@ -417,7 +433,8 @@ export default class EditorV extends Vue {
 
         this.configFileStructure = {
             uuid: this.uuid,
-            config: configZip,
+            zip: configZip,
+            configs: this.configs,
             assets: {
                 en: assetsFolder.folder('en'),
                 fr: assetsFolder.folder('fr')
@@ -444,67 +461,83 @@ export default class EditorV extends Vue {
      * Loads a configuration file from the product folder, and sets application data
      * as needed.
      */
-    loadConfig(): void {
+    async loadConfig(config?: StoryRampConfig): Promise<void> {
         const configPath = `${this.uuid}_${this.lang}.json`;
 
-        this.configFileStructure.config
-            .file(configPath)
+        if (config) {
+            this.useConfig(config);
+            return;
+        }
+
+        await this.configFileStructure.zip
+            .file(`${this.uuid}_en.json`)
             .async('string')
             .then((res: any) => {
-                this.config = JSON.parse(res);
-                this.editExisting ? (this.loadStatus = 'waiting') : (this.loadStatus = 'loaded');
+                this.configs['en'] = JSON.parse(res);
+            });
+        await this.configFileStructure.zip
+            .file(`${this.uuid}_fr.json`)
+            .async('string')
+            .then((res: any) => {
+                this.configs['fr'] = JSON.parse(res);
+            });
 
-                // Load in project data.
-                if (this.config) {
-                    this.metadata.title = this.config.title;
-                    this.metadata.introTitle = this.config.introSlide.title;
-                    this.metadata.introSubtitle = this.config.introSlide.subtitle;
-                    this.metadata.contextLink = this.config.contextLink;
-                    this.metadata.contextLabel = this.config.contextLabel;
-                    this.metadata.dateModified = this.config.dateModified;
-                    const logo = this.config.introSlide.logo.src;
+        this.editExisting ? (this.loadStatus = 'waiting') : (this.loadStatus = 'loaded');
 
-                    // Fetch the logo from the folder (if it exists).
-                    const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
-                    const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
+        // Load in project data.
+        if (this.configs[this.lang]) {
+            this.useConfig(this.configs[this.lang]!);
 
-                    if (this.configFileStructure.config.file(logoSrc)) {
-                        this.configFileStructure.config
-                            .file(logoSrc)
-                            .async('blob')
-                            .then((img: any) => {
-                                this.logoImage = new File([img], logoName);
-                                this.metadata.logoPreview = URL.createObjectURL(img);
-                                this.metadata.logoName = logoName;
-                            });
-                    } else {
-                        // If it doesn't exist, maybe it's a remote file?
-                        fetch(logo).then((data: any) => {
-                            if (data.status !== 404) {
-                                this.logoImage = new File([data], logoName);
-                                this.metadata.logoPreview = logo;
-                            }
-                        });
+            this.findSources(this.configs);
+        }
+    }
 
-                        // Fill in the field with this value whether it exists or not.
-                        this.metadata.logoName = logo;
-                    }
+    useConfig(config: StoryRampConfig) {
+        this.metadata.title = config.title;
+        this.metadata.introTitle = config.introSlide.title;
+        this.metadata.introSubtitle = config.introSlide.subtitle;
+        this.metadata.contextLink = config.contextLink;
+        this.metadata.contextLabel = config.contextLabel;
+        this.metadata.dateModified = config.dateModified;
+        const logo = config.introSlide.logo.src;
 
-                    this.slides = this.config.slides;
-                    // conversion for individual image panels to slideshow for gallery display
-                    this.slides.forEach((slide: Slide) => {
-                        if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
-                            const newSlide = {
-                                type: 'slideshow',
-                                images: [slide.panel[1]]
-                            };
-                            Vue.set(slide.panel, 1, newSlide);
-                        }
-                    });
+        // Fetch the logo from the folder (if it exists).
+        const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
+        const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
 
-                    this.findSources(this.config);
+        if (this.configFileStructure.zip.file(logoSrc)) {
+            this.configFileStructure.zip
+                .file(logoSrc)
+                .async('blob')
+                .then((img: any) => {
+                    this.logoImage = new File([img], logoName);
+                    this.metadata.logoPreview = URL.createObjectURL(img);
+                    this.metadata.logoName = logoName;
+                });
+        } else {
+            // If it doesn't exist, maybe it's a remote file?
+            fetch(logo).then((data: any) => {
+                if (data.status !== 404) {
+                    this.logoImage = new File([data], logoName);
+                    this.metadata.logoPreview = logo;
                 }
             });
+
+            // Fill in the field with this value whether it exists or not.
+            this.metadata.logoName = logo;
+        }
+
+        this.slides = config.slides;
+        // conversion for individual image panels to slideshow for gallery display
+        this.slides.forEach((slide: Slide) => {
+            if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
+                const newSlide = {
+                    type: 'slideshow',
+                    images: [slide.panel[1]]
+                };
+                Vue.set(slide.panel, 1, newSlide);
+            }
+        });
     }
 
     /**
@@ -519,12 +552,12 @@ export default class EditorV extends Vue {
 
         // Update the configuration file.
         const fileName = `${this.uuid}_${this.lang}.json`;
-        const formattedConfigFile = JSON.stringify(this.config, null, 4);
+        const formattedConfigFile = JSON.stringify(this.configs[this.lang], null, 4);
 
-        this.configFileStructure.config.file(fileName, formattedConfigFile);
+        this.configFileStructure.zip.file(fileName, formattedConfigFile);
 
         // Upload the ZIP file.
-        this.configFileStructure.config.generateAsync({ type: 'blob' }).then((content: any) => {
+        this.configFileStructure.zip.generateAsync({ type: 'blob' }).then((content: any) => {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
             const headers = { 'Content-Type': 'multipart/form-data' };
@@ -558,22 +591,24 @@ export default class EditorV extends Vue {
      */
     saveMetadata(): void {
         // update metadata content to existing config only if it has been successfully loaded
-        if (this.config !== undefined) {
-            this.config.title = this.metadata.title;
-            this.config.introSlide.title = this.metadata.introTitle;
-            this.config.introSlide.subtitle = this.metadata.introSubtitle;
-            this.config.contextLink = this.metadata.contextLink;
-            this.config.contextLabel = this.metadata.contextLabel;
-            this.config.dateModified = this.metadata.dateModified;
+        if (this.configs[this.lang] !== undefined) {
+            this.configs[this.lang]!.title = this.metadata.title;
+            this.configs[this.lang]!.introSlide.title = this.metadata.introTitle;
+            this.configs[this.lang]!.introSlide.subtitle = this.metadata.introSubtitle;
+            this.configs[this.lang]!.contextLink = this.metadata.contextLink;
+            this.configs[this.lang]!.contextLabel = this.metadata.contextLabel;
+            this.configs[this.lang]!.dateModified = this.metadata.dateModified;
 
             // If the logo doesn't include HTTP, assume it's a local file.
             if (!this.metadata.logoName) {
-                this.config.introSlide.logo.src = '';
+                this.configs[this.lang]!.introSlide.logo.src = '';
             } else if (!this.metadata.logoName.includes('http')) {
-                this.config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+                this.configs[
+                    this.lang
+                ]!.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
                 this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
             } else {
-                this.config.introSlide.logo.src = this.metadata.logoName;
+                this.configs[this.lang]!.introSlide.logo.src = this.metadata.logoName;
             }
         }
         if (this.$modals.isActive('metadata-edit-modal')) {
@@ -618,7 +653,7 @@ export default class EditorV extends Vue {
      */
     continueToEditor(): void {
         if (this.editExisting) {
-            this.config !== undefined
+            this.configs[this.lang] !== undefined
                 ? (this.loadStatus = 'loaded')
                 : this.$message.error('No config exists for storylines product.');
             this.unsavedChanges = false;
@@ -633,7 +668,7 @@ export default class EditorV extends Vue {
      */
     swapLang(): void {
         this.lang = this.lang === 'en' ? 'fr' : 'en';
-        this.generateRemoteConfig();
+        this.loadConfig();
     }
 
     /**

@@ -118,8 +118,8 @@ export default class MapEditorV extends Vue {
             // Check if the config file exists in the ZIP folder first.
             const assetSrc = `${this.panel.config.substring(this.panel.config.indexOf('/') + 1)}`;
 
-            if (this.configFileStructure.config.file(assetSrc)) {
-                this.configFileStructure.config
+            if (this.configFileStructure.zip.file(assetSrc)) {
+                this.configFileStructure.zip
                     .file(assetSrc)
                     .async('string')
                     .then((res: any) => {
