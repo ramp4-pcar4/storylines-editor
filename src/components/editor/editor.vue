@@ -177,6 +177,7 @@
                         @slides-updated="updateSlides"
                         :configFileStructure="configFileStructure"
                         :lang="lang"
+                        :sourceCounts="sourceCounts"
                     ></slide-toc>
                 </div>
                 <slide-editor

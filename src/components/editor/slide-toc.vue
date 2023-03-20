@@ -95,6 +95,7 @@ export default class SlideTocV extends Vue {
     @Prop() slideIndex!: number;
     @Prop() configFileStructure!: any;
     @Prop() lang!: string;
+    @Prop() sourceCounts!: any;
 
     total = 0;
     $modals: any;
@@ -131,8 +132,53 @@ export default class SlideTocV extends Vue {
         if (index === this.slideIndex) {
             this.$emit('slide-change', -1);
         }
+
+        // Before removing the slide, updated the sources for the panels.
+        this.removeSourceCounts(index);
+
         this.slides.splice(index, 1);
         this.$emit('slides-updated', this.slides);
+    }
+
+    removeSourceCounts(deletedIndex: any): void {
+        const panel = this.slides.find((panel: any, idx: number) => idx === deletedIndex).panel;
+        panel.forEach((p: any) => this.removeSourceHelper(p));
+    }
+
+    removeSourceHelper(panel: any) {
+        // The provided panel is being removed. Update source counts accordingly.
+        switch (panel.type) {
+            case 'map':
+                this.sourceCounts[panel.config] -= 1;
+                if (this.sourceCounts[panel.config] === 0) {
+                    this.configFileStructure.config.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+                }
+                break;
+
+            case 'chart':
+                panel.charts.forEach((chart: any) => {
+                    this.sourceCounts[chart.src] -= 1;
+                    if (this.sourceCounts[chart.src] === 0) {
+                        this.configFileStructure.config.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'slideshow':
+                panel.images.forEach((image: any) => {
+                    this.sourceCounts[image.src] -= 1;
+                    if (this.sourceCounts[image.src] === 0) {
+                        this.configFileStructure.config.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'dynamic':
+                panel.children.forEach((subPanel: any) => {
+                    this.removeSourceCounts(subPanel.panel);
+                });
+                break;
+        }
     }
 
     moveUp(index: number): void {

@@ -3,6 +3,7 @@ var bodyParser = require('body-parser'); //connects bodyParsing middleware
 var formidable = require('formidable');
 var path = require('path'); //used for file path
 var fs = require('fs-extra'); //File System-needed for renaming file etc
+var recursiveRead = require('recursive-readdir');
 var cors = require('cors');
 const decompress = require('decompress');
 const archiver = require('archiver');
@@ -61,6 +62,35 @@ app.route('/upload').post(function (req, res, next) {
         // Unzip the contents of the uploaded zip file into the target directory. Will overwrite
         // old files in the folder.
         decompress(secureFilename, fileName).then((files) => {
+            // Below is some logic to remove items from the server directory that are no longer used.
+
+            // Retrieve the existing files in the directory and change the path.
+            const existingFiles = recursiveRead(fileName).then((existing) => {
+                return existing.map((item) => {
+                    item = item.replace(/\\/g, '/');
+                    return item.substring(item.indexOf('/', item.indexOf('/', 2) + 1) + 1);
+                });
+            });
+
+            // Once the existing files are retrieved, parse the new files being uploaded
+            // and check to see if any of the existing files have been removed from the
+            // project (if they've been removed, they won't be in the new file list).
+            existingFiles.then((existing) => {
+                var newFiles = files.filter((x) => x.type == 'file').map((i) => i.path);
+
+                let difference = existing
+                    .filter((x) => !newFiles.includes(x))
+                    .concat(newFiles.filter((x) => !existing.includes(x)));
+
+                // Delete the file if it doesn't exist in the newly uploaded product.
+                difference.forEach((file) => {
+                    // TODO: remove this, but leaving it in for now just in case something was
+                    // overlooked and files start randomly disappearing.
+                    console.log(`[DEBUG] Removing ${file} because it no longer exists in the project.`);
+                    fs.rm(fileName + '/' + file);
+                });
+            });
+
             // SECURITY FEATURE: delete all files in the folder that don't have one of the following extensions:
             // .json, .jpg, .jpeg, .gif, .png, .csv
             // TODO: Disabled until I can find a better regex
