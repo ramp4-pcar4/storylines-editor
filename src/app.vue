@@ -5,10 +5,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Route } from 'vue-router';
 
 @Component({})
-export default class App extends Vue {}
+export default class App extends Vue {
+    @Watch('$route', { immediate: true })
+    onRouteUpdate(to: Route, from: Route) {
+        this.$i18n.locale = to.params.lang ?? 'en';
+        document.title = this.$t(to.meta?.title).toString();
+    }
+}
 </script>
 
 <style lang="scss">
