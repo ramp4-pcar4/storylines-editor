@@ -2,6 +2,7 @@
 node_modules
 /dist
 server/node_modules
+server/logfile.txt
 
 
 # local env files
