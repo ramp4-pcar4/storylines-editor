@@ -5,6 +5,7 @@ var path = require('path'); //used for file path
 var fs = require('fs-extra'); //File System-needed for renaming file etc
 var recursiveRead = require('recursive-readdir');
 var cors = require('cors');
+var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
 
@@ -12,9 +13,13 @@ const archiver = require('archiver');
 PORT = 6040; // the Express server will run on this port.
 UPLOAD_PATH = './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
 TARGET_PATH = './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
+LOG_PATH = 'logfile.txt'; // the path to the logfile
 
 // Create express app.
 var app = express();
+
+// Open the logfile in append mode.
+var logFile = fs.createWriteStream(LOG_PATH, { flags: 'a' });
 
 // Express middleware.
 app.use(express.static(path.join(__dirname, 'public')));
@@ -46,7 +51,7 @@ app.route('/upload').post(function (req, res, next) {
 
         // SECURITY FEATURE (temporary): Make sure the project name isn't `scripts`, or `help`, and doesn't contain . or / in order to prevent overwriting folders.
         if (fileName !== 'scripts' && fileName !== 'help' && !fileName.includes('/') && !fileName.includes('.')) {
-            console.error('ABORTING: file does not match Storylines UUID standards.');
+            logger('WARNING', 'Upload Aborted: file does not match Storylines UUID standards.');
 
             // Delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
@@ -86,7 +91,7 @@ app.route('/upload').post(function (req, res, next) {
                 difference.forEach((file) => {
                     // TODO: remove this, but leaving it in for now just in case something was
                     // overlooked and files start randomly disappearing.
-                    console.log(`[DEBUG] Removing ${file} because it no longer exists in the project.`);
+                    logger('WARNING', `Removing ${file} because it no longer exists in the product.`);
                     fs.rm(fileName + '/' + file);
                 });
             });
@@ -101,6 +106,8 @@ app.route('/upload').post(function (req, res, next) {
 
         // Finally, delete the uploaded zip file.
         safeRM(secureFilename, UPLOAD_PATH);
+
+        logger('INFO', `Uploaded files to product ${fileName}`);
 
         // Send a response back to the client.
         res.end();
@@ -141,7 +148,10 @@ app.route('/retrieve/:id').get(function (req, res, next) {
                 archive.pipe(output);
                 archive.directory(PRODUCT_PATH, false);
                 archive.finalize();
+
+                logger('INFO', `Successfully loaded product ${req.params.id}`);
             } else {
+                logger('INFO', `Access attempt to ${req.params.id} failed, does not exist.`);
                 res.status(404).send({ status: 'Not Found' });
             }
         })
@@ -159,12 +169,18 @@ app.route('/retrieve/:id/:lang').get(function (req, res) {
                     if (!err) {
                         // return JSON config file as response
                         const configJson = JSON.parse(data.toString());
+                        logger(
+                            'INFO',
+                            `Successfully loaded config file for ${req.params.id}, language ${req.params.lang}`
+                        );
                         res.json(configJson);
                     } else {
+                        logger('INFO', `Access attempt to ${req.params.id} failed, error status ${err.status}`);
                         res.status(err.status);
                     }
                 });
             } else {
+                logger('INFO', `Access attempt to ${req.params.id} failed, does not exist.`);
                 res.status(404).send({ status: 'Not Found' });
             }
         })
@@ -185,7 +201,7 @@ function validateFile(fileObj, path) {
 
     // If the provided object is a file, check to see if it has a valid file extension.
     if (fileObj.type === 'file' && !filenameRegex.test(fileObj.path)) {
-        console.error(`Validation of ${fileObj.path} failed. Deleting.`);
+        logger('WARNING', `Validation of ${fileObj.path} failed. Deleting.`);
         safeRM(fullPath, path);
     }
 }
@@ -202,7 +218,21 @@ function safeRM(path, folder) {
     }
 }
 
+/**
+ * Appends the message alongside a timestamp to the logfile.
+ * @param {string} message the message to write to the logfile.
+ */
+function logger(type, message) {
+    let currentDate = moment().format('MM/DD/YYYY HH:mm:ss a');
+
+    // Append to log file.
+    logFile.write(`${currentDate} [${type}] ${message}\n`);
+
+    // Print to console.
+    console.log(`${currentDate} [${type}] ${message}`);
+}
+
 // Run the express app on port 6040.
 var server = app.listen(6040, function () {
-    console.log('Listening on port %d', server.address().port);
+    logger('INFO', `Storylines Express Server Started, PORT: ${server.address().port}`);
 });
