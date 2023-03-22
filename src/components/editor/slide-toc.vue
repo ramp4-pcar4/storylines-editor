@@ -31,7 +31,7 @@
                     </button>
                     <span class="text-lg font-bold my-6"> {{ $t('or') }} </span>
                     <div class="flex">
-                        <select v-model="selectedForCopying">
+                        <select v-model="selectedForCopying" class="overflow-ellipsis copy-select">
                             <option
                                 v-for="(slide, index) in configFileStructure.configs[lang === 'en' ? 'fr' : 'en']
                                     .slides"
@@ -256,5 +256,9 @@ export default class SlideTocV extends Vue {
 
 .toc-slide button:hover {
     background: none !important;
+}
+
+.copy-select {
+    width: 450px;
 }
 </style>

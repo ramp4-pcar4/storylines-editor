@@ -689,6 +689,7 @@ export default class EditorV extends Vue {
     swapLang(): void {
         this.lang = this.lang === 'en' ? 'fr' : 'en';
         this.loadConfig();
+        this.selectSlide(-1);
     }
 
     /**
