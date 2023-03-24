@@ -622,6 +622,7 @@ export default class EditorV extends Vue {
             this.currentSlide = index === -1 ? '' : this.slides[index];
             this.slideIndex = index;
             (this.$refs.slide as any).panelIndex = 0;
+            window.scrollTo(0, 0);
         }, 5);
     }
 
