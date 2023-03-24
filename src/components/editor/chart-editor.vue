@@ -32,14 +32,21 @@
 
         <!-- Gallery preview of all charts -->
         <ul class="flex flex-wrap list-none" v-show="chartConfigs.length">
-            <ChartPreview
-                v-for="(chart, idx) in chartConfigs"
-                :key="`${chart.name}-${idx}`"
-                :chart="chart"
-                :configFileStructure="configFileStructure"
-                @delete="$modals.show(`${chart.name}-${idx}`)"
-                @edit="editChart"
-            ></ChartPreview>
+            <draggable
+                v-model="chartConfigs"
+                handle=".handle"
+                @update="onChartsEdited"
+                class="flex flex-wrap list-none"
+            >
+                <ChartPreview
+                    v-for="(chart, idx) in chartConfigs"
+                    :key="`${chart.name}-${idx}`"
+                    :chart="chart"
+                    :configFileStructure="configFileStructure"
+                    @delete="$modals.show(`${chart.name}-${idx}`)"
+                    @edit="editChart"
+                ></ChartPreview>
+            </draggable>
         </ul>
         <confirmation-modal
             v-for="(chart, idx) in chartConfigs"
@@ -57,12 +64,14 @@ import { ChartConfig } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
+import draggable from 'vuedraggable';
 
 @Component({
     components: {
         'chart-panel': ChartPanelV,
         ChartPreview: ChartPreviewV,
-        'confirmation-modal': ConfirmationModalV
+        'confirmation-modal': ConfirmationModalV,
+        draggable
     }
 })
 export default class ChartEditorV extends Vue {
