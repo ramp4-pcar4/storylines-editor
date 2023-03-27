@@ -122,7 +122,7 @@ export default class MapEditorV extends Vue {
         this.validateTimeSlider();
     }
 
-    beforeDestroy() {
+    beforeDestroy(): void {
         window.removeEventListener('message', this.saveEditor);
     }
 
@@ -189,7 +189,7 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    saveTimeSlider() {
+    saveTimeSlider(): void {
         if (!this.timeSliderError || !this.usingTimeSlider) {
             this.panel.timeSlider = this.usingTimeSlider ? this.timeSliderConf : undefined;
         }
@@ -213,14 +213,14 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    onTimeSliderInput(property: 'range' | 'start' | 'attribute', index: number, value: string) {
+    onTimeSliderInput(property: 'range' | 'start' | 'attribute', index: number, value: string): void {
         property === 'attribute'
             ? (this.timeSliderConf[property] = value)
             : (this.timeSliderConf[property][index] = Number(value));
         this.validateTimeSlider();
     }
 
-    validateTimeSlider() {
+    validateTimeSlider(): void {
         this.timeSliderError =
             this.timeSliderConf.range.some((val) => val < 0 || !Number.isInteger(val)) ||
             this.timeSliderConf.start.some((val) => val < 0 || !Number.isInteger(val)) ||

@@ -64,5 +64,3 @@ editor.slides.addSlide,"New Slide",1,"New Slide",0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copy slides from the other language",0
 editor.slides.deleteSlide.confirm,"Are you sure you want to delete the slide {title}?",1,"Are you sure you want to delete the slide {title}?",0
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",0
-dynamic.back,Back,1,Retour,0
-or,Or,1,Ou,1

@@ -29,7 +29,7 @@
                     >
                         Copy All
                     </button>
-                    <span class="text-lg font-bold my-6"> {{ $t('or') }} </span>
+                    <span class="text-lg font-bold my-6"> {{ $t('editor.image.label.or') }} </span>
                     <div class="flex">
                         <select v-model="selectedForCopying" class="overflow-ellipsis copy-select">
                             <option
@@ -198,12 +198,12 @@ export default class SlideTocV extends Vue {
         this.$emit('slides-updated', this.slides);
     }
 
-    removeSourceCounts(deletedIndex: any): void {
+    removeSourceCounts(deletedIndex: number): void {
         const panel = this.slides.find((panel: any, idx: number) => idx === deletedIndex).panel;
         panel.forEach((p: any) => this.removeSourceHelper(p));
     }
 
-    removeSourceHelper(panel: any) {
+    removeSourceHelper(panel: any): void {
         // The provided panel is being removed. Update source counts accordingly.
         switch (panel.type) {
             case 'map':
