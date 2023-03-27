@@ -1,101 +1,680 @@
 <template>
-    <div>
-        <label class="mb-5">{{ $t('editor.title') }}:</label>
-        <input type="text" name="title" :value="metadata.title" @change="metadataChanged" class="w-1/3" />
-        <br />
-        <label class="mb-5">Intro Title:</label>
-        <input type="text" name="introTitle" :value="metadata.introTitle" @change="metadataChanged" class="w-1/4" />
-        <label class="mb-5">Intro Subtitle:</label>
-        <input
-            type="text"
-            name="introSubtitle"
-            :value="metadata.introSubtitle"
-            @change="metadataChanged"
-            class="w-1/4"
-        />
-        <br />
-        <!-- only display an image preview if one is provided.-->
-        <div v-if="!!metadata.logoPreview">
-            <label>{{ $t('editor.logoPreview') }}:</label>
-            <img
-                :src="metadata.logoPreview"
-                v-if="!!metadata.logoPreview && metadata.logoPreview != 'error'"
-                class="image-preview"
-            />
-            <p v-if="metadata.logoPreview == 'error'" class="image-preview">
-                An error occurred when trying to load image.
-            </p>
-        </div>
-        <label class="mb-5">{{ $t('editor.logo') }}:</label>
-        <input type="text" @change="$emit('logo-source-changed', $event)" :value="metadata.logoName" class="w-1/4" />
-        <button @click.stop="openFileSelector" class="bg-black text-white hover:bg-gray-800">
-            {{ $t('editor.browse') }}
-        </button>
-        <button v-if="metadata.logoName || metadata.logoPreview" @click.stop="removeLogo" class="border border-black">
-            Remove
-        </button>
-        <!-- hide the actual file input -->
-        <input
-            type="file"
-            id="logoUpload"
-            @change="$emit('logo-changed', $event)"
-            class="w-1/4"
-            style="display: none"
-        />
-        <br />
-        <label>{{ $t('editor.contextLink') }}:</label>
-        <input type="text" name="contextLink" :value="metadata.contextLink" @change="metadataChanged" class="w-2/3" />
-        <br />
-        <label class="mb-5"></label>
-        <p class="inline-block">
-            <i>
-                Context link shows up at the bottom of the page to provide additional resources for interested users
-            </i>
-        </p>
-        <br />
-        <label>{{ $t('editor.contextLabel') }}:</label>
-        <input type="text" name="contextLabel" :value="metadata.contextLabel" @change="metadataChanged" class="w-2/3" />
-        <br />
-        <label class="mb-5"></label>
-        <p class="inline-block">
-            <i> Context label shows up before the context link to explain what the link is for </i>
-        </p>
-        <br />
-        <label class="mb-5">{{ $t('editor.dateModified') }}:</label>
-        <input type="date" name="dateModified" :value="metadata.dateModified" @change="metadataChanged" />
-        <br /><br />
+    <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
+    <div class="editor-container">
+        <template v-if="!loadEditor">
+            <div class="px-20 py-5">
+                <div class="flex">
+                    <div class="flex text-2xl font-bold mb-5">
+                        {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                    </div>
+                    <button @click="swapLang">
+                        {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                    </button>
+                </div>
+
+                <div class="border py-5 w-5/6">
+                    <label>{{ $t('editor.uuid') }}:</label>
+                    <input
+                        type="text"
+                        @input="error = false"
+                        v-model="uuid"
+                        class="w-1/3"
+                        :class="error ? 'input-error' : ''"
+                    />
+                    <button
+                        @click="generateRemoteConfig"
+                        class="bg-black text-white hover:bg-gray-800"
+                        :class="error ? 'input-error' : ''"
+                        v-if="editExisting"
+                    >
+                        {{ $t('editor.load') }}
+                    </button>
+
+                    <!-- If config is loading, display a small spinner. -->
+                    <div class="inline-flex" v-if="loadStatus === 'loading'">
+                        <spinner
+                            size="20px"
+                            background="#00D2D3"
+                            color="#009cd1"
+                            stroke="2px"
+                            class="mx-2 my-auto"
+                        ></spinner>
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="mb-4">
+                    <h3>Storylines product details</h3>
+                    <p>
+                        Fill in metadata details about your new Storyline. Use the “Preview” button to see what your
+                        slides will look like.
+                    </p>
+                </div>
+
+                <metadata-content
+                    :metadata="metadata"
+                    @metadata-changed="updateMetadata"
+                    @logo-changed="onFileChange"
+                    @logo-source-changed="onLogoSourceInput"
+                ></metadata-content>
+            </div>
+
+            <div class="flex mt-8">
+                <button @click="saveMetadata" class="pl-8">{{ $t('editor.saveChanges') }}</button>
+                <div class="ml-auto">
+                    <router-link :to="{ name: 'home' }" target>
+                        <button>{{ $t('editor.back') }}</button>
+                    </router-link>
+                    <button @click="continueToEditor" class="bg-black text-white px-8">
+                        {{ $t('editor.next') }}
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        <template v-if="loadEditor && loadStatus === 'loaded'">
+            <editor
+                :configs="configs"
+                :configFileStructure="configFileStructure"
+                :sourceCounts="sourceCounts"
+                :metadata="metadata"
+                ref="mainEditor"
+            >
+                <template v-slot:langModal="slotProps">
+                    <button @click.stop="slotProps.unsavedChanges ? $modals.show(`change-lang`) : swapLang()">
+                        {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                    </button>
+                    <confirmation-modal
+                        :name="`change-lang`"
+                        :message="$t('editor.changeLang.modal')"
+                        @Ok="swapLang()"
+                    />
+                </template>
+
+                <template v-slot:metadataModal>
+                    <vue-modal name="metadata-edit-modal" :outer-close="false" :hide-close-btn="true" size="xlg">
+                        <h2 slot="header" class="text-lg font-bold">Edit Project Metadata</h2>
+                        <metadata-content
+                            :metadata="metadata"
+                            @metadata-changed="updateMetadata"
+                            @logo-changed="onFileChange"
+                            @logo-source-changed="onLogoSourceInput"
+                        ></metadata-content>
+                        <div class="w-full flex justify-end">
+                            <button class="bg-black text-white hover:bg-gray-800" @click="saveMetadata">Done</button>
+                        </div>
+                    </vue-modal>
+                </template>
+            </editor>
+        </template>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Route } from 'vue-router';
+import {
+    AudioPanel,
+    BasePanel,
+    ChartConfig,
+    ChartPanel,
+    DynamicChildItem,
+    DynamicPanel,
+    ImagePanel,
+    MapPanel,
+    Slide,
+    SlideshowPanel,
+    StoryRampConfig
+} from '@/definitions';
+
+const JSZip = require('jszip');
+const { v4: uuidv4 } = require('uuid');
+
+import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
+import SlideEditorV from './slide-editor.vue';
+import SlideTocV from './slide-toc.vue';
+import MetadataContentV from './helpers/metadata-content.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import EditorV from './editor.vue';
 
 @Component({
-    components: {}
+    components: {
+        Editor: EditorV,
+        'confirmation-modal': ConfirmationModalV,
+        'metadata-content': MetadataContentV,
+        spinner: Circle2,
+        'slide-editor': SlideEditorV,
+        'slide-toc': SlideTocV
+    }
 })
 export default class MetadataEditorV extends Vue {
-    @Prop() metadata!: {
-        title: string;
-        introTitle: string;
-        introSubtitle: string;
-        logoName: string;
-        logoPreview: string;
-        contextLink: string;
-        contextLabel: string;
-        dateModified: string;
+    @Prop({ default: true }) editExisting!: boolean; // true if editing existing storylines product, false if new product
+
+    configs: {
+        [key: string]: StoryRampConfig | undefined;
+    } = { en: undefined, fr: undefined };
+    configFileStructure: any = undefined;
+    loadStatus = 'waiting';
+    loadEditor = false;
+    error = false; // whether an error has occurred
+    lang = 'en';
+
+    // Form properties.
+    uuid = '';
+    logoImage: undefined | File = undefined;
+    $modals: any;
+    metadata = {
+        title: '',
+        introTitle: '',
+        introSubtitle: '',
+        logoPreview: '',
+        logoName: '',
+        contextLink: '',
+        contextLabel: '',
+        dateModified: ''
     };
+    sourceCounts: any = {};
 
-    openFileSelector(): void {
-        document.getElementById('logoUpload')?.click();
+    created(): void {
+        // Generate UUID for new product
+        this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
+        this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
+
+        // Initialize Storylines config and the configuration structure.
+        this.configs = { en: undefined, fr: undefined };
+        this.configFileStructure = undefined;
+
+        // Find which view to render based on route
+        if (this.$route.name === 'editor') {
+            this.loadEditor = true;
+
+            // Properties already passed in props, load editor view
+            if (this.$route.params.configs && this.$route.params.configFileStructure) {
+                this.configs = this.$route.params.configs as any;
+                this.configFileStructure = this.$route.params.configFileStructure;
+                this.metadata = this.$route.params.metadata as any;
+                this.sourceCounts = this.$route.params.sourceCounts;
+
+                this.loadStatus = 'loaded';
+                return;
+            }
+        }
+
+        // If a product UUID is provided, fetch the contents from the server.
+        if (this.$route.params.uid) {
+            this.generateRemoteConfig();
+        }
     }
 
-    metadataChanged(event: any): void {
-        this.$emit('metadata-changed', event.target.name, event.target.value);
+    /**
+     * Generates a new product file for brand new products.
+     */
+    generateNewConfig(): void {
+        const configZip = new JSZip();
+
+        // Generate a new configuration file and populate required fields.
+        this.configs[this.lang] = this.configHelper();
+        const config = this.configs[this.lang] as StoryRampConfig;
+
+        config.title = this.metadata.title;
+        config.introSlide.title = this.metadata.introTitle;
+        config.introSlide.subtitle = this.metadata.introSubtitle;
+        config.slides = [];
+
+        // Set the source of the product logo
+        if (!this.metadata.logoName) {
+            config.introSlide.logo.src = '';
+        } else if (!this.metadata.logoName.includes('http')) {
+            config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+        } else {
+            config.introSlide.logo.src = this.metadata.logoName;
+        }
+
+        const otherLang = this.lang === 'en' ? 'fr' : 'en';
+        this.configs[otherLang] = config;
+        (this.configs[otherLang] as StoryRampConfig).lang = otherLang;
+        const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
+
+        // Add the newly generated Storylines configuration file to the ZIP file.
+        const fileName = `${this.uuid}_${this.lang}.json`;
+        const formattedConfigFile = JSON.stringify(config, null, 4);
+
+        configZip.file(fileName, formattedConfigFile);
+        configZip.file(`${this.uuid}_${otherLang}.json`, formattedOtherLangConfig);
+
+        // Generate the file structure, defer uploading the image until the structure is created.
+        this.configFileStructureHelper(configZip, this.logoImage);
     }
 
-    removeLogo(): void {
-        this.metadata.logoName = '';
-        this.metadata.logoPreview = '';
+    configHelper(): StoryRampConfig {
+        // TODO: require user to input these fields instead of defaulting (speeds up testing purposes for now)
+        return {
+            title: 'Test Config',
+            lang: 'en',
+            introSlide: {
+                logo: {
+                    src: ''
+                },
+                title: '',
+                subtitle: ''
+            },
+            slides: [],
+            contextLabel: this.metadata.contextLabel,
+            contextLink: this.metadata.contextLink,
+            dateModified: this.metadata.dateModified
+        };
+    }
+
+    /**
+     * Provided with a UID, retrieve the project contents from the file server.
+     */
+    generateRemoteConfig(): void {
+        this.loadStatus = 'loading';
+
+        // Attempt to fetch the project from the server.
+        fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
+            if (res.status === 404) {
+                // Product not found.
+                this.$message.error(`The requested UUID ${this.uuid ?? ''} does not exist.`);
+                this.error = true;
+                this.loadStatus = 'waiting';
+            } else {
+                const configZip = new JSZip();
+                // Files retrieved. Convert them into a JSZip object.
+                res.blob().then((file: any) => {
+                    configZip.loadAsync(file).then(() => {
+                        this.configFileStructureHelper(configZip);
+                        this.$message.success('Successfully loaded storyline!');
+                    });
+                });
+            }
+        });
+    }
+
+    findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
+        ['en', 'fr'].forEach((lang) => {
+            this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.logo.src);
+            (configs[lang] as StoryRampConfig).slides.forEach((slide) => {
+                slide.panel.forEach((panel) => {
+                    this.panelSourceHelper(panel);
+                });
+            });
+        });
+    }
+
+    panelSourceHelper(panel: BasePanel): void {
+        switch (panel.type) {
+            case 'dynamic':
+                (panel as DynamicPanel).children.forEach((subPanel: DynamicChildItem) => {
+                    this.panelSourceHelper(subPanel.panel);
+                });
+                break;
+            case 'slideshow':
+                (panel as SlideshowPanel).images.forEach((image: ImagePanel) => {
+                    this.incrementSourceCount(image.src);
+                });
+                break;
+            case 'chart':
+                (panel as ChartPanel).charts.forEach((chart: ChartConfig) => {
+                    this.incrementSourceCount(chart.src);
+                });
+                break;
+            case 'image':
+            case 'video':
+            case 'audio':
+                this.incrementSourceCount((panel as AudioPanel).src);
+                break;
+            case 'map':
+                this.incrementSourceCount((panel as MapPanel).config);
+                break;
+            default:
+                break;
+        }
+    }
+
+    incrementSourceCount(src: string): void {
+        if (this.sourceCounts[src]) {
+            this.sourceCounts[src] += 1;
+        } else {
+            this.sourceCounts[src] = 1;
+        }
+    }
+
+    /**
+     * Generates or loads a ZIP file and creates required project folders if needed.
+     * Returns an object that makes it easy to access any specific folder.
+     */
+    configFileStructureHelper(configZip: any, uploadLogo?: File | undefined): void {
+        const assetsFolder = configZip.folder('assets');
+        const chartsFolder = configZip.folder('charts');
+        const rampConfigFolder = configZip.folder('ramp-config');
+
+        this.configFileStructure = {
+            uuid: this.uuid,
+            zip: configZip,
+            configs: this.configs,
+            assets: {
+                en: assetsFolder.folder('en'),
+                fr: assetsFolder.folder('fr')
+            },
+            charts: {
+                en: chartsFolder.folder('en'),
+                fr: chartsFolder.folder('fr')
+            },
+            rampConfig: {
+                en: rampConfigFolder.folder('en'),
+                fr: rampConfigFolder.folder('fr')
+            }
+        };
+
+        // If uploadLogo is set, upload the logo to the directory.
+        if (uploadLogo !== undefined) {
+            this.configFileStructure.assets[this.lang].file(uploadLogo?.name, uploadLogo);
+        }
+
+        this.loadConfig();
+    }
+
+    /**
+     * Loads a configuration file from the product folder, and sets application data
+     * as needed.
+     */
+    async loadConfig(config?: StoryRampConfig): Promise<void> {
+        if (config) {
+            this.useConfig(config);
+            return;
+        }
+
+        await this.configFileStructure.zip
+            .file(`${this.uuid}_en.json`)
+            .async('string')
+            .then((res: any) => {
+                this.configs['en'] = JSON.parse(res);
+            });
+        await this.configFileStructure.zip
+            .file(`${this.uuid}_fr.json`)
+            .async('string')
+            .then((res: any) => {
+                this.configs['fr'] = JSON.parse(res);
+            });
+
+        // Load in project data.
+        if (this.configs[this.lang]) {
+            this.useConfig(this.configs[this.lang] as StoryRampConfig);
+            this.findSources(this.configs);
+
+            // Update router path
+            if (!this.editExisting) {
+                this.loadEditor = true;
+                this.updateEditorPath();
+            }
+        }
+    }
+
+    useConfig(config: StoryRampConfig): void {
+        this.metadata.title = config.title;
+        this.metadata.introTitle = config.introSlide.title;
+        this.metadata.introSubtitle = config.introSlide.subtitle;
+        this.metadata.contextLink = config.contextLink;
+        this.metadata.contextLabel = config.contextLabel;
+        this.metadata.dateModified = config.dateModified;
+
+        // Conversion for individual image panels to slideshow for gallery display
+        config.slides.forEach((slide: Slide) => {
+            if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
+                const newSlide = {
+                    type: 'slideshow',
+                    images: [slide.panel[1]]
+                };
+                Vue.set(slide.panel, 1, newSlide);
+            }
+        });
+
+        const logo = config.introSlide.logo.src;
+        // Fetch the logo from the folder (if it exists).
+        const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
+        const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
+        if (this.configFileStructure.zip.file(logoSrc)) {
+            this.configFileStructure.zip
+                .file(logoSrc)
+                .async('blob')
+                .then((img: any) => {
+                    this.logoImage = new File([img], logoName);
+                    this.metadata.logoPreview = URL.createObjectURL(img);
+                    this.metadata.logoName = logoName;
+                    this.loadStatus = 'loaded';
+                });
+        } else {
+            // Fill in the field with this value whether it exists or not.
+            this.metadata.logoName = logo;
+
+            // If it doesn't exist, maybe it's a remote file?
+            fetch(logo).then((data: any) => {
+                if (data.status !== 404) {
+                    this.logoImage = new File([data], logoName);
+                    this.metadata.logoPreview = logo;
+                }
+                this.loadStatus = 'loaded';
+            });
+        }
+    }
+
+    updateMetadata(
+        key: 'title' | 'introTitle' | 'introSubtitle' | 'contextLink' | 'contextLabel' | 'dateModified',
+        value: string
+    ): void {
+        this.metadata[key] = value;
+    }
+
+    /**
+     * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
+     * to config file. TODO: decide whether to upload file to server (e.g. call generateConfig).
+     */
+    saveMetadata(): void {
+        // update metadata content to existing config only if it has been successfully loaded
+        const config = this.configs[this.lang];
+        if (config !== undefined) {
+            config.title = this.metadata.title;
+            config.introSlide.title = this.metadata.introTitle;
+            config.introSlide.subtitle = this.metadata.introSubtitle;
+            config.contextLink = this.metadata.contextLink;
+            config.contextLabel = this.metadata.contextLabel;
+            config.dateModified = this.metadata.dateModified;
+
+            // If the logo doesn't include HTTP, assume it's a local file.
+            if (!this.metadata.logoName) {
+                config.introSlide.logo.src = '';
+            } else if (!this.metadata.logoName.includes('http')) {
+                config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+                this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+            } else {
+                config.introSlide.logo.src = this.metadata.logoName;
+            }
+        }
+        if (this.$modals.isActive('metadata-edit-modal')) {
+            this.$modals.hide('metadata-edit-modal');
+        }
+    }
+
+    /**
+     * Called when 'next' button is pressed on metadata page to continue to main editor.
+     */
+    continueToEditor(): void {
+        if (this.editExisting) {
+            if (this.configs[this.lang] !== undefined) {
+                this.loadEditor = true;
+                this.updateEditorPath();
+            } else {
+                this.$message.error('No config exists for storylines product.');
+            }
+        } else {
+            // TODO: check for non-empty required metadata fields
+            this.generateNewConfig();
+        }
+    }
+
+    /**
+     * Language toggle.
+     */
+    swapLang(): void {
+        this.lang = this.lang === 'en' ? 'fr' : 'en';
+        this.loadConfig();
+        if (this.loadEditor) {
+            (this.$refs.mainEditor as any).selectSlide(-1);
+        }
+    }
+
+    /**
+     * React to param changes in URL.
+     */
+    beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
+        this.lang = to.params.lang;
+        this.uuid = to.params.uid;
+        this.$i18n.locale = this.lang;
+
+        if (this.uuid) {
+            this.generateRemoteConfig();
+        }
+        next();
+    }
+
+    onLogoSourceInput(e: InputEvent): void {
+        const isImgUrl = (url: string) => {
+            const img = new Image();
+            img.src = url;
+            return new Promise((resolve) => {
+                img.onerror = () => resolve(false);
+                img.onload = () => resolve(true);
+            });
+        };
+
+        this.metadata.logoName = (e.target as HTMLInputElement).value;
+
+        isImgUrl(this.metadata.logoName).then((res) => {
+            if (res) {
+                this.metadata.logoPreview = this.metadata.logoName;
+                this.$message.success('Successfully loaded logo image.');
+            } else {
+                this.metadata.logoPreview = 'error';
+                this.$message.error('Failed to load logo image.');
+            }
+        });
+    }
+
+    onFileChange(e: Event): void {
+        // Retrieve the uploaded file.
+        const uploadedFile = ((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+        this.logoImage = uploadedFile;
+
+        // Generate an image preview.
+        this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
+        this.metadata.logoName = uploadedFile.name;
+    }
+
+    updateEditorPath(): void {
+        if (this.$route.name !== 'editor') {
+            const props = {
+                uid: this.uuid,
+                lang: this.lang,
+                configs: this.configs as any,
+                configFileStructure: this.configFileStructure,
+                sourceCounts: this.sourceCounts,
+                metadata: this.metadata as any
+            };
+            this.$router.push({ name: 'editor', params: props });
+        }
     }
 }
 </script>
+
+<style lang="scss">
+$font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+.storyramp-app {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .h1,
+    .h2,
+    .h3,
+    .h4,
+    .h5,
+    .h6 {
+        font-family: $font-list;
+        line-height: 1.5;
+        border-bottom: 0px;
+    }
+
+    .editor-container {
+        margin: 0 auto;
+    }
+
+    .editor-container label {
+        width: 10vw;
+        text-align: right;
+        margin-right: 15px;
+        display: inline-block;
+    }
+
+    .editor-container h3 {
+        font-size: larger;
+    }
+
+    .editor-container input {
+        padding: 5px 10px;
+        margin-top: 5px;
+        border: 1px solid black;
+        display: inline;
+    }
+
+    .editor-container .input-error {
+        border: 1px solid red;
+    }
+
+    .editor-container button {
+        padding: 5px 12px;
+        margin: 0px 10px;
+        font-weight: 600;
+        transition-duration: 0.2s;
+    }
+
+    .editor-container button:hover:enabled {
+        background-color: #dbdbdb;
+        color: black;
+    }
+
+    .editor-container button:disabled {
+        border: 1px solid gray;
+        color: gray;
+        cursor: not-allowed;
+    }
+
+    .editor-toc button {
+        background-color: #f3f4f6;
+        color: black;
+        border: none;
+        transition-duration: 0.2s;
+        padding: 0.25 0.25em !important;
+    }
+
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        display: inline;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.2s;
+    }
+
+    .fade-enter,
+    .fade-leave-to {
+        opacity: 0;
+    }
+}
+</style>
