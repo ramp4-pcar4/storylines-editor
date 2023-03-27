@@ -285,7 +285,7 @@ export default class SlideEditorV extends Vue {
     };
 
     @Watch('currentSlide', { deep: true })
-    onSlideChange() {
+    onSlideChange(): void {
         this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
     }
 
@@ -378,7 +378,7 @@ export default class SlideEditorV extends Vue {
         this.$emit('slide-change', index);
     }
 
-    cancelTypeChange() {
+    cancelTypeChange(): void {
         (this.$refs.typeSelector as HTMLSelectElement).value = this.currentSlide.panel[this.panelIndex].type;
     }
 

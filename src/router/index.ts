@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import StoryV from '@/components/story/story.vue';
 import LandingV from '@/components/editor/landing.vue';
-import EditorV from '@/components/editor/editor.vue';
+import MetadataEditorV from '@/components/editor/metadata-editor.vue';
 import StoryPreviewV from '@/components/editor/preview.vue';
 import Router, { Route } from 'vue-router';
 
@@ -20,16 +20,27 @@ const routes = [
         meta: { title: 'editor.window.title' }
     },
     {
+        path: '/:lang/editor/:uid',
+        redirect: '/:lang/editor-metadata/:uid'
+    },
+    {
         path: '/:lang/editor-metadata',
         name: 'metadata',
-        component: EditorV,
+        component: MetadataEditorV,
         props: true,
         meta: { title: 'editor.window.title' }
     },
     {
-        path: '/:lang/editor/:uid',
+        path: '/:lang/editor-metadata/:uid',
+        component: MetadataEditorV,
+        props: true,
+        meta: { title: 'editor.window.title' }
+    },
+    {
+        path: '/:lang/editor-main/:uid',
         name: 'editor',
-        component: EditorV,
+        component: MetadataEditorV,
+        props: true,
         meta: { title: 'editor.window.title' }
     },
     {

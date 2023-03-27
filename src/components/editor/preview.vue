@@ -11,7 +11,19 @@
             <header class="sticky top-0 z-50 flex border-b border-black bg-gray-200 py-2 px-2 justify-between">
                 <span class="font-semibold text-lg m-1">{{ config.title }}</span>
                 <!-- TODO: change this route back to the main editor (complete along with #89) -->
-                <router-link :to="{ name: 'home' }" target v-if="!savedProduct">
+                <router-link
+                    :to="{
+                        path: `editor-main/${uid}`,
+                        params: {
+                            config: config,
+                            configFileStructure: configFileStructure,
+                            metadata: metadata,
+                            sourceCounts: sourceCounts
+                        }
+                    }"
+                    target
+                    v-if="!savedProduct"
+                >
                     <button class="bg-white border border-black font-bold hover:bg-gray-100 px-4 py-2">
                         {{ $t('editor.back') }}
                     </button>
@@ -67,14 +79,17 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
     }
 })
 export default class StoryPreviewV extends Vue {
-    @Prop() conf!: StoryRampConfig | undefined;
+    @Prop() conf!: StoryRampConfig;
     @Prop() configFileStructure!: any;
+    @Prop() sourceCounts!: any;
+    @Prop() metadata!: any;
 
     config: StoryRampConfig | undefined = undefined;
     savedProduct = false;
     loadStatus = 'loading';
     activeChapterIndex = -1;
     lang = 'en';
+    uid = '';
 
     created(): void {
         const uid = this.$route.params.uid;
@@ -95,8 +110,9 @@ export default class StoryPreviewV extends Vue {
                     });
                 }
             });
-        } else if (this.conf) {
+        } else if (this.conf && this.configFileStructure) {
             this.config = this.conf;
+            this.uid = this.configFileStructure.uuid;
             this.loadStatus = 'loaded';
         }
 
