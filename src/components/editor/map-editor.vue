@@ -81,7 +81,7 @@ export default class MapEditorV extends Vue {
         window.addEventListener('message', this.saveEditor);
     }
 
-    beforeDestroy() {
+    beforeDestroy(): void {
         window.removeEventListener('message', this.saveEditor);
     }
 
@@ -148,7 +148,7 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    saveEditor(e: any) {
+    saveEditor(e: any): void {
         if (e.data === 'mapSaved') {
             this.status = 'default';
 
