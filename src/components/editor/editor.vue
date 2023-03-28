@@ -31,9 +31,9 @@
                     </button>
 
                     <!-- If config is loading, display a small spinner. -->
-                    <div class="inline-flex" v-if="loadStatus === 'loading'">
+                    <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
                         <spinner
-                            size="20px"
+                            size="24px"
                             background="#00D2D3"
                             color="#009cd1"
                             stroke="2px"
@@ -358,16 +358,16 @@ export default class EditorV extends Vue {
         fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
             if (res.status === 404) {
                 // Product not found.
-                this.$message.error(`The requested UUID ${this.uuid ?? ''} does not exist.`);
+                this.$message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
                 this.error = true;
                 this.loadStatus = 'waiting';
+                this.clearConfig();
             } else {
                 const configZip = new JSZip();
                 // Files retrieved. Convert them into a JSZip object.
                 res.blob().then((file: any) => {
                     configZip.loadAsync(file).then(() => {
                         this.configFileStructureHelper(configZip);
-                        this.$message.success('Successfully loaded storyline!');
                     });
                 });
             }
@@ -463,64 +463,100 @@ export default class EditorV extends Vue {
     loadConfig(): void {
         const configPath = `${this.uuid}_${this.lang}.json`;
 
-        this.configFileStructure.config
-            .file(configPath)
-            .async('string')
-            .then((res: any) => {
-                this.config = JSON.parse(res);
-                this.editExisting ? (this.loadStatus = 'waiting') : (this.loadStatus = 'loaded');
+        try {
+            this.configFileStructure.config
+                .file(configPath)
+                .async('string')
+                .then((res: any) => {
+                    try {
+                        this.config = JSON.parse(res);
+                    } catch {
+                        this.$message.error(`The requested product '${this.uuid ?? ''}' is malformed.`);
+                        this.loadStatus = 'waiting';
+                        this.clearConfig();
+                        return;
+                    }
 
-                // Load in project data.
-                if (this.config) {
-                    this.metadata.title = this.config.title;
-                    this.metadata.introTitle = this.config.introSlide.title;
-                    this.metadata.introSubtitle = this.config.introSlide.subtitle;
-                    this.metadata.contextLink = this.config.contextLink;
-                    this.metadata.contextLabel = this.config.contextLabel;
-                    this.metadata.dateModified = this.config.dateModified;
-                    const logo = this.config.introSlide.logo.src;
-
-                    // Fetch the logo from the folder (if it exists).
-                    const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
-                    const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
-
-                    if (this.configFileStructure.config.file(logoSrc)) {
-                        this.configFileStructure.config
-                            .file(logoSrc)
-                            .async('blob')
-                            .then((img: any) => {
-                                this.logoImage = new File([img], logoName);
-                                this.metadata.logoPreview = URL.createObjectURL(img);
-                                this.metadata.logoName = logoName;
-                            });
+                    if (this.editExisting) {
+                        this.loadStatus = 'waiting';
+                        this.$message.success('Successfully loaded storyline!');
                     } else {
-                        // If it doesn't exist, maybe it's a remote file?
-                        fetch(logo).then((data: any) => {
-                            if (data.status !== 404) {
-                                this.logoImage = new File([data], logoName);
-                                this.metadata.logoPreview = logo;
+                        this.loadStatus = 'loaded';
+                    }
+
+                    // Load in project data.
+                    if (this.config) {
+                        this.metadata.title = this.config.title;
+                        this.metadata.introTitle = this.config.introSlide.title;
+                        this.metadata.introSubtitle = this.config.introSlide.subtitle;
+                        this.metadata.contextLink = this.config.contextLink;
+                        this.metadata.contextLabel = this.config.contextLabel;
+                        this.metadata.dateModified = this.config.dateModified;
+                        const logo = this.config.introSlide.logo.src;
+
+                        // Fetch the logo from the folder (if it exists).
+                        const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
+                        const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
+
+                        if (this.configFileStructure.config.file(logoSrc)) {
+                            this.configFileStructure.config
+                                .file(logoSrc)
+                                .async('blob')
+                                .then((img: any) => {
+                                    this.logoImage = new File([img], logoName);
+                                    this.metadata.logoPreview = URL.createObjectURL(img);
+                                    this.metadata.logoName = logoName;
+                                });
+                        } else {
+                            // If it doesn't exist, maybe it's a remote file?
+                            fetch(logo).then((data: any) => {
+                                if (data.status !== 404) {
+                                    this.logoImage = new File([data], logoName);
+                                    this.metadata.logoPreview = logo;
+                                }
+                            });
+
+                            // Fill in the field with this value whether it exists or not.
+                            this.metadata.logoName = logo;
+                        }
+
+                        this.slides = this.config.slides;
+                        // conversion for individual image panels to slideshow for gallery display
+                        this.slides.forEach((slide: Slide) => {
+                            if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
+                                const newSlide = {
+                                    type: 'slideshow',
+                                    images: [slide.panel[1]]
+                                };
+                                Vue.set(slide.panel, 1, newSlide);
                             }
                         });
 
-                        // Fill in the field with this value whether it exists or not.
-                        this.metadata.logoName = logo;
+                        this.findSources(this.config);
                     }
+                });
+        } catch (error) {
+            this.$message.error('The requested config cannot be loaded');
+        }
+    }
 
-                    this.slides = this.config.slides;
-                    // conversion for individual image panels to slideshow for gallery display
-                    this.slides.forEach((slide: Slide) => {
-                        if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
-                            const newSlide = {
-                                type: 'slideshow',
-                                images: [slide.panel[1]]
-                            };
-                            Vue.set(slide.panel, 1, newSlide);
-                        }
-                    });
+    /**
+     * Called when a nonexistant or malformed UUID is loaded
+     */
+    clearConfig(): void {
+        this.metadata = {
+            title: '',
+            introTitle: '',
+            introSubtitle: '',
+            contextLink: '',
+            contextLabel: '',
+            dateModified: '',
+            logoPreview: '',
+            logoName: ''
+        };
 
-                    this.findSources(this.config);
-                }
-            });
+        this.config = undefined;
+        this.slides = [];
     }
 
     /**
@@ -643,8 +679,10 @@ export default class EditorV extends Vue {
                 ? (this.loadStatus = 'loaded')
                 : this.$message.error('No config exists for storylines product.');
             this.unsavedChanges = false;
+        } else if (!this.uuid) {
+            this.$message.error('Missing required field: UUID');
+            this.error = true;
         } else {
-            // TODO: check for non-empty required metadata fields
             this.generateNewConfig();
         }
     }
