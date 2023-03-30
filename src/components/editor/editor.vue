@@ -87,13 +87,35 @@
                         <tippy delay="200" placement="right">{{ $t('editor.returnToLanding') }}</tippy>
                     </router-link>
                 </span>
-                <div class="ml-3 flex flex-col">
-                    <span class="font-semibold text-lg">{{ metadata.title }}</span>
-                    <span :class="metadata.title ? 'text-xs' : ''">UUID: {{ uuid }}</span>
+                <div class="ml-3">
+                    <div class="flex flex-col">
+                        <span class="font-semibold text-lg">{{ metadata.title }}</span>
+                        <span :class="metadata.title ? 'text-xs' : ''">UUID: {{ uuid }}</span>
+                    </div>
                 </div>
                 <span class="ml-auto"></span>
+
+                <button
+                    v-if="unsavedChanges"
+                    class="items-center border-2 border-red-700 text-red-700 rounded p-1 mr-2"
+                    @click="refreshConfig"
+                >
+                    <svg
+                        class="inline"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="18px"
+                        height="18px"
+                    >
+                        <path
+                            d="M 2 2 L 4.9394531 4.9394531 C 3.1262684 6.7482143 2 9.2427079 2 12 C 2 17.514 6.486 22 12 22 C 17.514 22 22 17.514 22 12 C 22 6.486 17.514 2 12 2 L 12 4 C 16.411 4 20 7.589 20 12 C 20 16.411 16.411 20 12 20 C 7.589 20 4 16.411 4 12 C 4 9.7940092 4.9004767 7.7972757 6.3496094 6.3496094 L 9 9 L 9 2 L 2 2 z"
+                        />
+                    </svg>
+                    <span class="font-normal ml-1">{{ $t('editor.resetChanges') }}</span>
+                    <tippy delay="200" placement="bottom">{{ $t('editor.resetChanges') }}</tippy>
+                </button>
                 <transition name="fade">
-                    <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
+                    <span v-if="unsavedChanges" class="items-center border-2 border-red-700 text-red-700 rounded p-1">
                         <span class="align-middle inline-block mr-1 pb-1 fill-current"
                             ><svg
                                 clip-rule="evenodd"
@@ -115,6 +137,7 @@
                         <span class="align-center inline-block select-none">Unsaved Changes</span>
                     </span>
                 </transition>
+
                 <button @click.stop="unsavedChanges ? $modals.show(`change-lang`) : swapLang()">
                     {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                 </button>
@@ -129,6 +152,7 @@
                         {{ $t('editor.preview') }}
                     </button>
                 </router-link>
+
                 <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                     <span class="inline-block">{{
                         saving ? $t('editor.savingChanges') : $t('editor.saveChanges')
@@ -143,6 +167,7 @@
                         ></spinner>
                     </span>
                 </button>
+
                 <router-link
                     :to="{
                         path: `editor-preview/${uuid}`
@@ -504,6 +529,8 @@ export default class EditorV extends Vue {
         if (this.configs[this.lang]) {
             this.useConfig(this.configs[this.lang]!);
 
+            // Reset source sounts before re-counting.
+            this.sourceCounts = {};
             this.findSources(this.configs);
         }
     }
@@ -556,6 +583,40 @@ export default class EditorV extends Vue {
         });
     }
 
+    refreshConfig() {
+        // Reset selected slide.
+        this.currentSlide = '';
+
+        // Re-fetch the product from the server.
+        if (this.editExisting) {
+            this.generateRemoteConfig();
+        } else {
+            // This is a new product we want to refresh, so generate a new config with reset fields
+            // and set loadStatus back to waiting.
+            this.resetConfig();
+            this.generateNewConfig();
+            setTimeout(() => {
+                this.loadStatus = 'waiting';
+            }, 10);
+        }
+    }
+
+    resetConfig() {
+        this.slides = [];
+        this.metadata = {
+            title: '',
+            introTitle: '',
+            introSubtitle: '',
+            logoPreview: '',
+            logoName: '',
+            contextLink: '',
+            contextLabel: '',
+            dateModified: ''
+        };
+        this.sourceCounts = {};
+        this.logoImage = undefined;
+    }
+
     /**
      * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
      * with the new changes, then generates and submits the product file to the server.
@@ -586,6 +647,9 @@ export default class EditorV extends Vue {
                     res.status; // HTTP status
                     this.unsavedChanges = false;
                     this.$message.success('Successfully saved changes!');
+
+                    // If this was a new product, mark it as existing now.
+                    this.editExisting = true;
                 })
                 .catch(() => {
                     this.$message.error('Failed to save changes.');
