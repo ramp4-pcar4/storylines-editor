@@ -91,62 +91,78 @@
                     <span class="font-semibold text-lg">{{ metadata.title }}</span>
                     <span :class="metadata.title ? 'text-xs' : ''">UUID: {{ uuid }}</span>
                 </div>
-                <span class="ml-auto"></span>
-                <transition name="fade">
-                    <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
-                        <span class="align-middle inline-block mr-1 pb-1 fill-current"
-                            ><svg
-                                clip-rule="evenodd"
-                                fill-rule="evenodd"
-                                class="fill-red-600"
-                                width="18"
-                                height="18"
-                                stroke-linejoin="round"
-                                stroke-miterlimit="2"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="m12.002 21.534c5.518 0 9.998-4.48 9.998-9.998s-4.48-9.997-9.998-9.997c-5.517 0-9.997 4.479-9.997 9.997s4.48 9.998 9.997 9.998zm0-1.5c-4.69 0-8.497-3.808-8.497-8.498s3.807-8.497 8.497-8.497 8.498 3.807 8.498 8.497-3.808 8.498-8.498 8.498zm0-6.5c-.414 0-.75-.336-.75-.75v-5.5c0-.414.336-.75.75-.75s.75.336.75.75v5.5c0 .414-.336.75-.75.75zm-.002 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"
-                                    fill-rule="nonzero"
-                                />
-                            </svg>
-                        </span>
-                        <span class="align-center inline-block select-none">Unsaved Changes</span>
-                    </span>
-                </transition>
-                <router-link
-                    :to="{
-                        name: 'preview',
-                        params: { conf: config, configFileStructure: configFileStructure }
-                    }"
-                >
-                    <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
-                        {{ $t('editor.preview') }}
+
+                <div class="flex align-middle">
+                    <span class="ml-auto"></span>
+                    <button
+                        v-if="unsavedChanges && editExisting"
+                        class="border-2 border-red-700 text-red-700 rounded p-1 mr-2"
+                        @click="refreshConfig"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px">
+                            <path
+                                d="M 2 2 L 4.9394531 4.9394531 C 3.1262684 6.7482143 2 9.2427079 2 12 C 2 17.514 6.486 22 12 22 C 17.514 22 22 17.514 22 12 C 22 6.486 17.514 2 12 2 L 12 4 C 16.411 4 20 7.589 20 12 C 20 16.411 16.411 20 12 20 C 7.589 20 4 16.411 4 12 C 4 9.7940092 4.9004767 7.7972757 6.3496094 6.3496094 L 9 9 L 9 2 L 2 2 z"
+                            />
+                        </svg>
+                        <tippy delay="200" placement="bottom">{{ $t('editor.resetChanges') }}</tippy>
                     </button>
-                </router-link>
-                <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
-                    <span class="inline-block">{{
-                        saving ? $t('editor.savingChanges') : $t('editor.saveChanges')
-                    }}</span>
-                    <span v-if="saving" class="align-middle inline-block px-1"
-                        ><spinner
-                            size="16px"
-                            background="#6B7280"
-                            color="#FFFFFF"
-                            stroke="2px"
-                            class="ml-1 mb-1"
-                        ></spinner>
-                    </span>
-                </button>
-                <router-link
-                    :to="{
-                        path: `editor-preview/${uuid}`
-                    }"
-                    target="_blank"
-                >
-                    <button class="bg-white border border-black hover:bg-gray-100">View Saved Product</button>
-                </router-link>
+                    <transition name="fade">
+                        <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
+                            <span class="align-middle inline-block mr-1 pb-1 fill-current"
+                                ><svg
+                                    clip-rule="evenodd"
+                                    fill-rule="evenodd"
+                                    class="fill-red-600"
+                                    width="18"
+                                    height="18"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="m12.002 21.534c5.518 0 9.998-4.48 9.998-9.998s-4.48-9.997-9.998-9.997c-5.517 0-9.997 4.479-9.997 9.997s4.48 9.998 9.997 9.998zm0-1.5c-4.69 0-8.497-3.808-8.497-8.498s3.807-8.497 8.497-8.497 8.498 3.807 8.498 8.497-3.808 8.498-8.498 8.498zm0-6.5c-.414 0-.75-.336-.75-.75v-5.5c0-.414.336-.75.75-.75s.75.336.75.75v5.5c0 .414-.336.75-.75.75zm-.002 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"
+                                        fill-rule="nonzero"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="align-center inline-block select-none">Unsaved Changes</span>
+                        </span>
+                    </transition>
+
+                    <router-link
+                        :to="{
+                            name: 'preview',
+                            params: { conf: config, configFileStructure: configFileStructure }
+                        }"
+                    >
+                        <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
+                            {{ $t('editor.preview') }}
+                        </button>
+                    </router-link>
+                    <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
+                        <span class="inline-block">{{
+                            saving ? $t('editor.savingChanges') : $t('editor.saveChanges')
+                        }}</span>
+                        <span v-if="saving" class="align-middle inline-block px-1"
+                            ><spinner
+                                size="16px"
+                                background="#6B7280"
+                                color="#FFFFFF"
+                                stroke="2px"
+                                class="ml-1 mb-1"
+                            ></spinner>
+                        </span>
+                    </button>
+                    <router-link
+                        :to="{
+                            path: `editor-preview/${uuid}`
+                        }"
+                        target="_blank"
+                    >
+                        <button class="bg-white border border-black hover:bg-gray-100">View Saved Product</button>
+                    </router-link>
+                </div>
             </div>
             <div class="flex">
                 <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
@@ -518,9 +534,19 @@ export default class EditorV extends Vue {
                         }
                     });
 
+                    // Reset source sounts before re-counting.
+                    this.sourceCounts = {};
                     this.findSources(this.config);
                 }
             });
+    }
+
+    refreshConfig() {
+        // Reset selected slide.
+        this.currentSlide = '';
+
+        // Re-fetch the product from the server.
+        this.generateRemoteConfig();
     }
 
     /**
