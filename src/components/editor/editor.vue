@@ -119,16 +119,9 @@
                     {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                 </button>
                 <confirmation-modal :name="`change-lang`" :message="$t('editor.changeLang.modal')" @Ok="swapLang()" />
-                <router-link
-                    :to="{
-                        name: 'preview',
-                        params: { conf: configs[lang], configFileStructure: configFileStructure }
-                    }"
-                >
-                    <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
-                        {{ $t('editor.preview') }}
-                    </button>
-                </router-link>
+                <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
+                    {{ $t('editor.preview') }}
+                </button>
                 <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                     <span class="inline-block">{{
                         saving ? $t('editor.savingChanges') : $t('editor.saveChanges')
@@ -701,6 +694,12 @@ export default class EditorV extends Vue {
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as any).saveChanges();
         }
+        const routeData = this.$router.resolve({ name: 'preview' });
+        const previewTab = window.open(routeData.href, '_blank');
+        (previewTab as any).props = {
+            config: JSON.parse(JSON.stringify(this.configs[this.lang])),
+            configFileStructure: this.configFileStructure
+        };
     }
 
     /**

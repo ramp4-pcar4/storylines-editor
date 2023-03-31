@@ -10,12 +10,6 @@
         <div class="storyramp-app bg-white" v-if="config !== undefined">
             <header class="sticky top-0 z-50 flex border-b border-black bg-gray-200 py-2 px-2 justify-between">
                 <span class="font-semibold text-lg m-1">{{ config.title }}</span>
-                <!-- TODO: change this route back to the main editor (complete along with #89) -->
-                <router-link :to="{ name: 'home' }" target v-if="!savedProduct">
-                    <button class="bg-white border border-black font-bold hover:bg-gray-100 px-4 py-2">
-                        {{ $t('editor.back') }}
-                    </button>
-                </router-link>
             </header>
 
             <introduction :config="config.introSlide" :configFileStructure="configFileStructure"></introduction>
@@ -67,10 +61,8 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
     }
 })
 export default class StoryPreviewV extends Vue {
-    @Prop() conf!: StoryRampConfig | undefined;
-    @Prop() configFileStructure!: any;
-
     config: StoryRampConfig | undefined = undefined;
+    configFileStructure: any;
     savedProduct = false;
     loadStatus = 'loading';
     activeChapterIndex = -1;
@@ -95,8 +87,9 @@ export default class StoryPreviewV extends Vue {
                     });
                 }
             });
-        } else if (this.conf) {
-            this.config = this.conf;
+        } else {
+            this.config = (window as any).props.config;
+            this.configFileStructure = (window as any).props.configFileStructure;
             this.loadStatus = 'loaded';
         }
 
