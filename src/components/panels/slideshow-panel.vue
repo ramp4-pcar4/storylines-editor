@@ -61,8 +61,8 @@ export default class SlideshowPanelV extends Vue {
         if (this.configFileStructure) {
             this.config.images.forEach((image) => {
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
-                if (this.configFileStructure.config.file(assetSrc)) {
-                    this.configFileStructure.config
+                if (this.configFileStructure.zip.file(assetSrc)) {
+                    this.configFileStructure.zip
                         .file(assetSrc)
                         .async('blob')
                         .then((res: any) => {

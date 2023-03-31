@@ -12,6 +12,48 @@
                 </span>
                 <span class="align-middle inline-block">{{ $t('editor.slides.addSlide') }}</span>
             </button>
+            <button @click.stop="$modals.show(`copy-from-other-lang`)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                    <path
+                        d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z"
+                    />
+                </svg>
+                <tippy delay="200" placement="right">{{ $t('editor.slides.copyFromLang') }}</tippy>
+            </button>
+            <vue-modal :name="`copy-from-other-lang`">
+                <h2 slot="header" class="text-xl font-bold">{{ $t('editor.slides.copyFromLang') }}</h2>
+                <div class="flex flex-col">
+                    <button
+                        class="w-32 h-12 ml-0"
+                        @click="copyAllFromOtherLang(configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides)"
+                    >
+                        Copy All
+                    </button>
+                    <span class="text-lg font-bold my-6"> {{ $t('or') }} </span>
+                    <div class="flex">
+                        <select v-model="selectedForCopying" class="overflow-ellipsis copy-select">
+                            <option
+                                v-for="(slide, index) in configFileStructure.configs[lang === 'en' ? 'fr' : 'en']
+                                    .slides"
+                                :value="index"
+                                :key="slide.title + index"
+                            >
+                                Slide {{ index + ': ' + slide.title }}
+                            </option>
+                        </select>
+
+                        <button
+                            @click="
+                                copyFromOtherLang(
+                                    configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides[selectedForCopying]
+                                )
+                            "
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </vue-modal>
         </div>
         <ul>
             <draggable :list="slides" @update="$emit('slides-updated', slides)">
@@ -103,6 +145,7 @@ export default class SlideTocV extends Vue {
 
     total = 0;
     $modals: any;
+    selectedForCopying = 0;
 
     selectSlide(index: number): void {
         this.$emit('slide-change', index);
@@ -128,8 +171,19 @@ export default class SlideTocV extends Vue {
         this.total++;
     }
 
+    copyFromOtherLang(slide: any) {
+        this.slides.splice(this.slides.length, 0, cloneDeep(slide));
+        this.$emit('slides-updated', this.slides);
+    }
+
+    copyAllFromOtherLang(slides: any[]) {
+        this.slides.splice(this.slides.length, 0, ...slides.map((slide) => cloneDeep(slide)));
+        this.$emit('slides-updated', this.slides);
+    }
+
     copySlide(index: number): void {
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
+        this.$emit('slides-updated', this.slides);
     }
 
     removeSlide(index: number): void {
@@ -206,5 +260,9 @@ export default class SlideTocV extends Vue {
 
 .toc-slide button:hover {
     background: none !important;
+}
+
+.copy-select {
+    width: 450px;
 }
 </style>

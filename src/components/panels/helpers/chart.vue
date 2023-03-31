@@ -64,9 +64,9 @@ export default class ChartV extends Vue {
             const assetSrc = `${this.config.src.substring(this.config.src.indexOf('/') + 1)}`;
 
             if (extension === 'json') {
-                if (this.configFileStructure && this.configFileStructure.config.file(assetSrc)) {
+                if (this.configFileStructure && this.configFileStructure.zip.file(assetSrc)) {
                     // First attempt to fetch the configuration file from the ZIP folder.
-                    this.configFileStructure.config
+                    this.configFileStructure.zip
                         .file(assetSrc)
                         .async('string')
                         .then((res: any) => {
@@ -94,9 +94,9 @@ export default class ChartV extends Vue {
                     });
                 }
             } else if (extension === 'csv') {
-                if (this.configFileStructure && this.configFileStructure.config.file(assetSrc)) {
+                if (this.configFileStructure && this.configFileStructure.zip.file(assetSrc)) {
                     // First attempt to fetch the configuration file from the ZIP folder.
-                    this.configFileStructure.config
+                    this.configFileStructure.zip
                         .file(assetSrc)
                         .async('blob')
                         .then((res: any) => {
