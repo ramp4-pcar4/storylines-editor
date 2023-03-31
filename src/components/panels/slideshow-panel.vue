@@ -1,6 +1,10 @@
 <template>
     <div v-if="config.images.length === 1">
-        <image-panel :config="config.images[0]" :configFileStructure="configFileStructure"></image-panel>
+        <image-panel
+            :config="config.images[0]"
+            :configFileStructure="configFileStructure"
+            :key="config.images[0].src"
+        ></image-panel>
     </div>
     <div v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <full-screen :expandable="config.fullscreen" :type="config.type">
@@ -67,6 +71,7 @@ export default class SlideshowPanelV extends Vue {
                         .async('blob')
                         .then((res: any) => {
                             image.src = URL.createObjectURL(res);
+                            this.$forceUpdate();
                         });
                 }
             });
