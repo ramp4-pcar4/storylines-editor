@@ -13,13 +13,20 @@
                 </div>
 
                 <div class="border py-5 w-5/6">
-                    <label>{{ $t('editor.uuid') }}:</label>
+                    <label
+                        ><span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:</label
+                    >
                     <input
                         type="text"
-                        @input="error = false"
+                        @input="
+                            {
+                                error = false;
+                                reqFields.uuid = true;
+                            }
+                        "
                         v-model="uuid"
                         class="w-1/3"
-                        :class="error ? 'input-error' : ''"
+                        :class="error || !reqFields.uuid ? 'input-error' : ''"
                     />
                     <button
                         @click="generateRemoteConfig"
@@ -252,6 +259,10 @@ export default class EditorV extends Vue {
     currentSlide: any = '';
     slideIndex = -1;
     $modals: any;
+    // add more required metadata fields to here as needed
+    reqFields: { uuid: boolean } = {
+        uuid: true
+    };
     metadata = {
         title: '',
         introTitle: '',
@@ -284,6 +295,16 @@ export default class EditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.config = undefined;
         this.configFileStructure = undefined;
+
+        // set any metadata default values for creating new product
+        if (!this.editExisting) {
+            // set current date as default
+            const curDate = new Date();
+            const year = curDate.getFullYear();
+            const month = (curDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = curDate.getDate().toString().padStart(2, '0');
+            this.metadata.dateModified = `${year}-${month}-${day}`;
+        }
 
         // If a product UUID is provided, fetch the contents from the server.
         if (this.$route.params.uid) {
@@ -360,6 +381,7 @@ export default class EditorV extends Vue {
                 // Product not found.
                 this.$message.error(`The requested UUID ${this.uuid ?? ''} does not exist.`);
                 this.error = true;
+                this.clearMetadata();
                 this.loadStatus = 'waiting';
             } else {
                 const configZip = new JSZip();
@@ -576,6 +598,23 @@ export default class EditorV extends Vue {
     }
 
     /**
+     * Clear all metadata fields. Called when loading invalid UUID and need to erase
+     * previously populated metadata content.
+     */
+    clearMetadata(): void {
+        this.metadata = {
+            title: '',
+            introTitle: '',
+            introSubtitle: '',
+            logoPreview: '',
+            logoName: '',
+            contextLink: '',
+            contextLabel: '',
+            dateModified: ''
+        };
+    }
+
+    /**
      * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
      * to config file. TODO: decide whether to upload file to server (e.g. call generateConfig).
      */
@@ -638,10 +677,14 @@ export default class EditorV extends Vue {
      * Called when 'next' button is pressed on metadata page to continue to main editor.
      */
     continueToEditor(): void {
+        if (!this.checkRequiredFields()) {
+            return;
+        }
+
         if (this.editExisting) {
-            this.config !== undefined
+            this.config !== undefined && this.uuid === this.configFileStructure.uuid
                 ? (this.loadStatus = 'loaded')
-                : this.$message.error('No config exists for storylines product.');
+                : this.$message.error('Invalid UUID for existing storylines product.');
             this.unsavedChanges = false;
         } else {
             // TODO: check for non-empty required metadata fields
@@ -720,6 +763,17 @@ export default class EditorV extends Vue {
             e.preventDefault();
             e.returnValue = '';
         }
+    }
+
+    checkRequiredFields(): boolean {
+        // check if all required metadata fields are non-empty
+        this.reqFields.uuid = !!this.uuid;
+        if (Object.values(this.reqFields).some((field: boolean) => !field)) {
+            this.$message.error(`Please fill out the required fields before proceeding.`);
+            return false;
+        }
+
+        return true;
     }
 }
 </script>
