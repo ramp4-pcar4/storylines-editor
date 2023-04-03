@@ -49,6 +49,16 @@ editor.chart.label.info,Interactive charts ({num}),1,Interactive charts ({num}),
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Are you sure you want to delete the chart {name}?,0
 editor.map.label.create,Create New Configuration File,1,Create New Configuration File,0
 editor.map.label.edit,Edit Map Configuration,1,Edit Map Configuration,0
+editor.map.timeslider.enable,Enable Time Slider:,1,Enable Time Slider:,0
+editor.map.timeslider.edit,Edit Time Slider Config,1,Edit Time Slider Config,0
+editor.map.timeslider.range,Range:,1,Range:,0
+editor.map.timeslider.start,Start:,1,Start:,0
+editor.map.timeslider.attribute,Attribute:,1,Attribute:,0
+editor.map.timeslider.to,to,1,to,0
+editor.map.timeslider.warning,⚠️Warning! Please ensure that:,1,⚠️Warning! Please ensure that:,0
+editor.map.timeslider.warning.bullet1,All range and start values are positive integers.,1,All range and start values are positive integers.,0
+editor.map.timeslider.warning.bullet2,The "to" value is greater than or equal to the "from" value.,1,The "to" value is greater than or equal to the "from" value.,0
+editor.map.timeslider.warning.end,"Otherwise, your time slider config cannot be saved.",1,"Otherwise, your time slider config cannot be saved.",0
 editor.slides.title,SLIDES,1,SLIDES,0
 editor.slides.addSlide,"New Slide",1,"New Slide",0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copy slides from the other language",0

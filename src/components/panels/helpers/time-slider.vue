@@ -1,5 +1,5 @@
 <template>
-    <div class="time-slider">
+    <div class="time-slider absolute w-full left-0 flex flex-col items-center bg-white">
         <button
             class="absolute top-1 left-4 play-button"
             @click="intervalID >= 0 ? endLoop() : startLoop()"
@@ -187,8 +187,6 @@ export default class TimeSlider extends Vue {
 <style lang="scss">
 .time-slider {
     @import './../../../../node_modules/nouislider/dist/nouislider';
-
-    @apply absolute w-full left-0 flex flex-col items-center bg-white;
 
     height: 150px;
     pointer-events: all;

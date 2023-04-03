@@ -4,12 +4,22 @@
         <input type="text" v-model="panel.title" />
 
         <div v-if="status === 'editing'">
-            <label class="mt-2">Enable Scrollguard:</label>
+            <label class="mt-6">Enable Scrollguard:</label>
             <input type="checkbox" @change="panel.scrollguard = $event.target.value" v-model="panel.scrollguard" />
             <span class="ml-6"></span>
-            <label class="mt-2">Enable Time Slider:</label>
-            <input type="checkbox" @change="usingTimeSlider = $event.target.value" v-model="usingTimeSlider" />
+            <label class="mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
+            <input type="checkbox" @change="saveTimeSlider" v-model="usingTimeSlider" />
+            <span class="mx-4"></span>
+            <button
+                v-if="usingTimeSlider"
+                class="bg-black text-white hover:bg-gray-800 mt-3"
+                @click="$modals.show('time-slider-edit-modal')"
+            >
+                {{ $t('editor.map.timeslider.edit') }}
+            </button>
             <br />
+
+            <div class="mb-4" v-if="usingTimeSlider"></div>
 
             <div class="flex justify-between mb-4">
                 <label class="mt-2">Map Editor:</label>
@@ -50,6 +60,23 @@
                 </li>
             </ul>
         </div>
+        <vue-modal name="time-slider-edit-modal" :outer-close="false" :hide-close-btn="true" size="md">
+            <h2 slot="header" class="text-lg font-bold">{{ $t('editor.map.timeslider.edit') }}</h2>
+            <time-slider-editor
+                :config="timeSliderConf"
+                :error="timeSliderError"
+                @time-slider-changed="onTimeSliderInput"
+            ></time-slider-editor>
+            <div class="w-full flex justify-end">
+                <button
+                    :class="timeSliderError ? '' : 'bg-black text-white hover:bg-gray-800'"
+                    :disabled="timeSliderError"
+                    @click="saveTimeSlider"
+                >
+                    Done
+                </button>
+            </div>
+        </vue-modal>
     </div>
 </template>
 
@@ -57,9 +84,13 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import defaultConfigEn from '../../../public/scripts/ramp-editor/samples/map_en.json';
 import defaultConfigFr from '../../../public/scripts/ramp-editor/samples/map_fr.json';
+import { TimeSliderConfig } from '@/definitions';
+import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 
 @Component({
-    components: {}
+    components: {
+        'time-slider-editor': TimeSliderEditorV
+    }
 })
 export default class MapEditorV extends Vue {
     @Prop() panel!: any;
@@ -71,14 +102,24 @@ export default class MapEditorV extends Vue {
     newFileName = '';
 
     // TimeSlider
-    usingTimeSlider = false;
-
+    usingTimeSlider = !!this.panel.timeSlider;
+    timeSliderError = false;
+    timeSliderConf: TimeSliderConfig = { range: [], start: [], attribute: '' };
+    $modals: any;
     status = this.panel.config !== '' ? 'default' : 'creating';
     strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[3].split('.')[0] : '';
 
     mounted(): void {
         // If a message is received, it means the map save button was pressed.
         window.addEventListener('message', this.saveEditor);
+        this.timeSliderConf = JSON.parse(
+            JSON.stringify({
+                range: this.panel.timeSlider?.range ?? [1000, new Date().getFullYear()],
+                start: this.panel.timeSlider?.start ?? [1000, new Date().getFullYear()],
+                attribute: this.panel.timeSlider?.attribute ?? ''
+            })
+        );
+        this.validateTimeSlider();
     }
 
     beforeDestroy() {
@@ -148,7 +189,17 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    saveEditor(e: any) {
+    saveTimeSlider() {
+        if (!this.timeSliderError || !this.usingTimeSlider) {
+            this.panel.timeSlider = this.usingTimeSlider ? this.timeSliderConf : undefined;
+        }
+        this.$parent.$emit('slide-edit');
+        if (this.$modals.isActive('time-slider-edit-modal')) {
+            this.$modals.hide('time-slider-edit-modal');
+        }
+    }
+
+    saveEditor(e: any): void {
         if (e.data === 'mapSaved') {
             this.status = 'default';
 
@@ -160,6 +211,21 @@ export default class MapEditorV extends Vue {
 
             this.$parent.$emit('slide-edit');
         }
+    }
+
+    onTimeSliderInput(property: 'range' | 'start' | 'attribute', index: number, value: string) {
+        property === 'attribute'
+            ? (this.timeSliderConf[property] = value)
+            : (this.timeSliderConf[property][index] = Number(value));
+        this.validateTimeSlider();
+    }
+
+    validateTimeSlider() {
+        this.timeSliderError =
+            this.timeSliderConf.range.some((val) => val < 0 || !Number.isInteger(val)) ||
+            this.timeSliderConf.start.some((val) => val < 0 || !Number.isInteger(val)) ||
+            this.timeSliderConf.range[1] < this.timeSliderConf.range[0] ||
+            this.timeSliderConf.start[1] < this.timeSliderConf.start[0];
     }
 }
 </script>
@@ -196,5 +262,9 @@ select {
     content: url('../../assets/add.svg');
     margin: 0 auto;
     margin-bottom: 20px;
+}
+
+input[type='number'] {
+    width: 76px;
 }
 </style>
