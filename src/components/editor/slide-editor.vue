@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-grow m-5">
+    <div class="sticky top-20 h-auto self-start flex-grow m-5">
         <div v-if="currentSlide !== ''">
             <div class="flex">
                 <div class="flex flex-col">
