@@ -6,7 +6,7 @@
         <v-md-editor
             v-model="panel.content"
             height="400px"
-            left-toolbar="undo redo clear | h bold italic strikethrough quote | ul ol table hr | addLink image code | save"
+            left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper | ul ol table hr | addLink image code | save"
             :toolbar="toolbar"
         ></v-md-editor>
     </div>
@@ -22,6 +22,40 @@ export default class TextEditorV extends Vue {
     @Prop() panel!: any;
 
     toolbar = {
+        subsuper: {
+            title: 'Superscript/Subscript',
+            text: 'T',
+            menus: [
+                {
+                    name: 'Superscript',
+                    text: 'Superscript',
+                    action(editor: any) {
+                        editor.insert((selected: string) => {
+                            const content = selected || ``;
+
+                            return {
+                                text: `<sup>${content}</sup>`,
+                                selected: selected
+                            };
+                        });
+                    }
+                },
+                {
+                    name: 'Subscript',
+                    text: 'Subscript',
+                    action(editor: any) {
+                        editor.insert((selected: string) => {
+                            const content = selected || ``;
+
+                            return {
+                                text: `<sub>${content}</sub>`,
+                                selected: selected
+                            };
+                        });
+                    }
+                }
+            ]
+        },
         addLink: {
             title: 'Insert Link',
             icon: 'v-md-icon-link',
