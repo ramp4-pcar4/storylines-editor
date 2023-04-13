@@ -152,16 +152,16 @@ export default class DynamicEditorV extends Vue {
     newSlideName = '';
     newSlideType = 'text';
 
-    get idUsed() {
+    get idUsed(): any {
         return this.panel.children.some((ch: any) => ch.id === this.newSlideName);
     }
 
-    changePanel(target: string) {
+    changePanel(target: string): void {
         this.saveChanges();
         this.editingStatus = target;
     }
 
-    switchSlide(idx: number) {
+    switchSlide(idx: number): void {
         // Save slide changes if neccessary and switch to the newly selected slide.
         this.saveChanges();
         this.editingSlide = idx;
@@ -175,7 +175,7 @@ export default class DynamicEditorV extends Vue {
         }
     }
 
-    removeSlide(item: any) {
+    removeSlide(item: any): void {
         const panel = this.panel.children.find((panel: any, idx: number) => idx === item).panel;
 
         // Update source counts based on which panel is removed.
@@ -215,7 +215,7 @@ export default class DynamicEditorV extends Vue {
         }
     }
 
-    createNewSlide() {
+    createNewSlide(): void {
         if (!this.newSlideName) return;
 
         const newConfig = {
@@ -227,7 +227,7 @@ export default class DynamicEditorV extends Vue {
         this.panel.children.push(newConfig);
     }
 
-    saveChanges() {
+    saveChanges(): void {
         if (this.$refs.slide !== undefined && typeof (this.$refs.slide as any).saveChanges === 'function') {
             (this.$refs.slide as any).saveChanges();
         }
