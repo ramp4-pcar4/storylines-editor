@@ -16,11 +16,36 @@
                     <label>{{ $t('editor.uuid') }}:</label>
                     <input
                         type="text"
-                        @input="error = false"
+                        @input="
+                            error = false;
+                            checkUuid();
+                        "
                         v-model="uuid"
                         class="w-1/3"
                         :class="error ? 'input-error' : ''"
                     />
+                    <span v-if="warning" class="text-yellow-500 rounded p-1 ml-2">
+                        <span class="align-middle inline-block mr-1 pb-1 fill-current">
+                            <svg
+                                clip-rule="evenodd"
+                                fill-rule="evenodd"
+                                stroke-linejoin="round"
+                                stroke-miterlimit="2"
+                                viewBox="0 0 24 24"
+                                width="18"
+                                height="18"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="m2.095 19.886 9.248-16.5c.133-.237.384-.384.657-.384.272 0 .524.147.656.384l9.248 16.5c.064.115.096.241.096.367 0 .385-.309.749-.752.749h-18.496c-.44 0-.752-.36-.752-.749 0-.126.031-.252.095-.367zm9.907-6.881c-.414 0-.75.336-.75.75v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5c0-.414-.336-.75-.75-.75zm-.002-3c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1z"
+                                    fill-rule="nonzero"
+                                />
+                            </svg>
+                        </span>
+                        <span class="align-center inline-block select-none"
+                            >UUID already exists. Saving this will overwrite existing product.</span
+                        >
+                    </span>
                     <button
                         @click="generateRemoteConfig"
                         class="bg-black text-white hover:bg-gray-800"
@@ -31,9 +56,9 @@
                     </button>
 
                     <!-- If config is loading, display a small spinner. -->
-                    <div class="inline-flex" v-if="loadStatus === 'loading'">
+                    <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
                         <spinner
-                            size="20px"
+                            size="24px"
                             background="#00D2D3"
                             color="#009cd1"
                             stroke="2px"
@@ -66,9 +91,17 @@
                     <router-link :to="{ name: 'home' }" target>
                         <button>{{ $t('editor.back') }}</button>
                     </router-link>
-                    <button @click="continueToEditor" class="bg-black text-white px-8">
+                    <button
+                        @click="!warning ? continueToEditor() : $modals.show(`confirm-uuid-overwrite`)"
+                        class="bg-black text-white px-8"
+                    >
                         {{ $t('editor.next') }}
                     </button>
+                    <confirmation-modal
+                        :name="`confirm-uuid-overwrite`"
+                        :message="$t(`Are you sure you want to overwrite product '${uuid}'?`)"
+                        @Ok="continueToEditor()"
+                    />
                 </div>
             </div>
         </template>
@@ -160,6 +193,7 @@ export default class MetadataEditorV extends Vue {
     loadStatus = 'waiting';
     loadEditor = false;
     error = false; // whether an error has occurred
+    warning = false; // used for duplicate uuid warning
     lang = 'en';
 
     // Form properties.
@@ -277,23 +311,28 @@ export default class MetadataEditorV extends Vue {
         this.loadStatus = 'loading';
 
         // Attempt to fetch the project from the server.
-        fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
-            if (res.status === 404) {
-                // Product not found.
-                this.$message.error(`The requested UUID ${this.uuid ?? ''} does not exist.`);
-                this.error = true;
-                this.loadStatus = 'waiting';
-            } else {
-                const configZip = new JSZip();
-                // Files retrieved. Convert them into a JSZip object.
-                res.blob().then((file: any) => {
-                    configZip.loadAsync(file).then(() => {
-                        this.configFileStructureHelper(configZip);
-                        this.$message.success('Successfully loaded storyline!');
+        fetch(`http://localhost:6040/retrieve/${this.uuid}`)
+            .then((res: any) => {
+                if (res.status === 404) {
+                    // Product not found.
+                    this.$message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+                    this.error = true;
+                    this.loadStatus = 'waiting';
+                    this.clearConfig();
+                } else {
+                    const configZip = new JSZip();
+                    // Files retrieved. Convert them into a JSZip object.
+                    res.blob().then((file: any) => {
+                        configZip.loadAsync(file).then(() => {
+                            this.configFileStructureHelper(configZip);
+                        });
                     });
-                });
-            }
-        });
+                }
+            })
+            .catch(() => {
+                this.$message.error(`Failed to load product, no response from server`);
+                this.loadStatus = 'loaded';
+            });
     }
 
     findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
@@ -390,18 +429,32 @@ export default class MetadataEditorV extends Vue {
             return;
         }
 
-        await this.configFileStructure.zip
-            .file(`${this.uuid}_en.json`)
-            .async('string')
-            .then((res: any) => {
-                this.configs['en'] = JSON.parse(res);
-            });
-        await this.configFileStructure.zip
-            .file(`${this.uuid}_fr.json`)
-            .async('string')
-            .then((res: any) => {
-                this.configs['fr'] = JSON.parse(res);
-            });
+        try {
+            await this.configFileStructure.zip
+                .file(`${this.uuid}_en.json`)
+                .async('string')
+                .then((res: any) => {
+                    this.configs['en'] = JSON.parse(res);
+                });
+            await this.configFileStructure.zip
+                .file(`${this.uuid}_fr.json`)
+                .async('string')
+                .then((res: any) => {
+                    this.configs['fr'] = JSON.parse(res);
+                });
+        } catch {
+            this.$message.error(`The requested product '${this.uuid ?? ''}' is malformed.`);
+            this.loadStatus = 'waiting';
+            this.clearConfig();
+            return;
+        }
+
+        if (this.editExisting) {
+            this.loadStatus = 'waiting';
+            this.$message.success('Successfully loaded storyline!');
+        } else {
+            this.loadStatus = 'loaded';
+        }
 
         // Load in project data.
         if (this.configs[this.lang]) {
@@ -513,8 +566,10 @@ export default class MetadataEditorV extends Vue {
             } else {
                 this.$message.error('No config exists for storylines product.');
             }
+        } else if (!this.uuid) {
+            this.$message.error('Missing required field: UUID');
+            this.error = true;
         } else {
-            // TODO: check for non-empty required metadata fields
             this.generateNewConfig();
         }
     }
@@ -528,6 +583,35 @@ export default class MetadataEditorV extends Vue {
         if (this.loadEditor) {
             (this.$refs.mainEditor as any).selectSlide(-1);
         }
+    }
+
+    /**
+     * Called when a nonexistant or malformed UUID is loaded
+     */
+    clearConfig(): void {
+        this.metadata = {
+            title: '',
+            introTitle: '',
+            introSubtitle: '',
+            contextLink: '',
+            contextLabel: '',
+            dateModified: '',
+            logoPreview: '',
+            logoName: ''
+        };
+        this.configs = { en: undefined, fr: undefined };
+        this.slides = [];
+    }
+
+    checkUuid(): void {
+        if (!this.editExisting) {
+            fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
+                if (res.status !== 404) {
+                    this.warning = true;
+                }
+            });
+        }
+        this.warning = false;
     }
 
     /**
