@@ -13,16 +13,19 @@
                 </div>
 
                 <div class="border py-5 w-5/6">
-                    <label>{{ $t('editor.uuid') }}:</label>
+                    <label
+                        ><span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:</label
+                    >
                     <input
                         type="text"
                         @input="
                             error = false;
+                            reqFields.uuid = true;
                             checkUuid();
                         "
                         v-model="uuid"
                         class="w-1/3"
-                        :class="error ? 'input-error' : ''"
+                        :class="error || !reqFields.uuid ? 'input-error' : ''"
                     />
                     <span v-if="warning" class="text-yellow-500 rounded p-1 ml-2">
                         <span class="align-middle inline-block mr-1 pb-1 fill-current">
@@ -210,6 +213,10 @@ export default class MetadataEditorV extends Vue {
         contextLabel: '',
         dateModified: ''
     };
+    // add more required metadata fields to here as needed
+    reqFields: { uuid: boolean } = {
+        uuid: true
+    };
     slides: Slide[] = [];
     sourceCounts: any = {};
 
@@ -221,6 +228,16 @@ export default class MetadataEditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
+
+        // set any metadata default values for creating new product
+        if (!this.editExisting) {
+            // set current date as default
+            const curDate = new Date();
+            const year = curDate.getFullYear();
+            const month = (curDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = curDate.getDate().toString().padStart(2, '0');
+            this.metadata.dateModified = `${year}-${month}-${day}`;
+        }
 
         // Find which view to render based on route
         if (this.$route.name === 'editor') {
@@ -556,37 +573,8 @@ export default class MetadataEditorV extends Vue {
     }
 
     /**
-     * Called when 'next' button is pressed on metadata page to continue to main editor.
-     */
-    continueToEditor(): void {
-        if (this.editExisting) {
-            if (this.configs[this.lang] !== undefined) {
-                this.loadEditor = true;
-                this.updateEditorPath();
-            } else {
-                this.$message.error('No config exists for storylines product.');
-            }
-        } else if (!this.uuid) {
-            this.$message.error('Missing required field: UUID');
-            this.error = true;
-        } else {
-            this.generateNewConfig();
-        }
-    }
-
-    /**
-     * Language toggle.
-     */
-    swapLang(): void {
-        this.lang = this.lang === 'en' ? 'fr' : 'en';
-        this.loadConfig();
-        if (this.loadEditor) {
-            (this.$refs.mainEditor as any).selectSlide(-1);
-        }
-    }
-
-    /**
-     * Called when a nonexistant or malformed UUID is loaded
+     * Called when loading a nonexistant or invalid UUID. Clears all previously populated
+     * metadata fields, configs, and slide content.
      */
     clearConfig(): void {
         this.metadata = {
@@ -601,6 +589,17 @@ export default class MetadataEditorV extends Vue {
         };
         this.configs = { en: undefined, fr: undefined };
         this.slides = [];
+    }
+
+    /**
+     * Language toggle.
+     */
+    swapLang(): void {
+        this.lang = this.lang === 'en' ? 'fr' : 'en';
+        this.loadConfig();
+        if (this.loadEditor) {
+            (this.$refs.mainEditor as any).selectSlide(-1);
+        }
     }
 
     checkUuid(): void {
@@ -670,6 +669,39 @@ export default class MetadataEditorV extends Vue {
                 slides: this.slides as any
             };
             this.$router.push({ name: 'editor', params: props });
+        }
+    }
+
+    checkRequiredFields(): boolean {
+        // check if all required metadata fields are non-empty
+        this.reqFields.uuid = !!this.uuid;
+        if (Object.values(this.reqFields).some((field: boolean) => !field)) {
+            this.$message.error(`Please fill out the required fields before proceeding.`);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Called when 'next' button is pressed on metadata page to continue to main editor.
+     */
+    continueToEditor(): void {
+        if (!this.checkRequiredFields()) {
+            return;
+        }
+
+        if (this.editExisting) {
+            if (this.configs[this.lang] !== undefined && this.uuid === this.configFileStructure.uuid) {
+                this.loadEditor = true;
+                this.updateEditorPath();
+            } else {
+                this.$message.error('No config exists for storylines product.');
+            }
+        } else if (!this.uuid) {
+            this.$message.error('Missing required field: UUID');
+            this.error = true;
+        } else {
+            this.generateNewConfig();
         }
     }
 }
