@@ -31,6 +31,7 @@ editor.next,Next,1,Suivant,1
 editor.preview,Preview,1,Aperçu,0
 editor.saveChanges,Save Changes,1,Sauvegarder les Modifications,0
 editor.savingChanges,Saving...,1,Sauver...,0
+editor.resetChanges,Reset Changes,1,Reset Changes,0
 editor.changeLang.modal,"Are you sure you want to switch languages? All unsaved changes will be lost.",1,"Are you sure you want to switch languages? All unsaved changes will be lost.",0
 editor.frenchConfig,View French Config,1,Afficher la configuration française,0
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,0

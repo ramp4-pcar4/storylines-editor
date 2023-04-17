@@ -61,7 +61,9 @@
             </div>
 
             <div class="flex mt-8">
-                <button @click="saveMetadata" class="pl-8">{{ $t('editor.saveChanges') }}</button>
+                <button v-if="editExisting" @click="saveMetadata(true)" class="pl-8">
+                    {{ $t('editor.saveChanges') }}
+                </button>
                 <div class="ml-auto">
                     <router-link :to="{ name: 'home' }" target>
                         <button>{{ $t('editor.back') }}</button>
@@ -81,6 +83,12 @@
                 :metadata="metadata"
                 :slides="slides"
                 :configLang="lang"
+                :saving="saving"
+                :unsavedChanges="unsavedChanges"
+                :editExisting="editExisting"
+                @save-changes="generateConfig"
+                @save-status="updateSaveStatus"
+                @refresh-config="refreshConfig"
                 ref="mainEditor"
             >
                 <template v-slot:langModal="slotProps">
@@ -104,7 +112,9 @@
                             @logo-source-changed="onLogoSourceInput"
                         ></metadata-content>
                         <div class="w-full flex justify-end">
-                            <button class="bg-black text-white hover:bg-gray-800" @click="saveMetadata">Done</button>
+                            <button class="bg-black text-white hover:bg-gray-800" @click="saveMetadata(false)">
+                                Done
+                            </button>
                         </div>
                     </vue-modal>
                 </template>
@@ -131,6 +141,7 @@ import {
 } from '@/definitions';
 
 const JSZip = require('jszip');
+const axios = require('axios').default;
 const { v4: uuidv4 } = require('uuid');
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
@@ -161,6 +172,10 @@ export default class MetadataEditorV extends Vue {
     loadEditor = false;
     error = false; // whether an error has occurred
     lang = 'en';
+
+    // Saving properties.
+    saving = false;
+    unsavedChanges = false;
 
     // Form properties.
     uuid = '';
@@ -200,7 +215,38 @@ export default class MetadataEditorV extends Vue {
                 this.slides = this.$route.params.slides as any;
                 this.sourceCounts = this.$route.params.sourceCounts;
 
-                this.loadStatus = 'loaded';
+                // Load product logo (if provided).
+                const logo = this.configs[this.lang]!.introSlide.logo.src;
+                const logoSrc = `assets/${this.lang}/${this.metadata.logoName}`;
+
+                if (logo) {
+                    if (this.configFileStructure.zip.file(logoSrc)) {
+                        this.configFileStructure.zip
+                            .file(logoSrc)
+                            .async('blob')
+                            .then((img: any) => {
+                                this.logoImage = new File([img], this.metadata.logoName);
+                                this.metadata.logoPreview = URL.createObjectURL(img);
+                                this.loadStatus = 'loaded';
+                            });
+                    } else {
+                        // Fill in the field with this value whether it exists or not.
+                        this.metadata.logoName = logo;
+
+                        // If it doesn't exist, maybe it's a remote file?
+                        fetch(logo).then((data: any) => {
+                            if (data.status !== 404) {
+                                this.logoImage = new File([data], this.metadata.logoName);
+                                this.metadata.logoPreview = logo;
+                            }
+                            this.loadStatus = 'loaded';
+                        });
+                    }
+                } else {
+                    // No logo to load.
+                    this.loadStatus = 'loaded';
+                }
+
                 return;
             }
         }
@@ -465,6 +511,52 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
+    /**
+     * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
+     * with the new changes, then generates and submits the product file to the server.
+     */
+    generateConfig(): StoryRampConfig {
+        this.saving = true;
+        // save current slide final changes before generating config file
+        if (this.$refs.slide !== undefined) {
+            (this.$refs.slide as any).saveChanges();
+        }
+
+        // Update the configuration file.
+        const fileName = `${this.uuid}_${this.lang}.json`;
+        const formattedConfigFile = JSON.stringify(this.configs[this.lang], null, 4);
+
+        this.configFileStructure.zip.file(fileName, formattedConfigFile);
+
+        // Upload the ZIP file.
+        this.configFileStructure.zip.generateAsync({ type: 'blob' }).then((content: any) => {
+            const formData = new FormData();
+            formData.append('data', content, `${this.uuid}.zip`);
+            const headers = { 'Content-Type': 'multipart/form-data' };
+
+            axios
+                .post('http://localhost:6040/upload', formData, { headers })
+                .then((res: any) => {
+                    res.data.files; // binary representation of the file
+                    res.status; // HTTP status
+                    this.unsavedChanges = false;
+                    this.editExisting = true; // if editExisting was false, we can now set it to true
+                    this.$message.success('Successfully saved changes!');
+                })
+                .catch(() => {
+                    this.$message.error('Failed to save changes.');
+                })
+                .finally(() => {
+                    // padding to prevent save button from being clicked rapidly
+                    setTimeout(() => {
+                        this.saving = false;
+                    }, 500);
+                });
+        });
+
+        return this.configFileStructure;
+    }
+
     updateMetadata(
         key: 'title' | 'introTitle' | 'introSubtitle' | 'contextLink' | 'contextLabel' | 'dateModified',
         value: string
@@ -474,9 +566,9 @@ export default class MetadataEditorV extends Vue {
 
     /**
      * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
-     * to config file. TODO: decide whether to upload file to server (e.g. call generateConfig).
+     * to config file. If `publish` is set to true, publish to server as well.
      */
-    saveMetadata(): void {
+    saveMetadata(publish = false): void {
         // update metadata content to existing config only if it has been successfully loaded
         const config = this.configs[this.lang];
         if (config !== undefined) {
@@ -495,6 +587,10 @@ export default class MetadataEditorV extends Vue {
                 this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
             } else {
                 config.introSlide.logo.src = this.metadata.logoName;
+            }
+
+            if (publish) {
+                this.generateConfig();
             }
         }
         if (this.$modals.isActive('metadata-edit-modal')) {
@@ -583,9 +679,37 @@ export default class MetadataEditorV extends Vue {
                 configFileStructure: this.configFileStructure,
                 sourceCounts: this.sourceCounts,
                 metadata: this.metadata as any,
-                slides: this.slides as any
+                slides: this.slides as any,
+                editExisting: this.editExisting as any
             };
             this.$router.push({ name: 'editor', params: props });
+        }
+    }
+
+    /**
+     * Update the unsaved changes value to the payload.
+     */
+    updateSaveStatus(payload: boolean) {
+        this.unsavedChanges = payload;
+    }
+
+    refreshConfig() {
+        // Re-fetch the product from the server.
+        if (this.editExisting) {
+            this.loadEditor = false;
+            this.loadStatus = 'loading';
+            this.generateRemoteConfig();
+        } else {
+            this.generateNewConfig();
+            setTimeout(() => {
+                this.$router.push({
+                    name: 'metadata',
+                    params: {
+                        lang: this.lang,
+                        editExisting: false as any
+                    }
+                });
+            }, 100);
         }
     }
 }
