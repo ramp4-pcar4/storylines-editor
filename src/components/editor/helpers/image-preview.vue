@@ -1,6 +1,6 @@
 <template>
-    <li class="image-item items-center my-8 mx-4 overflow-hidden grabbable">
-        <div class="relative items-center justify-center text-center w-full">
+    <li class="image-item items-center my-8 mx-4 overflow-hidden">
+        <div class="relative items-center justify-center text-center w-full grabbable">
             <button
                 class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
                 @click="() => $emit('delete', imageFile)"
@@ -13,12 +13,14 @@
                     />
                 </svg>
             </button>
-            <img
-                class="image-file object-cover w-full h-full"
-                :title="imageFile.id"
-                :src="imageFile.src"
-                :alt="imageFile.altText"
-            />
+            <div class="flex-grow">
+                <img
+                    class="image-file object-cover w-full h-full"
+                    :title="imageFile.id"
+                    :src="imageFile.src"
+                    :alt="imageFile.altText"
+                />
+            </div>
         </div>
         <slot></slot>
     </li>

@@ -47,9 +47,14 @@
                 :imageFile="image"
                 @delete="deleteImage"
             >
-                <div class="flex mt-4 items-center">
-                    <label class="alt-label">Alt tag:</label>
-                    <input type="text" v-model="image.altText" />
+                <div class="flex mt-4 items-center w-full text-left">
+                    <label class="text-label">Alt tag:</label>
+                    <input class="w-4/5" type="text" v-model="image.altText" @change="onImagesEdited" />
+                </div>
+
+                <div class="flex mt-4 items-center w-full text-left">
+                    <label class="text-label">Caption:</label>
+                    <input class="w-4/5" type="text" v-model="image.caption" @change="onImagesEdited" />
                 </div>
             </ImagePreview>
         </draggable>
@@ -137,6 +142,7 @@ export default class ImageEditorV extends Vue {
                 return {
                     id: file.name,
                     altText: '',
+                    caption: '',
                     src: imageSrc
                 };
             })
@@ -163,6 +169,7 @@ export default class ImageEditorV extends Vue {
                     return {
                         id: file.name,
                         altText: '',
+                        caption: '',
                         src: imageSrc
                     };
                 })
@@ -226,10 +233,9 @@ export default class ImageEditorV extends Vue {
     width: auto !important;
 }
 
-.alt-label {
-    width: 12% !important;
+.text-label {
+    width: 25% !important;
     margin-right: 0.5rem !important;
-    text-align: left !important;
 }
 
 .dragging {

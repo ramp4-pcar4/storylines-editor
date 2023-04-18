@@ -199,6 +199,7 @@ export interface ImageFile {
     id: string;
     src: string;
     altText: string;
+    caption?: string;
     width?: number;
     height?: number;
 }
