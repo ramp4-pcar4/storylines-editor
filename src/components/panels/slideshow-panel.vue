@@ -12,6 +12,7 @@
                         :style="{ width: `${image.width}px`, height: `${image.height}px` }"
                         class="m-auto story-graphic carousel-image"
                     />
+                    <div v-if="image.caption" class="text-center my-8 text-sm" v-html="md.render(image.caption)"></div>
                 </slide>
 
                 <hooper-navigation slot="hooper-addons"></hooper-navigation>
@@ -82,6 +83,8 @@ export default class SlideshowPanelV extends Vue {
     ::v-deep .hooper-navigation svg {
         overflow: visible;
         padding-left: initial !important;
+        border-radius: 100%;
+        background: radial-gradient(white, transparent 75%);
     }
 
     ::v-deep .hooper-indicator {
