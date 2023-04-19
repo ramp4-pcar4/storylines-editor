@@ -209,7 +209,7 @@ export default class SlideTocV extends Vue {
             case 'map':
                 this.sourceCounts[panel.config] -= 1;
                 if (this.sourceCounts[panel.config] === 0) {
-                    this.configFileStructure.config.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+                    this.configFileStructure.zip.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
                 }
                 break;
 
@@ -217,7 +217,7 @@ export default class SlideTocV extends Vue {
                 panel.charts.forEach((chart: any) => {
                     this.sourceCounts[chart.src] -= 1;
                     if (this.sourceCounts[chart.src] === 0) {
-                        this.configFileStructure.config.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
+                        this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
@@ -226,7 +226,7 @@ export default class SlideTocV extends Vue {
                 panel.images.forEach((image: any) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
-                        this.configFileStructure.config.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                        this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
