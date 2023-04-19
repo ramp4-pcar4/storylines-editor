@@ -61,14 +61,28 @@ export default class TextEditorV extends Vue {
             icon: 'v-md-icon-link',
             menus: [
                 {
-                    name: 'Add External Link',
-                    text: 'Add External Link',
+                    name: 'Add External Link (New Tab)',
+                    text: 'Add External Link (New Tab)',
                     action(editor: any) {
                         editor.insert((selected: string) => {
                             const content = selected || ``;
 
                             return {
                                 text: `[${content}](http://)`,
+                                selected: selected
+                            };
+                        });
+                    }
+                },
+                {
+                    name: 'Add External Link (Same Tab)',
+                    text: 'Add External Link (Same Tab)',
+                    action(editor: any) {
+                        editor.insert((selected: string) => {
+                            const content = selected || ``;
+
+                            return {
+                                text: `<a href='http://' target='_self'>${content}</a>`,
                                 selected: selected
                             };
                         });
