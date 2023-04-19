@@ -43,35 +43,15 @@
                 </span>
             </transition>
             <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
-            <router-link
-                :to="{
-                    name: 'preview',
-                    params: {
-                        conf: configs[configLang],
-                        configFileStructure: configFileStructure,
-                        metadata: metadata,
-                        sourceCounts: sourceCounts
-                    }
-                }"
-            >
-                <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
-                    {{ $t('editor.preview') }}
-                </button>
-            </router-link>
+            <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
+                {{ $t('editor.preview') }}
+            </button>
             <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
                 <span v-if="saving" class="align-middle inline-block px-1"
                     ><spinner size="16px" background="#6B7280" color="#FFFFFF" stroke="2px" class="ml-1 mb-1"></spinner>
                 </span>
             </button>
-            <router-link
-                :to="{
-                    path: `/${$route.params.lang}/editor-preview/${uuid}`
-                }"
-                target="_blank"
-            >
-                <button class="bg-white border border-black hover:bg-gray-100">View Saved Product</button>
-            </router-link>
         </div>
         <div class="flex">
             <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
@@ -266,6 +246,12 @@ export default class EditorV extends Vue {
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as any).saveChanges();
         }
+        const routeData = this.$router.resolve({ name: 'preview' });
+        const previewTab = window.open(routeData.href, '_blank');
+        (previewTab as any).props = {
+            config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
+            configFileStructure: this.configFileStructure
+        };
     }
 
     beforeWindowUnload(e: any): void {
