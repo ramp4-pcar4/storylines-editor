@@ -38,7 +38,7 @@
         <draggable
             v-model="imagePreviews"
             v-show="!imagePreviewsLoading && imagePreviews.length"
-            class="flex flex-wrap list-none"
+            class="flex flex-wrap list-none border my-4"
             @update="onImagesEdited"
         >
             <ImagePreview
@@ -58,6 +58,11 @@
                 </div>
             </ImagePreview>
         </draggable>
+
+        <div v-show="imagePreviews.length > 1" class="flex items-center w-full text-left">
+            <label class="text-label">Slideshow Caption:</label>
+            <input class="w-3/5" type="text" v-model="slideshowCaption" @change="onImagesEdited" />
+        </div>
     </div>
 </template>
 
@@ -85,6 +90,7 @@ export default class ImageEditorV extends Vue {
     imagePreviewsLoading = false;
     imagePreviewPromises = [] as Array<Promise<ImageFile>>;
     imagePreviews = [] as Array<ImageFile>;
+    slideshowCaption = '';
 
     get isDragging(): boolean {
         return this.dragging;
@@ -120,6 +126,8 @@ export default class ImageEditorV extends Vue {
                 this.imagePreviews = res;
                 this.imagePreviewsLoading = false;
             });
+
+            this.slideshowCaption = this.panel.caption;
         }
     }
 
@@ -203,6 +211,7 @@ export default class ImageEditorV extends Vue {
                     src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`
                 };
             });
+            this.panel.caption = this.slideshowCaption ?? undefined;
         }
         this.edited = false;
     }
@@ -236,6 +245,7 @@ export default class ImageEditorV extends Vue {
 .text-label {
     width: 25% !important;
     margin-right: 0.5rem !important;
+    margin-bottom: 0 !important;
 }
 
 .dragging {
