@@ -220,7 +220,7 @@ export default class DynamicEditorV extends Vue {
 
         const newConfig = {
             id: this.newSlideName,
-            panel: this.startingConfig[this.newSlideType as keyof DefaultConfigs]
+            panel: JSON.parse(JSON.stringify(this.startingConfig[this.newSlideType as keyof DefaultConfigs]))
         };
 
         this.newSlideName = '';
