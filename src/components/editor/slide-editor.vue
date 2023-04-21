@@ -5,7 +5,7 @@
                 <div class="flex flex-col">
                     <label>Slide title:</label>
                     <div class="flex">
-                        <input type="text" v-model="currentSlide.title" class="w-2/3" />
+                        <input type="text" v-model="currentSlide.title" placeholder="Add a title" class="w-2/3" />
                         <span class="ml-auto"></span>
                         <button
                             @click.stop="selectSlide(slideIndex - 1)"
