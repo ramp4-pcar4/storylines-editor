@@ -143,7 +143,6 @@ export default class SlideTocV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: any;
 
-    total = 0;
     $modals: any;
     selectedForCopying = 0;
 
@@ -153,7 +152,7 @@ export default class SlideTocV extends Vue {
 
     addNewSlide(): void {
         this.slides.push({
-            title: `Untitled${this.total ? '(' + this.total + ')' : ''}`,
+            title: this.slideTitle(),
             panel: [
                 {
                     type: 'text',
@@ -168,7 +167,6 @@ export default class SlideTocV extends Vue {
             ]
         });
         this.$emit('slides-updated', this.slides);
-        this.total++;
     }
 
     copyFromOtherLang(slide: any) {
@@ -184,6 +182,16 @@ export default class SlideTocV extends Vue {
     copySlide(index: number): void {
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
         this.$emit('slides-updated', this.slides);
+    }
+
+    slideTitle(): string {
+        const titles = this.slides.map((slide) => slide.title);
+        if (!titles.includes('Untitled')) return 'Untitled';
+        let i = 1;
+        while (titles.includes(`Untitled(${i})`)) {
+            i++;
+        }
+        return `Untitled(${i})`;
     }
 
     removeSlide(index: number): void {
