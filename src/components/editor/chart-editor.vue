@@ -127,7 +127,6 @@ export default class ChartEditorV extends Vue {
 
     clearEditor(): void {
         // reset to clear modal editor options
-        this.modalEditor.chartOptions = {};
         this.modalEditor.editor.chart.options.setAll({
             title: {
                 text: `Chart ${this.chartConfigs.length + 1}`
@@ -140,8 +139,9 @@ export default class ChartEditorV extends Vue {
             }
         });
 
-        // clear data section
-        this.modalEditor.editor.dataTable.clear();
+        // resets and clears datatable section
+        const defaultTableData = `"Column 1";"Column 2"\n" "";" "`;
+        this.modalEditor.editor.dataTable.loadCSV({ csv: defaultTableData });
     }
 
     createNewChart(chartInfo: string): void {
