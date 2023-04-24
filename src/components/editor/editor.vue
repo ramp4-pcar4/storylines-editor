@@ -19,6 +19,19 @@
                 <span :class="metadata.title ? 'text-xs' : ''">UUID: {{ uuid }}</span>
             </div>
             <span class="ml-auto"></span>
+            <button
+                v-if="unsavedChanges"
+                @click="$modals.show(`reload-config`)"
+                class="border-2 border-red-700 text-red-700 rounded p-1 mr-2"
+            >
+                <svg class="inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px">
+                    <path
+                        d="M 2 2 L 4.9394531 4.9394531 C 3.1262684 6.7482143 2 9.2427079 2 12 C 2 17.514 6.486 22 12 22 C 17.514 22 22 17.514 22 12 C 22 6.486 17.514 2 12 2 L 12 4 C 16.411 4 20 7.589 20 12 C 20 16.411 16.411 20 12 20 C 7.589 20 4 16.411 4 12 C 4 9.7940092 4.9004767 7.7972757 6.3496094 6.3496094 L 9 9 L 9 2 L 2 2 z"
+                    />
+                </svg>
+                <span class="font-normal ml-1">{{ $t('editor.resetChanges') }}</span>
+                <tippy delay="200" placement="bottom">{{ $t('editor.resetChanges') }}</tippy>
+            </button>
             <transition name="fade">
                 <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
                     <span class="align-middle inline-block mr-1 pb-1 fill-current"
@@ -46,7 +59,7 @@
             <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
                 {{ $t('editor.preview') }}
             </button>
-            <button @click="generateConfig" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
+            <button @click="$emit('save-changes')" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
                 <span v-if="saving" class="align-middle inline-block px-1"
                     ><spinner size="16px" background="#6B7280" color="#FFFFFF" stroke="2px" class="ml-1 mb-1"></spinner>
@@ -102,6 +115,11 @@
             ></slide-editor>
         </div>
         <slot name="metadataModal"></slot>
+        <confirmation-modal
+            :name="`reload-config`"
+            :message="$t('editor.refreshChanges.modal')"
+            @Ok="$emit('refresh-config')"
+        />
     </div>
 </template>
 
@@ -115,10 +133,12 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Component({
     components: {
         'metadata-content': MetadataContentV,
+        'confirmation-modal': ConfirmationModalV,
         spinner: Circle2,
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV
@@ -133,9 +153,9 @@ export default class EditorV extends Vue {
     @Prop() metadata!: any;
     @Prop() slides!: Slide[];
     @Prop() configLang!: string;
-
-    unsavedChanges = false;
-    saving = false;
+    @Prop() saving!: boolean;
+    @Prop() unsavedChanges!: boolean;
+    @Prop() editExisting!: boolean;
 
     // Form properties.
     uuid = '';
@@ -146,12 +166,12 @@ export default class EditorV extends Vue {
 
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
-        this.unsavedChanges = true;
+        this.$emit('save-status', true);
     }
 
     @Watch('metadata', { deep: true })
     onMetadataEdited(): void {
-        this.unsavedChanges = true;
+        this.$emit('save-status', true);
     }
 
     created(): void {
@@ -161,51 +181,6 @@ export default class EditorV extends Vue {
 
     beforeDestroy(): void {
         window.removeEventListener('beforeunload', this.beforeWindowUnload);
-    }
-
-    /**
-     * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
-     * with the new changes, then generates and submits the product file to the server.
-     */
-    generateConfig(): StoryRampConfig {
-        this.saving = true;
-        // save current slide final changes before generating config file
-        if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as any).saveChanges();
-        }
-
-        // Update the configuration file.
-        const fileName = `${this.uuid}_${this.configLang}.json`;
-        const formattedConfigFile = JSON.stringify(this.configs[this.configLang], null, 4);
-
-        this.configFileStructure.zip.file(fileName, formattedConfigFile);
-
-        // Upload the ZIP file.
-        this.configFileStructure.zip.generateAsync({ type: 'blob' }).then((content: any) => {
-            const formData = new FormData();
-            formData.append('data', content, `${this.uuid}.zip`);
-            const headers = { 'Content-Type': 'multipart/form-data' };
-
-            axios
-                .post('http://localhost:6040/upload', formData, { headers })
-                .then((res: any) => {
-                    res.data.files; // binary representation of the file
-                    res.status; // HTTP status
-                    this.unsavedChanges = false;
-                    this.$message.success('Successfully saved changes!');
-                })
-                .catch(() => {
-                    this.$message.error('Failed to save changes.');
-                })
-                .finally(() => {
-                    // padding to prevent save button from being clicked rapidly
-                    setTimeout(() => {
-                        this.saving = false;
-                    }, 500);
-                });
-        });
-
-        return this.configFileStructure;
     }
 
     /**
