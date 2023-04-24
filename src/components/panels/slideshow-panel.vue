@@ -6,12 +6,12 @@
             :key="config.images[0].src"
         ></image-panel>
     </div>
-    <div v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
+    <div ref="images" v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <full-screen :expandable="config.fullscreen" :type="config.type">
             <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
                 <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
                     <img
-                        :src="image.src"
+                        :data-src="image.src"
                         :alt="image.altText || ''"
                         :style="{ width: `${image.width}px`, height: `${image.height}px` }"
                         class="m-auto story-graphic carousel-image"
@@ -57,6 +57,16 @@ export default class SlideshowPanelV extends Vue {
 
     md = new MarkdownIt({ html: true });
 
+    observer = new IntersectionObserver(([image]) => {
+        // lazy load images
+        if (image.isIntersecting) {
+            (this.$refs.images as Element).querySelectorAll('.carousel-image').forEach((img) => {
+                img.setAttribute('src', img.getAttribute('data-src')!);
+            });
+            this.observer.disconnect();
+        }
+    });
+
     mounted(): void {
         setTimeout(() => {
             this.width = this.$el.clientWidth;
@@ -76,6 +86,10 @@ export default class SlideshowPanelV extends Vue {
                         });
                 }
             });
+        }
+
+        if (this.config.images.length > 1) {
+            this.observer.observe(this.$refs.images as Element);
         }
     }
 }
