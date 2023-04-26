@@ -4,7 +4,11 @@
             {{ config.title }}
         </div>
 
-        <div :id="`ramp-map-${slideIdx}`" class="w-full bg-gray-200 rv-map h-story">
+        <div
+            :id="`ramp-map-${slideIdx}`"
+            class="w-full bg-gray-200 rv-map h-story"
+            :class="config.title ? 'rv-map-title' : 'rv-map'"
+        >
             <div class="flex items-center justify-center w-full h-full map-loading">
                 <svg class="animate-pulse w-52" viewBox="0 0 100 82.202" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -171,11 +175,16 @@ export default class MapPanelV extends Vue {
     width: 100%;
 }
 
+.rv-map-title {
+    height: calc(100vh - 9rem) !important;
+    width: 100%;
+}
+
 .map-title {
     color: #111827;
     font-weight: 700;
     font-size: 1.5em;
-    margin-top: 2em;
+    margin-top: 1em;
     margin-bottom: 1em;
     line-height: 1.3333333;
 }
