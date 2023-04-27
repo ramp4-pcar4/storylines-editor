@@ -66,7 +66,8 @@
                 >
                     <tippy delay="200" placement="right">{{ slide.title }}</tippy>
                     <div class="self-center overflow-ellipsis whitespace-nowrap overflow-hidden flex-grow ml-2">
-                        Slide {{ index + 1 }}: <span class="font-bold overflow-hidden">{{ slide.title || '' }}</span>
+                        Slide {{ index + 1 }}:
+                        <span class="font-bold overflow-hidden">{{ slide.title || 'Add a title' }}</span>
                     </div>
                     <div class="flex">
                         <div class="flex flex-col">
@@ -143,7 +144,6 @@ export default class SlideTocV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: any;
 
-    total = 0;
     $modals: any;
     selectedForCopying = 0;
 
@@ -153,7 +153,7 @@ export default class SlideTocV extends Vue {
 
     addNewSlide(): void {
         this.slides.push({
-            title: `Untitled${this.total ? '(' + this.total + ')' : ''}`,
+            title: '',
             panel: [
                 {
                     type: 'text',
@@ -167,8 +167,8 @@ export default class SlideTocV extends Vue {
                 }
             ]
         });
+        this.selectSlide(this.slides.length - 1);
         this.$emit('slides-updated', this.slides);
-        this.total++;
     }
 
     copyFromOtherLang(slide: any) {
