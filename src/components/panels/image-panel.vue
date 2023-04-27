@@ -2,7 +2,7 @@
     <div class="graphic self-start justify-center flex flex-col h-full align-middle py-5 w-full">
         <full-screen :expandable="config.fullscreen" :type="config.type">
             <img
-                :src="config.src"
+                ref="img"
                 :class="config.class"
                 :alt="config.altText || ''"
                 :style="{ width: `${config.width}px`, height: `${config.height}px` }"
@@ -34,6 +34,19 @@ export default class ImagePanelV extends Vue {
     @Prop() config!: ImagePanel;
 
     md = new MarkdownIt({ html: true });
+
+    observer = new IntersectionObserver(([image]) => {
+        // lazy load images
+        if (image.isIntersecting) {
+            (this.$refs.img as Element).setAttribute('src', this.config.src);
+            this.$forceUpdate();
+            this.observer!.disconnect();
+        }
+    });
+
+    mounted(): void {
+        this.observer?.observe(this.$refs.img as Element);
+    }
 }
 </script>
 
