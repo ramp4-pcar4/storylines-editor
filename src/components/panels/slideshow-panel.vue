@@ -6,12 +6,13 @@
             :key="config.images[0].src"
         ></image-panel>
     </div>
-    <div v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
+    <div ref="images" v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
         <full-screen :expandable="config.fullscreen" :type="config.type">
             <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
                 <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
                     <img
-                        :src="image.src"
+                        :data-src="image.src"
+                        :src="slideIdx > 2 ? '' : image.src"
                         :alt="image.altText || ''"
                         :style="{ width: `${image.width}px`, height: `${image.height}px` }"
                         class="m-auto story-graphic carousel-image"
@@ -52,10 +53,25 @@ import ImagePanelV from '@/components/panels/image-panel.vue';
 export default class SlideshowPanelV extends Vue {
     @Prop() config!: SlideshowPanel;
     @Prop() configFileStructure!: any;
+    @Prop() slideIdx!: number;
 
     width = -1;
 
     md = new MarkdownIt({ html: true });
+
+    observer =
+        this.slideIdx > 2
+            ? new IntersectionObserver(([image]) => {
+                  // lazy load images
+                  if (image.isIntersecting) {
+                      (this.$refs.images as Element).querySelectorAll('.carousel-image').forEach((img) => {
+                          img.setAttribute('src', img.getAttribute('data-src')!);
+                      });
+                      this.$forceUpdate();
+                      this.observer!.disconnect();
+                  }
+              })
+            : undefined;
 
     mounted(): void {
         setTimeout(() => {
@@ -76,6 +92,10 @@ export default class SlideshowPanelV extends Vue {
                         });
                 }
             });
+        }
+
+        if (this.config.images.length > 1) {
+            this.observer?.observe(this.$refs.images as Element);
         }
     }
 }
