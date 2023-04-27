@@ -2,7 +2,8 @@
     <div class="graphic self-start justify-center flex flex-col h-full align-middle py-5 w-full">
         <full-screen :expandable="config.fullscreen" :type="config.type">
             <img
-                :src="config.src"
+                ref="img"
+                :src="slideIdx > 2 ? '' : config.src"
                 :class="config.class"
                 :alt="config.altText || ''"
                 :style="{ width: `${config.width}px`, height: `${config.height}px` }"
@@ -32,8 +33,24 @@ import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
 })
 export default class ImagePanelV extends Vue {
     @Prop() config!: ImagePanel;
+    @Prop() slideIdx!: number;
 
     md = new MarkdownIt({ html: true });
+
+    observer =
+        this.slideIdx > 2
+            ? new IntersectionObserver(([image]) => {
+                  // lazy load images
+                  if (image.isIntersecting) {
+                      (this.$refs.img as Element).setAttribute('src', this.config.src);
+                      this.observer!.disconnect();
+                  }
+              })
+            : undefined;
+
+    mounted(): void {
+        this.observer?.observe(this.$refs.img as Element);
+    }
 }
 </script>
 
