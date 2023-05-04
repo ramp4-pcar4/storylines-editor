@@ -7,8 +7,8 @@
                     <div class="flex text-2xl font-bold mb-5">
                         {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
                     </div>
-                    <button @click="swapLang">
-                        {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                    <button @click="swapLang()">
+                        {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                 </div>
 
@@ -118,7 +118,7 @@
                 :sourceCounts="sourceCounts"
                 :metadata="metadata"
                 :slides="slides"
-                :configLang="lang"
+                :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
                 :editExisting="editExisting"
@@ -129,7 +129,7 @@
             >
                 <template v-slot:langModal="slotProps">
                     <button @click.stop="slotProps.unsavedChanges ? $modals.show(`change-lang`) : swapLang()">
-                        {{ lang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                        {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                     <confirmation-modal
                         :name="`change-lang`"
@@ -208,7 +208,7 @@ export default class MetadataEditorV extends Vue {
     loadEditor = false;
     error = false; // whether an error has occurred
     warning = false; // used for duplicate uuid warning
-    lang = 'en';
+    configLang = 'en';
 
     // Saving properties.
     saving = false;
@@ -238,7 +238,7 @@ export default class MetadataEditorV extends Vue {
     created(): void {
         // Generate UUID for new product
         this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
-        this.lang = this.$route.params.lang ? this.$route.params.lang : 'en';
+        this.configLang = this.$route.params.configLang ? this.$route.params.configLang : 'en';
 
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
@@ -267,8 +267,8 @@ export default class MetadataEditorV extends Vue {
                 this.sourceCounts = this.$route.params.sourceCounts;
 
                 // Load product logo (if provided).
-                const logo = this.configs[this.lang]!.introSlide.logo.src;
-                const logoSrc = `assets/${this.lang}/${this.metadata.logoName}`;
+                const logo = this.configs[this.configLang]!.introSlide.logo.src;
+                const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
 
                 if (logo) {
                     if (this.configFileStructure.zip.file(logoSrc)) {
@@ -315,8 +315,8 @@ export default class MetadataEditorV extends Vue {
         const configZip = new JSZip();
 
         // Generate a new configuration file and populate required fields.
-        this.configs[this.lang] = this.configHelper();
-        const config = this.configs[this.lang] as StoryRampConfig;
+        this.configs[this.configLang] = this.configHelper();
+        const config = this.configs[this.configLang] as StoryRampConfig;
 
         config.title = this.metadata.title;
         config.introSlide.title = this.metadata.introTitle;
@@ -327,18 +327,18 @@ export default class MetadataEditorV extends Vue {
         if (!this.metadata.logoName) {
             config.introSlide.logo.src = '';
         } else if (!this.metadata.logoName.includes('http')) {
-            config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
+            config.introSlide.logo.src = `${this.uuid}/assets/${this.configLang}/${this.logoImage?.name}`;
         } else {
             config.introSlide.logo.src = this.metadata.logoName;
         }
 
-        const otherLang = this.lang === 'en' ? 'fr' : 'en';
+        const otherLang = this.configLang === 'en' ? 'fr' : 'en';
         this.configs[otherLang] = config;
         (this.configs[otherLang] as StoryRampConfig).lang = otherLang;
         const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
 
         // Add the newly generated Storylines configuration file to the ZIP file.
-        const fileName = `${this.uuid}_${this.lang}.json`;
+        const fileName = `${this.uuid}_${this.configLang}.json`;
         const formattedConfigFile = JSON.stringify(config, null, 4);
 
         configZip.file(fileName, formattedConfigFile);
@@ -476,7 +476,7 @@ export default class MetadataEditorV extends Vue {
 
         // If uploadLogo is set, upload the logo to the directory.
         if (uploadLogo !== undefined) {
-            this.configFileStructure.assets[this.lang].file(uploadLogo?.name, uploadLogo);
+            this.configFileStructure.assets[this.configLang].file(uploadLogo?.name, uploadLogo);
         }
 
         this.loadConfig();
@@ -520,8 +520,8 @@ export default class MetadataEditorV extends Vue {
         }
 
         // Load in project data.
-        if (this.configs[this.lang]) {
-            this.useConfig(this.configs[this.lang] as StoryRampConfig);
+        if (this.configs[this.configLang]) {
+            this.useConfig(this.configs[this.configLang] as StoryRampConfig);
             this.findSources(this.configs);
 
             // Update router path
@@ -593,8 +593,8 @@ export default class MetadataEditorV extends Vue {
         }
 
         // Update the configuration file.
-        const fileName = `${this.uuid}_${this.lang}.json`;
-        const formattedConfigFile = JSON.stringify(this.configs[this.lang], null, 4);
+        const fileName = `${this.uuid}_${this.configLang}.json`;
+        const formattedConfigFile = JSON.stringify(this.configs[this.configLang], null, 4);
 
         this.configFileStructure.zip.file(fileName, formattedConfigFile);
 
@@ -640,7 +640,7 @@ export default class MetadataEditorV extends Vue {
      */
     saveMetadata(publish = false): void {
         // update metadata content to existing config only if it has been successfully loaded
-        const config = this.configs[this.lang];
+        const config = this.configs[this.configLang];
         if (config !== undefined) {
             config.title = this.metadata.title;
             config.introSlide.title = this.metadata.introTitle;
@@ -653,8 +653,8 @@ export default class MetadataEditorV extends Vue {
             if (!this.metadata.logoName) {
                 config.introSlide.logo.src = '';
             } else if (!this.metadata.logoName.includes('http')) {
-                config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
-                this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+                config.introSlide.logo.src = `${this.uuid}/assets/${this.configLang}/${this.logoImage?.name}`;
+                this.configFileStructure.assets[this.configLang].file(this.logoImage?.name, this.logoImage);
             } else {
                 config.introSlide.logo.src = this.metadata.logoName;
             }
@@ -691,8 +691,11 @@ export default class MetadataEditorV extends Vue {
      * Language toggle.
      */
     swapLang(): void {
-        this.lang = this.lang === 'en' ? 'fr' : 'en';
-        this.loadConfig();
+        this.configLang = this.configLang === 'en' ? 'fr' : 'en';
+        if (!this.configs[this.configLang]) {
+            return;
+        }
+        this.loadConfig(this.configs[this.configLang]);
         if (this.loadEditor) {
             (this.$refs.mainEditor as any).selectSlide(-1);
         }
@@ -713,9 +716,8 @@ export default class MetadataEditorV extends Vue {
      * React to param changes in URL.
      */
     beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
-        this.lang = to.params.lang;
         this.uuid = to.params.uid;
-        this.$i18n.locale = this.lang;
+        this.$i18n.locale = to.params.lang;
 
         next();
     }
@@ -757,7 +759,7 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.name !== 'editor') {
             const props = {
                 uid: this.uuid,
-                configLang: this.lang,
+                configLang: this.configLang,
                 configs: this.configs as any,
                 configFileStructure: this.configFileStructure,
                 sourceCounts: this.sourceCounts,
@@ -788,7 +790,7 @@ export default class MetadataEditorV extends Vue {
         }
 
         if (this.editExisting) {
-            if (this.configs[this.lang] !== undefined && this.uuid === this.configFileStructure.uuid) {
+            if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure.uuid) {
                 this.loadEditor = true;
                 this.updateEditorPath();
             } else {
@@ -821,7 +823,7 @@ export default class MetadataEditorV extends Vue {
                 this.$router.push({
                     name: 'metadata',
                     params: {
-                        lang: this.lang,
+                        configLang: this.configLang,
                         editExisting: false as any
                     }
                 });
