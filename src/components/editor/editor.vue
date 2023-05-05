@@ -59,7 +59,7 @@
             <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
                 {{ $t('editor.preview') }}
             </button>
-            <button @click="$emit('save-changes')" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
+            <button @click="saveChanges" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
                 <span v-if="saving" class="align-middle inline-block px-1"
                     ><spinner size="16px" background="#6B7280" color="#FFFFFF" stroke="2px" class="ml-1 mb-1"></spinner>
@@ -227,6 +227,16 @@ export default class EditorV extends Vue {
             config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
             configFileStructure: this.configFileStructure
         };
+    }
+
+    saveChanges(): void {
+        // save current slide final changes before generating config file
+        if (this.$refs.slide !== undefined) {
+            (this.$refs.slide as any).saveChanges();
+        }
+
+        // emit save changes event
+        this.$emit('save-changes');
     }
 
     beforeWindowUnload(e: any): void {

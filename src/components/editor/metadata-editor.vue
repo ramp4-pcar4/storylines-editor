@@ -587,10 +587,6 @@ export default class MetadataEditorV extends Vue {
      */
     generateConfig(): StoryRampConfig {
         this.saving = true;
-        // save current slide final changes before generating config file
-        if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as any).saveChanges();
-        }
 
         // Update the configuration file.
         const fileName = `${this.uuid}_${this.configLang}.json`;

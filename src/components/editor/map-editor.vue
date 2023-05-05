@@ -5,7 +5,7 @@
 
         <div v-if="status === 'editing'">
             <label class="mt-6">Enable Scrollguard:</label>
-            <input type="checkbox" @change="panel.scrollguard = $event.target.value" v-model="panel.scrollguard" />
+            <input type="checkbox" @change="saveScrollguard" v-model="panel.scrollguard" />
             <span class="ml-6"></span>
             <label class="mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
             <input type="checkbox" @change="saveTimeSlider" v-model="usingTimeSlider" />
@@ -187,6 +187,10 @@ export default class MapEditorV extends Vue {
                 });
             }
         }
+    }
+
+    saveScrollguard($event: any): void {
+        this.panel.scrollguard = $event.target.checked;
     }
 
     saveTimeSlider(): void {
