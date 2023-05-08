@@ -13,9 +13,9 @@
                     />
                 </svg>
             </button>
-            <div class="flex-grow">
+            <div class="flex-grow image-container">
                 <img
-                    class="image-file object-cover w-full h-full"
+                    class="image-file object-cover"
                     :title="imageFile.id"
                     :src="imageFile.src"
                     :alt="imageFile.altText"
@@ -39,13 +39,22 @@ export default class ImagePreviewV extends Vue {
 <style lang="scss" scoped>
 .image-item {
     width: 30%;
+
     cursor: move; // fallback
     cursor: grab;
     cursor: -moz-grab;
     cursor: -webkit-grab;
 
     .image-file {
-        aspect-ratio: 1/1;
+        aspect-ratio: auto;
+        max-height: 300px;
+    }
+
+    .image-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 300px;
     }
 
     button {
