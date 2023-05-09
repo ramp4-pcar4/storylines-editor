@@ -56,6 +56,7 @@ editor.map.timeslider.edit,Edit Time Slider Config,1,Edit Time Slider Config,0
 editor.map.timeslider.range,Range:,1,Range:,0
 editor.map.timeslider.start,Start:,1,Start:,0
 editor.map.timeslider.attribute,Attribute:,1,Attribute:,0
+editor.map.timeslider.layers,(OPTIONAL) Comma separated Layer IDs:,1,(OPTIONAL) Comma separated Layer IDs:,0
 editor.map.timeslider.to,to,1,to,0
 editor.map.timeslider.warning,⚠️Warning! Please ensure that:,1,⚠️Warning! Please ensure that:,0
 editor.map.timeslider.warning.bullet1,All range and start values are positive integers.,1,All range and start values are positive integers.,0
