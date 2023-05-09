@@ -1,7 +1,7 @@
 <template>
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
-        <div class="sticky top-0 z-50 flex items-center border-b border-black bg-gray-200 py-2 px-2">
+        <div class="editor-header sticky flex items-center border-b border-black bg-gray-200 py-2 px-2">
             <span class="mx-1">
                 <router-link :to="{ name: 'home' }" class="mt-1 flex justify-center h-full w-full" target>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18.001" viewBox="0 0 18 18.001">
@@ -179,6 +179,15 @@ export default class EditorV extends Vue {
         this.uuid = this.$route.params.uid;
     }
 
+    mounted(): void {
+        // from https://css-tricks.com/how-to-detect-when-a-sticky-element-gets-pinned/
+        const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-50', e.intersectionRatio < 1), {
+            threshold: [1]
+        });
+
+        observer.observe(document.querySelector('.editor-header')!);
+    }
+
     beforeDestroy(): void {
         window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }
@@ -300,6 +309,11 @@ export default class EditorV extends Vue {
     border: none;
     transition-duration: 0.2s;
     padding: 0.25 0.25em !important;
+}
+
+.editor-header {
+    top: -1px;
+    padding-top: 9px;
 }
 
 .fade-enter-active,
