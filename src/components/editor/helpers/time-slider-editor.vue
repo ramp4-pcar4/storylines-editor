@@ -41,11 +41,23 @@
             <span>{{ $t('editor.map.timeslider.warning.end') }}</span>
         </div>
         <br v-if="error" />
-        <label>{{ $t('editor.map.timeslider.attribute') }}</label>
-        <input
-            :value="config.attribute"
-            @input="$emit('time-slider-changed', 'attribute', undefined, $event.target.value)"
-        />
+        <div>
+            <label>{{ $t('editor.map.timeslider.attribute') }}</label>
+            <input
+                :value="config.attribute"
+                @input="$emit('time-slider-changed', 'attribute', undefined, $event.target.value)"
+            />
+        </div>
+        <br />
+        <div>
+            <label>{{ $t('editor.map.timeslider.layers') }}</label>
+            <br />
+            <input
+                class="w-full"
+                :value="config.layers || ''"
+                @input="$emit('time-slider-changed', 'layers', undefined, $event.target.value)"
+            />
+        </div>
         <br /><br />
     </div>
 </template>

@@ -217,10 +217,20 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    onTimeSliderInput(property: 'range' | 'start' | 'attribute', index: number, value: string): void {
-        property === 'attribute'
-            ? (this.timeSliderConf[property] = value)
-            : (this.timeSliderConf[property][index] = Number(value));
+    onTimeSliderInput(property: 'range' | 'start' | 'attribute' | 'layers', index: number, value: string): void {
+        if (property === 'layers') {
+            if (!value || value === '') {
+                delete this.timeSliderConf['layers'];
+            } else {
+                this.timeSliderConf['layers'] = value.split(',').map((layerId) => {
+                    return layerId.trim();
+                });
+            }
+        } else {
+            property === 'attribute'
+                ? (this.timeSliderConf[property] = value)
+                : (this.timeSliderConf[property][index] = Number(value));
+        }
         this.validateTimeSlider();
     }
 

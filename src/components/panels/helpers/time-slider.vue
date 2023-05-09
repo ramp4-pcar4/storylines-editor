@@ -123,7 +123,18 @@ export default class TimeSlider extends Vue {
                     break;
             }
 
-            this.mapi.layers.allLayers[0].setFilterSql('time_slider', sqlString);
+            if (!this.config.layers || this.config.layers.length === 0) {
+                this.mapi.layers.allLayers.forEach((layer: any) => {
+                    layer.setFilterSql('time_slider', sqlString);
+                });
+            } else {
+                this.config.layers.forEach((layerId) => {
+                    const layers = this.mapi.layers.getLayersById(layerId);
+                    layers.forEach((layer: any) => {
+                        layer.setFilterSql('time_slider', sqlString);
+                    });
+                });
+            }
         });
 
         // to have an element focusable inside the RAMP container, its tabindex must not be 0;
