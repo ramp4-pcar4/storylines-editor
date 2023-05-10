@@ -187,6 +187,8 @@ import MetadataContentV from './helpers/metadata-content.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import EditorV from './editor.vue';
 
+import cloneDeep from 'clone-deep';
+
 @Component({
     components: {
         Editor: EditorV,
@@ -333,7 +335,7 @@ export default class MetadataEditorV extends Vue {
         }
 
         const otherLang = this.configLang === 'en' ? 'fr' : 'en';
-        this.configs[otherLang] = config;
+        this.configs[otherLang] = cloneDeep(config);
         (this.configs[otherLang] as StoryRampConfig).lang = otherLang;
         const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
 
