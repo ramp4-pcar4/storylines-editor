@@ -208,7 +208,7 @@ export default class ImageEditorV extends Vue {
             this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
                 return {
                     ...imageFile,
-                    src: `${this.configFileStructure.uuid}/assets/en/${imageFile.id}`
+                    src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`
                 };
             });
             this.panel.caption = this.slideshowCaption ?? undefined;
