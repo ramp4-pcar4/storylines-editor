@@ -21,6 +21,8 @@ editor.uuid,UUID,1,UUID,0
 editor.title,Title,1,Titre,0
 editor.logo,Logo,1,Logo,0
 editor.logoPreview,Logo Preview,1,Logo Preview,0
+editor.logoAltText,Logo Alt Text,1,Description alternative du logo,0
+editor.logoAltText.desc,"For accessibility purposes, provide description text for the logo.",1,"Pour des raisons d'accessibilité, fournissez un texte descriptif pour le logo.",0
 editor.contextLink,Context Link,1,Lien contextuel,0
 editor.contextLabel,Context Label,1,Libellé de contexte,0
 editor.dateModified,Date Modified,1,Date modifiée,0

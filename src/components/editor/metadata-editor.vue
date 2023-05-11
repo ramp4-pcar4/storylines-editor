@@ -224,6 +224,7 @@ export default class MetadataEditorV extends Vue {
         introSubtitle: '',
         logoPreview: '',
         logoName: '',
+        logoAltText: '',
         contextLink: '',
         contextLabel: '',
         dateModified: ''
@@ -267,7 +268,7 @@ export default class MetadataEditorV extends Vue {
                 this.sourceCounts = this.$route.params.sourceCounts;
 
                 // Load product logo (if provided).
-                const logo = this.configs[this.configLang]!.introSlide.logo.src;
+                const logo = this.configs[this.configLang]!.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
 
                 if (logo) {
@@ -400,7 +401,10 @@ export default class MetadataEditorV extends Vue {
 
     findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
         ['en', 'fr'].forEach((lang) => {
-            this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.logo.src);
+            if ((configs[lang] as StoryRampConfig).introSlide.logo?.src) {
+                this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.logo.src);
+            }
+
             (configs[lang] as StoryRampConfig).slides.forEach((slide) => {
                 slide.panel.forEach((panel) => {
                     this.panelSourceHelper(panel);
@@ -552,32 +556,38 @@ export default class MetadataEditorV extends Vue {
             }
         });
 
-        const logo = config.introSlide.logo.src;
-        // Fetch the logo from the folder (if it exists).
-        const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
-        const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
-        if (this.configFileStructure.zip.file(logoSrc)) {
-            this.configFileStructure.zip
-                .file(logoSrc)
-                .async('blob')
-                .then((img: any) => {
-                    this.logoImage = new File([img], logoName);
-                    this.metadata.logoPreview = URL.createObjectURL(img);
-                    this.metadata.logoName = logoName;
+        const logo = config.introSlide.logo?.src;
+        if (logo) {
+            // Set the alt text for the logo.
+            this.metadata.logoAltText = config.introSlide.logo?.altText ? config.introSlide.logo.altText : '';
+
+            // Fetch the logo from the folder (if it exists).
+            const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
+            const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
+
+            if (this.configFileStructure.zip.file(logoSrc)) {
+                this.configFileStructure.zip
+                    .file(logoSrc)
+                    .async('blob')
+                    .then((img: any) => {
+                        this.logoImage = new File([img], logoName);
+                        this.metadata.logoPreview = URL.createObjectURL(img);
+                        this.metadata.logoName = logoName;
+                        this.loadStatus = 'loaded';
+                    });
+            } else {
+                // Fill in the field with this value whether it exists or not.
+                this.metadata.logoName = logo;
+
+                // If it doesn't exist, maybe it's a remote file?
+                fetch(logo).then((data: any) => {
+                    if (data.status !== 404) {
+                        this.logoImage = new File([data], logoName);
+                        this.metadata.logoPreview = logo;
+                    }
                     this.loadStatus = 'loaded';
                 });
-        } else {
-            // Fill in the field with this value whether it exists or not.
-            this.metadata.logoName = logo;
-
-            // If it doesn't exist, maybe it's a remote file?
-            fetch(logo).then((data: any) => {
-                if (data.status !== 404) {
-                    this.logoImage = new File([data], logoName);
-                    this.metadata.logoPreview = logo;
-                }
-                this.loadStatus = 'loaded';
-            });
+            }
         }
     }
 
@@ -645,6 +655,13 @@ export default class MetadataEditorV extends Vue {
             config.contextLabel = this.metadata.contextLabel;
             config.dateModified = this.metadata.dateModified;
 
+            // If the logo section is missing, create it here before overwriting values.
+            if (config.introSlide.logo === undefined) {
+                config.introSlide.logo = { src: '', altText: '' };
+            }
+
+            config.introSlide.logo.altText = this.metadata.logoAltText;
+
             // If the logo doesn't include HTTP, assume it's a local file.
             if (!this.metadata.logoName) {
                 config.introSlide.logo.src = '';
@@ -677,7 +694,8 @@ export default class MetadataEditorV extends Vue {
             contextLabel: '',
             dateModified: '',
             logoPreview: '',
-            logoName: ''
+            logoName: '',
+            logoAltText: ''
         };
         this.configs = { en: undefined, fr: undefined };
         this.slides = [];

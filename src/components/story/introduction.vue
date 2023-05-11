@@ -1,6 +1,11 @@
 <template>
     <div class="py-24 mx-auto text-center max-w-9xl" id="intro">
-        <img class="inline-block" :src="config.logo.src" :alt="config.logo.altText" />
+        <img
+            v-if="config.logo && config.logo.src"
+            class="inline-block"
+            :src="config.logo.src"
+            :alt="config.logo.altText"
+        />
 
         <h1 class="m-10 text-5xl font-bold text-gray-800">
             {{ config.title }}
@@ -80,15 +85,19 @@ export default class IntroV extends Vue {
     mounted(): void {
         // obtain logo from ZIP file if it exists
         if (this.configFileStructure) {
-            const logoSrc = `${this.config.logo.src.substring(this.config.logo.src.indexOf('/') + 1)}`;
-            if (this.configFileStructure.zip.file(logoSrc)) {
-                this.configFileStructure.zip
-                    .file(logoSrc)
-                    .async('blob')
-                    .then((res: any) => {
-                        this.config.logo.src = URL.createObjectURL(res);
-                        this.$forceUpdate();
-                    });
+            const logo = this.config.logo?.src;
+
+            if (logo) {
+                const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
+                if (this.configFileStructure.zip.file(logoSrc)) {
+                    this.configFileStructure.zip
+                        .file(logoSrc)
+                        .async('blob')
+                        .then((res: any) => {
+                            this.config.logo.src = URL.createObjectURL(res);
+                            this.$forceUpdate();
+                        });
+                }
             }
         }
     }
