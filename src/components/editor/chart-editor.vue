@@ -153,8 +153,7 @@ export default class ChartEditorV extends Vue {
             const chartSrc = `${this.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
             const chartConfig = {
                 name: chart.title.text,
-                src: chartSrc,
-                config: chart
+                src: chartSrc
             };
 
             if (this.sourceCounts[chartSrc]) {
@@ -193,7 +192,10 @@ export default class ChartEditorV extends Vue {
             );
 
             chartInfo.newChart.src = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.newChart.name}.json`;
-            this.chartConfigs[idx] = chartInfo.newChart;
+            this.chartConfigs[idx] = {
+                name: chartInfo.newChart.name,
+                src: chartInfo.newChart.src
+            };
         }
         this.onChartsEdited();
     }
