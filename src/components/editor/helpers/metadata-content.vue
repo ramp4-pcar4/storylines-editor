@@ -43,6 +43,16 @@
             style="display: none"
         />
         <br />
+        <label>{{ $t('editor.logoAltText') }}:</label>
+        <input type="text" name="logoAltText" :value="metadata.logoAltText" @change="metadataChanged" class="w-2/3" />
+        <br />
+        <label class="mb-5"></label>
+        <p class="inline-block">
+            <i>
+                {{ $t('editor.logoAltText.desc') }}
+            </i>
+        </p>
+        <br />
         <label>{{ $t('editor.contextLink') }}:</label>
         <input type="text" name="contextLink" :value="metadata.contextLink" @change="metadataChanged" class="w-2/3" />
         <br />
@@ -80,6 +90,7 @@ export default class MetadataEditorV extends Vue {
         introSubtitle: string;
         logoName: string;
         logoPreview: string;
+        logoAltText: string;
         contextLink: string;
         contextLabel: string;
         dateModified: string;
