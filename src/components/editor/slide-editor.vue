@@ -1,6 +1,6 @@
 <template>
     <div class="sticky top-20 h-auto self-start flex-grow m-5">
-        <div v-if="currentSlide !== ''">
+        <div v-if="!!currentSlide">
             <div class="flex">
                 <div class="flex flex-col">
                     <label>Slide title:</label>
@@ -234,8 +234,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { StoryRampConfig, DefaultConfigs, PanelType } from '@/definitions';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import {
+    BasePanel,
+    ChartConfig,
+    ChartPanel,
+    ConfigFileStructure,
+    DefaultConfigs,
+    DynamicChildItem,
+    DynamicPanel,
+    ImagePanel,
+    MapPanel,
+    PanelType,
+    Slide,
+    SlideshowPanel,
+    SourceCounts,
+    StoryRampConfig,
+    TextPanel
+} from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
@@ -260,21 +276,19 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
 })
 export default class SlideEditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    @Prop() currentSlide!: any;
-    @Prop() configFileStructure!: any;
+    @Prop() currentSlide!: Slide;
+    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() uid!: string;
     @Prop() slideIndex!: number;
     @Prop() isLast!: number;
-    @Prop() sourceCounts!: any;
-
-    $modals: any;
+    @Prop() sourceCounts!: SourceCounts;
 
     panelIndex = 0;
     newType = '';
     rightOnly = false;
 
-    editors = {
+    editors: Record<string, string> = {
         text: 'text-editor',
         image: 'image-editor',
         slideshow: 'image-editor',
@@ -298,9 +312,15 @@ export default class SlideEditorV extends Vue {
             },
             dynamic: {
                 type: PanelType.Dynamic,
-                title: this.currentSlide.panel[0] && prevType === 'text' ? this.currentSlide.panel[0].title : '',
+                title:
+                    this.currentSlide.panel[0] && prevType === 'text'
+                        ? (this.currentSlide.panel[0] as TextPanel).title
+                        : '',
                 titleTag: '',
-                content: this.currentSlide.panel[0] && prevType === 'text' ? this.currentSlide.panel[0].content : '',
+                content:
+                    this.currentSlide.panel[0] && prevType === 'text'
+                        ? (this.currentSlide.panel[0] as TextPanel).content
+                        : '',
                 children: []
             },
             slideshow: {
@@ -320,7 +340,7 @@ export default class SlideEditorV extends Vue {
         };
 
         // Before swapping panel type, update sources from the to-be-deleted config.
-        this.currentSlide.panel.forEach((panel: any) => this.removeSourceCounts(panel));
+        this.currentSlide.panel.forEach((panel: BasePanel) => this.removeSourceCounts(panel));
 
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
@@ -332,45 +352,58 @@ export default class SlideEditorV extends Vue {
         }
     }
 
-    removeSourceCounts(panel: any): void {
+    removeSourceCounts(panel: BasePanel): void {
         // The provided panel is being removed. Update source counts accordingly.
         switch (panel.type) {
-            case 'map':
-                this.sourceCounts[panel.config] -= 1;
-                if (this.sourceCounts[panel.config] === 0) {
-                    this.configFileStructure.zip.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+            case 'map': {
+                const mapPanel = panel as MapPanel;
+                this.sourceCounts[mapPanel.config] -= 1;
+                if (this.sourceCounts[mapPanel.config] === 0) {
+                    this.configFileStructure.zip.remove(
+                        `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
+                    );
                 }
                 break;
+            }
 
-            case 'chart':
-                panel.charts.forEach((chart: any) => {
+            case 'chart': {
+                const chartPanel = panel as ChartPanel;
+                chartPanel.charts.forEach((chart: ChartConfig) => {
                     this.sourceCounts[chart.src] -= 1;
                     if (this.sourceCounts[chart.src] === 0) {
                         this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
+            }
 
-            case 'slideshow':
-                panel.images.forEach((image: any) => {
+            case 'slideshow': {
+                const slideshowPanel = panel as SlideshowPanel;
+                slideshowPanel.images.forEach((image: ImagePanel) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
+            }
 
-            case 'dynamic':
-                panel.children.forEach((subPanel: any) => {
+            case 'dynamic': {
+                const dynamicPanel = panel as DynamicPanel;
+                dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
                     this.removeSourceCounts(subPanel.panel);
                 });
                 break;
+            }
         }
     }
 
     saveChanges(): void {
-        if (this.$refs.editor !== undefined && typeof (this.$refs.editor as any).saveChanges === 'function') {
-            (this.$refs.editor as any).saveChanges();
+        if (
+            this.$refs.editor !== undefined &&
+            typeof (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges === 'function'
+        ) {
+            (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges();
         }
     }
 

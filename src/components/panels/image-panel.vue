@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { ImagePanel } from '@/definitions';
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import MarkdownIt from 'markdown-it';
 import FullscreenV from '@/components/panels/helpers/fullscreen.vue';

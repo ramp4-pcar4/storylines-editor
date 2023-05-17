@@ -13,8 +13,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartConfig, DQVChartConfig, PieSeriesData, LineSeriesData } from '@/definitions';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ChartConfig, DQVChartConfig, LineSeriesData, PieSeriesData } from '@/definitions';
 
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';

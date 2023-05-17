@@ -19,9 +19,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import { PanelType, BasePanel } from '@/definitions';
+import { BasePanel, PanelType } from '@/definitions';
 import TextPanelV from './text-panel.vue';
 import MapPanelV from './map-panel.vue';
 import ImagePanelV from './image-panel.vue';

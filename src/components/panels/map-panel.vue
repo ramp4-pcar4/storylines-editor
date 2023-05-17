@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { MapPanel } from '@/definitions';
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import TimeSlider from '@/components/panels/helpers/time-slider.vue';
 import Scrollguard from '@/components/panels/helpers/scrollguard.vue';
@@ -57,7 +57,7 @@ export default class MapPanelV extends Vue {
         const observer = new IntersectionObserver(
             ([e]) => {
                 if (e.isIntersecting) {
-                    this.intersectTimeoutHandle = setTimeout(() => {
+                    this.intersectTimeoutHandle = window.setTimeout(() => {
                         this.init();
                         observer.disconnect();
                         this.mapComponent?.querySelector('.map-loading')?.remove();
