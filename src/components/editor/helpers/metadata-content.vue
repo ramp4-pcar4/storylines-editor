@@ -100,8 +100,12 @@ export default class MetadataEditorV extends Vue {
         document.getElementById('logoUpload')?.click();
     }
 
-    metadataChanged(event: any): void {
-        this.$emit('metadata-changed', event.target.name, event.target.value);
+    metadataChanged(event: Event): void {
+        this.$emit(
+            'metadata-changed',
+            (event.target as HTMLInputElement).name,
+            (event.target as HTMLInputElement).value
+        );
     }
 
     removeLogo(): void {

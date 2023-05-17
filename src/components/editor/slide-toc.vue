@@ -121,6 +121,20 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import {
+    BasePanel,
+    ChartConfig,
+    ChartPanel,
+    ConfigFileStructure,
+    DynamicChildItem,
+    DynamicPanel,
+    ImagePanel,
+    MapPanel,
+    Slide,
+    SourceCounts,
+    SlideshowPanel,
+    TextPanel
+} from '@/definitions';
 import cloneDeep from 'clone-deep';
 import draggable from 'vuedraggable';
 
@@ -137,14 +151,13 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
     }
 })
 export default class SlideTocV extends Vue {
-    @Prop() slides!: any[];
-    @Prop() currentSlide!: any;
+    @Prop() slides!: Slide[];
+    @Prop() currentSlide!: Slide | string;
     @Prop() slideIndex!: number;
-    @Prop() configFileStructure!: any;
+    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: any;
+    @Prop() sourceCounts!: SourceCounts;
 
-    $modals: any;
     selectedForCopying = 0;
 
     selectSlide(index: number): void {
@@ -159,26 +172,30 @@ export default class SlideTocV extends Vue {
                     type: 'text',
                     title: '',
                     content: ''
-                },
+                } as TextPanel,
                 {
                     type: 'text',
                     title: '',
                     content: ''
-                }
+                } as TextPanel
             ]
         });
         this.selectSlide(this.slides.length - 1);
         this.$emit('slides-updated', this.slides);
     }
 
-    copyFromOtherLang(slide: any) {
-        this.slides.splice(this.slides.length, 0, cloneDeep(slide));
-        this.$emit('slides-updated', this.slides);
+    copyFromOtherLang(slide: Slide | undefined): void {
+        if (slide) {
+            this.slides.splice(this.slides.length, 0, cloneDeep(slide));
+            this.$emit('slides-updated', this.slides);
+        }
     }
 
-    copyAllFromOtherLang(slides: any[]) {
-        this.slides.splice(this.slides.length, 0, ...slides.map((slide) => cloneDeep(slide)));
-        this.$emit('slides-updated', this.slides);
+    copyAllFromOtherLang(slides: Slide[] | undefined): void {
+        if (slides) {
+            this.slides.splice(this.slides.length, 0, ...slides.map((slide) => cloneDeep(slide)));
+            this.$emit('slides-updated', this.slides);
+        }
     }
 
     copySlide(index: number): void {
@@ -199,43 +216,53 @@ export default class SlideTocV extends Vue {
     }
 
     removeSourceCounts(deletedIndex: number): void {
-        const panel = this.slides.find((panel: any, idx: number) => idx === deletedIndex).panel;
-        panel.forEach((p: any) => this.removeSourceHelper(p));
+        const panel = this.slides.find((slide: Slide, idx: number) => idx === deletedIndex)?.panel;
+        panel?.forEach((p: BasePanel) => this.removeSourceHelper(p));
     }
 
-    removeSourceHelper(panel: any): void {
+    removeSourceHelper(panel: BasePanel): void {
         // The provided panel is being removed. Update source counts accordingly.
         switch (panel.type) {
-            case 'map':
-                this.sourceCounts[panel.config] -= 1;
-                if (this.sourceCounts[panel.config] === 0) {
-                    this.configFileStructure.zip.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+            case 'map': {
+                const mapPanel = panel as MapPanel;
+                this.sourceCounts[mapPanel.config] -= 1;
+                if (this.sourceCounts[mapPanel.config] === 0) {
+                    this.configFileStructure.zip.remove(
+                        `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
+                    );
                 }
                 break;
+            }
 
-            case 'chart':
-                panel.charts.forEach((chart: any) => {
+            case 'chart': {
+                const chartPanel = panel as ChartPanel;
+                chartPanel.charts.forEach((chart: ChartConfig) => {
                     this.sourceCounts[chart.src] -= 1;
                     if (this.sourceCounts[chart.src] === 0) {
                         this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
+            }
 
-            case 'slideshow':
-                panel.images.forEach((image: any) => {
+            case 'slideshow': {
+                const slideshowPanel = panel as SlideshowPanel;
+                slideshowPanel.images.forEach((image: ImagePanel) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
+            }
 
-            case 'dynamic':
-                panel.children.forEach((subPanel: any) => {
-                    this.removeSourceCounts(subPanel.panel);
+            case 'dynamic': {
+                const dynamicPanel = panel as DynamicPanel;
+                dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
+                    this.removeSourceHelper(subPanel.panel);
                 });
                 break;
+            }
         }
     }
 

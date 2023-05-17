@@ -18,8 +18,6 @@ export default class MetadataEditorV extends Vue {
     @Prop() message!: string;
     @Prop() name!: string;
 
-    $modals: any;
-
     onOk(): void {
         this.$emit('Ok');
         this.$modals.hide(this.name);

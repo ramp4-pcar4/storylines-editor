@@ -11,7 +11,7 @@ import { Route } from 'vue-router';
 @Component({})
 export default class App extends Vue {
     @Watch('$route', { immediate: true })
-    onRouteUpdate(to: Route, from: Route) {
+    onRouteUpdate(to: Route): void {
         this.$i18n.locale = to.params.lang ?? 'en';
         document.title = this.$t(to.meta?.title).toString();
     }
