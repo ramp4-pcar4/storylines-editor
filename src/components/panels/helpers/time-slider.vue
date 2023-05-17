@@ -143,7 +143,7 @@ export default class TimeSlider extends Vue {
             this.slider.set(sliderValues.map(() => sliderValues[0]));
         }
         // delay happens before first call
-        this.intervalID = setInterval(this.moveHandleRight, 1400);
+        this.intervalID = window.setInterval(this.moveHandleRight, 1400);
     }
 
     /**

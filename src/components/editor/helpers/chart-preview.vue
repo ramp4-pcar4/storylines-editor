@@ -61,7 +61,14 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartConfig, DQVChartConfig, PieSeriesData, PieDataRow, LineSeriesData } from '@/definitions';
+import {
+    ChartConfig,
+    DQVChartConfig,
+    PieSeriesData,
+    PieDataRow,
+    LineSeriesData,
+    ConfigFileStructure
+} from '@/definitions';
 import ChartV from '@/components/panels/helpers/chart.vue';
 
 @Component({
@@ -71,13 +78,13 @@ import ChartV from '@/components/panels/helpers/chart.vue';
 })
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
-    @Prop() configFileStructure!: any;
+    @Prop() configFileStructure!: ConfigFileStructure;
 
     loading = true;
     chartIdx = 0;
     chartConfig = {};
     chartName = '';
-    modalEditor: any = undefined;
+    modalEditor: typeof highed.ModalEditor = undefined;
 
     mounted(): void {
         this.chartConfig = this.chart;
@@ -104,7 +111,7 @@ export default class ChartPreviewV extends Vue {
                 },
                 defaultChartOptions: chartOptions
             },
-            (newChart: any) => {
+            (newChart: string) => {
                 const chart = JSON.parse(newChart);
                 const chartConfig = {
                     name: chart.title.text,

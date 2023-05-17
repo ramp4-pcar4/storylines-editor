@@ -121,7 +121,6 @@
                 :configLang="lang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
-                :editExisting="editExisting"
                 @save-changes="generateConfig"
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
@@ -162,17 +161,22 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Route } from 'vue-router';
+import { Dictionary } from 'vue-router/types/router';
+import { AxiosResponse } from 'axios';
 import {
     AudioPanel,
     BasePanel,
     ChartConfig,
     ChartPanel,
+    ConfigFileStructure,
     DynamicChildItem,
     DynamicPanel,
     ImagePanel,
     MapPanel,
+    MetadataContent,
     Slide,
     SlideshowPanel,
+    SourceCounts,
     StoryRampConfig
 } from '@/definitions';
 
@@ -186,6 +190,18 @@ import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import EditorV from './editor.vue';
+
+interface RouteParams {
+    uid: string;
+    configLang: string;
+    configs: {
+        [key: string]: StoryRampConfig | undefined;
+    };
+    configFileStructure: ConfigFileStructure;
+    metadata: MetadataContent;
+    slides: Slide[];
+    sourceCounts: SourceCounts;
+}
 
 @Component({
     components: {
@@ -203,7 +219,7 @@ export default class MetadataEditorV extends Vue {
     configs: {
         [key: string]: StoryRampConfig | undefined;
     } = { en: undefined, fr: undefined };
-    configFileStructure: any = undefined;
+    configFileStructure: ConfigFileStructure | undefined = undefined;
     loadStatus = 'waiting';
     loadEditor = false;
     error = false; // whether an error has occurred
@@ -217,8 +233,7 @@ export default class MetadataEditorV extends Vue {
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
-    $modals: any;
-    metadata = {
+    metadata: MetadataContent = {
         title: '',
         introTitle: '',
         introSubtitle: '',
@@ -233,7 +248,7 @@ export default class MetadataEditorV extends Vue {
         uuid: true
     };
     slides: Slide[] = [];
-    sourceCounts: any = {};
+    sourceCounts: SourceCounts = {};
 
     created(): void {
         // Generate UUID for new product
@@ -260,37 +275,42 @@ export default class MetadataEditorV extends Vue {
 
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
             if (this.$route.params.configs && this.$route.params.configFileStructure) {
-                this.configs = this.$route.params.configs as any;
-                this.configFileStructure = this.$route.params.configFileStructure;
-                this.metadata = this.$route.params.metadata as any;
-                this.slides = this.$route.params.slides as any;
-                this.sourceCounts = this.$route.params.sourceCounts;
+                // declare props typing to get around TS warnings
+                const route = this.$route as Route & {
+                    params: RouteParams;
+                };
+
+                this.configs = route.params.configs;
+                this.configFileStructure = route.params.configFileStructure;
+                this.metadata = route.params.metadata;
+                this.slides = route.params.slides;
+                this.sourceCounts = route.params.sourceCounts;
 
                 // Load product logo (if provided).
-                const logo = this.configs[this.lang]!.introSlide.logo.src;
+                const logo = (this.configs[this.lang] as StoryRampConfig).introSlide.logo.src;
                 const logoSrc = `assets/${this.lang}/${this.metadata.logoName}`;
 
                 if (logo) {
-                    if (this.configFileStructure.zip.file(logoSrc)) {
-                        this.configFileStructure.zip
-                            .file(logoSrc)
-                            .async('blob')
-                            .then((img: any) => {
-                                this.logoImage = new File([img], this.metadata.logoName);
-                                this.metadata.logoPreview = URL.createObjectURL(img);
-                                this.loadStatus = 'loaded';
-                            });
+                    const logoFile = this.configFileStructure?.zip.file(logoSrc);
+                    if (logoFile) {
+                        logoFile.async('blob').then((img: Blob) => {
+                            this.logoImage = new File([img], this.metadata.logoName);
+                            this.metadata.logoPreview = URL.createObjectURL(img);
+                            this.loadStatus = 'loaded';
+                        });
                     } else {
                         // Fill in the field with this value whether it exists or not.
                         this.metadata.logoName = logo;
 
                         // If it doesn't exist, maybe it's a remote file?
-                        fetch(logo).then((data: any) => {
+                        fetch(logo).then((data: Response) => {
                             if (data.status !== 404) {
-                                this.logoImage = new File([data], this.metadata.logoName);
-                                this.metadata.logoPreview = logo;
+                                data.blob().then((blob: Blob) => {
+                                    this.logoImage = new File([blob], this.metadata.logoName);
+                                    this.metadata.logoPreview = logo;
+                                    this.loadStatus = 'loaded';
+                                });
                             }
-                            this.loadStatus = 'loaded';
                         });
                     }
                 } else {
@@ -318,11 +338,6 @@ export default class MetadataEditorV extends Vue {
         this.configs[this.lang] = this.configHelper();
         const config = this.configs[this.lang] as StoryRampConfig;
 
-        config.title = this.metadata.title;
-        config.introSlide.title = this.metadata.introTitle;
-        config.introSlide.subtitle = this.metadata.introSubtitle;
-        config.slides = [];
-
         // Set the source of the product logo
         if (!this.metadata.logoName) {
             config.introSlide.logo.src = '';
@@ -331,6 +346,7 @@ export default class MetadataEditorV extends Vue {
         } else {
             config.introSlide.logo.src = this.metadata.logoName;
         }
+        config.slides = [];
 
         const otherLang = this.lang === 'en' ? 'fr' : 'en';
         this.configs[otherLang] = config;
@@ -349,16 +365,15 @@ export default class MetadataEditorV extends Vue {
     }
 
     configHelper(): StoryRampConfig {
-        // TODO: require user to input these fields instead of defaulting (speeds up testing purposes for now)
         return {
-            title: 'Test Config',
-            lang: 'en',
+            title: this.metadata.title,
+            lang: this.lang,
             introSlide: {
                 logo: {
                     src: ''
                 },
-                title: '',
-                subtitle: ''
+                title: this.metadata.introTitle,
+                subtitle: this.metadata.introSubtitle
             },
             slides: [],
             contextLabel: this.metadata.contextLabel,
@@ -375,7 +390,7 @@ export default class MetadataEditorV extends Vue {
 
         // Attempt to fetch the project from the server.
         fetch(`http://localhost:6040/retrieve/${this.uuid}`)
-            .then((res: any) => {
+            .then((res: Response) => {
                 if (res.status === 404) {
                     // Product not found.
                     this.$message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
@@ -385,7 +400,7 @@ export default class MetadataEditorV extends Vue {
                 } else {
                     const configZip = new JSZip();
                     // Files retrieved. Convert them into a JSZip object.
-                    res.blob().then((file: any) => {
+                    res.blob().then((file: Blob) => {
                         configZip.loadAsync(file).then(() => {
                             this.configFileStructureHelper(configZip);
                         });
@@ -451,7 +466,7 @@ export default class MetadataEditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: any, uploadLogo?: File | undefined): void {
+    configFileStructureHelper(configZip: typeof JSZip, uploadLogo?: File | undefined): void {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -459,7 +474,7 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure = {
             uuid: this.uuid,
             zip: configZip,
-            configs: this.configs,
+            configs: (this.configs as unknown) as { [key: string]: StoryRampConfig },
             assets: {
                 en: assetsFolder.folder('en'),
                 fr: assetsFolder.folder('fr')
@@ -493,18 +508,14 @@ export default class MetadataEditorV extends Vue {
         }
 
         try {
-            await this.configFileStructure.zip
-                .file(`${this.uuid}_en.json`)
-                .async('string')
-                .then((res: any) => {
-                    this.configs['en'] = JSON.parse(res);
-                });
-            await this.configFileStructure.zip
-                .file(`${this.uuid}_fr.json`)
-                .async('string')
-                .then((res: any) => {
-                    this.configs['fr'] = JSON.parse(res);
-                });
+            const enFile = this.configFileStructure?.zip.file(`${this.uuid}_en.json`);
+            const frFile = this.configFileStructure?.zip.file(`${this.uuid}_fr.json`);
+            await enFile?.async('string').then((res: string) => {
+                this.configs['en'] = JSON.parse(res);
+            });
+            await frFile?.async('string').then((res: string) => {
+                this.configs['fr'] = JSON.parse(res);
+            });
         } catch {
             this.$message.error(`The requested product '${this.uuid ?? ''}' is malformed.`);
             this.loadStatus = 'waiting';
@@ -556,27 +567,28 @@ export default class MetadataEditorV extends Vue {
         // Fetch the logo from the folder (if it exists).
         const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
         const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
-        if (this.configFileStructure.zip.file(logoSrc)) {
-            this.configFileStructure.zip
-                .file(logoSrc)
-                .async('blob')
-                .then((img: any) => {
-                    this.logoImage = new File([img], logoName);
-                    this.metadata.logoPreview = URL.createObjectURL(img);
-                    this.metadata.logoName = logoName;
-                    this.loadStatus = 'loaded';
-                });
+        const logoFile = this.configFileStructure?.zip.file(logoSrc);
+
+        if (logoFile) {
+            logoFile.async('blob').then((img: Blob) => {
+                this.logoImage = new File([img], logoName);
+                this.metadata.logoPreview = URL.createObjectURL(img);
+                this.metadata.logoName = logoName;
+                this.loadStatus = 'loaded';
+            });
         } else {
             // Fill in the field with this value whether it exists or not.
             this.metadata.logoName = logo;
 
             // If it doesn't exist, maybe it's a remote file?
-            fetch(logo).then((data: any) => {
+            fetch(logo).then((data: Response) => {
                 if (data.status !== 404) {
-                    this.logoImage = new File([data], logoName);
-                    this.metadata.logoPreview = logo;
+                    data.blob().then((blob: Blob) => {
+                        this.logoImage = new File([blob], logoName);
+                        this.metadata.logoPreview = logo;
+                        this.loadStatus = 'loaded';
+                    });
                 }
-                this.loadStatus = 'loaded';
             });
         }
     }
@@ -585,28 +597,28 @@ export default class MetadataEditorV extends Vue {
      * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
      * with the new changes, then generates and submits the product file to the server.
      */
-    generateConfig(): StoryRampConfig {
+    generateConfig(): ConfigFileStructure {
         this.saving = true;
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as any).saveChanges();
+            (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
         // Update the configuration file.
         const fileName = `${this.uuid}_${this.lang}.json`;
         const formattedConfigFile = JSON.stringify(this.configs[this.lang], null, 4);
 
-        this.configFileStructure.zip.file(fileName, formattedConfigFile);
+        this.configFileStructure?.zip.file(fileName, formattedConfigFile);
 
         // Upload the ZIP file.
-        this.configFileStructure.zip.generateAsync({ type: 'blob' }).then((content: any) => {
+        this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
             const headers = { 'Content-Type': 'multipart/form-data' };
 
             axios
                 .post('http://localhost:6040/upload', formData, { headers })
-                .then((res: any) => {
+                .then((res: AxiosResponse) => {
                     res.data.files; // binary representation of the file
                     res.status; // HTTP status
                     this.unsavedChanges = false;
@@ -624,7 +636,7 @@ export default class MetadataEditorV extends Vue {
                 });
         });
 
-        return this.configFileStructure;
+        return this.configFileStructure as ConfigFileStructure;
     }
 
     updateMetadata(
@@ -632,6 +644,7 @@ export default class MetadataEditorV extends Vue {
         value: string
     ): void {
         this.metadata[key] = value;
+        this.unsavedChanges = true;
     }
 
     /**
@@ -654,7 +667,10 @@ export default class MetadataEditorV extends Vue {
                 config.introSlide.logo.src = '';
             } else if (!this.metadata.logoName.includes('http')) {
                 config.introSlide.logo.src = `${this.uuid}/assets/${this.lang}/${this.logoImage?.name}`;
-                this.configFileStructure.assets[this.lang].file(this.logoImage?.name, this.logoImage);
+                this.configFileStructure?.assets[this.lang].file(
+                    this.logoImage?.name as string,
+                    this.logoImage as File
+                );
             } else {
                 config.introSlide.logo.src = this.metadata.logoName;
             }
@@ -694,13 +710,13 @@ export default class MetadataEditorV extends Vue {
         this.lang = this.lang === 'en' ? 'fr' : 'en';
         this.loadConfig();
         if (this.loadEditor) {
-            (this.$refs.mainEditor as any).selectSlide(-1);
+            (this.$refs.mainEditor as EditorV).selectSlide(-1);
         }
     }
 
     checkUuid(): void {
         if (!this.editExisting) {
-            fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: any) => {
+            fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
                     this.warning = true;
                 }
@@ -755,16 +771,15 @@ export default class MetadataEditorV extends Vue {
 
     updateEditorPath(): void {
         if (this.$route.name !== 'editor') {
-            const props = {
+            const props = ({
                 uid: this.uuid,
                 configLang: this.lang,
-                configs: this.configs as any,
-                configFileStructure: this.configFileStructure,
+                configs: this.configs,
+                configFileStructure: this.configFileStructure as ConfigFileStructure,
                 sourceCounts: this.sourceCounts,
-                metadata: this.metadata as any,
-                slides: this.slides as any,
-                editExisting: this.editExisting as any
-            };
+                metadata: this.metadata,
+                slides: this.slides
+            } as unknown) as Dictionary<string>;
             this.$router.push({ name: 'editor', params: props });
         }
     }
@@ -788,7 +803,7 @@ export default class MetadataEditorV extends Vue {
         }
 
         if (this.editExisting) {
-            if (this.configs[this.lang] !== undefined && this.uuid === this.configFileStructure.uuid) {
+            if (this.configs[this.lang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
                 this.updateEditorPath();
             } else {
@@ -805,11 +820,11 @@ export default class MetadataEditorV extends Vue {
     /**
      * Update the unsaved changes value to the payload.
      */
-    updateSaveStatus(payload: boolean) {
+    updateSaveStatus(payload: boolean): void {
         this.unsavedChanges = payload;
     }
 
-    refreshConfig() {
+    refreshConfig(): void {
         // Re-fetch the product from the server.
         if (this.editExisting) {
             this.loadEditor = false;
@@ -820,12 +835,22 @@ export default class MetadataEditorV extends Vue {
             setTimeout(() => {
                 this.$router.push({
                     name: 'metadata',
-                    params: {
+                    params: ({
                         lang: this.lang,
-                        editExisting: false as any
-                    }
+                        editExisting: false
+                    } as unknown) as Dictionary<string>
                 });
             }, 100);
+        }
+    }
+
+    beforeRouteLeave(to: Route, from: Route, next: (cont?: boolean) => void): void {
+        const curEditor = this.$route.name === 'editor';
+        const confirmationMessage = 'Leave the page? Changes made may not be saved.';
+        if (this.unsavedChanges && curEditor && !window.confirm(confirmationMessage)) {
+            next(false);
+        } else {
+            next();
         }
     }
 }

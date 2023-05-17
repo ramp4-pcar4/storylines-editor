@@ -82,9 +82,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import defaultConfigEn from '../../../public/scripts/ramp-editor/samples/map_en.json';
 import defaultConfigFr from '../../../public/scripts/ramp-editor/samples/map_fr.json';
-import { TimeSliderConfig } from '@/definitions';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 
 @Component({
@@ -93,10 +93,10 @@ import TimeSliderEditorV from './helpers/time-slider-editor.vue';
     }
 })
 export default class MapEditorV extends Vue {
-    @Prop() panel!: any;
-    @Prop() configFileStructure!: any;
+    @Prop() panel!: MapPanel;
+    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: any;
+    @Prop() sourceCounts!: SourceCounts;
 
     // For creating new files.
     newFileName = '';
@@ -105,7 +105,6 @@ export default class MapEditorV extends Vue {
     usingTimeSlider = !!this.panel.timeSlider;
     timeSliderError = false;
     timeSliderConf: TimeSliderConfig = { range: [], start: [], attribute: '' };
-    $modals: any;
     status = this.panel.config !== '' ? 'default' : 'creating';
     strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[3].split('.')[0] : '';
 
@@ -158,19 +157,17 @@ export default class MapEditorV extends Vue {
         if (this.panel.config) {
             // Check if the config file exists in the ZIP folder first.
             const assetSrc = `${this.panel.config.substring(this.panel.config.indexOf('/') + 1)}`;
+            const configFile = this.configFileStructure.zip.file(assetSrc);
 
-            if (this.configFileStructure.zip.file(assetSrc)) {
-                this.configFileStructure.zip
-                    .file(assetSrc)
-                    .async('string')
-                    .then((res: any) => {
-                        window.config = res;
-                        const iframe = document.getElementById('RAMPeditorframe') as HTMLIFrameElement;
-                        if (iframe.contentWindow) {
-                            iframe.contentWindow.config = res;
-                            iframe.contentWindow.configname = this.strippedFileName;
-                        }
-                    });
+            if (configFile) {
+                configFile.async('string').then((res: string) => {
+                    window.config = res;
+                    const iframe = document.getElementById('RAMPeditorframe') as HTMLIFrameElement;
+                    if (iframe.contentWindow) {
+                        iframe.contentWindow.config = res;
+                        iframe.contentWindow.configname = this.strippedFileName;
+                    }
+                });
             } else {
                 // If it does not exist in the ZIP folder, try and fetch from server.
                 fetch(this.panel.config).then((data) => {
@@ -199,7 +196,7 @@ export default class MapEditorV extends Vue {
         }
     }
 
-    saveEditor(e: any): void {
+    saveEditor(e: MessageEvent): void {
         if (e.data === 'mapSaved') {
             this.status = 'default';
 

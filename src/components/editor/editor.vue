@@ -87,7 +87,7 @@
                                 />
                             </svg>
                         </span>
-                        <span class="align-middle inline-block">Edit Project Metadata</span>
+                        <span class="align-middle inline-block">{{ $t('editor.editMetadata') }}</span>
                     </button>
                 </div>
                 <slide-toc
@@ -125,9 +125,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { StoryRampConfig, Slide } from '@/definitions';
-
-const axios = require('axios').default;
+import { StoryRampConfig, Slide, MetadataContent, SourceCounts, ConfigFileStructure } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
@@ -148,21 +146,19 @@ export default class EditorV extends Vue {
     @Prop() configs!: {
         [key: string]: StoryRampConfig | undefined;
     };
-    @Prop() configFileStructure!: any;
-    @Prop() sourceCounts!: any;
-    @Prop() metadata!: any;
+    @Prop() configFileStructure!: ConfigFileStructure | undefined;
+    @Prop() sourceCounts!: SourceCounts;
+    @Prop() metadata!: MetadataContent;
     @Prop() slides!: Slide[];
     @Prop() configLang!: string;
     @Prop() saving!: boolean;
     @Prop() unsavedChanges!: boolean;
-    @Prop() editExisting!: boolean;
 
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
-    currentSlide: any = '';
+    currentSlide: Slide | string = '';
     slideIndex = -1;
-    $modals: any;
 
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
@@ -175,8 +171,8 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
-        window.addEventListener('beforeunload', this.beforeWindowUnload);
         this.uuid = this.$route.params.uid;
+        window.addEventListener('beforeunload', this.beforeWindowUnload);
     }
 
     beforeDestroy(): void {
@@ -189,18 +185,19 @@ export default class EditorV extends Vue {
     selectSlide(index: number): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as any).saveChanges();
+            (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
         // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
         this.currentSlide = {
+            title: '',
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
         setTimeout(() => {
             this.currentSlide = index === -1 ? '' : (this.slides as Slide[])[index];
             this.slideIndex = index;
-            (this.$refs.slide as any).panelIndex = 0;
+            (this.$refs.slide as SlideEditorV).panelIndex = 0;
             window.scrollTo(0, 0);
         }, 5);
     }
@@ -210,7 +207,7 @@ export default class EditorV extends Vue {
      */
     updateSlides(slides: Slide[]): void {
         this.slides = slides;
-        this.slideIndex = this.slides.indexOf(this.currentSlide);
+        this.slideIndex = this.slides.indexOf(this.currentSlide as Slide);
     }
 
     /**
@@ -219,17 +216,17 @@ export default class EditorV extends Vue {
     preview(): void {
         // save current slide final changes before previewing product
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as any).saveChanges();
+            (this.$refs.slide as SlideEditorV).saveChanges();
         }
         const routeData = this.$router.resolve({ name: 'preview' });
         const previewTab = window.open(routeData.href, '_blank');
-        (previewTab as any).props = {
+        (previewTab as Window).props = {
             config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
             configFileStructure: this.configFileStructure
         };
     }
 
-    beforeWindowUnload(e: any): void {
+    beforeWindowUnload(e: BeforeUnloadEvent): void {
         // show popup if when leaving page with unsaved changes
         if (this.unsavedChanges && !window.confirm()) {
             e.preventDefault();
