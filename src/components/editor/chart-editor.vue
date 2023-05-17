@@ -59,8 +59,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import { ChartConfig } from '@/definitions';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ChartConfig, ChartPanel, ConfigFileStructure, Highchart, SourceCounts } from '@/definitions';
 import ChartPanelV from '@/components/panels/chart-panel.vue';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
@@ -75,17 +75,15 @@ import draggable from 'vuedraggable';
     }
 })
 export default class ChartEditorV extends Vue {
-    @Prop() panel!: any;
-    @Prop() configFileStructure!: any;
+    @Prop() panel!: ChartPanel;
+    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: any;
-
-    $modals: any;
+    @Prop() sourceCounts!: SourceCounts;
 
     edited = false;
 
     chartConfigs = [] as Array<ChartConfig>;
-    modalEditor = {} as any;
+    modalEditor = {} as typeof highed.ModalEditor;
 
     mounted(): void {
         // attach highcharts modal editor to summoner node
@@ -99,8 +97,7 @@ export default class ChartEditorV extends Vue {
                         options: 'plugins csv json'
                     }
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (chart: any) => {
+                (chart: Highchart) => {
                     this.createNewChart(chart.toString());
                 }
             );

@@ -57,7 +57,7 @@ export default class MapPanelV extends Vue {
         const observer = new IntersectionObserver(
             ([e]) => {
                 if (e.isIntersecting) {
-                    this.intersectTimeoutHandle = setTimeout(() => {
+                    this.intersectTimeoutHandle = window.setTimeout(() => {
                         this.init();
                         observer.disconnect();
                         this.mapComponent?.querySelector('.map-loading')?.remove();

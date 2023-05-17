@@ -67,9 +67,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ConfigFileStructure, ImageFile, ImagePanel, PanelType, SlideshowPanel, SourceCounts } from '@/definitions';
 import draggable from 'vuedraggable';
-import { ImagePanel, ImageFile } from '@/definitions';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
 @Component({
@@ -79,10 +79,10 @@ import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
     }
 })
 export default class ImageEditorV extends Vue {
-    @Prop() panel!: any;
-    @Prop() configFileStructure!: any;
+    @Prop() panel!: SlideshowPanel;
+    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: any;
+    @Prop() sourceCounts!: SourceCounts;
 
     dragging = false;
     edited = false;
@@ -107,18 +107,18 @@ export default class ImageEditorV extends Vue {
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');
 
-                this.imagePreviewPromises.push(
-                    this.configFileStructure.zip
-                        .file(assetSrc)
-                        .async('blob')
-                        .then((res: any) => {
+                const assetFile = this.configFileStructure.zip.file(assetSrc);
+                if (assetFile) {
+                    this.imagePreviewPromises.push(
+                        assetFile.async('blob').then((res: Blob) => {
                             return {
                                 ...image,
                                 id: filename ? filename : image.src,
                                 src: URL.createObjectURL(res)
-                            };
+                            } as ImageFile;
                         })
-                );
+                    );
+                }
             });
 
             // Once all images have been retrieved, display them.
@@ -127,7 +127,7 @@ export default class ImageEditorV extends Vue {
                 this.imagePreviewsLoading = false;
             });
 
-            this.slideshowCaption = this.panel.caption;
+            this.slideshowCaption = this.panel.caption as string;
         }
     }
 
@@ -208,7 +208,8 @@ export default class ImageEditorV extends Vue {
             this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
                 return {
                     ...imageFile,
-                    src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`
+                    src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`,
+                    type: PanelType.Image
                 };
             });
             this.panel.caption = this.slideshowCaption ?? undefined;

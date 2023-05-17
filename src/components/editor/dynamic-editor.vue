@@ -87,12 +87,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import {
+    ChartConfig,
+    ChartPanel,
+    ConfigFileStructure,
+    DefaultConfigs,
+    DynamicChildItem,
+    DynamicPanel,
+    ImagePanel,
+    MapPanel,
+    PanelType,
+    SlideshowPanel,
+    SourceCounts
+} from '@/definitions';
+
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
-import { DefaultConfigs, PanelType } from '@/definitions';
 
 @Component({
     components: {
@@ -104,12 +117,12 @@ import { DefaultConfigs, PanelType } from '@/definitions';
     }
 })
 export default class DynamicEditorV extends Vue {
-    @Prop() panel!: any;
-    @Prop() configFileStructure!: any;
+    @Prop() panel!: DynamicPanel;
+    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: any;
+    @Prop() sourceCounts!: SourceCounts;
 
-    editors = {
+    editors: Record<string, string> = {
         text: 'text-editor',
         image: 'image-editor',
         slideshow: 'image-editor',
@@ -152,8 +165,8 @@ export default class DynamicEditorV extends Vue {
     newSlideName = '';
     newSlideType = 'text';
 
-    get idUsed(): any {
-        return this.panel.children.some((ch: any) => ch.id === this.newSlideName);
+    get idUsed(): boolean {
+        return this.panel.children.some((ch: DynamicChildItem) => ch.id === this.newSlideName);
     }
 
     changePanel(target: string): void {
@@ -168,46 +181,54 @@ export default class DynamicEditorV extends Vue {
 
         // Image Panel to Slideshow Panel Conversion
         if (this.panel.children[this.editingSlide].panel.type === 'image') {
-            this.panel.children[this.editingSlide].panel = {
-                type: 'slideshow',
-                images: [this.panel.children[this.editingSlide].panel]
+            (this.panel.children[this.editingSlide].panel as SlideshowPanel) = {
+                type: PanelType.Slideshow,
+                images: [this.panel.children[this.editingSlide].panel as ImagePanel]
             };
         }
     }
 
-    removeSlide(item: any): void {
-        const panel = this.panel.children.find((panel: any, idx: number) => idx === item).panel;
+    removeSlide(item: number): void {
+        const panel = this.panel.children.find((panel: DynamicChildItem, idx: number) => idx === item)?.panel;
 
         // Update source counts based on which panel is removed.
-        switch (panel.type) {
-            case 'map':
-                this.sourceCounts[panel.config] -= 1;
-                if (this.sourceCounts[panel.config] === 0) {
-                    this.configFileStructure.zip.remove(`${panel.config.substring(panel.config.indexOf('/') + 1)}`);
+        switch (panel?.type) {
+            case 'map': {
+                const mapPanel = panel as MapPanel;
+                this.sourceCounts[mapPanel.config] -= 1;
+                if (this.sourceCounts[mapPanel.config] === 0) {
+                    this.configFileStructure.zip.remove(
+                        `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
+                    );
                 }
                 break;
+            }
 
-            case 'chart':
-                panel.charts.forEach((chart: any) => {
+            case 'chart': {
+                const chartPanel = panel as ChartPanel;
+                chartPanel.charts.forEach((chart: ChartConfig) => {
                     this.sourceCounts[chart.src] -= 1;
                     if (this.sourceCounts[chart.src] === 0) {
                         this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
+            }
 
-            case 'slideshow':
-                panel.images.forEach((image: any) => {
+            case 'slideshow': {
+                const slideshowPanel = panel as SlideshowPanel;
+                slideshowPanel.images.forEach((image: ImagePanel) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
                     }
                 });
                 break;
+            }
         }
 
         // Remove the panel itself.
-        this.panel.children = this.panel.children.filter((panel: any, idx: number) => idx !== item);
+        this.panel.children = this.panel.children.filter((panel: DynamicChildItem, idx: number) => idx !== item);
 
         // If the slide being removed is the currently selected slide, unselect it.
         if (this.editingSlide === item) {
@@ -228,8 +249,11 @@ export default class DynamicEditorV extends Vue {
     }
 
     saveChanges(): void {
-        if (this.$refs.slide !== undefined && typeof (this.$refs.slide as any).saveChanges === 'function') {
-            (this.$refs.slide as any).saveChanges();
+        if (
+            this.$refs.slide !== undefined &&
+            typeof (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges === 'function'
+        ) {
+            (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges();
         }
     }
 }

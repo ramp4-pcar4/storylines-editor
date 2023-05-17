@@ -46,8 +46,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import { StoryRampConfig } from '@/definitions';
+import { Component, Vue } from 'vue-property-decorator';
+import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
 
 import StoryContentV from '@/components/story/story-content.vue';
 import IntroV from '@/components/story/introduction.vue';
@@ -62,7 +62,7 @@ import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 })
 export default class StoryPreviewV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    configFileStructure: any;
+    configFileStructure: ConfigFileStructure | undefined = undefined;
     savedProduct = false;
     loadStatus = 'loading';
     activeChapterIndex = -1;
@@ -75,7 +75,7 @@ export default class StoryPreviewV extends Vue {
         if (uid) {
             this.savedProduct = true;
             // attempt to fetch saved config file from the server (TODO: setup as express route?)
-            fetch(`http://localhost:6040/retrieve/${uid}/${lang}`).then((res: any) => {
+            fetch(`http://localhost:6040/retrieve/${uid}/${lang}`).then((res: Response) => {
                 if (res.status === 404) {
                     console.error(`There does not exist a saved product with UID ${uid}.`);
                     // redirect to canada.ca 404 page on invalid URL params
@@ -89,8 +89,8 @@ export default class StoryPreviewV extends Vue {
                 }
             });
         } else {
-            this.config = (window as any).props.config;
-            this.configFileStructure = (window as any).props.configFileStructure;
+            this.config = window.props.config;
+            this.configFileStructure = window.props.configFileStructure;
             this.loadStatus = 'loaded';
         }
 
