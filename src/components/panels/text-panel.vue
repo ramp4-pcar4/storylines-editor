@@ -4,7 +4,7 @@
             {{ config.title }}
         </component>
 
-        <div class="px-10 md-content object-contain" v-html="md.render(config.content)"></div>
+        <div class="px-10 md-content object-contain" v-html="mdContent"></div>
     </Scrollama>
 </template>
 
@@ -24,8 +24,14 @@ export default class TextPanelV extends Vue {
     @Prop() config!: TextPanel;
 
     md = new MarkdownIt({ html: true });
+    mdContent = '';
 
     mounted(): void {
+        this.mdContent = this.md
+            .render(this.config.content)
+            .replace(/<table/g, '<div class="table-container"><table')
+            .replace(/<\/table>/g, '</table></div>');
+
         document.querySelectorAll('.storyramp-app a:not([target])').forEach((el: any) => (el.target = '_blank'));
     }
 }
@@ -39,6 +45,10 @@ export default class TextPanelV extends Vue {
 
     .md-content {
         max-width: 100vw;
+
+        ::v-deep .table-container {
+            overflow-x: auto;
+        }
     }
 }
 </style>
