@@ -6,26 +6,36 @@
             :key="config.images[0].src"
         ></image-panel>
     </div>
-    <div ref="images" v-else class="carousel self-start px-10 my-8 bg-gray-200_ h-28_" :style="{ width: `${width}px` }">
-        <full-screen :expandable="config.fullscreen" :type="config.type">
-            <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
-                <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
-                    <img
-                        :data-src="image.src"
-                        :src="slideIdx > 2 ? '' : image.src"
-                        :alt="image.altText || ''"
-                        :style="{ width: `${image.width}px`, height: `${image.height}px` }"
-                        class="m-auto story-graphic carousel-image"
-                    />
-                    <div v-if="image.caption" class="text-center my-8 text-sm" v-html="md.render(image.caption)"></div>
-                </slide>
+    <div class="flex" v-else>
+        <div
+            ref="images"
+            class="carousel self-center px-10 my-8 mx-auto bg-gray-200_ h-28_"
+            :style="{ width: `${width}px` }"
+        >
+            <full-screen :expandable="config.fullscreen" :type="config.type">
+                <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
+                    <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
+                        <img
+                            :data-src="image.src"
+                            :src="slideIdx > 2 ? '' : image.src"
+                            :alt="image.altText || ''"
+                            :style="{ width: `${image.width}px`, height: `${image.height}px` }"
+                            class="m-auto story-graphic carousel-image"
+                        />
+                        <div
+                            v-if="image.caption"
+                            class="text-center my-8 text-sm"
+                            v-html="md.render(image.caption)"
+                        ></div>
+                    </slide>
 
-                <hooper-navigation slot="hooper-addons"></hooper-navigation>
-                <hooper-pagination slot="hooper-addons"></hooper-pagination>
-            </hooper>
-        </full-screen>
+                    <hooper-navigation slot="hooper-addons"></hooper-navigation>
+                    <hooper-pagination slot="hooper-addons"></hooper-pagination>
+                </hooper>
+            </full-screen>
 
-        <div v-if="config.caption" class="text-center mt-5 text-sm" v-html="md.render(config.caption)"></div>
+            <div v-if="config.caption" class="text-center mt-5 text-sm" v-html="md.render(config.caption)"></div>
+        </div>
     </div>
 </template>
 
@@ -110,6 +120,18 @@ export default class SlideshowPanelV extends Vue {
         padding-left: initial !important;
         border-radius: 100%;
         background: radial-gradient(white, transparent 75%);
+    }
+
+    ::v-deep .hooper-next {
+        right: calc(-32px - 2em);
+    }
+
+    ::v-deep .hooper-prev {
+        left: calc(-32px - 2em);
+    }
+
+    ::v-deep .hooper-pagination {
+        transform: translate(50%, 200%);
     }
 
     ::v-deep .hooper-indicator {
