@@ -131,9 +131,6 @@ export default class DynamicPanelV extends Vue {
 }
 
 @media screen and (max-width: 640px) {
-    .dynamic-content {
-        max-height: 40vh;
-    }
     .return-button-container {
         position: static;
         text-align: center;
