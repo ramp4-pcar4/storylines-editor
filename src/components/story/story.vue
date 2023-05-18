@@ -25,7 +25,7 @@
                         :slides="config.slides"
                         :lang="lang"
                     />
-                    <div class="flex-none font-semibold">
+                    <div class="flex-none w-mobile-full truncate font-semibold">
                         <span class="text-lg">{{ config.title }}</span>
                     </div>
                     <div class="flex justify-end flex-auto space-x-6">
@@ -180,11 +180,18 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     .prose a:not([panel])::after {
         content: url('../../assets/popout.svg');
     }
+
+    .w-mobile-full {
+        width: 80%;
+    }
 }
 
 @media screen and (min-width: 640px) {
     .mobile-menu {
         display: none !important;
+    }
+    .w-mobile-full {
+        width: 100% !important;
     }
 }
 </style>
