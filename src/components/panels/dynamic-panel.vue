@@ -27,6 +27,7 @@
             :slideIdx="slideIdx"
             :dynamicIdx="activeIdx"
             :ratio="false"
+            ref="content"
         >
         </panel>
     </div>
@@ -97,6 +98,15 @@ export default class DynamicPanelV extends Vue {
                         this.activeConfig = panel.panel;
                         this.activeIdx = panel.id;
                     }, 10);
+
+                    setTimeout(() => {
+                        const elTop = (this.$refs['content'] as Vue).$el.getBoundingClientRect().top;
+                        window.scrollTo({
+                            top: window.pageYOffset + elTop - 63,
+                            left: 0,
+                            behavior: 'smooth'
+                        });
+                    }, 50);
                 }
             };
         });
