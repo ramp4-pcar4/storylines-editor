@@ -69,7 +69,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
-import { ImagePanel, ImageFile } from '@/definitions';
+import { ImageConfig, ImageFile } from '@/definitions';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
 @Component({
@@ -102,7 +102,7 @@ export default class ImageEditorV extends Vue {
             this.imagePreviewsLoading = true;
 
             // Process each existing image.
-            this.panel.images.map((image: ImagePanel) => {
+            this.panel.images.map((image: ImageConfig) => {
                 // Check if the config file exists in the ZIP folder first.
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');

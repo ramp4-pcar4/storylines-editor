@@ -169,6 +169,7 @@ import {
     ChartPanel,
     DynamicChildItem,
     DynamicPanel,
+    ImageConfig,
     ImagePanel,
     MapPanel,
     Slide,
@@ -422,8 +423,8 @@ export default class MetadataEditorV extends Vue {
                     this.panelSourceHelper(subPanel.panel);
                 });
                 break;
-            case 'slideshow':
-                (panel as SlideshowPanel).images.forEach((image: ImagePanel) => {
+            case 'image':
+                (panel as ImagePanel).images.forEach((image: ImageConfig) => {
                     this.incrementSourceCount(image.src);
                 });
                 break;
@@ -432,7 +433,14 @@ export default class MetadataEditorV extends Vue {
                     this.incrementSourceCount(chart.src);
                 });
                 break;
-            case 'image':
+            case 'slideshow':
+                (panel as SlideshowPanel).items.forEach((item: any) => {
+                    if (item.type !== 'text') {
+                        const itemSrc = item.type === 'map' ? item.config.config : item.config.src;
+                        this.incrementSourceCount(itemSrc);
+                    }
+                });
+                break;
             case 'video':
             case 'audio':
                 this.incrementSourceCount((panel as AudioPanel).src);

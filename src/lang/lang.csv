@@ -51,6 +51,11 @@ editor.chart.label.empty,Empty,1,Vide,1
 editor.chart.label.create,Add new chart,1,Add new chart,0
 editor.chart.label.info,Interactive charts ({num}),1,Interactive charts ({num}),0
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Are you sure you want to delete the chart {name}?,0
+editor.slideshow.label.info,Slideshow items ({num}),1,Slideshow items ({num}),0
+editor.slideshow.label.create,Add new item,1,Add new item,0
+editor.slideshow.label.type,Type,1,Type,0
+editor.slideshow.label.imagePreview,Image Preview,1,Image Preview,0
+editor.slideshow.label.image,Image,1,Image,0
 editor.map.label.create,Create New Configuration File,1,Create New Configuration File,0
 editor.map.label.edit,Edit Map Configuration,1,Edit Map Configuration,0
 editor.map.timeslider.enable,Enable Time Slider:,1,Enable Time Slider:,0

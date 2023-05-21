@@ -93,6 +93,7 @@ import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import { DefaultConfigs, PanelType } from '@/definitions';
+import SlideshowEditorV from './slideshow-editor.vue';
 
 @Component({
     components: {
@@ -100,7 +101,8 @@ import { DefaultConfigs, PanelType } from '@/definitions';
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
         'dynamic-editor': DynamicEditorV,
-        'map-editor': MapEditorV
+        'map-editor': MapEditorV,
+        'slideshow-editor': SlideshowEditorV
     }
 })
 export default class DynamicEditorV extends Vue {
@@ -109,10 +111,10 @@ export default class DynamicEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: any;
 
-    editors = {
+    editors: { [key: string]: string } = {
         text: 'text-editor',
         image: 'image-editor',
-        slideshow: 'image-editor',
+        slideshow: 'slideshow-editor',
         chart: 'chart-editor',
         map: 'map-editor'
     };
@@ -130,9 +132,13 @@ export default class DynamicEditorV extends Vue {
             content: '',
             children: []
         },
+        image: {
+            type: PanelType.Image,
+            images: []
+        },
         slideshow: {
             type: PanelType.Slideshow,
-            images: []
+            items: []
         },
         chart: {
             type: PanelType.Chart,
@@ -196,11 +202,23 @@ export default class DynamicEditorV extends Vue {
                 });
                 break;
 
-            case 'slideshow':
+            case 'image':
                 panel.images.forEach((image: any) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'slideshow':
+                panel.items.forEach((item: any) => {
+                    if (item.type !== 'text') {
+                        const itemSrc = item.type === 'map' ? item.config.config : item.config.src;
+                        this.sourceCounts[itemSrc] -= 1;
+                        if (this.sourceCounts[itemSrc] === 0) {
+                            this.configFileStructure.zip.remove(`${itemSrc.substring(itemSrc.indexOf('/') + 1)}`);
+                        }
                     }
                 });
                 break;

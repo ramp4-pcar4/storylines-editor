@@ -192,11 +192,9 @@
                             :value="currentSlide.panel[panelIndex].type"
                         >
                             <option
-                                v-for="thing in Object.keys(editors).filter(
-                                    (editor) => editor !== 'slideshow' && editor !== 'loading'
-                                )"
+                                v-for="thing in Object.keys(editors).filter((editor) => editor !== 'loading')"
                                 :key="thing"
-                                :value="thing === 'image' ? 'slideshow' : thing"
+                                :value="thing"
                             >
                                 {{ thing }}
                             </option>
@@ -235,7 +233,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { StoryRampConfig, DefaultConfigs, PanelType } from '@/definitions';
+import { StoryRampConfig, DefaultConfigs, PanelType, SlideshowItem } from '@/definitions';
 
 import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
@@ -245,6 +243,7 @@ import MapEditorV from './map-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import SlideshowEditorV from './slideshow-editor.vue';
 
 @Component({
     components: {
@@ -255,6 +254,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
         'map-editor': MapEditorV,
         'loading-page': LoadingPageV,
         'dynamic-editor': DynamicEditorV,
+        'slideshow-editor': SlideshowEditorV,
         'confirmation-modal': ConfirmationModalV
     }
 })
@@ -274,10 +274,10 @@ export default class SlideEditorV extends Vue {
     newType = '';
     rightOnly = false;
 
-    editors = {
+    editors: { [key: string]: string } = {
         text: 'text-editor',
         image: 'image-editor',
-        slideshow: 'image-editor',
+        slideshow: 'slideshow-editor',
         chart: 'chart-editor',
         map: 'map-editor',
         loading: 'loading-page',
@@ -303,9 +303,13 @@ export default class SlideEditorV extends Vue {
                 content: this.currentSlide.panel[0] && prevType === 'text' ? this.currentSlide.panel[0].content : '',
                 children: []
             },
+            image: {
+                type: PanelType.Image,
+                images: []
+            },
             slideshow: {
                 type: PanelType.Slideshow,
-                images: []
+                items: []
             },
             chart: {
                 type: PanelType.Chart,
@@ -351,11 +355,23 @@ export default class SlideEditorV extends Vue {
                 });
                 break;
 
-            case 'slideshow':
+            case 'image':
                 panel.images.forEach((image: any) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'slideshow':
+                panel.items.forEach((item: any) => {
+                    if (item.type !== 'text') {
+                        const itemSrc = item.type === 'map' ? item.config.config : item.config.src;
+                        this.sourceCounts[itemSrc] -= 1;
+                        if (this.sourceCounts[itemSrc] === 0) {
+                            this.configFileStructure.zip.remove(`${itemSrc.substring(itemSrc.indexOf('/') + 1)}`);
+                        }
                     }
                 });
                 break;

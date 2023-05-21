@@ -138,7 +138,7 @@
             "description": "A multimedia slide component.",
             "oneOf": [
                 {
-                    "$ref": "#/$defs/multimediaImage"
+                    "$ref": "#/$defs/imagePanel"
                 },
                 {
                     "$ref": "#/$defs/multimediaVideo"
@@ -147,7 +147,7 @@
                     "$ref": "#/$defs/multimediaAudio"
                 },
                 {
-                    "$ref": "#/$defs/multimediaSlideshow"
+                    "$ref": "#/$defs/slideshowPanel"
                 }
             ],
             "properties": {
@@ -157,6 +157,88 @@
                     "default": true
                 }
             }
+        },
+
+        "imagePanel": {
+            "type": "object",
+            "description": "An image panel.",
+            "properties": {
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/multimediaImage"
+                    },
+                    "description": "An array of images to display in the slideshow.",
+                    "minItems": 1
+                },
+                "loop": {
+                    "type": "boolean",
+                    "description": "Determines whether the slideshow loops back around to the beginning when you reach the end.",
+                    "default": false
+                },
+                "caption": {
+                    "type": "text",
+                    "description": "A caption to display below the slideshow."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["slideshow"]
+                }
+            }
+        },
+
+        "slideshowPanel": {
+            "type": "object",
+            "description": "A multimedia slideshow component.",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "description": "Type of this slideshow item.",
+                                "enum": ["text", "map", "image", "chart"]
+                            },
+                            "config": {
+                                "type": "object",
+                                "description": "Config for this slideshow item.",
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/$defs/multimediaImage"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/mapPanel"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/textPanel"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/dqvchartPanel"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "description": "An array of images to display in the slideshow.",
+                    "minItems": 1
+                },
+                "loop": {
+                    "type": "boolean",
+                    "description": "Determines whether the slideshow loops back around to the beginning when you reach the end.",
+                    "default": false
+                },
+                "caption": {
+                    "type": "text",
+                    "description": "A caption to display below the slideshow."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["slideshow"]
+                }
+            },
+            "required": ["items", "type"]
         },
 
         "mapPanel": {
@@ -249,10 +331,6 @@
                 "tooltip": {
                     "type": "string",
                     "description": "Tooltip content for the image."
-                },
-                "type": {
-                    "type": "string",
-                    "enum": ["image"]
                 }
             },
             "required": ["src", "type"]
@@ -306,34 +384,6 @@
             "required": ["src", "type"]
         },
 
-        "multimediaSlideshow": {
-            "type": "object",
-            "description": "A multimedia slideshow component.",
-            "properties": {
-                "images": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/$defs/multimediaImage"
-                    },
-                    "description": "An array of images to display in the slideshow.",
-                    "minItems": 1
-                },
-                "loop": {
-                    "type": "boolean",
-                    "description": "Determines whether the slideshow loops back around to the beginning when you reach the end.",
-                    "default": false
-                },
-                "caption": {
-                    "type": "text",
-                    "description": "A caption to display below the slideshow."
-                },
-                "type": {
-                    "type": "string",
-                    "enum": ["slideshow"]
-                }
-            },
-            "required": ["images", "type"]
-        },
         "dqvchartOptions": {
             "type": "object",
             "description": "Configuration for a dqvchart.",
@@ -349,7 +399,20 @@
                 "type": {
                     "type": "string",
                     "description": "The type of chart.",
-                    "enum": ["line", "spline", "area", "areaspline", "column", "bar", "pie", "scatter", "gauge", "arearange", "areasplinerange", "columnrange"]
+                    "enum": [
+                        "line",
+                        "spline",
+                        "area",
+                        "areaspline",
+                        "column",
+                        "bar",
+                        "pie",
+                        "scatter",
+                        "gauge",
+                        "arearange",
+                        "areasplinerange",
+                        "columnrange"
+                    ]
                 },
                 "width": {
                     "type": "number",
@@ -385,79 +448,80 @@
                     "description": "The title of the y-axis."
                 }
             }
-    },
-
-    "properties": {
-        "title": {
-            "type": "string",
-            "description": "The title of the story map."
         },
 
-        "introSlide": {
-            "type": "object",
-            "description": "The introductory slide",
-            "properties": {
-                "logo": {
-                    "type": "object",
-                    "description": "Information about the StoryRAMP logo",
-                    "properties": {
-                        "src": {
-                            "type": "string",
-                            "description": "An image source that is displayed at the top of the slide"
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": "The title of the story map."
+            },
+
+            "introSlide": {
+                "type": "object",
+                "description": "The introductory slide",
+                "properties": {
+                    "logo": {
+                        "type": "object",
+                        "description": "Information about the StoryRAMP logo",
+                        "properties": {
+                            "src": {
+                                "type": "string",
+                                "description": "An image source that is displayed at the top of the slide"
+                            },
+                            "altText": {
+                                "type": "string",
+                                "description": "Alt text for the logo"
+                            }
                         },
-                        "altText": {
-                            "type": "string",
-                            "description": "Alt text for the logo"
-                        }
+                        "required": ["src"]
                     },
-                    "required": ["src"]
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the project, displayed under the image"
+                    },
+                    "subtitle": {
+                        "type": "string",
+                        "description": "An optional subtitle that is displayed under the title."
+                    },
+                    "blurb": {
+                        "type": "string",
+                        "description": "Any additional information to display on the introductory slide."
+                    }
                 },
-                "title": {
-                    "type": "string",
-                    "description": "The title of the project, displayed under the image"
-                },
-                "subtitle": {
-                    "type": "string",
-                    "description": "An optional subtitle that is displayed under the title."
-                },
-                "blurb": {
-                    "type": "string",
-                    "description": "Any additional information to display on the introductory slide."
-                }
+                "required": ["logo", "title"]
             },
-            "required": ["logo", "title"]
-        },
 
-        "slides": {
-            "type": "array",
-            "description": "A list of StoryRAMP slides. A minimum of one slide is required.",
-            "items": {
-                "$ref": "#/$defs/slide"
+            "slides": {
+                "type": "array",
+                "description": "A list of StoryRAMP slides. A minimum of one slide is required.",
+                "items": {
+                    "$ref": "#/$defs/slide"
+                },
+                "minItems": 1
             },
-            "minItems": 1
+
+            "contextLink": {
+                "type": "string",
+                "description": "A link pointing to the source information"
+            },
+
+            "contextLabel": {
+                "type": "string",
+                "description": "A description that explains the context link."
+            },
+
+            "lang": {
+                "type": "string",
+                "description": "The language to display in the app",
+                "enum": ["en", "fr"]
+            },
+
+            "dateModified": {
+                "type": "string",
+                "description": "The last date that this config file was modified."
+            }
         },
 
-        "contextLink": {
-            "type": "string",
-            "description": "A link pointing to the source information"
-        },
-
-        "contextLabel": {
-            "type": "string",
-            "description": "A description that explains the context link."
-        },
-
-        "lang": {
-            "type": "string",
-            "description": "The language to display in the app",
-            "enum": ["en", "fr"]
-        },
-
-        "dateModified": {
-            "type": "string",
-            "description": "The last date that this config file was modified."
-        }
-    },
-
-    "required": ["title", "introSlide", "slides"]
+        "required": ["title", "introSlide", "slides"]
+    }
 }

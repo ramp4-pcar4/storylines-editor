@@ -18,9 +18,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg",
                     "type": "image",
-                    "caption": "This is a caption for the image."
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg",
+                            "caption": "This is a caption for the image."
+                        }
+                    ]
                 }
             ]
         },
@@ -43,8 +47,12 @@
                         {
                             "id": "panel-2",
                             "panel": {
-                                "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
-                                "type": "image"
+                                "type": "image",
+                                "images": [
+                                    {
+                                        "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -105,9 +113,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
                     "type": "image",
-                    "fullscreen": false
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
+                            "fullscreen": false
+                        }
+                    ]
                 }
             ]
         },
@@ -120,8 +132,8 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 3 - mine vs insitu.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [{ "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 3 - mine vs insitu.jpg" }]
                 }
             ]
         },
@@ -151,37 +163,30 @@
                 {
                     "images": [
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/1_AuroraNorth_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/1_AuroraNorth_RelDisp.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/2_FortHills_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/2_FortHills_RelDisp.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/3_Horizon_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/3_Horizon_RelDisp.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/4_Kearl_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/4_Kearl_RelDisp.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/5_MuskegJackpine_R5_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/5_MuskegJackpine_R5_RelDisp.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/6_Suncor_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/6_Suncor_RelDisp.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/7_Syncrude_RelDisp.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/7_Syncrude_RelDisp.PNG"
                         }
                     ],
                     "loop": true,
                     "caption": "NPRI substances reported for oil sands mining facilities",
-                    "type": "slideshow"
+                    "type": "image"
                 }
             ]
         },
@@ -245,8 +250,8 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/slide 6 - mining trends.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [{ "src": "00000000-0000-0000-0000-000000000000/assets/en/slide 6 - mining trends.jpg" }]
                 }
             ]
         },
@@ -259,8 +264,12 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Top10SubstancesTailings2019.png",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Top10SubstancesTailings2019.png"
+                        }
+                    ]
                 }
             ]
         },
@@ -275,37 +284,30 @@
                 {
                     "images": [
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/AuroraNorth_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/AuroraNorth_Tailings.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/FortHills_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/FortHills_Tailings.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Horizon_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Horizon_Tailings.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Kearl_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Kearl_Tailings.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Muskeg_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Muskeg_Tailings.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Suncor_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Suncor_Tailings.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Syncrude_Tailings.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/Syncrude_Tailings.PNG"
                         }
                     ],
                     "loop": true,
                     "caption": "Reported mine tailings from oil sands surface mining facilities",
-                    "type": "slideshow"
+                    "type": "image"
                 }
             ]
         },
@@ -346,8 +348,8 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 10 - SAGD vs CSS.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [{ "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 10 - SAGD vs CSS.jpg" }]
                 }
             ]
         },
@@ -393,8 +395,12 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg"
+                        }
+                    ]
                 }
             ]
         },
@@ -407,8 +413,12 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-516166467__1554821531978__w1920.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-516166467__1554821531978__w1920.jpg"
+                        }
+                    ]
                 }
             ]
         },
