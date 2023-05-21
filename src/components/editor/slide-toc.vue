@@ -222,11 +222,23 @@ export default class SlideTocV extends Vue {
                 });
                 break;
 
-            case 'slideshow':
+            case 'image':
                 panel.images.forEach((image: any) => {
                     this.sourceCounts[image.src] -= 1;
                     if (this.sourceCounts[image.src] === 0) {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
+                    }
+                });
+                break;
+
+            case 'slideshow':
+                panel.items.forEach((item: any) => {
+                    if (item.type !== 'text') {
+                        const itemSrc = item.type === 'map' ? item.config.config : item.config.src;
+                        this.sourceCounts[itemSrc] -= 1;
+                        if (this.sourceCounts[itemSrc] === 0) {
+                            this.configFileStructure.zip.remove(`${itemSrc.substring(itemSrc.indexOf('/') + 1)}`);
+                        }
                     }
                 });
                 break;

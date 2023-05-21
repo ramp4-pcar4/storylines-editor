@@ -112,21 +112,28 @@ export interface BasePanel {
     width?: number;
 }
 
-export interface TextPanel extends BasePanel {
+export interface TextPanel extends BasePanel, TextConfig {
     type: PanelType.Text;
+}
+
+export interface TextConfig {
     title: string;
     titleTag?: string;
     content: string; // in md format
 }
 
-export interface MapPanel extends BasePanel {
+export interface MapPanel extends BasePanel, MapConfig {
     type: PanelType.Map;
+}
+
+export interface MapConfig {
     config: string;
     fullscreen?: boolean;
     timeSlider?: TimeSliderConfig;
     title: string;
     scrollguard: boolean;
 }
+
 export interface TimeSliderConfig {
     range: number[];
     start: number[];
@@ -149,6 +156,13 @@ export interface DynamicChildItem {
 
 export interface ImagePanel extends BasePanel {
     type: PanelType.Image;
+    images: Array<ImageConfig>;
+    fullscreen?: boolean;
+    loop?: boolean;
+    caption?: string;
+}
+
+export interface ImageConfig {
     src: string;
     width?: number;
     height?: number;
@@ -176,10 +190,15 @@ export interface AudioPanel extends BasePanel {
 
 export interface SlideshowPanel extends BasePanel {
     type: PanelType.Slideshow;
-    images: ImagePanel[];
+    items: Array<SlideshowItem>;
     fullscreen?: boolean;
     loop?: boolean;
     caption?: string;
+}
+
+export interface SlideshowItem {
+    type: string;
+    config: ImageConfig | ChartConfig | MapConfig | TextConfig;
 }
 
 export interface ChartPanel extends BasePanel {
@@ -207,6 +226,7 @@ export interface ImageFile {
 
 export interface DefaultConfigs {
     text: TextPanel;
+    image: ImagePanel;
     slideshow: SlideshowPanel;
     chart: ChartPanel;
     dynamic: DynamicPanel;

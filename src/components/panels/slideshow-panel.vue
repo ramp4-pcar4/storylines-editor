@@ -1,38 +1,23 @@
 <template>
-    <div v-if="config.images.length === 1">
-        <image-panel
-            :config="config.images[0]"
-            :configFileStructure="configFileStructure"
-            :key="config.images[0].src"
-        ></image-panel>
-    </div>
-    <div class="flex" v-else>
-        <div
-            ref="images"
-            class="carousel self-center px-10 my-8 mx-auto bg-gray-200_ h-28_"
-            :style="{ width: `${width}px` }"
-        >
-            <full-screen :expandable="config.fullscreen" :type="config.type">
-                <hooper ref="carousel" v-if="width !== -1" class="h-full bg-white" :infiniteScroll="config.loop">
-                    <slide v-for="(image, index) in config.images" :key="index" :index="index" class="self-center">
-                        <img
-                            :data-src="image.src"
-                            :src="slideIdx > 2 ? '' : image.src"
-                            :alt="image.altText || ''"
-                            :style="{ width: `${image.width}px`, height: `${image.height}px` }"
-                            class="m-auto story-graphic carousel-image"
-                        />
-                        <div
-                            v-if="image.caption"
-                            class="text-center my-8 text-sm"
-                            v-html="md.render(image.caption)"
-                        ></div>
-                    </slide>
+    <div class="flex">
+        <div class="carousel self-center px-10 my-8 mx-auto bg-gray-200_" :style="{ width: `${width}px` }">
+            <hooper
+                @slide="onSlide"
+                ref="carousel"
+                v-if="width !== -1 && config.items.length > 1"
+                :infiniteScroll="config.loop"
+            >
+                <slide v-for="(panelConfig, index) in panelConfigs" :key="`item-${index}`" :index="index">
+                    <panel :config="panelConfig" :configFileStructure="configFileStructure" :slideIdx="slideIdx" />
+                </slide>
 
-                    <hooper-navigation slot="hooper-addons"></hooper-navigation>
-                    <hooper-pagination slot="hooper-addons"></hooper-pagination>
-                </hooper>
-            </full-screen>
+                <hooper-navigation slot="hooper-addons"></hooper-navigation>
+                <hooper-pagination slot="hooper-addons"></hooper-pagination>
+            </hooper>
+
+            <div v-else-if="width !== -1">
+                <panel :config="panelConfigs[0]" :configFileStructure="configFileStructure" :slideIdx="slideIdx" />
+            </div>
 
             <div v-if="config.caption" class="text-center mt-5 text-sm" v-html="md.render(config.caption)"></div>
         </div>
@@ -48,7 +33,6 @@ import MarkdownIt from 'markdown-it';
 
 import { SlideshowPanel } from '@/definitions';
 import FullscreenV from '@/components/panels/helpers/fullscreen.vue';
-import ImagePanelV from '@/components/panels/image-panel.vue';
 
 @Component({
     components: {
@@ -57,7 +41,7 @@ import ImagePanelV from '@/components/panels/image-panel.vue';
         'full-screen': FullscreenV,
         HooperNavigation,
         HooperPagination,
-        'image-panel': ImagePanelV
+        panel: () => import('./panel.vue')
     }
 })
 export default class SlideshowPanelV extends Vue {
@@ -65,48 +49,33 @@ export default class SlideshowPanelV extends Vue {
     @Prop() configFileStructure!: any;
     @Prop() slideIdx!: number;
 
+    md = new MarkdownIt({ html: true });
+    panelConfigs: Array<any> = [];
+
     width = -1;
 
-    md = new MarkdownIt({ html: true });
-
-    observer =
-        this.slideIdx > 2
-            ? new IntersectionObserver(([image]) => {
-                  // lazy load images
-                  if (image.isIntersecting) {
-                      (this.$refs.images as Element).querySelectorAll('.carousel-image').forEach((img) => {
-                          img.setAttribute('src', img.getAttribute('data-src')!);
-                      });
-                      this.$forceUpdate();
-                      this.observer!.disconnect();
-                  }
-              })
-            : undefined;
-
     mounted(): void {
+        this.panelConfigs = this.config.items.map((item) => {
+            let panelConfig: any = { ...item.config, type: item.type };
+            if (item.type === 'chart') {
+                panelConfig.charts = [item.config];
+            } else if (item.type === 'image') {
+                panelConfig.images = [item.config];
+            }
+            return panelConfig;
+        });
         setTimeout(() => {
             this.width = this.$el.clientWidth;
         }, 100);
+    }
 
-        // obtain image files from ZIP folder in editor preview mode
-        if (this.configFileStructure) {
-            this.config.images.forEach((image) => {
-                const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
-                if (this.configFileStructure.zip.file(assetSrc)) {
-                    this.configFileStructure.zip
-                        .file(assetSrc)
-                        .async('blob')
-                        .then((res: any) => {
-                            image.src = URL.createObjectURL(res);
-                            this.$forceUpdate();
-                        });
-                }
-            });
-        }
-
-        if (this.config.images.length > 1) {
-            this.observer?.observe(this.$refs.images as Element);
-        }
+    onSlide() {
+        const hooperList = this.$el.querySelector('.hooper-list') as HTMLElement;
+        setTimeout(() => {
+            // use setTimeout otherwise you get value for previous slide for some reason..
+            const hooperHeight = this.$el.querySelector('.is-current')?.clientHeight;
+            hooperList.style.maxHeight = hooperHeight + 'px';
+        }, 100);
     }
 }
 </script>
@@ -114,12 +83,16 @@ export default class SlideshowPanelV extends Vue {
 <style lang="scss" scoped>
 .hooper {
     height: auto;
-
     ::v-deep .hooper-navigation svg {
         overflow: visible;
         padding-left: initial !important;
         border-radius: 100%;
         background: radial-gradient(white, transparent 75%);
+    }
+
+    ::v-deep .hooper-list {
+        max-height: 300px;
+        transition: all 0.1s;
     }
 
     ::v-deep .hooper-next {
@@ -161,6 +134,14 @@ export default class SlideshowPanelV extends Vue {
     }
     .carousel-image {
         max-height: 48vh;
+    }
+
+    .graphic {
+        max-width: 100vw;
+        background-color: white;
+    }
+    .graphic-image {
+        max-height: 38vh;
     }
 }
 </style>

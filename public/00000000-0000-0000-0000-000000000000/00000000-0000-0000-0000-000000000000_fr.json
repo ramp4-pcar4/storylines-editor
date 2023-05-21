@@ -18,8 +18,12 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/NPRIpictogramme-2016data-FR__1552505700147__w975.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/NPRIpictogramme-2016data-FR__1552505700147__w975.jpg"
+                        }
+                    ]
                 }
             ]
         },
@@ -47,8 +51,12 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/GettyImages-187242601__1554821412825__w1920.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/GettyImages-187242601__1554821412825__w1920.jpg"
+                        }
+                    ]
                 }
             ]
         },
@@ -61,8 +69,8 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/Slide 3 - mine vs insitu.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [{ "src": "00000000-0000-0000-0000-000000000000/assets/fr/Slide 3 - mine vs insitu.jpg" }]
                 }
             ]
         },
@@ -91,37 +99,30 @@
                 {
                     "images": [
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/AuroraNorth_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/AuroraNorth_RelDisp_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/FortHills_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/FortHills_RelDisp_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Horizon_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Horizon_RelDisp_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Kearl_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Kearl_RelDisp_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/MuskegJackpine_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/MuskegJackpine_RelDisp_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Suncor_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Suncor_RelDisp_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Syncrude_RelDisp_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/Syncrude_RelDisp_FR.PNG"
                         }
                     ],
                     "loop": true,
                     "caption": "NPRI substances reported for oil sands mining facilities",
-                    "type": "slideshow"
+                    "type": "image"
                 }
             ]
         },
@@ -187,8 +188,8 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/slide 6 trends in mining.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [{ "src": "00000000-0000-0000-0000-000000000000/assets/fr/slide 6 trends in mining.jpg" }]
                 }
             ]
         },
@@ -201,8 +202,10 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/Top10SubstancesTailings2019.png",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        { "src": "00000000-0000-0000-0000-000000000000/assets/fr/Top10SubstancesTailings2019.png" }
+                    ]
                 }
             ]
         },
@@ -217,37 +220,30 @@
                 {
                     "images": [
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/AuroraNorth_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/AuroraNorth_Tailings_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/FortHills_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/FortHills_Tailings_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Horizon_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Horizon_Tailings_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Kearl_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Kearl_Tailings_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Muskeg_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Muskeg_Tailings_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Suncor_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Suncor_Tailings_FR.PNG"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Syncrude_Tailings_FR.PNG",
-                            "type": "image"
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/Syncrude_Tailings_FR.PNG"
                         }
                     ],
                     "loop": true,
                     "caption": "Résidus miniers déclarés à l’INRP par les installations d’exploitation minière à ciel ouvert de sables bitumineux",
-                    "type": "slideshow"
+                    "type": "image"
                 }
             ]
         },
@@ -288,8 +284,8 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/Slide 10 - SAGD vs CSS.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [{ "src": "00000000-0000-0000-0000-000000000000/assets/fr/Slide 10 - SAGD vs CSS.jpg" }]
                 }
             ]
         },
@@ -330,8 +326,12 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/Slide%2013%20Insitu%20trends%20-%20French__1554407015712__w628.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/fr/Slide%2013%20Insitu%20trends%20-%20French__1554407015712__w628.jpg"
+                        }
+                    ]
                 }
             ]
         },
@@ -344,8 +344,10 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/fr/slide%2014%20-%20athabasca.jpg",
-                    "type": "image"
+                    "type": "image",
+                    "images": [
+                        { "src": "00000000-0000-0000-0000-000000000000/assets/fr/slide%2014%20-%20athabasca.jpg" }
+                    ]
                 }
             ]
         }
