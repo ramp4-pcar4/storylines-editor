@@ -27,6 +27,7 @@
             :slideIdx="slideIdx"
             :dynamicIdx="activeIdx"
             :ratio="false"
+            ref="content"
         >
         </panel>
     </div>
@@ -97,6 +98,15 @@ export default class DynamicPanelV extends Vue {
                         this.activeConfig = panel.panel;
                         this.activeIdx = panel.id;
                     }, 10);
+
+                    setTimeout(() => {
+                        const elTop = (this.$refs['content'] as Vue).$el.getBoundingClientRect().top;
+                        window.scrollTo({
+                            top: window.pageYOffset + elTop - 63,
+                            left: 0,
+                            behavior: 'smooth'
+                        });
+                    }, 50);
                 }
             };
         });
@@ -106,8 +116,23 @@ export default class DynamicPanelV extends Vue {
      * When clicking the back button, change the panel back to the default (first) panel.
      */
     clickBack(): void {
-        this.activeConfig = this.defaultPanel.panel;
-        this.activeIdx = this.defaultPanel.id;
+        this.activeConfig = {
+            type: 'loading'
+        };
+
+        setTimeout(() => {
+            this.activeConfig = this.defaultPanel.panel;
+            this.activeIdx = this.defaultPanel.id;
+        }, 10);
+
+        setTimeout(() => {
+            const elTop = (this.$refs['content'] as Vue).$el.getBoundingClientRect().top;
+            window.scrollTo({
+                top: window.pageYOffset + elTop - 63,
+                left: 0,
+                behavior: 'smooth'
+            });
+        }, 50);
     }
 }
 </script>
