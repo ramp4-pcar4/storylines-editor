@@ -9,7 +9,9 @@
     <div v-else-if="loadStatus === 'loaded'">
         <div class="storyramp-app bg-white" v-if="config !== undefined">
             <header class="sticky top-0 z-50 flex border-b border-black bg-gray-200 py-2 px-2 justify-between">
-                <span class="font-semibold text-lg m-1">{{ config.title }}</span>
+                <div class="w-mobile-full truncate">
+                    <span class="font-semibold text-lg m-1">{{ config.title }}</span>
+                </div>
             </header>
 
             <introduction :config="config.introSlide" :configFileStructure="configFileStructure"></introduction>
@@ -141,6 +143,16 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     .prose a:not([panel])::after {
         content: url('../../assets/popout.svg');
+    }
+
+    .w-mobile-full {
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .w-mobile-full {
+        width: 100% !important;
     }
 }
 </style>
