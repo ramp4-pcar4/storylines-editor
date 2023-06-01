@@ -14,9 +14,13 @@ declare global {
     interface Window {
         config: string;
         configname: string;
+        props: any;
     }
 
     const RAMP: any;
 
-    const highed: any;
+    const highed: {
+        ready(callback: () => void): void;
+        ModalEditor: any;
+    };
 }

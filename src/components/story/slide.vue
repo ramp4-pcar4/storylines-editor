@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PanelV from '@/components/panels/panel.vue';
 import { PanelType, Slide } from '@/definitions';

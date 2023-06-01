@@ -26,7 +26,7 @@
 <script lang="ts">
 import 'intersection-observer';
 import Scrollama from 'vue-scrollama';
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import ChapterMenuV from './chapter-menu.vue';
 import SlideV from './slide.vue';

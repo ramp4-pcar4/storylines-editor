@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { VideoPanel } from '@/definitions';
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component({})
 export default class VideoPanelV extends Vue {

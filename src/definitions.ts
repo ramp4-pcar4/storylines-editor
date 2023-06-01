@@ -1,3 +1,5 @@
+import JSZip from 'jszip';
+
 export interface StoryRampConfig {
     title: string;
     lang: string;
@@ -6,6 +8,42 @@ export interface StoryRampConfig {
     contextLink: string;
     contextLabel: string;
     dateModified: string;
+}
+
+export interface ConfigFileStructure {
+    uuid: string;
+    zip: JSZip;
+    configs: { [key: string]: StoryRampConfig };
+    assets: {
+        [key: string]: JSZip;
+    };
+    charts: {
+        [key: string]: JSZip;
+    };
+    rampConfig: {
+        [key: string]: JSZip;
+    };
+}
+
+export interface SourceCounts {
+    [key: string]: number;
+}
+
+export interface MetadataContent {
+    title: string;
+    introTitle: string;
+    introSubtitle: string;
+    logoPreview: string;
+    logoName: string;
+    logoAltText: string;
+    contextLink: string;
+    contextLabel: string;
+    dateModified: string;
+}
+
+// unofficial interface: add properties as needed (just to make TS warnings disappear)
+export interface Highchart {
+    toString(): string;
 }
 
 export interface DQVOptions {

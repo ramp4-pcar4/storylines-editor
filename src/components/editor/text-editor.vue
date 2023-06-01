@@ -13,13 +13,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { TextPanel } from '@/definitions';
+
+interface MDEditor {
+    insert(callback: (selected: string) => { text: string; selected: string }): void;
+}
 
 @Component({
     components: {}
 })
 export default class TextEditorV extends Vue {
-    @Prop() panel!: any;
+    @Prop() panel!: TextPanel;
 
     toolbar = {
         subsuper: {
@@ -29,7 +34,7 @@ export default class TextEditorV extends Vue {
                 {
                     name: 'Superscript',
                     text: 'Superscript',
-                    action(editor: any) {
+                    action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
                             const content = selected || ``;
 
@@ -43,7 +48,7 @@ export default class TextEditorV extends Vue {
                 {
                     name: 'Subscript',
                     text: 'Subscript',
-                    action(editor: any) {
+                    action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
                             const content = selected || ``;
 
@@ -63,7 +68,7 @@ export default class TextEditorV extends Vue {
                 {
                     name: 'Add External Link (New Tab)',
                     text: 'Add External Link (New Tab)',
-                    action(editor: any) {
+                    action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
                             const content = selected || ``;
 
@@ -77,7 +82,7 @@ export default class TextEditorV extends Vue {
                 {
                     name: 'Add External Link (Same Tab)',
                     text: 'Add External Link (Same Tab)',
-                    action(editor: any) {
+                    action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
                             const content = selected || ``;
 
@@ -91,7 +96,7 @@ export default class TextEditorV extends Vue {
                 {
                     name: 'Add Dynamic Link',
                     text: 'Add Dynamic Link',
-                    action(editor: any) {
+                    action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
                             const content = selected || ``;
 

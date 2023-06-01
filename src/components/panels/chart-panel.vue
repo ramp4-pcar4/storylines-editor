@@ -28,8 +28,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Hooper, Slide, Navigation as HooperNavigation, Pagination as HooperPagination } from 'hooper';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Hooper, Navigation as HooperNavigation, Pagination as HooperPagination, Slide } from 'hooper';
 import 'hooper/dist/hooper.css';
 
 import { ChartPanel } from '@/definitions';
