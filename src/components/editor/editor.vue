@@ -1,7 +1,7 @@
 <template>
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
-        <div class="editor-header sticky flex items-center border-b border-black bg-gray-200 py-2 px-2">
+        <div class="editor-header sticky flex items-center border-b border-black bg-gray-200 py-2 px-2 z-10">
             <span class="mx-1">
                 <router-link :to="{ name: 'home' }" class="mt-1 flex justify-center h-full w-full" target>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18.001" viewBox="0 0 18 18.001">
