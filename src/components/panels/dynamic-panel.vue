@@ -1,16 +1,6 @@
 <template>
     <div :id="this.$vnode.key" class="story-slide w-full h-full flex sm:flex-row flex-col">
         <Scrollama class="flex-1 order-2 sm:order-1 prose max-w-none my-5">
-            <div class="return-button-container top-16" v-show="activeIdx !== defaultPanel.id">
-                <button class="return-button" @click="clickBack">
-                    <img
-                        style="display: inline; margin: 0px"
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAB4UlEQVRIie3WP08WQRAG8J+2SolRQaLyKvR+BTsVaQnfwD9YCH4PS6I2ViAS1GhMKLWESkzUmBAT7azECoS8Fjcvqxe52zuMseBJNpebe2ae2dmdveUA/wiHGnCHcBWXcBqDYf+CT3iOp/j8t5IbwCy20a0ZO3gUie0L4/geQTcxhwmM4EiMkbDNB6eLDYy1Fb2lmEEXj3E2w2cYi9Lsp5qKjofjNm43dcZ0+O9oMPNBqbxtRHuYkcp+MsfhgVTe/WIpYt2rIw4pyrtp7zU9hlW8zhDuRKxtqf3+iJuR4VyF6FpwVjKEKdqri+tVpJdBmqgRXYv3HEyGz4sq0scgnSvZ+/Emvr3D8UxRij7v4n0VaSNIfSX7qvpTqzfKa98n7e5dHG6QeS66bZw+hOP5kr1c6hMNYo7+4reL8ozX43mhZP+Ki3gbgZblb65erPUq0o3Ibn6P723aaSH416pIp6QDZLhCfAWvMkQ72MIPNQcI3I8MFzMC1+FJxJrNIQ9IbTW9D9E7EeObBptxTPqtzbQU7flfaeo8JV0ElhTrVYeOVN4dxdnfCmNS2bcUB/6koqWOxhgN20JweuW93Fa0h37cVezMnMveQxlr2uR6Oyhdb8/4/Xq7rvj7PIv3A/w/+Am/TqGFCMnpPgAAAABJRU5ErkJggg=="
-                    />
-                    {{ $t('editor.back') }}
-                </button>
-            </div>
-
             <component
                 :is="config.titleTag || 'h2'"
                 class="px-10 mb-0 chapter-title top-20"
@@ -21,15 +11,36 @@
 
             <div class="px-10 md-content" v-html="md.render(config.content)"></div>
         </Scrollama>
-        <panel
-            class="dynamic-content flex-2"
-            :config="activeConfig"
-            :slideIdx="slideIdx"
-            :dynamicIdx="activeIdx"
-            :ratio="false"
-            ref="content"
+
+        <div
+            :class="
+                activeConfig.type !== 'text'
+                    ? `sticky ${
+                          activeConfig.type === 'map' ? 'top-16' : 'top-8'
+                      } sm:self-start flex-2 order-1 sm:order-2 z-40 dynamic-content-media sm:flex-col`
+                    : 'flex-2 order-2 sm:order-1 dynamic-content-text'
+            "
         >
-        </panel>
+            <span class="return-button-container top-16" v-show="activeIdx !== defaultPanel.id">
+                <button class="return-button py-1 text-base right-0 absolute" @click="clickBack">
+                    <img
+                        style="display: inline; margin: 0px"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAB4UlEQVRIie3WP08WQRAG8J+2SolRQaLyKvR+BTsVaQnfwD9YCH4PS6I2ViAS1GhMKLWESkzUmBAT7azECoS8Fjcvqxe52zuMseBJNpebe2ae2dmdveUA/wiHGnCHcBWXcBqDYf+CT3iOp/j8t5IbwCy20a0ZO3gUie0L4/geQTcxhwmM4EiMkbDNB6eLDYy1Fb2lmEEXj3E2w2cYi9Lsp5qKjofjNm43dcZ0+O9oMPNBqbxtRHuYkcp+MsfhgVTe/WIpYt2rIw4pyrtp7zU9hlW8zhDuRKxtqf3+iJuR4VyF6FpwVjKEKdqri+tVpJdBmqgRXYv3HEyGz4sq0scgnSvZ+/Emvr3D8UxRij7v4n0VaSNIfSX7qvpTqzfKa98n7e5dHG6QeS66bZw+hOP5kr1c6hMNYo7+4reL8ozX43mhZP+Ki3gbgZblb65erPUq0o3Ibn6P723aaSH416pIp6QDZLhCfAWvMkQ72MIPNQcI3I8MFzMC1+FJxJrNIQ9IbTW9D9E7EeObBptxTPqtzbQU7flfaeo8JV0ElhTrVYeOVN4dxdnfCmNS2bcUB/6koqWOxhgN20JweuW93Fa0h37cVezMnMveQxlr2uR6Oyhdb8/4/Xq7rvj7PIv3A/w/+Am/TqGFCMnpPgAAAABJRU5ErkJggg=="
+                    />
+                    {{ $t('dynamic.back') }}
+                </button>
+            </span>
+
+            <panel
+                class="dynamic-content flex-2"
+                :config="activeConfig"
+                :slideIdx="slideIdx"
+                :dynamicIdx="activeIdx"
+                :ratio="false"
+                ref="content"
+            >
+            </panel>
+        </div>
     </div>
 </template>
 
@@ -145,11 +156,11 @@ export default class DynamicPanelV extends Vue {
     pointer-events: none;
 }
 .return-button {
-    padding: 5px;
-    font-size: 20px;
+    float: right;
     pointer-events: auto;
     background: #fff;
     box-shadow: 0px 2px 5px #000;
+    width: 75px;
 }
 .return-button img {
     margin: 0px;
@@ -157,9 +168,25 @@ export default class DynamicPanelV extends Vue {
 
 @media screen and (max-width: 640px) {
     .return-button-container {
-        position: static;
-        text-align: center;
+        position: sticky;
+        text-align: right;
         margin-bottom: 10px;
+    }
+
+    .return-button {
+        position: sticky;
+        opacity: 0.7;
+    }
+    .return-button:hover {
+        opacity: 1;
+    }
+    .dynamic-content-text {
+        display: flex;
+        flex-direction: column;
+    }
+    .dynamic-content-media {
+        display: flex;
+        flex-direction: column-reverse;
     }
 }
 </style>
