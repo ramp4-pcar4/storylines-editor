@@ -52,7 +52,7 @@
                             />
                         </svg>
                     </span>
-                    <span class="align-center inline-block select-none">Unsaved Changes</span>
+                    <span class="align-center inline-block select-none">{{ $t('editor.unsavedChanges') }}</span>
                 </span>
             </transition>
             <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>

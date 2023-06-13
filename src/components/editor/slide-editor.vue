@@ -12,18 +12,18 @@
                             :disabled="slideIndex === 0"
                             class="border border-black"
                         >
-                            Previous Slide
+                            {{ $t('editor.slides.previousSlide') }}
                         </button>
                         <button
                             @click.stop="selectSlide(slideIndex + 1)"
                             :disabled="isLast"
                             class="border border-black"
                         >
-                            Next Slide
+                            {{ $t('editor.slides.nextSlide') }}
                         </button>
                     </div>
                     <div class="flex mt-3">
-                        <span class="mx-2 font-bold">Make the right panel the full slide</span>
+                        <span class="mx-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
                         <input
                             type="checkbox"
                             class="rounded-none cursor-pointer w-4 h-4"
@@ -80,7 +80,7 @@
                             />
                         </svg>
                     </span>
-                    <span class="align-middle inline-block pl-1">Left Panel</span>
+                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.leftPanel') }}</span>
                 </button>
                 <button
                     @click="
@@ -127,7 +127,7 @@
                         </svg>
                     </span>
 
-                    <span class="align-middle inline-block pl-1">Right Panel</span>
+                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.rightPanel') }}</span>
                 </button>
             </div>
             <div v-else class="border-b border-black">
@@ -174,7 +174,7 @@
                         </svg>
                     </span>
 
-                    <span class="align-middle inline-block pl-1">Fullscreen Panel</span>
+                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.fullscreenPanel') }}</span>
                 </button>
             </div>
             <div>
@@ -182,7 +182,7 @@
                     <span class="font-bold text-xl">Content:</span>
                     <span class="ml-auto flex-grow"></span>
                     <div v-if="panelIndex === 1 || rightOnly" class="flex flex-col mr-8">
-                        <label class="text-left text-lg">Content type:</label>
+                        <label class="text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
                         <select
                             ref="typeSelector"
                             @input="
@@ -216,7 +216,7 @@
             </div>
         </div>
         <div v-else class="flex h-full mt-4 justify-center text-gray-600 text-xl">
-            <span>Please select a slide to edit.</span>
+            <span>{{ $t('editor.slides.select') }}</span>
         </div>
         <confirmation-modal
             :name="`change-slide-${slideIndex}`"

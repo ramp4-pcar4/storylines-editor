@@ -27,7 +27,7 @@
                         class="w-32 h-12 ml-0"
                         @click="copyAllFromOtherLang(configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides)"
                     >
-                        Copy All
+                        {{ $t('editor.slides.copyAll') }}
                     </button>
                     <span class="text-lg font-bold my-6"> {{ $t('editor.image.label.or') }} </span>
                     <div class="flex">
