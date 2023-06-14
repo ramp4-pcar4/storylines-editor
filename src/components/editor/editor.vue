@@ -177,7 +177,7 @@ export default class EditorV extends Vue {
 
     mounted(): void {
         // from https://css-tricks.com/how-to-detect-when-a-sticky-element-gets-pinned/
-        const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-50', e.intersectionRatio < 1), {
+        const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-40', e.intersectionRatio < 1), {
             threshold: [1]
         });
 
