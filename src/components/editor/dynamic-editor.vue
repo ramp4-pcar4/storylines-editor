@@ -7,14 +7,14 @@
                 class="border hover:bg-gray-100"
                 :class="editingStatus === 'text' ? 'border-black' : 'border-gray-300'"
             >
-                Text Section
+                {{ $t('dynamic.textSection') }}
             </button>
             <button
                 @click="() => changePanel('panels')"
                 class="border hover:bg-gray-100"
                 :class="editingStatus !== 'text' ? 'border-black' : 'border-gray-300'"
             >
-                Panel Collection
+                {{ $t('dynamic.panel.collection') }}
             </button>
         </div>
         <!-- Text Section -->
@@ -30,22 +30,22 @@
         <div v-if="editingStatus === 'panels'">
             <table class="w-2/3 mt-5">
                 <tr class="table-header">
-                    <th>Panel ID</th>
-                    <th>Panel Type</th>
-                    <th>Panel Actions</th>
+                    <th>{{ $t('dynamic.panel.id') }}</th>
+                    <th>{{ $t('dynamic.panel.type') }}</th>
+                    <th>{{ $t('dynamic.panel.actions') }}</th>
                 </tr>
                 <tr class="table-contents" v-for="(item, idx) in panel.children" :key="idx">
                     <td>{{ item.id }}</td>
                     <td>{{ item.panel.type }}</td>
                     <td>
-                        <span @click="() => switchSlide(idx)">Edit</span> |
-                        <span @click="() => removeSlide(idx)">Remove</span>
+                        <span @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</span> |
+                        <span @click="() => removeSlide(idx)">{{ $t('editor.remove') }}</span>
                     </td>
                 </tr>
                 <tr class="table-add-row">
                     <th class="flex flex-col items-center">
                         <input type="text" placeholder="Enter Panel ID" v-model="newSlideName" />
-                        <p v-if="idUsed">⚠ Panel ID is already taken.</p>
+                        <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
                     </th>
                     <th>
                         <select v-model="newSlideType">
@@ -65,7 +65,8 @@
                 <br />
                 <hr />
                 <br />
-                <span class="font-bold text-xl">Panel Editor:</span><br />
+                <span class="font-bold text-xl">{{ $t('dynamic.panel.editor') }}</span
+                ><br />
                 <component
                     ref="slide"
                     :is="

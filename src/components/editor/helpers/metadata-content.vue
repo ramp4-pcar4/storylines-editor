@@ -3,9 +3,9 @@
         <label class="mb-5">{{ $t('editor.title') }}:</label>
         <input type="text" name="title" :value="metadata.title" @change="metadataChanged" class="w-1/3" />
         <br />
-        <label class="mb-5">Intro Title:</label>
+        <label class="mb-5">{{ $t('editor.slides.title') }}:</label>
         <input type="text" name="introTitle" :value="metadata.introTitle" @change="metadataChanged" class="w-1/4" />
-        <label class="mb-5">Intro Subtitle:</label>
+        <label class="mb-5">{{ $t('editor.slides.intro') }}:</label>
         <input
             type="text"
             name="introSubtitle"
@@ -23,7 +23,7 @@
                 class="image-preview"
             />
             <p v-if="metadata.logoPreview == 'error'" class="image-preview">
-                An error occurred when trying to load image.
+                {{ $t('editor.image.loadingError') }}
             </p>
         </div>
         <label class="mb-5">{{ $t('editor.logo') }}:</label>
@@ -32,7 +32,7 @@
             {{ $t('editor.browse') }}
         </button>
         <button v-if="metadata.logoName || metadata.logoPreview" @click.stop="removeLogo" class="border border-black">
-            Remove
+            {{ $t('editor.remove') }}
         </button>
         <!-- hide the actual file input -->
         <input
@@ -59,7 +59,7 @@
         <label class="mb-5"></label>
         <p class="inline-block">
             <i>
-                Context link shows up at the bottom of the page to provide additional resources for interested users
+                {{ $t('editor.contextLink.info') }}
             </i>
         </p>
         <br />
@@ -68,7 +68,7 @@
         <br />
         <label class="mb-5"></label>
         <p class="inline-block">
-            <i> Context label shows up before the context link to explain what the link is for </i>
+            <i> {{ $t('editor.contextLabel.info') }}</i>
         </p>
         <br />
         <label class="mb-5">{{ $t('editor.dateModified') }}:</label>
