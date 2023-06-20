@@ -27,7 +27,7 @@
                         class="w-32 h-12 ml-0"
                         @click="copyAllFromOtherLang(configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides)"
                     >
-                        Copy All
+                        {{ $t('editor.slides.copyAll') }}
                     </button>
                     <span class="text-lg font-bold my-6"> {{ $t('editor.image.label.or') }} </span>
                     <div class="flex">
@@ -38,7 +38,7 @@
                                 :value="index"
                                 :key="slide.title + index"
                             >
-                                Slide {{ index + ': ' + slide.title }}
+                                {{ $t('editor.slides.slide') }} {{ index + ': ' + slide.title }}
                             </option>
                         </select>
 
@@ -49,7 +49,7 @@
                                 )
                             "
                         >
-                            Copy
+                            {{ $t('editor.slides.copy') }}
                         </button>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                 >
                     <tippy delay="200" placement="right">{{ slide.title }}</tippy>
                     <div class="self-center overflow-ellipsis whitespace-nowrap overflow-hidden flex-grow ml-2">
-                        Slide {{ index + 1 }}:
+                        {{ $t('editor.slides.slide') }} {{ index + 1 }}:
                         <span class="font-bold overflow-hidden">{{ slide.title || 'Add a title' }}</span>
                     </div>
                     <div class="flex">

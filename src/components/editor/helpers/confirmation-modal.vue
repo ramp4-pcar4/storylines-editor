@@ -2,8 +2,8 @@
     <vue-modal :name="name" :outer-close="false" :hide-close-btn="true" size="md">
         <h2 slot="header" class="text-lg font-bold">{{ message }}</h2>
         <div class="w-full flex justify-end">
-            <button class="confirm-button hover:bg-gray-800" @click.stop="onOk">Confirm</button>
-            <button class="cancel-button hover:bg-gray-100" @click.stop="onCancel">Cancel</button>
+            <button class="confirm-button hover:bg-gray-800" @click.stop="onOk">{{ $t('editor.confirm') }}</button>
+            <button class="cancel-button hover:bg-gray-100" @click.stop="onCancel">{{ $t('editor.cancel') }}</button>
         </div>
     </vue-modal>
 </template>

@@ -1,10 +1,10 @@
 <template>
     <div class="flex flex-col">
-        <label class="text-left">Map title:</label>
+        <label class="text-left">{{ $t('editor.map.title') }}:</label>
         <input type="text" v-model="panel.title" />
 
         <div v-if="status === 'editing'">
-            <label class="mt-6">Enable Scrollguard:</label>
+            <label class="mt-6">{{ $t('editor.map.scrollguard.enable') }}:</label>
             <input type="checkbox" @change="saveScrollguard" v-model="panel.scrollguard" />
             <span class="ml-6"></span>
             <label class="mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
@@ -22,7 +22,7 @@
             <div class="mb-4" v-if="usingTimeSlider"></div>
 
             <div class="flex justify-between mb-4">
-                <label class="mt-2">Map Editor:</label>
+                <label class="mt-2">{{ $t('editor.map.edit') }}:</label>
                 <button
                     class="border border-black hover:bg-gray-100"
                     @click="
@@ -31,7 +31,7 @@
                         }
                     "
                 >
-                    Cancel Editing
+                    {{ $t('editor.map.edit.cancel') }}
                 </button>
             </div>
             <iframe
@@ -41,7 +41,7 @@
             ></iframe>
         </div>
         <div v-if="status === 'creating'">
-            <label class="text-left mt-2">Map config name*:</label>
+            <label class="text-left mt-2">{{ $t('editor.map.label.name') }}*:</label>
             <div class="flex flex-row items-center"><input type="text" v-model="newFileName" />.json</div>
 
             <ul class="flex flex-wrap list-none justify-center" v-if="newFileName != ''">
@@ -52,7 +52,7 @@
             </ul>
         </div>
         <div v-if="status === 'default'">
-            <label class="text-left mt-2">Map Editor:</label>
+            <label class="text-left mt-2">{{ $t('editor.map.edit') }}:</label>
             <ul class="flex flex-wrap list-none justify-center">
                 <li class="map-item items-center my-8 mx-5 overflow-hidden" @click="openEditor">
                     <div class="edit-map"></div>

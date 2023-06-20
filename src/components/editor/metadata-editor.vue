@@ -45,9 +45,7 @@
                                 />
                             </svg>
                         </span>
-                        <span class="align-center inline-block select-none"
-                            >UUID already exists. Saving this will overwrite existing product.</span
-                        >
+                        <span class="align-center inline-block select-none">{{ $t('editor.uuid.exists') }}</span>
                     </span>
                     <button
                         @click="generateRemoteConfig"
@@ -73,10 +71,9 @@
                 <br />
 
                 <div class="mb-4">
-                    <h3>Storylines product details</h3>
+                    <h3>{{ $t('editor.productDetails') }}</h3>
                     <p>
-                        Fill in metadata details about your new Storyline. Use the “Preview” button to see what your
-                        slides will look like.
+                        {{ $t('editor.metadata.instructions') }}
                     </p>
                 </div>
 

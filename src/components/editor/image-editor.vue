@@ -31,7 +31,7 @@
         </div>
 
         <span v-show="!imagePreviewsLoading && imagePreviews.length" class="flex justify-center">
-            <i>Click and drag to reorder images</i>
+            <i> {{ $t('editor.image.reorder') }}</i>
         </span>
 
         <!-- Gallery preview of all images -->
@@ -48,19 +48,19 @@
                 @delete="deleteImage"
             >
                 <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">Alt tag:</label>
+                    <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
                     <input class="w-4/5" type="text" v-model="image.altText" @change="onImagesEdited" />
                 </div>
 
                 <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">Caption:</label>
+                    <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
                     <input class="w-4/5" type="text" v-model="image.caption" @change="onImagesEdited" />
                 </div>
             </ImagePreview>
         </draggable>
 
         <div v-show="imagePreviews.length > 1" class="flex items-center w-full text-left">
-            <label class="text-label">Slideshow Caption:</label>
+            <label class="text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
             <input class="w-3/5" type="text" v-model="slideshowCaption" @change="onImagesEdited" />
         </div>
     </div>
