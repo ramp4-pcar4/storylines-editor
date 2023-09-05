@@ -120,7 +120,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
     ChartConfig,
@@ -138,13 +138,11 @@ import {
 import cloneDeep from 'clone-deep';
 import draggable from 'vuedraggable';
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import SlideEditorV from './slide-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
-@Component({
+@Options({
     components: {
-        spinner: Circle2,
         'slide-editor': SlideEditorV,
         'confirmation-modal': ConfirmationModalV,
         draggable

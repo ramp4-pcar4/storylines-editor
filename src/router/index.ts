@@ -1,18 +1,9 @@
-import Vue from 'vue';
-import StoryV from '@/components/story/story.vue';
 import LandingV from '@/components/editor/landing.vue';
 import MetadataEditorV from '@/components/editor/metadata-editor.vue';
 import StoryPreviewV from '@/components/editor/preview.vue';
-import Router, { Route } from 'vue-router';
-
-Vue.use(Router);
+import { createRouter, createWebHashHistory, RouteLocationNormalized } from 'vue-router';
 
 const routes = [
-    {
-        path: '/',
-        component: StoryV,
-        meta: { title: 'story.window.title' }
-    },
     {
         path: '/:lang/editor',
         name: 'home',
@@ -54,23 +45,14 @@ const routes = [
         path: '/:lang/editor-preview/:uid',
         component: StoryPreviewV,
         meta: { title: 'story.window.title' }
-    },
-    {
-        path: '/:uid',
-        component: StoryV,
-        meta: { title: 'story.window.title' }
-    },
-    {
-        path: '/:lang/:uid',
-        component: StoryV,
-        meta: { title: 'story.window.title' }
     }
 ];
 
-export default new Router({
+const router = createRouter({
     routes: routes,
-    // mode: 'history', // TODO: uncomment to change to history mode for nicer URLs (eliminating middle hash) see #100
-    scrollBehavior: function (to: Route) {
+    // TODO: change to history mode for nicer URLs (eliminating middle hash) see #100
+    history: createWebHashHistory(),
+    scrollBehavior: function (to: RouteLocationNormalized) {
         if (to.hash) {
             return {
                 selector: decodeURIComponent(to.hash),
@@ -79,3 +61,5 @@ export default new Router({
         }
     }
 });
+
+export default router;

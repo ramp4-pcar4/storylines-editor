@@ -27,10 +27,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import { ImageFile } from '@/definitions';
 
-@Component({})
 export default class ImagePreviewV extends Vue {
     @Prop() imageFile!: ImageFile;
 }

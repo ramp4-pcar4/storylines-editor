@@ -81,13 +81,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import defaultConfigEn from '../../../public/scripts/ramp-editor/samples/map_en.json';
 import defaultConfigFr from '../../../public/scripts/ramp-editor/samples/map_fr.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 
-@Component({
+@Options({
     components: {
         'time-slider-editor': TimeSliderEditorV
     }

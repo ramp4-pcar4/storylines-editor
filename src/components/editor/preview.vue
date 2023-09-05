@@ -2,7 +2,7 @@
     <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div v-if="loadStatus === 'loading'">
         <div class="block py-20 align-middle text-center h-full" style="margin: 0 auto">
-            <spinner size="120px" background="#00D2D3" color="#009cd1" stroke="10px" style="margin: 0 auto"></spinner>
+            <spinner size="120px" color="#009cd1" style="margin: 0 auto"></spinner>
         </div>
     </div>
 
@@ -14,15 +14,15 @@
                 </div>
             </header>
 
-            <introduction :config="config.introSlide" :configFileStructure="configFileStructure"></introduction>
+            <!-- <introduction :config="config.introSlide" :configFileStructure="configFileStructure"></introduction> -->
 
             <div class="w-full mx-auto pb-10" id="story">
-                <StoryContentV
+                <!-- <StoryContentV
                     :config="config"
                     :configFileStructure="configFileStructure"
                     :lang="lang"
                     @step="updateActiveIndex"
-                />
+                /> -->
             </div>
 
             <footer class="p-8 pt-2 text-right text-sm">
@@ -48,18 +48,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
+import { VueSpinnerOval } from 'vue3-spinners';
 
-import StoryContentV from '@/components/story/story-content.vue';
-import IntroV from '@/components/story/introduction.vue';
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
-
-@Component({
+@Options({
     components: {
-        StoryContentV,
-        introduction: IntroV,
-        spinner: Circle2
+        spinner: VueSpinnerOval
     }
 })
 export default class StoryPreviewV extends Vue {
@@ -72,8 +67,8 @@ export default class StoryPreviewV extends Vue {
     uid = '';
 
     created(): void {
-        const uid = this.$route.params.uid;
-        const lang = this.$route.params.lang;
+        const uid = this.$route.params.uid as string;
+        const lang = this.$route.params.lang as string;
         if (uid) {
             this.savedProduct = true;
             // attempt to fetch saved config file from the server (TODO: setup as express route?)

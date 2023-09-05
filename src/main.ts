@@ -1,5 +1,5 @@
 import './router/componentHooks';
-import Vue from 'vue';
+import { createApp } from 'vue';
 import App from './app.vue';
 import router from './router';
 import './style.css';
@@ -15,38 +15,33 @@ VueMarkdownEditor.lang.use('en-US', enUS);
 VueMarkdownEditor.use(githubTheme, {
     Hljs: hljs
 });
-Vue.use(VueMarkdownEditor);
 
 import { i18n } from './lang';
-import VueTippy, { TippyComponent } from 'vue-tippy';
-
-Vue.use(VueTippy);
-Vue.component('tippy', TippyComponent);
-
+import VueTippy from 'vue-tippy';
 import HighchartsVue from 'highcharts-vue';
-Vue.use(HighchartsVue);
-
 import VuePapaParse from 'vue-papa-parse';
-Vue.use(VuePapaParse);
-
-import VueProgressiveImage from 'vue-progressive-image';
-Vue.use(VueProgressiveImage);
-
 import VueFullScreen from 'vue-fullscreen';
-Vue.use(VueFullScreen);
-
 // @ts-expect-error: module does not have TS support :(
 import VueModal from 'vue2-modal';
-Vue.use(VueModal);
 
-import Message from 'vue-m-message';
-import 'vue-m-message/dist/index.css';
-Vue.use(Message);
+// TODO: resolve/replace this dependency
+// import Message from 'vue-m-message';
+// import 'vue-m-message/dist/index.css';
 
-Vue.config.productionTip = false;
+// TODO: import storylines viewer as plugin once a Vue 3 version is published
 
-new Vue({
-    render: (h) => h(App),
-    i18n,
-    router
-}).$mount('#app');
+const app = createApp(App);
+
+app.use(router)
+    .use(i18n)
+    .use(VueTippy, {
+        directive: 'tippy',
+        component: 'tippy'
+    })
+    .use(VueMarkdownEditor)
+    .use(HighchartsVue)
+    .use(VuePapaParse)
+    .use(VueFullScreen)
+    .use(VueModal);
+
+app.mount('#app');

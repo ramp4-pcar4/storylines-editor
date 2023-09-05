@@ -58,13 +58,7 @@
 
                     <!-- If config is loading, display a small spinner. -->
                     <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
-                        <spinner
-                            size="24px"
-                            background="#00D2D3"
-                            color="#009cd1"
-                            stroke="2px"
-                            class="mx-2 my-auto"
-                        ></spinner>
+                        <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
                     </div>
                 </div>
 
@@ -156,8 +150,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Route } from 'vue-router';
+import { Options, Prop, Vue } from 'vue-property-decorator';
+import { RouteLocationNormalized } from 'vue-router';
 import { Dictionary } from 'vue-router/types/router';
 import { AxiosResponse } from 'axios';
 import {
@@ -181,7 +175,7 @@ const JSZip = require('jszip');
 const axios = require('axios').default;
 const { v4: uuidv4 } = require('uuid');
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
+import { VueSpinnerOval } from 'vue3-spinners';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
@@ -202,12 +196,12 @@ interface RouteParams {
     sourceCounts: SourceCounts;
 }
 
-@Component({
+@Options({
     components: {
         Editor: EditorV,
         'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
-        spinner: Circle2,
+        spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV
     }
@@ -253,7 +247,7 @@ export default class MetadataEditorV extends Vue {
     created(): void {
         // Generate UUID for new product
         this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
-        this.configLang = this.$route.params.configLang ? this.$route.params.configLang : 'en';
+        this.configLang = this.$route.params.configLang ? (this.$route.params.configLang as string) : 'en';
 
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
@@ -276,7 +270,7 @@ export default class MetadataEditorV extends Vue {
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
             if (this.$route.params.configs && this.$route.params.configFileStructure) {
                 // declare props typing to get around TS warnings
-                const route = this.$route as Route & {
+                const route = this.$route as RouteLocationNormalized & {
                     params: RouteParams;
                 };
 
@@ -477,7 +471,7 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure = {
             uuid: this.uuid,
             zip: configZip,
-            configs: (this.configs as unknown) as { [key: string]: StoryRampConfig },
+            configs: this.configs as unknown as { [key: string]: StoryRampConfig },
             assets: {
                 en: assetsFolder.folder('en'),
                 fr: assetsFolder.folder('fr')
@@ -743,9 +737,9 @@ export default class MetadataEditorV extends Vue {
     /**
      * React to param changes in URL.
      */
-    beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
-        this.uuid = to.params.uid;
-        this.$i18n.locale = to.params.lang;
+    beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
+        this.uuid = to.params.uid as string;
+        this.$i18n.locale = to.params.lang as string;
 
         next();
     }
@@ -785,7 +779,7 @@ export default class MetadataEditorV extends Vue {
 
     updateEditorPath(): void {
         if (this.$route.name !== 'editor') {
-            const props = ({
+            const props = {
                 uid: this.uuid,
                 configLang: this.configLang,
                 configs: this.configs,
@@ -793,7 +787,7 @@ export default class MetadataEditorV extends Vue {
                 sourceCounts: this.sourceCounts,
                 metadata: this.metadata,
                 slides: this.slides
-            } as unknown) as Dictionary<string>;
+            } as unknown as Dictionary<string>;
 
             this.$router.push({ name: 'editor', params: props });
         }
@@ -850,16 +844,16 @@ export default class MetadataEditorV extends Vue {
             setTimeout(() => {
                 this.$router.push({
                     name: 'metadata',
-                    params: ({
+                    params: {
                         lang: this.configLang,
                         editExisting: false
-                    } as unknown) as Dictionary<string>
+                    } as unknown as Dictionary<string>
                 });
             }, 100);
         }
     }
 
-    beforeRouteLeave(to: Route, from: Route, next: (cont?: boolean) => void): void {
+    beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
         const curEditor = this.$route.name === 'editor';
         const confirmationMessage = 'Leave the page? Changes made may not be saved.';
         if (this.unsavedChanges && curEditor && !window.confirm(confirmationMessage)) {

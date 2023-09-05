@@ -1,5 +1,4 @@
 <template>
-    <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
         <div class="editor-header sticky flex items-center border-b border-black bg-gray-200 py-2 px-2 z-10">
             <span class="mx-1">
@@ -61,8 +60,8 @@
             </button>
             <button @click="saveChanges" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
-                <span v-if="saving" class="align-middle inline-block px-1"
-                    ><spinner size="16px" background="#6B7280" color="#FFFFFF" stroke="2px" class="ml-1 mb-1"></spinner>
+                <span v-if="saving" class="align-middle inline-block px-1">
+                    <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
                 </span>
             </button>
         </div>
@@ -124,20 +123,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ConfigFileStructure, MetadataContent, Slide, SourceCounts, StoryRampConfig } from '@/definitions';
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
+import { VueSpinnerOval } from 'vue3-spinners';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
-@Component({
+@Options({
     components: {
         'metadata-content': MetadataContentV,
         'confirmation-modal': ConfirmationModalV,
-        spinner: Circle2,
+        spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV
     }
@@ -171,7 +170,7 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
-        this.uuid = this.$route.params.uid;
+        this.uuid = this.$route.params.uid as string;
         window.addEventListener('beforeunload', this.beforeWindowUnload);
     }
 

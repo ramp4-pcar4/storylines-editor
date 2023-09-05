@@ -67,12 +67,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, ImageFile, ImagePanel, PanelType, SlideshowPanel, SourceCounts } from '@/definitions';
 import draggable from 'vuedraggable';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
-@Component({
+@Options({
     components: {
         ImagePreview: ImagePreviewV,
         draggable

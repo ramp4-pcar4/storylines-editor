@@ -21,15 +21,33 @@ module.exports = {
     },
     publicPath: '',
     chainWebpack: (config) => {
+        config.resolve.alias.set('vue', '@vue/compat');
+
         config.module
             .rule('lint')
             .test(/lang\.csv$/)
             .use('eslint')
             .loader('dsv-loader')
-            .end()
+            .end();
+
+        config.module
             .rule('html')
             .test(/(.)*.(html)$/)
             .use('html-loader')
             .loader('html-loader');
+
+        config.module
+            .rule('vue')
+            .use('vue-loader')
+            .tap((options) => {
+                return {
+                    ...options,
+                    compilerOptions: {
+                        compatConfig: {
+                            MODE: 2
+                        }
+                    }
+                };
+            });
     }
 };

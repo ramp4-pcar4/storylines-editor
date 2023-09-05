@@ -234,7 +234,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
     ChartConfig,
@@ -253,7 +253,6 @@ import {
     TextPanel
 } from '@/definitions';
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
@@ -262,9 +261,8 @@ import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
-@Component({
+@Options({
     components: {
-        spinner: Circle2,
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,

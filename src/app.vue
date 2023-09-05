@@ -5,13 +5,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { Route } from 'vue-router';
+import { Vue, Watch } from 'vue-property-decorator';
+import { RouteLocationNormalized } from 'vue-router';
 
-@Component({})
 export default class App extends Vue {
     @Watch('$route', { immediate: true })
-    onRouteUpdate(to: Route): void {
+    onRouteUpdate(to: RouteLocationNormalized): void {
         this.$i18n.locale = to.params.lang ?? 'en';
         document.title = this.$t(to.meta?.title).toString();
     }
