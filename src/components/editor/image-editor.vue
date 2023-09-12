@@ -219,7 +219,7 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$parent.$emit('slide-edit');
+        this.$emit('slide-edit');
     }
 }
 </script>

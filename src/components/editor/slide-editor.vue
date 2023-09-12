@@ -343,10 +343,10 @@ export default class SlideEditorV extends Vue {
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
             this.panelIndex = 0;
-            Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
+            this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
         } else {
             // Switching panel type when dynamic panels are not involved.
-            Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
+            this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }
     }
 
@@ -417,9 +417,9 @@ export default class SlideEditorV extends Vue {
         this.saveChanges();
         if (this.rightOnly) {
             this.panelIndex = 0;
-            Vue.set(this.currentSlide, 'panel', [this.currentSlide.panel[1]]);
+            this.currentSlide['panel'] = [this.currentSlide.panel[1]];
         } else {
-            Vue.set(this.currentSlide, 'panel', [
+            this.currentSlide['panel'] = [
                 Object.assign(
                     {},
                     {
@@ -429,7 +429,7 @@ export default class SlideEditorV extends Vue {
                     }
                 ),
                 Object.assign({}, this.currentSlide.panel[0])
-            ]);
+            ];
         }
     }
 }

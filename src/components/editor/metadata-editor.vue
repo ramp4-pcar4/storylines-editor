@@ -151,8 +151,7 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import { RouteLocationNormalized } from 'vue-router';
-import { Dictionary } from 'vue-router/types/router';
+import { RouteLocationNormalized, RouteParamsRaw } from 'vue-router';
 import { AxiosResponse } from 'axios';
 import {
     AudioPanel,
@@ -246,7 +245,7 @@ export default class MetadataEditorV extends Vue {
 
     created(): void {
         // Generate UUID for new product
-        this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
+        this.uuid = (this.$route.params.uid as string) ?? (this.editExisting ? undefined : uuidv4());
         this.configLang = this.$route.params.configLang ? (this.$route.params.configLang as string) : 'en';
 
         // Initialize Storylines config and the configuration structure.
@@ -556,7 +555,7 @@ export default class MetadataEditorV extends Vue {
                     type: 'slideshow',
                     images: [slide.panel[1]]
                 };
-                Vue.set(slide.panel, 1, newSlide);
+                slide.panel[1] = newSlide;
             }
         });
 
@@ -684,9 +683,9 @@ export default class MetadataEditorV extends Vue {
                 this.generateConfig();
             }
         }
-        if (this.$modals.isActive('metadata-edit-modal')) {
-            this.$modals.hide('metadata-edit-modal');
-        }
+        // if (this.$modals.isActive('metadata-edit-modal')) {
+        //     this.$modals.hide('metadata-edit-modal');
+        // }
     }
 
     /**
@@ -787,7 +786,7 @@ export default class MetadataEditorV extends Vue {
                 sourceCounts: this.sourceCounts,
                 metadata: this.metadata,
                 slides: this.slides
-            } as unknown as Dictionary<string>;
+            } as unknown as RouteParamsRaw;
 
             this.$router.push({ name: 'editor', params: props });
         }
@@ -847,7 +846,7 @@ export default class MetadataEditorV extends Vue {
                     params: {
                         lang: this.configLang,
                         editExisting: false
-                    } as unknown as Dictionary<string>
+                    } as unknown as RouteParamsRaw
                 });
             }, 100);
         }

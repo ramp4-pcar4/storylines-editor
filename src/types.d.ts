@@ -1,11 +1,17 @@
 import { VuePapaParse } from 'vue-papa-parse';
 import { RouteLocationNormalized } from 'vue-router';
-import { Modals } from 'vue2-modal';
+import { MessageInstance } from 'vue-m-message';
+
+declare module 'vue-router' {
+    interface RouteMeta {
+        title: string;
+    }
+}
 
 declare module '@vue/runtime-core' {
     interface ComponentCustomProperties {
         $papa: VuePapaParse;
         $route: RouteLocationNormalized;
-        $modals: Modals;
+        $message: MessageInstance;
     }
 }

@@ -17,12 +17,12 @@ export default class MetadataEditorV extends Vue {
 
     onOk(): void {
         this.$emit('Ok');
-        this.$modals.hide(this.name);
+        // this.$modals.hide(this.name);
     }
 
     onCancel(): void {
         this.$emit('Cancel');
-        this.$modals.hide(this.name);
+        // this.$modals.hide(this.name);
     }
 }
 </script>

@@ -27,8 +27,10 @@ function fold(rows: csvRows): LocaleMessages {
 }
 
 const i18n = createI18n({
+    legacy: false,
     locale: lang || undefined,
     fallbackLocale: 'en',
+    globalInjection: true,
     messages: fold(rows)
 });
 

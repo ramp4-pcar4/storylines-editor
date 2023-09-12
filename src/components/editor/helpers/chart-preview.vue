@@ -69,11 +69,11 @@ import {
     PieDataRow,
     PieSeriesData
 } from '@/definitions';
-import ChartV from '@/components/panels/helpers/chart.vue';
 
 @Options({
     components: {
-        'dqv-chart': ChartV
+        // TODO: fix when storylines plugin updated to Vue 3
+        // 'dqv-chart': ChartV
     }
 })
 export default class ChartPreviewV extends Vue {

@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     pages: {
         index: {
@@ -20,6 +22,13 @@ module.exports = {
         }
     },
     publicPath: '',
+    configureWebpack: {
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src/')
+            }
+        }
+    },
     chainWebpack: (config) => {
         config.resolve.alias.set('vue', '@vue/compat');
 
@@ -34,7 +43,16 @@ module.exports = {
             .rule('html')
             .test(/(.)*.(html)$/)
             .use('html-loader')
-            .loader('html-loader');
+            .loader('html-loader')
+            .end();
+
+        config.module
+            .rule('cjs')
+            .test(/\.cjs$/)
+            .include.add(/node_modules/)
+            .end()
+            .use('babel-loader')
+            .loader('babel-loader');
 
         config.module
             .rule('vue')
@@ -48,6 +66,7 @@ module.exports = {
                         }
                     }
                 };
-            });
+            })
+            .end();
     }
 };

@@ -11,8 +11,8 @@ import { RouteLocationNormalized } from 'vue-router';
 export default class App extends Vue {
     @Watch('$route', { immediate: true })
     onRouteUpdate(to: RouteLocationNormalized): void {
-        this.$i18n.locale = to.params.lang ?? 'en';
-        document.title = this.$t(to.meta?.title).toString();
+        this.$i18n.locale = (to.params.lang as string) ?? 'en';
+        document.title = this.$t(to.meta.title);
     }
 }
 </script>

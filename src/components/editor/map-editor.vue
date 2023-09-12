@@ -194,10 +194,10 @@ export default class MapEditorV extends Vue {
         if (!this.timeSliderError || !this.usingTimeSlider) {
             this.panel.timeSlider = this.usingTimeSlider ? this.timeSliderConf : undefined;
         }
-        this.$parent.$emit('slide-edit');
-        if (this.$modals.isActive('time-slider-edit-modal')) {
-            this.$modals.hide('time-slider-edit-modal');
-        }
+        this.$emit('slide-edit');
+        // if (this.$modals.isActive('time-slider-edit-modal')) {
+        // this.$modals.hide('time-slider-edit-modal');
+        // }
     }
 
     saveEditor(e: MessageEvent): void {
@@ -210,7 +210,7 @@ export default class MapEditorV extends Vue {
                 JSON.stringify(JSON.parse(localStorage.RAMPconfig), null, 4)
             );
 
-            this.$parent.$emit('slide-edit');
+            this.$emit('slide-edit');
         }
     }
 
