@@ -10,11 +10,8 @@
             <label class="mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
             <input type="checkbox" @change="saveTimeSlider" v-model="usingTimeSlider" />
             <span class="mx-4"></span>
-            <button
-                v-if="usingTimeSlider"
-                class="bg-black text-white hover:bg-gray-800 mt-3"
-                @click="$modals.show('time-slider-edit-modal')"
-            >
+            <!-- @click="$modals.show('time-slider-edit-modal')" -->
+            <button v-if="usingTimeSlider" class="bg-black text-white hover:bg-gray-800 mt-3">
                 {{ $t('editor.map.timeslider.edit') }}
             </button>
             <br />

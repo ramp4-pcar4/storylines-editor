@@ -41,22 +41,19 @@
             class="flex flex-wrap list-none border my-4"
             @update="onImagesEdited"
         >
-            <ImagePreview
-                v-for="(image, idx) in imagePreviews"
-                :key="`${image.id}-${idx}`"
-                :imageFile="image"
-                @delete="deleteImage"
-            >
-                <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
-                    <input class="w-4/5" type="text" v-model="image.altText" @change="onImagesEdited" />
-                </div>
+            <template #item="{ image, index }" item-key="id">
+                <ImagePreview :key="`${image.id}-${index}`" :imageFile="image" @delete="deleteImage">
+                    <div class="flex mt-4 items-center w-full text-left">
+                        <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
+                        <input class="w-4/5" type="text" v-model="image.altText" @change="onImagesEdited" />
+                    </div>
 
-                <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
-                    <input class="w-4/5" type="text" v-model="image.caption" @change="onImagesEdited" />
-                </div>
-            </ImagePreview>
+                    <div class="flex mt-4 items-center w-full text-left">
+                        <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
+                        <input class="w-4/5" type="text" v-model="image.caption" @change="onImagesEdited" />
+                    </div>
+                </ImagePreview>
+            </template>
         </draggable>
 
         <div v-show="imagePreviews.length > 1" class="flex items-center w-full text-left">

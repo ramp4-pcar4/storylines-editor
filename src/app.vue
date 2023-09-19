@@ -12,7 +12,9 @@ export default class App extends Vue {
     @Watch('$route', { immediate: true })
     onRouteUpdate(to: RouteLocationNormalized): void {
         this.$i18n.locale = (to.params.lang as string) ?? 'en';
-        document.title = this.$t(to.meta.title);
+        if (to.params.lang) {
+            document.title = this.$t(to.meta.title);
+        }
     }
 }
 </script>

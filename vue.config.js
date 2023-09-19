@@ -30,8 +30,6 @@ module.exports = {
         }
     },
     chainWebpack: (config) => {
-        config.resolve.alias.set('vue', '@vue/compat');
-
         config.module
             .rule('lint')
             .test(/lang\.csv$/)
@@ -53,20 +51,5 @@ module.exports = {
             .end()
             .use('babel-loader')
             .loader('babel-loader');
-
-        config.module
-            .rule('vue')
-            .use('vue-loader')
-            .tap((options) => {
-                return {
-                    ...options,
-                    compilerOptions: {
-                        compatConfig: {
-                            MODE: 2
-                        }
-                    }
-                };
-            })
-            .end();
     }
 };

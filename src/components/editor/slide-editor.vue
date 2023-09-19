@@ -24,12 +24,12 @@
                     </div>
                     <div class="flex mt-3">
                         <span class="mx-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
+                        <!-- @change.stop="$modals.show(`right-only-${slideIndex}`)" -->
                         <input
                             type="checkbox"
                             class="rounded-none cursor-pointer w-4 h-4"
                             v-model="rightOnly"
                             :disabled="rightOnly && currentSlide.panel[panelIndex].type === 'dynamic'"
-                            @change.stop="$modals.show(`right-only-${slideIndex}`)"
                         />
                     </div>
                 </div>
@@ -183,12 +183,10 @@
                     <span class="ml-auto flex-grow"></span>
                     <div v-if="panelIndex === 1 || rightOnly" class="flex flex-col mr-8">
                         <label class="text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
+                        <!-- @input=$modals.show(`change-slide-${slideIndex}`); -->
                         <select
                             ref="typeSelector"
-                            @input="
-                                newType = $event.target.value;
-                                $modals.show(`change-slide-${slideIndex}`);
-                            "
+                            @input="newType = $event.target.value"
                             :value="currentSlide.panel[panelIndex].type"
                         >
                             <option
@@ -218,7 +216,7 @@
         <div v-else class="flex h-full mt-4 justify-center text-gray-600 text-xl">
             <span>{{ $t('editor.slides.select') }}</span>
         </div>
-        <confirmation-modal
+        <!-- <confirmation-modal
             :name="`change-slide-${slideIndex}`"
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
             @Ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
@@ -229,7 +227,7 @@
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
             @Ok="toggleRightOnly()"
             @Cancel="rightOnly = !rightOnly"
-        />
+        /> -->
     </div>
 </template>
 
@@ -259,7 +257,7 @@ import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+// import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
@@ -268,8 +266,8 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
         'text-editor': TextEditorV,
         'map-editor': MapEditorV,
         'loading-page': LoadingPageV,
-        'dynamic-editor': DynamicEditorV,
-        'confirmation-modal': ConfirmationModalV
+        'dynamic-editor': DynamicEditorV
+        // 'confirmation-modal': ConfirmationModalV
     }
 })
 export default class SlideEditorV extends Vue {
@@ -279,7 +277,7 @@ export default class SlideEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() uid!: string;
     @Prop() slideIndex!: number;
-    @Prop() isLast!: number;
+    @Prop() isLast!: boolean;
     @Prop() sourceCounts!: SourceCounts;
 
     panelIndex = 0;

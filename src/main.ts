@@ -26,8 +26,6 @@ import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
 
 import HighchartsVue from 'highcharts-vue';
-import VuePapaParse from 'vue-papa-parse';
-import VueFullScreen from 'vue-fullscreen';
 import Message from 'vue-m-message';
 import 'vue-m-message/dist/style.css';
 
@@ -43,9 +41,7 @@ app.use(router)
     })
     .use(HighchartsVue)
     .use(Message)
-    .use(VueFullScreen)
     .use(VueMarkdownEditor)
-    .use(vfm)
-    .use(VuePapaParse);
+    .use(vfm);
 
 app.mount('#app');
