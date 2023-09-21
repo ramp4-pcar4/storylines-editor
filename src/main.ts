@@ -23,7 +23,7 @@ const vfm = createVfm();
 
 import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';
-import 'tippy.js/animations/scale.css';
+import 'tippy.js/dist/backdrop.css';
 
 import HighchartsVue from 'highcharts-vue';
 import Message from 'vue-m-message';

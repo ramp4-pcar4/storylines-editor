@@ -5,7 +5,7 @@
                 class="bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-0 p-0 z-10 cursor-pointer"
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
-                v-tippy="{ placement: 'top', hideOnClick: false }"
+                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
             >
                 <svg
                     class="absolute transform -translate-x-1/2 -translate-y-1/2"
