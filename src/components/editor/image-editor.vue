@@ -40,17 +40,18 @@
             v-show="!imagePreviewsLoading && imagePreviews.length"
             class="flex flex-wrap list-none border my-4"
             @update="onImagesEdited"
+            item-key="id"
         >
-            <template #item="{ image, index }" item-key="id">
-                <ImagePreview :key="`${image.id}-${index}`" :imageFile="image" @delete="deleteImage">
+            <template #item="{ element, index }">
+                <ImagePreview :key="`${element.id}-${index}`" :imageFile="element" @delete="deleteImage">
                     <div class="flex mt-4 items-center w-full text-left">
                         <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
-                        <input class="w-4/5" type="text" v-model="image.altText" @change="onImagesEdited" />
+                        <input class="w-4/5" type="text" v-model="element.altText" @change="onImagesEdited" />
                     </div>
 
                     <div class="flex mt-4 items-center w-full text-left">
                         <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
-                        <input class="w-4/5" type="text" v-model="image.caption" @change="onImagesEdited" />
+                        <input class="w-4/5" type="text" v-model="element.caption" @change="onImagesEdited" />
                     </div>
                 </ImagePreview>
             </template>

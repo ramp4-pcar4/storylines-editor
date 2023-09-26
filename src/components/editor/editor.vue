@@ -27,9 +27,9 @@
                 <span :class="metadata.title ? 'text-xs' : ''">UUID: {{ uuid }}</span>
             </div>
             <span class="ml-auto"></span>
-            <!-- @click="$modals.show(`reload-config`)" -->
             <button
                 v-if="unsavedChanges"
+                @click="$vfm.open(`reload-config`)"
                 class="border-2 border-red-700 text-red-700 rounded p-1 mr-2"
                 v-tippy="{
                     delay: '200',
@@ -82,8 +82,7 @@
         <div class="flex">
             <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
                 <div class="flex items-center justify-center border-b p-2">
-                    <!-- @click.stop="$modals.show('metadata-edit-modal')" -->
-                    <button>
+                    <button @click.stop="$vfm.open('metadata-edit-modal')">
                         <span class="align-middle inline-block px-1"
                             ><svg
                                 clip-rule="evenodd"
@@ -129,11 +128,11 @@
             ></slide-editor>
         </div>
         <slot name="metadataModal"></slot>
-        <!-- <confirmation-modal
+        <confirmation-modal
             :name="`reload-config`"
             :message="$t('editor.refreshChanges.modal')"
             @Ok="$emit('refresh-config')"
-        /> -->
+        />
     </div>
 </template>
 
@@ -145,12 +144,12 @@ import { VueSpinnerOval } from 'vue3-spinners';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
-// import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
         'metadata-content': MetadataContentV,
-        // 'confirmation-modal': ConfirmationModalV,
+        'confirmation-modal': ConfirmationModalV,
         spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV

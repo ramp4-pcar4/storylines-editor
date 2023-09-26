@@ -37,25 +37,26 @@
                 handle=".handle"
                 @update="onChartsEdited"
                 class="flex flex-wrap list-none"
+                item-key="name"
             >
-                <!-- @delete="$modals.show(`${chart.name}-${index}`)" -->
-                <template #item="{ chart, index }" item-key="name">
+                <template #item="{ element, index }">
                     <ChartPreview
-                        :key="`${chart.name}-${index}`"
-                        :chart="chart"
+                        :key="`${element.name}-${index}`"
+                        :chart="element"
                         :configFileStructure="configFileStructure"
                         @edit="editChart"
+                        @delete="$vfm.open(`${element.name}-${index}`)"
                     ></ChartPreview>
                 </template>
             </draggable>
         </ul>
-        <!-- <confirmation-modal
+        <confirmation-modal
             v-for="(chart, idx) in chartConfigs"
             :key="`${chart.name}-${idx}`"
             :name="`${chart.name}-${idx}`"
             :message="$t('editor.chart.delete.confirm', { name: chart.name })"
             @Ok="deleteChart(chart)"
-        ></confirmation-modal> -->
+        ></confirmation-modal>
     </div>
 </template>
 
@@ -63,7 +64,7 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ChartConfig, ChartPanel, ConfigFileStructure, Highchart, SourceCounts } from '@/definitions';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
-// import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
+import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
 
 @Options({
@@ -71,7 +72,7 @@ import draggable from 'vuedraggable';
         // TODO: fix when storylines plugin updated to Vue 3
         // 'chart-panel': ChartPanelV,
         ChartPreview: ChartPreviewV,
-        // 'confirmation-modal': ConfirmationModalV,
+        'confirmation-modal': ConfirmationModalV,
         draggable
     }
 })

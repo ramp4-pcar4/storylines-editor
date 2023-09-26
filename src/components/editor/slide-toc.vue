@@ -12,8 +12,8 @@
                 </span>
                 <span class="align-middle inline-block">{{ $t('editor.slides.addSlide') }}</span>
             </button>
-            <!-- @click.stop="$modals.show(`copy-from-other-lang`)" -->
             <button
+                @click.stop="$vfm.open(`copy-from-other-lang`)"
                 v-tippy="{
                     delay: '200',
                     placement: 'right',
@@ -27,7 +27,11 @@
                     />
                 </svg>
             </button>
-            <!-- <vue-modal :name="`copy-from-other-lang`">
+            <vue-final-modal
+                modalId="copy-from-other-lang"
+                content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+                class="flex justify-center items-center"
+            >
                 <h2 slot="header" class="text-xl font-bold">{{ $t('editor.slides.copyFromLang') }}</h2>
                 <div class="flex flex-col">
                     <button
@@ -60,11 +64,11 @@
                         </button>
                     </div>
                 </div>
-            </vue-modal> -->
+            </vue-final-modal>
         </div>
         <ul>
-            <draggable v-model="slides" @update="$emit('slides-updated', slides)">
-                <template #item="{ element, index }" item-key="title">
+            <draggable v-model="slides" @update="$emit('slides-updated', slides)" item-key="title">
+                <template #item="{ element, index }">
                     <li
                         class="toc-slide border-t flex px-2 cursor-pointer hover:bg-gray-100"
                         :class="currentSlide === element ? 'bg-gray-100' : ''"
@@ -83,7 +87,7 @@
                         </div>
                         <div class="flex">
                             <div class="flex flex-col">
-                                <button @click.stop="$modals.show(`delete-slide-${index}`)">
+                                <button @click.stop="$vfm.open(`delete-slide-${index}`)">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                         <path
                                             d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
@@ -120,11 +124,11 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- <confirmation-modal
+                        <confirmation-modal
                             :name="`delete-slide-${index}`"
                             :message="$t('editor.slides.deleteSlide.confirm', { title: element.title })"
                             @Ok="removeSlide(index)"
-                        /> -->
+                        />
                     </li>
                 </template>
             </draggable>
@@ -148,16 +152,18 @@ import {
     SourceCounts,
     TextPanel
 } from '@/definitions';
+import { VueFinalModal } from 'vue-final-modal';
 import cloneDeep from 'clone-deep';
 import draggable from 'vuedraggable';
 
 import SlideEditorV from './slide-editor.vue';
-// import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
         'slide-editor': SlideEditorV,
-        // 'confirmation-modal': ConfirmationModalV,
+        'confirmation-modal': ConfirmationModalV,
+        'vue-final-modal': VueFinalModal,
         draggable
     }
 })

@@ -87,15 +87,17 @@
                     <router-link :to="{ name: 'home' }" target>
                         <button>{{ $t('editor.back') }}</button>
                     </router-link>
-                    <!-- @click="!warning ? continueToEditor() : $modals.show(`confirm-uuid-overwrite`)" -->
-                    <button @click="!warning ? continueToEditor() : null" class="bg-black text-white px-8">
+                    <button
+                        @click="!warning ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
+                        class="bg-black text-white px-8"
+                    >
                         {{ $t('editor.next') }}
                     </button>
-                    <!-- <confirmation-modal
+                    <confirmation-modal
                         :name="`confirm-uuid-overwrite`"
                         :message="$t(`Are you sure you want to overwrite product '${uuid}'?`)"
                         @Ok="continueToEditor()"
-                    /> -->
+                    />
                 </div>
             </div>
         </template>
@@ -116,20 +118,23 @@
                 ref="mainEditor"
             >
                 <template v-slot:langModal="slotProps">
-                    <!-- @click.stop="slotProps.unsavedChanges ? $modals.show(`change-lang`) : swapLang()" -->
-                    <button @click.stop="slotProps.unsavedChanges ? null : swapLang()">
+                    <button @click.stop="slotProps.unsavedChanges ? $vfm.open(`change-lang`) : swapLang()">
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
-                    <!-- <confirmation-modal
+                    <confirmation-modal
                         :name="`change-lang`"
                         :message="$t('editor.changeLang.modal')"
                         @Ok="swapLang()"
-                    /> -->
+                    />
                 </template>
 
                 <template v-slot:metadataModal>
-                    <vue-modal name="metadata-edit-modal" :outer-close="false" :hide-close-btn="true" size="xlg">
-                        <h2 slot="header" class="text-lg font-bold">Edit Project Metadata</h2>
+                    <vue-final-modal
+                        modalId="metadata-edit-modal"
+                        content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+                        class="flex justify-center items-center"
+                    >
+                        <h2 slot="header" class="text-lg font-bold">{{ $t('editor.editMetadata') }}</h2>
                         <metadata-content
                             :metadata="metadata"
                             @metadata-changed="updateMetadata"
@@ -141,7 +146,7 @@
                                 Done
                             </button>
                         </div>
-                    </vue-modal>
+                    </vue-final-modal>
                 </template>
             </editor>
         </template>
@@ -169,6 +174,7 @@ import {
     StoryRampConfig
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
+import { VueFinalModal } from 'vue-final-modal';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
@@ -178,7 +184,7 @@ import Message from 'vue-m-message';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
-// import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import EditorV from './editor.vue';
 
 import cloneDeep from 'clone-deep';
@@ -198,11 +204,12 @@ interface RouteParams {
 @Options({
     components: {
         Editor: EditorV,
-        // 'confirmation-modal': ConfirmationModalV,
+        'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
         spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV
+        'slide-toc': SlideTocV,
+        'vue-final-modal': VueFinalModal
     }
 })
 export default class MetadataEditorV extends Vue {
@@ -683,9 +690,7 @@ export default class MetadataEditorV extends Vue {
                 this.generateConfig();
             }
         }
-        // if (this.$modals.isActive('metadata-edit-modal')) {
-        //     this.$modals.hide('metadata-edit-modal');
-        // }
+        this.$vfm.close('metadata-edit-modal');
     }
 
     /**
@@ -867,19 +872,14 @@ export default class MetadataEditorV extends Vue {
 <style lang="scss">
 $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-.storyramp-app {
+.storyramp-app,
+.vfm {
     h1,
     h2,
     h3,
     h4,
     h5,
-    h6,
-    .h1,
-    .h2,
-    .h3,
-    .h4,
-    .h5,
-    .h6 {
+    h6 {
         font-family: $font-list;
         line-height: 1.5;
         border-bottom: 0px;
@@ -889,7 +889,12 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0 auto;
     }
 
-    .editor-container label {
+    .vfm__content {
+        max-width: 80%;
+    }
+
+    .editor-container label,
+    .vfm__content label {
         width: 10vw;
         text-align: right;
         margin-right: 15px;
@@ -900,7 +905,8 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: larger;
     }
 
-    .editor-container input {
+    .editor-container input,
+    .vfm__content input {
         padding: 5px 10px;
         margin-top: 5px;
         border: 1px solid black;
@@ -911,46 +917,31 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         border: 1px solid red;
     }
 
-    .editor-container button {
+    .editor-container button,
+    .vfm__content button {
         padding: 5px 12px;
         margin: 0px 10px;
         font-weight: 600;
         transition-duration: 0.2s;
     }
 
-    .editor-container button:hover:enabled {
+    .editor-container button:hover:enabled,
+    .vfm__content button:hover:enabled {
         background-color: #dbdbdb;
         color: black;
     }
 
-    .editor-container button:disabled {
+    .editor-container button:disabled,
+    .vfm__content button:disabled {
         border: 1px solid gray;
         color: gray;
         cursor: not-allowed;
-    }
-
-    .editor-toc button {
-        background-color: #f3f4f6;
-        color: black;
-        border: none;
-        transition-duration: 0.2s;
-        padding: 0.25 0.25em !important;
     }
 
     .image-preview {
         max-width: 150px;
         max-height: 150px;
         display: inline;
-    }
-
-    .fade-enter-active,
-    .fade-leave-active {
-        transition: opacity 0.2s;
-    }
-
-    .fade-enter,
-    .fade-leave-to {
-        opacity: 0;
     }
 }
 </style>

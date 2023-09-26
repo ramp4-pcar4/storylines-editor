@@ -1,28 +1,38 @@
 <template>
-    <vue-modal :name="name" :outer-close="false" :hide-close-btn="true" size="md">
+    <vue-final-modal
+        :modalId="name"
+        class="flex justify-center items-center"
+        content-class="flex flex-col max-w-xl mx-4 p-4 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg space-y-2"
+    >
         <h2 slot="header" class="text-lg font-bold">{{ message }}</h2>
         <div class="w-full flex justify-end">
             <button class="confirm-button hover:bg-gray-800" @click.stop="onOk">{{ $t('editor.confirm') }}</button>
             <button class="cancel-button hover:bg-gray-100" @click.stop="onCancel">{{ $t('editor.cancel') }}</button>
         </div>
-    </vue-modal>
+    </vue-final-modal>
 </template>
 
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
+import { VueFinalModal } from 'vue-final-modal';
 
+@Options({
+    components: {
+        'vue-final-modal': VueFinalModal
+    }
+})
 export default class MetadataEditorV extends Vue {
     @Prop() message!: string;
     @Prop() name!: string;
 
     onOk(): void {
         this.$emit('Ok');
-        // this.$modals.hide(this.name);
+        this.$vfm.close(this.name);
     }
 
     onCancel(): void {
         this.$emit('Cancel');
-        // this.$modals.hide(this.name);
+        this.$vfm.close(this.name);
     }
 }
 </script>

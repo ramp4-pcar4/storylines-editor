@@ -10,8 +10,11 @@
             <label class="mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
             <input type="checkbox" @change="saveTimeSlider" v-model="usingTimeSlider" />
             <span class="mx-4"></span>
-            <!-- @click="$modals.show('time-slider-edit-modal')" -->
-            <button v-if="usingTimeSlider" class="bg-black text-white hover:bg-gray-800 mt-3">
+            <button
+                v-if="usingTimeSlider"
+                @click="$vfm.open('time-slider-edit-modal')"
+                class="bg-black text-white hover:bg-gray-800 mt-3"
+            >
                 {{ $t('editor.map.timeslider.edit') }}
             </button>
             <br />
@@ -57,7 +60,11 @@
                 </li>
             </ul>
         </div>
-        <vue-modal name="time-slider-edit-modal" :outer-close="false" :hide-close-btn="true" size="md">
+        <vue-final-modal
+            modalId="time-slider-edit-modal"
+            content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+            class="flex justify-center items-center"
+        >
             <h2 slot="header" class="text-lg font-bold">{{ $t('editor.map.timeslider.edit') }}</h2>
             <time-slider-editor
                 :config="timeSliderConf"
@@ -73,20 +80,22 @@
                     Done
                 </button>
             </div>
-        </vue-modal>
+        </vue-final-modal>
     </div>
 </template>
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
+import { VueFinalModal } from 'vue-final-modal';
 import defaultConfigEn from '../../../public/scripts/ramp-editor/samples/map_en.json';
 import defaultConfigFr from '../../../public/scripts/ramp-editor/samples/map_fr.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 
 @Options({
     components: {
-        'time-slider-editor': TimeSliderEditorV
+        'time-slider-editor': TimeSliderEditorV,
+        'vue-final-modal': VueFinalModal
     }
 })
 export default class MapEditorV extends Vue {
@@ -192,9 +201,7 @@ export default class MapEditorV extends Vue {
             this.panel.timeSlider = this.usingTimeSlider ? this.timeSliderConf : undefined;
         }
         this.$emit('slide-edit');
-        // if (this.$modals.isActive('time-slider-edit-modal')) {
-        // this.$modals.hide('time-slider-edit-modal');
-        // }
+        this.$vfm.close('time-slider-edit-modal');
     }
 
     saveEditor(e: MessageEvent): void {
