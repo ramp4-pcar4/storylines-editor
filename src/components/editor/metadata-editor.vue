@@ -219,6 +219,7 @@ export default class MetadataEditorV extends Vue {
         [key: string]: StoryRampConfig | undefined;
     } = { en: undefined, fr: undefined };
     configFileStructure: ConfigFileStructure | undefined = undefined;
+    loadExisting = false;
     loadStatus = 'waiting';
     loadEditor = false;
     error = false; // whether an error has occurred
@@ -251,8 +252,10 @@ export default class MetadataEditorV extends Vue {
     sourceCounts: SourceCounts = {};
 
     created(): void {
+        this.loadExisting = this.editExisting;
+
         // Generate UUID for new product
-        this.uuid = (this.$route.params.uid as string) ?? (this.editExisting ? undefined : uuidv4());
+        this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
         this.configLang = this.$route.params.configLang ? (this.$route.params.configLang as string) : 'en';
 
         // Initialize Storylines config and the configuration structure.
@@ -260,7 +263,7 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure = undefined;
 
         // set any metadata default values for creating new product
-        if (!this.editExisting) {
+        if (!this.loadExisting) {
             // set current date as default
             const curDate = new Date();
             const year = curDate.getFullYear();
@@ -272,19 +275,15 @@ export default class MetadataEditorV extends Vue {
         // Find which view to render based on route
         if (this.$route.name === 'editor') {
             this.loadEditor = true;
+            const props = this.$route.meta.data as RouteParams;
 
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
-            if (this.$route.params.configs && this.$route.params.configFileStructure) {
-                // declare props typing to get around TS warnings
-                const route = this.$route as RouteLocationNormalized & {
-                    params: RouteParams;
-                };
-
-                this.configs = route.params.configs;
-                this.configFileStructure = route.params.configFileStructure;
-                this.metadata = route.params.metadata;
-                this.slides = route.params.slides;
-                this.sourceCounts = route.params.sourceCounts;
+            if (props.configs && props.configFileStructure) {
+                this.configs = props.configs;
+                this.configFileStructure = props.configFileStructure;
+                this.metadata = props.metadata;
+                this.slides = props.slides;
+                this.sourceCounts = props.sourceCounts;
 
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
@@ -526,7 +525,7 @@ export default class MetadataEditorV extends Vue {
             return;
         }
 
-        if (this.editExisting) {
+        if (this.loadExisting) {
             this.loadStatus = 'waiting';
             Message.success('Successfully loaded storyline!');
         } else {
@@ -539,7 +538,7 @@ export default class MetadataEditorV extends Vue {
             this.findSources(this.configs);
 
             // Update router path
-            if (!this.editExisting) {
+            if (!this.loadExisting) {
                 this.loadEditor = true;
                 this.updateEditorPath();
             }
@@ -626,7 +625,7 @@ export default class MetadataEditorV extends Vue {
                     res.data.files; // binary representation of the file
                     res.status; // HTTP status
                     this.unsavedChanges = false;
-                    this.editExisting = true; // if editExisting was false, we can now set it to true
+                    this.loadExisting = true; // if editExisting was false, we can now set it to true
                     Message.success('Successfully saved changes!');
                 })
                 .catch(() => {
@@ -728,7 +727,7 @@ export default class MetadataEditorV extends Vue {
     }
 
     checkUuid(): void {
-        if (!this.editExisting) {
+        if (!this.loadExisting) {
             fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
                     this.warning = true;
@@ -783,17 +782,20 @@ export default class MetadataEditorV extends Vue {
 
     updateEditorPath(): void {
         if (this.$route.name !== 'editor') {
-            const props = {
-                uid: this.uuid,
-                configLang: this.configLang,
-                configs: this.configs,
-                configFileStructure: this.configFileStructure,
-                sourceCounts: this.sourceCounts,
-                metadata: this.metadata,
-                slides: this.slides
-            } as unknown as RouteParamsRaw;
+            this.$router.beforeEach((to: RouteLocationNormalized) => {
+                if (to.name === 'editor') {
+                    to.meta.data = {
+                        configLang: this.configLang,
+                        configs: this.configs,
+                        configFileStructure: this.configFileStructure,
+                        sourceCounts: this.sourceCounts,
+                        metadata: this.metadata,
+                        slides: this.slides
+                    };
+                }
+            });
 
-            this.$router.push({ name: 'editor', params: props });
+            this.$router.push({ name: 'editor', params: { uid: this.uuid } });
         }
     }
 
@@ -815,7 +817,7 @@ export default class MetadataEditorV extends Vue {
             return;
         }
 
-        if (this.editExisting) {
+        if (this.loadExisting) {
             if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
                 this.updateEditorPath();
@@ -839,7 +841,7 @@ export default class MetadataEditorV extends Vue {
 
     refreshConfig(): void {
         // Re-fetch the product from the server.
-        if (this.editExisting) {
+        if (this.loadExisting) {
             this.loadEditor = false;
             this.loadStatus = 'loading';
             this.generateRemoteConfig();

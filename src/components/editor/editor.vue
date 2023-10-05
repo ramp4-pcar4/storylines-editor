@@ -170,6 +170,7 @@ export default class EditorV extends Vue {
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
+    loadSlides: undefined | Slide[] = undefined;
     currentSlide: Slide | string = '';
     slideIndex = -1;
 
@@ -184,6 +185,7 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
+        this.loadSlides = this.slides;
         this.uuid = this.$route.params.uid as string;
         window.addEventListener('beforeunload', this.beforeWindowUnload);
     }
@@ -217,7 +219,7 @@ export default class EditorV extends Vue {
         };
 
         setTimeout(() => {
-            this.currentSlide = index === -1 ? '' : (this.slides as Slide[])[index];
+            this.currentSlide = index === -1 ? '' : (this.loadSlides as Slide[])[index];
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             window.scrollTo(0, 0);
@@ -228,8 +230,8 @@ export default class EditorV extends Vue {
      * Updates slides after adding, removing, or reordering.
      */
     updateSlides(slides: Slide[]): void {
-        this.slides = slides;
-        this.slideIndex = this.slides.indexOf(this.currentSlide as Slide);
+        this.loadSlides = slides;
+        this.slideIndex = this.loadSlides.indexOf(this.currentSlide as Slide);
     }
 
     /**
