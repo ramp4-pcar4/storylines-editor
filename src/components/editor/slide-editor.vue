@@ -221,13 +221,13 @@
         <confirmation-modal
             :name="`change-slide-${slideIndex}`"
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
-            @Ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
+            @ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
             @Cancel="cancelTypeChange"
         />
         <confirmation-modal
             :name="`right-only-${slideIndex}`"
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
-            @Ok="toggleRightOnly()"
+            @ok="toggleRightOnly()"
             @Cancel="rightOnly = !rightOnly"
         />
     </div>

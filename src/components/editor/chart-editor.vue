@@ -55,7 +55,7 @@
             :key="`${chart.name}-${idx}`"
             :name="`${chart.name}-${idx}`"
             :message="$t('editor.chart.delete.confirm', { name: chart.name })"
-            @Ok="deleteChart(chart)"
+            @ok="deleteChart(chart)"
         ></confirmation-modal>
     </div>
 </template>

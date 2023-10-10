@@ -26,7 +26,7 @@ export default class MetadataEditorV extends Vue {
     @Prop() name!: string;
 
     onOk(): void {
-        this.$emit('Ok');
+        this.$emit('ok');
         this.$vfm.close(this.name);
     }
 

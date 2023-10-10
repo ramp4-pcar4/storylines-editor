@@ -131,7 +131,7 @@
         <confirmation-modal
             :name="`reload-config`"
             :message="$t('editor.refreshChanges.modal')"
-            @Ok="$emit('refresh-config')"
+            @ok="$emit('refresh-config')"
         />
     </div>
 </template>

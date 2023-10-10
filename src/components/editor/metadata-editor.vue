@@ -96,7 +96,7 @@
                     <confirmation-modal
                         :name="`confirm-uuid-overwrite`"
                         :message="$t(`Are you sure you want to overwrite product '${uuid}'?`)"
-                        @Ok="continueToEditor()"
+                        @ok="continueToEditor()"
                     />
                 </div>
             </div>
@@ -124,7 +124,7 @@
                     <confirmation-modal
                         :name="`change-lang`"
                         :message="$t('editor.changeLang.modal')"
-                        @Ok="swapLang()"
+                        @ok="swapLang()"
                     />
                 </template>
 
@@ -155,7 +155,7 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import { RouteLocationNormalized, RouteParamsRaw } from 'vue-router';
+import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
 import {
     AudioPanel,
@@ -199,6 +199,7 @@ interface RouteParams {
     metadata: MetadataContent;
     slides: Slide[];
     sourceCounts: SourceCounts;
+    existing: boolean;
 }
 
 @Options({
@@ -220,6 +221,7 @@ export default class MetadataEditorV extends Vue {
     } = { en: undefined, fr: undefined };
     configFileStructure: ConfigFileStructure | undefined = undefined;
     loadExisting = false;
+    reloadExisting = false;
     loadStatus = 'waiting';
     loadEditor = false;
     error = false; // whether an error has occurred
@@ -278,13 +280,13 @@ export default class MetadataEditorV extends Vue {
             const props = this.$route.meta.data as RouteParams;
 
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
-            if (props.configs && props.configFileStructure) {
+            if (props && props.configs && props.configFileStructure) {
                 this.configs = props.configs;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
                 this.slides = props.slides;
                 this.sourceCounts = props.sourceCounts;
-
+                this.loadExisting = props.existing;
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
@@ -386,7 +388,6 @@ export default class MetadataEditorV extends Vue {
      */
     generateRemoteConfig(): void {
         this.loadStatus = 'loading';
-
         // Attempt to fetch the project from the server.
         fetch(`http://localhost:6040/retrieve/${this.uuid}`)
             .then((res: Response) => {
@@ -536,9 +537,12 @@ export default class MetadataEditorV extends Vue {
         if (this.configs[this.configLang]) {
             this.useConfig(this.configs[this.configLang] as StoryRampConfig);
             this.findSources(this.configs);
-
             // Update router path
-            if (!this.loadExisting) {
+            if (this.reloadExisting) {
+                this.loadEditor = true;
+                this.generateConfig();
+                this.updateEditorPath();
+            } else if (!this.loadExisting) {
                 this.loadEditor = true;
                 this.updateEditorPath();
             }
@@ -790,7 +794,8 @@ export default class MetadataEditorV extends Vue {
                         configFileStructure: this.configFileStructure,
                         sourceCounts: this.sourceCounts,
                         metadata: this.metadata,
-                        slides: this.slides
+                        slides: this.slides,
+                        existing: this.editExisting
                     };
                 }
             });
@@ -816,7 +821,6 @@ export default class MetadataEditorV extends Vue {
         if (!this.checkRequiredFields()) {
             return;
         }
-
         if (this.loadExisting) {
             if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
@@ -842,20 +846,12 @@ export default class MetadataEditorV extends Vue {
     refreshConfig(): void {
         // Re-fetch the product from the server.
         if (this.loadExisting) {
-            this.loadEditor = false;
-            this.loadStatus = 'loading';
+            this.reloadExisting = true;
+            this.loadExisting = false;
             this.generateRemoteConfig();
         } else {
+            this.reloadExisting = false;
             this.generateNewConfig();
-            setTimeout(() => {
-                this.$router.push({
-                    name: 'metadata',
-                    params: {
-                        lang: this.configLang,
-                        editExisting: false
-                    } as unknown as RouteParamsRaw
-                });
-            }, 100);
         }
     }
 

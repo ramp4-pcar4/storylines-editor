@@ -127,7 +127,7 @@
                         <confirmation-modal
                             :name="`delete-slide-${index}`"
                             :message="$t('editor.slides.deleteSlide.confirm', { title: element.title })"
-                            @Ok="removeSlide(index)"
+                            @ok="removeSlide(index)"
                         />
                     </li>
                 </template>
