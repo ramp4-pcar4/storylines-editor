@@ -14,15 +14,16 @@
                 </div>
             </header>
 
-            <!-- <introduction :config="config.introSlide" :configFileStructure="configFileStructure"></introduction> -->
+            <storylines-intro :config="config.introSlide" :configFileStructure="configFileStructure" />
 
             <div class="w-full mx-auto pb-10" id="story">
-                <!-- <StoryContentV
+                <storylines-content
                     :config="config"
                     :configFileStructure="configFileStructure"
                     :lang="lang"
+                    :plugin="true"
                     @step="updateActiveIndex"
-                /> -->
+                />
             </div>
 
             <footer class="p-8 pt-2 text-right text-sm">

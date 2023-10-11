@@ -28,14 +28,14 @@
                 </svg>
             </button>
             <!-- chart component -->
-            <dqv-chart
+            <storylines-chart
                 class="w-full h-full"
                 :config="chartConfig"
                 :key="chartIdx"
                 :configFileStructure="configFileStructure"
                 @loaded="loadChart"
                 v-if="!loading"
-            ></dqv-chart>
+            ></storylines-chart>
         </div>
         <!-- chart description and edit  -->
         <div class="flex mt-4 items-center">
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import {
     ChartConfig,
     ConfigFileStructure,
@@ -70,12 +70,6 @@ import {
     PieSeriesData
 } from '@/definitions';
 
-@Options({
-    components: {
-        // TODO: fix when storylines plugin updated to Vue 3
-        // 'dqv-chart': ChartV
-    }
-})
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
     @Prop() configFileStructure!: ConfigFileStructure;

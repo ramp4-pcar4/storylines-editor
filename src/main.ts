@@ -30,7 +30,8 @@ import HighchartsVue from 'highcharts-vue';
 import Message from 'vue-m-message';
 import 'vue-m-message/dist/style.css';
 
-// TODO: import storylines viewer as plugin once a Vue 3 version is published
+import StorylinesViewer from 'ramp-storylines';
+import 'ramp-storylines/dist/storylines-viewer.css';
 
 const app = createApp(App);
 
@@ -42,6 +43,7 @@ app.use(router)
     })
     .use(HighchartsVue)
     .use(Message)
+    .use(StorylinesViewer)
     .use(VueMarkdownEditor)
     .use(vfm);
 

@@ -16,16 +16,16 @@ const routes = [
     },
     {
         path: '/:lang/editor-metadata',
-        name: 'metadataNew',
+        name: 'metadataExisting',
         component: MetadataEditorV,
-        props: { editExisting: false },
+        props: { editExisting: true },
         meta: { title: 'editor.window.title' }
     },
     {
         path: '/:lang/editor-metadata',
-        name: 'metadataExisting',
+        name: 'metadataNew',
         component: MetadataEditorV,
-        props: { editExisting: true },
+        props: { editExisting: false },
         meta: { title: 'editor.window.title' }
     },
     {
