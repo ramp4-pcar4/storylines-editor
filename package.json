@@ -21,7 +21,7 @@
         "jszip": "^3.10.1",
         "markdown-it": "^12.0.6",
         "nouislider": "^15.5.0",
-        "ramp-storylines": "^3.0.2",
+        "ramp-storylines": "^3.0.3",
         "uuid": "^9.0.0",
         "vue": "^3.3.4",
         "vue-class-component": "^8.0.0-rc.1",
