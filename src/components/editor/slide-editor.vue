@@ -397,12 +397,14 @@ export default class SlideEditorV extends Vue {
     }
 
     saveChanges(): void {
-        if (
-            this.$refs.editor !== undefined &&
-            typeof (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges === 'function'
-        ) {
-            (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges();
-        }
+        this.$nextTick(() => {
+            if (
+                this.$refs.editor !== undefined &&
+                typeof (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges === 'function'
+            ) {
+                (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges();
+            }
+        });
     }
 
     selectSlide(index: number): void {

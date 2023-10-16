@@ -725,8 +725,12 @@ export default class MetadataEditorV extends Vue {
             return;
         }
         this.loadConfig(this.configs[this.configLang]);
+
         if (this.loadEditor) {
-            (this.$refs.mainEditor as EditorV).selectSlide(-1);
+            (this.$refs.mainEditor as EditorV).updateSlides(this.slides);
+            this.$nextTick(() => {
+                (this.$refs.mainEditor as EditorV).selectSlide(-1);
+            });
         }
     }
 
