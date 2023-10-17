@@ -8,13 +8,15 @@
             height="400px"
             left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper | ul ol table hr | addLink image code | save"
             :toolbar="toolbar"
+            :disabled-menus="[]"
+            @upload-image="handleUploadImage"
         ></v-md-editor>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { TextPanel } from '@/definitions';
+import { ConfigFileStructure, TextPanel } from '@/definitions';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;
@@ -25,6 +27,8 @@ interface MDEditor {
 })
 export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
+    @Prop() configFileStructure!: ConfigFileStructure;
+    @Prop() lang!: string;
 
     toolbar = {
         subsuper: {
@@ -110,6 +114,18 @@ export default class TextEditorV extends Vue {
             ]
         }
     };
+
+    handleUploadImage(event: any, insertImage: any, files: File[]) {
+        const file = files[0];
+        // Get the files and upload them to the file server, then insert the corresponding content into the editor
+        this.configFileStructure.assets[this.lang].file(file.name, file);
+
+        // Here is just an example
+        insertImage({
+            url: `/${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`,
+            desc: file.name
+        });
+    }
 }
 </script>
 
