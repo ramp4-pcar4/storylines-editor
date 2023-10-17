@@ -242,14 +242,19 @@ export default class EditorV extends Vue {
     preview(): void {
         // save current slide final changes before previewing product
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as SlideEditorV).saveChanges();
+            this.$nextTick(() => {
+                (this.$refs.slide as SlideEditorV).saveChanges();
+            });
         }
-        const routeData = this.$router.resolve({ name: 'preview' });
-        const previewTab = window.open(routeData.href, '_blank');
-        (previewTab as Window).props = {
-            config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
-            configFileStructure: this.configFileStructure
-        };
+
+        setTimeout(() => {
+            const routeData = this.$router.resolve({ name: 'preview' });
+            const previewTab = window.open(routeData.href, '_blank');
+            (previewTab as Window).props = {
+                config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
+                configFileStructure: this.configFileStructure
+            };
+        }, 5);
     }
 
     saveChanges(): void {
