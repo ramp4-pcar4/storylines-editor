@@ -1,0 +1,540 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ABCF4774-42D4-4000-B91A-40F28DB334FD}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CE</RootNamespace>
+    <AssemblyName>CE</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort>44393</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GoC.WebTemplate.Components, Version=2.0.8446.30149, Culture=neutral, PublicKeyToken=1461a53e67b98f2c, processorArchitecture=MSIL">
+      <HintPath>packages\GoC.WebTemplate-Components.2.8.0\lib\net472\GoC.WebTemplate.Components.dll</HintPath>
+    </Reference>
+    <Reference Include="GoC.WebTemplate.Components.Framework, Version=2.0.8446.30171, Culture=neutral, PublicKeyToken=1461a53e67b98f2c, processorArchitecture=MSIL">
+      <HintPath>packages\GoC.WebTemplate-Components.Framework.2.8.0\lib\Net461\GoC.WebTemplate.Components.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="GoC.WebTemplate.WebForms, Version=2.0.8446.30175, Culture=neutral, PublicKeyToken=1461a53e67b98f2c, processorArchitecture=MSIL">
+      <HintPath>packages\GoC.WebTemplate-WebForms.2.8.0\lib\Net461\GoC.WebTemplate.WebForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Html.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Html.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Html.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Http.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Features, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Http.Features.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.Primitives, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Primitives.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration.ConfigurationManager, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Configuration.ConfigurationManager.5.0.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.AccessControl.5.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Permissions.5.0.0\lib\net461\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encodings.Web.5.0.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\GettyImages-187242601__1554821467033__w1920.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\GettyImages-516166467__1554821531978__w1920.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\NPRIdata__1598884946319__w1589.png" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\OilSands___1565005967929__w774.png" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\Slide 10 - SAGD vs CSS.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\Slide 13 - InSitu Trends__1554406944277__w594.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\Slide 3 - mine vs insitu.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\slide 6 - mining trends.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\slide 6 - mining trends__1553275702559__w592.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\Slide7 - Tailings__1554486679473__w860.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\1_AuroraNorth_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\2_FortHills_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\3_Horizon_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\4_Kearl_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\5_MuskegJackpine_R5_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\6_Suncor_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\substances\7_Syncrude_RelDisp.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\SurfaceExtractionEnglish__1563813765181__w791.png" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\AuroraNorth_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\FortHills_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\Horizon_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\Kearl_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\Muskeg_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\Suncor_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\tailings\Syncrude_Tailings.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\en\Top10SubstancesTailings2019.png" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\CNRL horizon rele and disp - French__1554382762060__w843.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\CNRL muskeg and jackpine rele and disp - French__1554382739046__w758.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Fort hills rele and disp - French__1554382957305__w828.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\FracingFrench__1563814142402__w817.png" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\GettyImages-187242601__1554821412825__w1920.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\GettyImages-516166467__1554821568441__w1920.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Imp oil, kearl, rele and disp - French__1554382997280__w861.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\NPRIpictogramme-2016data-FR__1552505700147__w975.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Slide 10 - SAGD vs CSS.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Slide 13 Insitu trends - French__1554407015712__w628.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\slide 14 - athabasca.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Slide 3 - mine vs insitu.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\slide 6 trends in mining - french__1554490568713__w655.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\slide 6 trends in mining.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\slide 7 - tailings__1554486363487__w866.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\AuroraNorth_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\FortHills_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\Horizon_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\Kearl_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\MuskegJackpine_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\Suncor_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\substances\Syncrude_RelDisp_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Suncor rele and disp - French__1554383302247__w855.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\SurfaceExtractionFrench__1563814112346__w816.png" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Syncrude Aurora rele and disp - French__1554383324827__w796.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Syncrude Mildred lake - rele and disp - French__1554383342580__w812.jpg" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\AuroraNorth_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\FortHills_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\Horizon_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\Kearl_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\Muskeg_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\Suncor_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\tailings\Syncrude_Tailings_FR.PNG" />
+    <Content Include="00000000-0000-0000-0000-000000000000\assets\fr\Top10SubstancesTailings2019.png" />
+    <Content Include="assets\css\chunk-common.5f115248.css" />
+    <Content Include="assets\css\chunk-vendors.5ce752f9.css" />
+    <Content Include="assets\favicon.ico" />
+    <Content Include="assets\favicon.svg" />
+    <Content Include="assets\help\default\images\accessibility\crosshairs.png" />
+    <Content Include="assets\help\default\images\accessibility\crosshairs_tooltip.png" />
+    <Content Include="assets\help\default\images\basemap\open.png" />
+    <Content Include="assets\help\default\images\basemap\open_fr.png" />
+    <Content Include="assets\help\default\images\datatable\allEntries_en.png" />
+    <Content Include="assets\help\default\images\datatable\allEntries_fr.png" />
+    <Content Include="assets\help\default\images\datatable\apply.png" />
+    <Content Include="assets\help\default\images\datatable\clear.png" />
+    <Content Include="assets\help\default\images\datatable\details.png" />
+    <Content Include="assets\help\default\images\datatable\filteredEntries_en.png" />
+    <Content Include="assets\help\default\images\datatable\filteredEntries_fr.png" />
+    <Content Include="assets\help\default\images\datatable\hideColumns.png" />
+    <Content Include="assets\help\default\images\datatable\leftReorderArrow.png" />
+    <Content Include="assets\help\default\images\datatable\menu_en.png" />
+    <Content Include="assets\help\default\images\datatable\menu_fr.png" />
+    <Content Include="assets\help\default\images\datatable\overview_en.png" />
+    <Content Include="assets\help\default\images\datatable\overview_fr.png" />
+    <Content Include="assets\help\default\images\datatable\reorder.png" />
+    <Content Include="assets\help\default\images\datatable\rightReorderArrow.png" />
+    <Content Include="assets\help\default\images\datatable\search_en.png" />
+    <Content Include="assets\help\default\images\datatable\search_fr.png" />
+    <Content Include="assets\help\default\images\datatable\sortAsc.png" />
+    <Content Include="assets\help\default\images\datatable\sortDesc.png" />
+    <Content Include="assets\help\default\images\datatable\tableControls_en.png" />
+    <Content Include="assets\help\default\images\datatable\tableControls_fr.png" />
+    <Content Include="assets\help\default\images\datatable\zoomto.png" />
+    <Content Include="assets\help\default\images\geosearch\geofilter_en.png" />
+    <Content Include="assets\help\default\images\geosearch\geofilter_fr.png" />
+    <Content Include="assets\help\default\images\geosearch\searchbar_en.png" />
+    <Content Include="assets\help\default\images\geosearch\searchbar_fr.png" />
+    <Content Include="assets\help\default\images\geosearch\visiblemap_en.png" />
+    <Content Include="assets\help\default\images\geosearch\visiblemap_fr.png" />
+    <Content Include="assets\help\default\images\layer\checkbox.png" />
+    <Content Include="assets\help\default\images\layer\eye.png" />
+    <Content Include="assets\help\default\images\layer\layer.png" />
+    <Content Include="assets\help\default\images\layer\scale.png" />
+    <Content Include="assets\help\default\images\layer\zoom.png" />
+    <Content Include="assets\help\default\images\layer_settings\datatable.png" />
+    <Content Include="assets\help\default\images\layer_settings\ellipses.png" />
+    <Content Include="assets\help\default\images\layer_settings\layer.png" />
+    <Content Include="assets\help\default\images\layer_settings\metadata.png" />
+    <Content Include="assets\help\default\images\layer_settings\reload.png" />
+    <Content Include="assets\help\default\images\layer_settings\remove.png" />
+    <Content Include="assets\help\default\images\layer_settings\settings.png" />
+    <Content Include="assets\help\default\images\layer_settings\zoomto.png" />
+    <Content Include="assets\help\default\images\layer_submenu\add.png" />
+    <Content Include="assets\help\default\images\layer_submenu\expand.png" />
+    <Content Include="assets\help\default\images\layer_submenu\menu.png" />
+    <Content Include="assets\help\default\images\layer_submenu\menu_fr.png" />
+    <Content Include="assets\help\default\images\layer_submenu\reorder.png" />
+    <Content Include="assets\help\default\images\layer_submenu\view.png" />
+    <Content Include="assets\help\default\images\menu\about.png" />
+    <Content Include="assets\help\default\images\menu\basemap.png" />
+    <Content Include="assets\help\default\images\menu\export.png" />
+    <Content Include="assets\help\default\images\menu\fullscreen.png" />
+    <Content Include="assets\help\default\images\menu\help.png" />
+    <Content Include="assets\help\default\images\menu\language.png" />
+    <Content Include="assets\help\default\images\menu\layers.png" />
+    <Content Include="assets\help\default\images\menu\menu.png" />
+    <Content Include="assets\help\default\images\menu\share.png" />
+    <Content Include="assets\help\default\images\menu\touch.png" />
+    <Content Include="assets\help\default\images\navigation\canada.png" />
+    <Content Include="assets\help\default\images\navigation\fullscreen.png" />
+    <Content Include="assets\help\default\images\navigation\geolocation.png" />
+    <Content Include="assets\help\default\images\navigation\help.png" />
+    <Content Include="assets\help\default\images\navigation\zoomin.png" />
+    <Content Include="assets\help\default\images\navigation\zoomout.png" />
+    <Content Include="assets\help\default\images\north_arrow\arrow.png" />
+    <Content Include="assets\help\default\images\overview\toggle.png" />
+    <Content Include="assets\img\add.8fc9e0fa.svg" />
+    <Content Include="assets\img\edit-icon.0cd4fc59.svg" />
+    <Content Include="assets\img\popout.409183e0.svg" />
+    <Content Include="assets\index-ca-en.html" />
+    <Content Include="assets\index-ca-fr.html" />
+    <Content Include="assets\index.html" />
+    <Content Include="assets\js\chunk-common.b1125170.js" />
+    <Content Include="assets\js\chunk-vendors.a28bff94.js" />
+    <Content Include="assets\js\index.827e9960.js" />
+    <Content Include="assets\js\indexCanadaEn.f8dd9c6c.js" />
+    <Content Include="assets\js\indexCanadaFr.42ecbc14.js" />
+    <Content Include="assets\scripts\highcharts-editor\highcharts-editor.complete.js" />
+    <Content Include="assets\scripts\highcharts-editor\highcharts-editor.min.css" />
+    <Content Include="assets\scripts\multi-ramp\legacy-api.js" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-areas-of-interest.js" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-back-to-cart.js" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-coordinate-info.js" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-custom-export.js" />
+    <Content Include="assets\scripts\multi-ramp\rv-main.js" />
+    <Content Include="assets\scripts\multi-ramp\rv-styles.css" />
+    <Content Include="assets\scripts\ramp-editor\av-main.js" />
+    <Content Include="assets\scripts\ramp-editor\av-styles.css" />
+    <Content Include="assets\scripts\ramp-editor\form\angular-schema-form-bootstrap-bundled.min.js" />
+    <Content Include="assets\scripts\ramp-editor\form\tv4.js" />
+    <Content Include="assets\scripts\ramp-editor\ie-polyfills.js" />
+    <Content Include="assets\scripts\ramp-editor\samples\extensions\agol\agol.js" />
+    <Content Include="assets\scripts\ramp-editor\samples\extensions\ddr\ddr-tools.js" />
+    <Content Include="assets\scripts\ramp-editor\samples\extensions\ddr\ddr.css" />
+    <Content Include="assets\scripts\ramp-editor\samples\extensions\ddr\ddr.js" />
+    <Content Include="assets\scripts\ramp-editor\samples\extensions\ddr\ddr_registry.js" />
+    <Content Include="assets\scripts\ramp-editor\samples\extensions\ddr\frame-ddr.html" />
+    <Content Include="assets\scripts\ramp-editor\samples\fgpv-author.html" />
+    <Content Include="assets\scripts\ramp-editor\samples\frame-extent.html" />
+    <Content Include="assets\scripts\ramp-editor\samples\frame-preview.html" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\applicationbar.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\applicationbarFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\diskette.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\draghandle.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\expandcollapse.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\expandcollapseFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\greencheckbox.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\header.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\headerFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\languagebutton.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\languagebuttonFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\layersettings.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\legendEntry.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\legendEntryGroup.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\legendInfoSection.gif" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\legendUnboundLayer.gif" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\legendVisibilitySet.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\menucouches.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\messLegendErrorValidation.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\messLegendValidation.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\messLegendValidationFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\plussign.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\preview.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\previewsample.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\previewsampleFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\redcircle.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\side menu list in viewer.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\structLegendSections.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\structLegendSectionsFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\summaryinfo.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\summarypanel.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\summarypanelFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\templates.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\templatesFR.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\uparrow.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\validate.png" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\images\validateFR.png" />
+    <Content Include="GoC.WebTemplate\ChangeLog.txt" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\appFooter-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\appFooter-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\appTop-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\appTop-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\footer-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\footer-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\prefooter-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\prefooter-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\refTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\secMenu-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\secMenu-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\secMenuTop-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\secMenuTop-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\serverBottom-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\serverBottom-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\serverBottom.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\serverRefTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\serverTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\splash.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\splashTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\top-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcintranet\top-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\appFooter-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\appFooter-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\appTop-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\appTop-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\footer-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\footer-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\prefooter-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\prefooter-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\refTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\secMenu-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\secMenu-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\secMenuTop-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\secMenuTop-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\serverBottom-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\serverBottom-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\serverBottom.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\serverRefTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\serverTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\splash.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\splashTop.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\top-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\top-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactFooter-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactFooter-fr.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactTop-en.html" />
+    <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactTop-fr.html" />
+    <Content Include="index.aspx">
+      <BrowseToURL>/</BrowseToURL>
+    </Content>
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="index.aspx.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="index.aspx.designer.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.UnilingualErrorPage.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.Transactional.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.Transactional.LeftMenu.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.SplashPage.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.LeftMenu.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.BilingualErrorPage.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.Application.Master" />
+    <Content Include="GoC.WebTemplate\GoCWebTemplate.Application.LeftMenu.Master" />
+    <Content Include="00000000-0000-0000-0000-000000000000\00000000-0000-0000-0000-000000000000_en.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\00000000-0000-0000-0000-000000000000_fr.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\charts\en\chartConfig.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\charts\en\Criteria air contaminant releases from oil sands mines_3.csv" />
+    <Content Include="00000000-0000-0000-0000-000000000000\charts\en\csvUrlChart.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\charts\en\hybridChartConfig.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\charts\en\Mine tailings reported.csv" />
+    <Content Include="00000000-0000-0000-0000-000000000000\charts\en\NPRI releases from thermal in-situ facilities_1.csv" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\OilSandsDeposits.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\OilSandsFacilityLocations2019.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\ReleasesandDisposalsbyMiningFacilitiesin2019%28satellite%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\ReleasesandDisposalsbyMiningFacilitiesin2019%28topo%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019%28timeslider%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\TailingsfromMiningFacilities2010to2019%28timeslider%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\en\TailingsfromMiningFacilities2019.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\OilSandsDeposits.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\OilSandsFacilityLocations2019.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\ReleasesandDisposalsbyMiningFacilitiesin2019%28satellite%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\ReleasesandDisposalsbyMiningFacilitiesin2019%28topo%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019%28timeslider%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\TailingsfromMiningFacilities2010to2019%28timeslider%29.json" />
+    <Content Include="00000000-0000-0000-0000-000000000000\ramp-config\fr\TailingsfromMiningFacilities2019.json" />
+    <Content Include="assets\help\default\en-CA.md" />
+    <Content Include="assets\help\default\fr-CA.md" />
+    <Content Include="assets\js\chunk-common.b1125170.js.map" />
+    <Content Include="assets\js\chunk-vendors.a28bff94.js.map" />
+    <Content Include="assets\js\index.827e9960.js.map" />
+    <Content Include="assets\js\indexCanadaEn.f8dd9c6c.js.map" />
+    <Content Include="assets\js\indexCanadaFr.42ecbc14.js.map" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOkCnqEu92Fr1Mu51xIIzQ.woff" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOlCnqEu92Fr1MmEU9fBBc-.woff" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOlCnqEu92Fr1MmEU9fBBc4.woff2" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOlCnqEu92Fr1MmSU5fBBc-.woff" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOlCnqEu92Fr1MmWUlfBBc-.woff" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOlCnqEu92Fr1MmWUlfBBc4.woff2" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOmCnqEu92Fr1Mu4mxK.woff2" />
+    <Content Include="assets\scripts\multi-ramp\fonts\KFOmCnqEu92Fr1Mu4mxM.woff" />
+    <Content Include="assets\scripts\multi-ramp\legacy-api.js.map" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-areas-of-interest.js.map" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-back-to-cart.js.map" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-coordinate-info.js.map" />
+    <Content Include="assets\scripts\multi-ramp\ramp-plugin-custom-export.js.map" />
+    <Content Include="assets\scripts\multi-ramp\rv-main.js.map" />
+    <Content Include="assets\scripts\multi-ramp\rv-styles.css.map" />
+    <Content Include="assets\scripts\ramp-editor\e18bbf611f2a2e43afc071aa2f4e1512.ttf" />
+    <Content Include="assets\scripts\ramp-editor\f4769f9bdb7466be65088239c12046d1.eot" />
+    <Content Include="assets\scripts\ramp-editor\samples\config-default.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\config\all-plugins-samplesv01.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\config\canada-world-en.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\config\canada-world-fr.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\config\config-extent-3857.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\config\config-extent-3978.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-basemaps-en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-basemaps-fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-extentlods-en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-extentlods-fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-layers-en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-layers-fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-legend-en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-legend-fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-plugins-en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-plugins-fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-servicesurl-en-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\help\info-servicesurl-fr-CA.md" />
+    <Content Include="assets\scripts\ramp-editor\samples\map_en.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\map_fr.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\intentions.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\intentions.fr-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\language.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\language.fr-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\map.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\map.fr-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\plugins.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\plugins.fr-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\services.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\services.fr-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\ui.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\ui.fr-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\version.en-CA.json" />
+    <Content Include="assets\scripts\ramp-editor\samples\schemaForm\version.fr-CA.json" />
+    <None Include="packages.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="WebTemplateWebForms.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>59107</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>https://localhost:44393/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
