@@ -264,7 +264,7 @@
     <Content Include="assets\img\popout.409183e0.svg" />
     <Content Include="assets\index-ca-en.html" />
     <Content Include="assets\index-ca-fr.html" />
-    <Content Include="assets\index.html" />
+    <Content Include="index.html" />
     <Content Include="assets\js\chunk-common.b1125170.js" />
     <Content Include="assets\js\chunk-vendors.a28bff94.js" />
     <Content Include="assets\js\index.827e9960.js" />
@@ -379,18 +379,18 @@
     <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactFooter-fr.html" />
     <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactTop-en.html" />
     <Content Include="GoC.WebTemplate\StaticFallbackFiles\gcweb\transactTop-fr.html" />
-    <Content Include="index.aspx">
+    <Content Include="index-cdts.aspx">
       <BrowseToURL>/</BrowseToURL>
     </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="index.aspx.cs">
-      <DependentUpon>index.aspx</DependentUpon>
+    <Compile Include="index-cdts.aspx.cs">
+      <DependentUpon>index-cdts.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="index.aspx.designer.cs">
-      <DependentUpon>index.aspx</DependentUpon>
+    <Compile Include="index-cdts.aspx.designer.cs">
+      <DependentUpon>index-cdts.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

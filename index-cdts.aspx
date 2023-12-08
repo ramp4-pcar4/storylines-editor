@@ -1,6 +1,6 @@
 ﻿<%@ Page Title="" Language="C#"
 MasterPageFile="~/GoC.WebTemplate/GoCWebTemplate.Master" AutoEventWireup="true"
-CodeBehind="index.aspx.cs" Inherits="Storylines.base_page" %>
+CodeBehind="index-cdts.aspx.cs" Inherits="Storylines.base_page" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
   <h1
