@@ -21,7 +21,6 @@ pnpm-debug.log*
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
 /.vs
 Fortifystory-ramp.bat

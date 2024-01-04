@@ -26,6 +26,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
+// Used to test IISNode. Remove once ready to deploy.
+app.get('/', function(req, res){
+    res.send("Express server on IISNode");
+});
+
 // POST requests made to /upload will be handled here.
 app.route('/upload').post(function (req, res, next) {
     const options = {
@@ -203,7 +208,7 @@ function logger(type, message) {
     console.log(`${currentDate} [${type}] ${message}`);
 }
 
-// Run the express app on port 6040.
-var server = app.listen(6040, function () {
+// Run the express app on the IIS Port.
+var server = app.listen(process.env.PORT, function () {
     logger('INFO', `Storylines Express Server Started, PORT: ${server.address().port}`);
 });
