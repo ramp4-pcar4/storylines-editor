@@ -40,6 +40,8 @@ editor.contextLabel,Context Label,1,Étiquette de contexte,1
 editor.contextLabel.info,Context label shows up before the context link to explain what the link is for,1,L’étiquette de contexte apparaît avant le lien contextuel et explique à quoi sert le lien.,1
 editor.dateModified,Date Modified,1,Date de modification,1
 editor.load,Load,1,Charger,1
+editor.loadPrevious,Load Previous,1,[FR] Load Previous,0
+editor.viewHistory,View Previous,1,[FR] View Previous,0
 editor.browse,Browse,1,Parcourir,1
 editor.remove,Remove,1,Supprimer,1
 editor.back,Back,1,Retour,1
@@ -130,3 +132,4 @@ editor.tocOrientation,Table of Contents Orientation,1,Orientation de la table de
 editor.tocOrientation.info,The table of contents orientation will be set to vertical in mobile view.,1,L'orientation de la table des matières sera définie sur verticale en vue mobile.,0
 editor.tocOrientation.vertical,Vertical,1,Vertical,0
 editor.tocOrientation.horizontal,Horizontal,1,Horizontal,0
+editor.landing.greeting,Hello,1,Bonjour,1
