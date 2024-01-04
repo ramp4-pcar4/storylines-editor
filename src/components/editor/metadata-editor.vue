@@ -13,20 +13,39 @@
                 </div>
 
                 <div class="border py-5 w-5/6">
-                    <label class="editor-label"
-                        ><span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:</label
-                    >
-                    <input
-                        class="editor-input w-1/3"
-                        type="text"
-                        @input="
-                            error = false;
-                            reqFields.uuid = true;
-                            checkUuid();
-                        "
-                        v-model="uuid"
-                        :class="error || !reqFields.uuid ? 'input-error' : ''"
-                    />
+                    <label>
+                        <span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:
+                    </label>
+                    <div class="relative w-1/3 inline-block">
+                        <input
+                            type="text"
+                            @focus="showDropdown = true"
+                            @blur="showDropdown = false"
+                            @input="
+                                error = false;
+                                reqFields.uuid = true;
+                                checkUuid();
+                            "
+                            v-model="uuid"
+                            class="w-full"
+                            :class="{ 'input-error': error || !reqFields.uuid }"
+                        />
+                        <div class="absolute z-10 w-full bg-white border border-gray-200 mt-1" v-show="showDropdown">
+                            <ul>
+                                <li
+                                    v-for="storyline in getStorylines"
+                                    :key="storyline.uuid"
+                                    @mousedown.prevent="selectUuid(storyline.uuid)"
+                                    :class="[
+                                        'p-2 hover:bg-gray-100 cursor-pointer',
+                                        storyline.isUserStoryline ? 'bg-gray-200' : ''
+                                    ]"
+                                >
+                                    {{ storyline.uuid }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     <span v-if="warning" class="text-yellow-500 rounded p-1 ml-2">
                         <span class="align-middle inline-block mr-1 pb-1 fill-current">
                             <svg
@@ -50,27 +69,50 @@
                     <button
                         @click="generateRemoteConfig"
                         class="editor-button bg-black text-white hover:bg-gray-800"
-                        :class="error ? 'input-error' : ''"
+                        :class="{ 'input-error': error }"
                         v-if="editExisting"
                     >
                         {{ $t('editor.load') }}
                     </button>
-
-                    <!-- If config is loading, display a small spinner. -->
+                    <button
+                        @click="fetchHistory"
+                        class="bg-black text-white hover:bg-gray-800"
+                        :class="{ 'input-error': error }"
+                        v-if="editExisting"
+                    >
+                        {{ $t('editor.viewHistory') }}
+                    </button>
                     <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
-                        <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                        <spinner size="24px" color="#009CD1" class="mx-2 my-auto"></spinner>
+                    </div>
+                    <div v-if="editExisting" class="inline-flex border py-5 ml-10">
+                        <ul>
+                            <li
+                                v-for="history in storylineHistory"
+                                :key="history.id"
+                                @click="selectHistory(history)"
+                                class="p-2 cursor-pointer"
+                                :class="{ 'bg-blue-200': selectedHistory && history.id === selectedHistory.id }"
+                            >
+                                {{ formatDate(history.created) }}
+                            </li>
+                        </ul>
+                        <button
+                            :disabled="!selectedHistory || selectedHistory.storylineUUID !== uuid"
+                            class="bg-black text-white hover:bg-gray-800"
+                            @click="loadHistory()"
+                        >
+                            {{ $t('editor.loadPrevious') }}
+                        </button>
                     </div>
                 </div>
-
                 <br />
-
                 <div class="mb-4">
                     <h3 class="editor-h3">{{ $t('editor.productDetails') }}</h3>
                     <p>
                         {{ $t('editor.metadata.instructions') }}
                     </p>
                 </div>
-
                 <metadata-content
                     :metadata="metadata"
                     @metadata-changed="updateMetadata"
@@ -182,6 +224,7 @@ import {
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
+import { useUserStore } from '../../stores/userStore';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
@@ -210,6 +253,12 @@ interface RouteParams {
     unsavedChanges: boolean;
 }
 
+interface History {
+    id: number;
+    storylineUUID: string;
+    created: string;
+}
+
 @Options({
     components: {
         Editor: EditorV,
@@ -235,10 +284,16 @@ export default class MetadataEditorV extends Vue {
     error = false; // whether an error has occurred
     warning = false; // used for duplicate uuid warning
     configLang = 'en';
+    showDropdown = false;
+
+    storylineHistory: History[] = [];
+    selectedHistory: History | null = null;
 
     // Saving properties.
     saving = false;
     unsavedChanges = false;
+
+    apiUrl = process.env.VUE_APP_CURR_ENV !== '' ? process.env.VUE_APP_API_URL : 'http://localhost:6040';
 
     // Form properties.
     uuid = '';
@@ -402,7 +457,7 @@ export default class MetadataEditorV extends Vue {
     generateRemoteConfig(): void {
         this.loadStatus = 'loading';
         // Attempt to fetch the project from the server.
-        fetch(`http://localhost:6040/retrieve/${this.uuid}`)
+        fetch(this.apiUrl + `/retrieve/${this.uuid}`)
             .then((res: Response) => {
                 if (res.status === 404) {
                     // Product not found.
@@ -419,11 +474,92 @@ export default class MetadataEditorV extends Vue {
                         });
                     });
                 }
+
+                fetch(this.apiUrl + `/retrieveMessages`)
+                    .then((res: any) => {
+                        if (res.ok) return res.json();
+                    })
+                    .then((data) => {
+                        axios
+                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                messages: data.messages
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    })
+                    .catch((error: any) => console.log(error.response || error));
             })
             .catch(() => {
                 Message.error(`Failed to load product, no response from server`);
                 this.loadStatus = 'loaded';
             });
+    }
+
+    fetchHistory(): void {
+        if (this.uuid === undefined) Message.error(`You must first enter a UUID`);
+
+        if (process.env.VUE_APP_CURR_ENV !== '') {
+            axios
+                .get(process.env.VUE_APP_NET_API_URL + `/api/version/fetch/${this.uuid}`)
+                .then((response: any) => {
+                    this.storylineHistory = response.data;
+                })
+                .catch((error: any) => console.log(error.response || error));
+        }
+    }
+
+    selectHistory(selected: any): void {
+        this.selectedHistory = selected;
+    }
+
+    formatDate(created: string): string {
+        const date = new Date(created);
+        const estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'America/Toronto'
+        };
+
+        return new Intl.DateTimeFormat('en-US', options).format(estDate);
+    }
+
+    loadHistory(): void {
+        if (this.selectedHistory && process.env.VUE_APP_CURR_ENV !== '') {
+            this.loadStatus = 'loading';
+
+            axios
+                .get(process.env.VUE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.id}`, {
+                    responseType: 'blob'
+                })
+                .then((response: any) => {
+                    const blob = response.data;
+
+                    JSZip.loadAsync(blob)
+                        .then((zip: any) => {
+                            this.configFileStructureHelper(zip);
+                        })
+                        .catch((jsZipError: any) => {
+                            console.error('Error processing ZIP file:', jsZipError);
+                            Message.error('Failed to process ZIP file');
+                        });
+                })
+                .catch((error: any) => {
+                    if (error.response && error.response.status === 404) {
+                        Message.error(`The requested version does not exist.`);
+                        this.error = true;
+                        this.loadStatus = 'waiting';
+                        this.clearConfig();
+                    } else {
+                        console.error('Failed to load version:', error);
+                        Message.error('Failed to load product, no response from server');
+                    }
+                    this.loadStatus = 'loaded';
+                });
+        }
     }
 
     findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
@@ -631,13 +767,58 @@ export default class MetadataEditorV extends Vue {
             const headers = { 'Content-Type': 'multipart/form-data' };
 
             axios
-                .post('http://localhost:6040/upload', formData, { headers })
+                .post(this.apiUrl + '/upload', formData, { headers })
                 .then((res: AxiosResponse) => {
-                    res.data.files; // binary representation of the file
-                    res.status; // HTTP status
+                    const responseData = res.data;
+                    responseData.files; // binary representation of the file
+                    responseData.status; // HTTP status
                     this.unsavedChanges = false;
                     this.loadExisting = true; // if editExisting was false, we can now set it to true
                     Message.success('Successfully saved changes!');
+
+                    if (process.env.VUE_APP_CURR_ENV !== '') {
+                        if (responseData.new) {
+                            axios
+                                .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
+                                    uuid: this.uuid
+                                })
+                                .then((response: any) => {
+                                    const userStore = useUserStore();
+                                    userStore.fetchUserProfile();
+                                    console.log(response);
+
+                                    formData.append('uuid', this.uuid);
+                                    axios
+                                        .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
+                                        .then((response: any) => {
+                                            console.log('Version saved successfully.');
+                                        })
+                                        .catch((error: any) => console.log(error.response || error));
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        } else {
+                            formData.append('uuid', this.uuid);
+                            axios
+                                .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
+                                .then((response: any) => {
+                                    console.log('Version saved successfully.');
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        }
+
+                        fetch(this.apiUrl + `/retrieveMessages`)
+                            .then((res: any) => {
+                                if (res.ok) return res.json();
+                            })
+                            .then((data) => {
+                                axios
+                                    .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                        messages: data.messages
+                                    })
+                                    .catch((error: any) => console.log(error.response || error));
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    }
                 })
                 .catch(() => {
                     Message.error('Failed to save changes.');
@@ -707,6 +888,9 @@ export default class MetadataEditorV extends Vue {
             if (publish) {
                 this.generateConfig();
             }
+
+            const userStore = useUserStore();
+            userStore.fetchUserProfile();
         }
         this.$vfm.close('metadata-edit-modal');
     }
@@ -752,10 +936,23 @@ export default class MetadataEditorV extends Vue {
 
     checkUuid(): void {
         if (!this.loadExisting) {
-            fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: Response) => {
+            fetch(this.apiUrl + `/retrieve/${this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
                     this.warning = true;
                 }
+
+                fetch(this.apiUrl + `/retrieveMessages`)
+                    .then((res: any) => {
+                        if (res.ok) return res.json();
+                    })
+                    .then((data) => {
+                        axios
+                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                messages: data.messages
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    })
+                    .catch((error: any) => console.log(error.response || error));
             });
         }
         this.warning = false;
@@ -886,6 +1083,25 @@ export default class MetadataEditorV extends Vue {
             next();
         }
     }
+
+    get getStorylines() {
+        const userStore = useUserStore();
+        const userStorylines = userStore.userProfile.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
+        const allStorylines =
+            userStore.userProfile.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
+
+        let combined = [...userStorylines, ...allStorylines];
+
+        if (this.uuid)
+            combined = combined.filter((storyline) => storyline.uuid.toLowerCase().includes(this.uuid.toLowerCase()));
+
+        return combined;
+    }
+
+    selectUuid(uuid: string): void {
+        this.uuid = uuid;
+        this.showDropdown = false;
+    }
 }
 </script>
 
@@ -913,6 +1129,7 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         max-width: 80%;
     }
 
+    .editor-container label,
     .vfm__content label {
         width: 10vw;
         text-align: right;
@@ -920,6 +1137,11 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: inline-block;
     }
 
+    .editor-container h3 {
+        font-size: larger;
+    }
+
+    .editor-container input,
     .vfm__content input {
         padding: 5px 10px;
         margin-top: 5px;
@@ -927,6 +1149,11 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: inline;
     }
 
+    .editor-container .input-error {
+        border: 1px solid red;
+    }
+
+    .editor-container button,
     .vfm__content button {
         padding: 5px 12px;
         margin: 0px 10px;
@@ -934,11 +1161,13 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         transition-duration: 0.2s;
     }
 
+    .editor-container button:hover:enabled,
     .vfm__content button:hover:enabled {
         background-color: #dbdbdb;
         color: black;
     }
 
+    .editor-container button:disabled,
     .vfm__content button:disabled {
         border: 1px solid gray;
         color: gray;

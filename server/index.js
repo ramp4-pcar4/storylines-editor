@@ -7,12 +7,16 @@ var cors = require('cors');
 var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
+const axios = require('axios');
+const responseMessages = [];
+require('dotenv').config();
 
 // CONFIGURATION
 PORT = 6040; // the Express server will run on this port.
-UPLOAD_PATH = './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
-TARGET_PATH = './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
-LOG_PATH = 'logfile.txt'; // the path to the logfile
+UPLOAD_PATH = process.env.SERVER_CURR_ENV !== '' ? process.env.SERVER_UPLOAD_PATH : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
+TARGET_PATH = process.env.SERVER_CURR_ENV !== '' ? process.env.SERVER_TARGET_PATH : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
+LOG_PATH = process.env.SERVER_CURR_ENV !== '' ? process.env.SERVER_LOG_PATH : './logfile.txt'; // the path to the logfile
+ROUTE_PREFIX = process.env.SERVER_CURR_ENV !== '' ? '/Storylines-Editor-STB-Server' : '';
 
 // Create express app.
 var app = express();
@@ -27,7 +31,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // POST requests made to /upload will be handled here.
-app.route('/upload').post(function (req, res, next) {
+app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     const options = {
         uploadDir: UPLOAD_PATH,
         keepExtensions: true
@@ -43,6 +47,7 @@ app.route('/upload').post(function (req, res, next) {
     form.parse(req, function (err, field, file) {
         const fileName = `${TARGET_PATH}/${file.data.originalFilename.split('.zip')[0]}`;
         const secureFilename = `${UPLOAD_PATH}/${file.data.newFilename}`;
+        let newStorylines = false;
 
         // SECURITY FEATURE (?): Check if the uploaded filename matches our Storylines UUID format. Prevents overwriting
         // other folders.
@@ -50,18 +55,23 @@ app.route('/upload').post(function (req, res, next) {
 
         // SECURITY FEATURE (temporary): Make sure the project name isn't `scripts`, or `help`, and doesn't contain . or / in order to prevent overwriting folders.
         if (fileName !== 'scripts' && fileName !== 'help' && !fileName.includes('/') && !fileName.includes('.')) {
+            responseMessages.push({
+                type: 'WARNING',
+                message: 'Upload Aborted: file does not match Storylines UUID standards.'
+            });
             logger('WARNING', 'Upload Aborted: file does not match Storylines UUID standards.');
-
             // Delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
-            res.end();
+            res.json({ new: newStorylines });
             return;
         }
 
         // Before unzipping, create the product folder in /public/ if it doesn't exist already.
         if (!fs.existsSync(fileName)) {
+            responseMessages.push({ type: 'INFO', message: `Successfully created new product ${fileName}` });
             logger('INFO', `Successfully created new product ${fileName}`);
             fs.mkdirSync(fileName);
+            newStorylines = true;
         }
 
         // Unzip the contents of the uploaded zip file into the target directory. Will overwrite
@@ -78,15 +88,16 @@ app.route('/upload').post(function (req, res, next) {
         // Finally, delete the uploaded zip file.
         safeRM(secureFilename, UPLOAD_PATH);
 
+        responseMessages.push({ type: 'INFO', message: `Uploaded files to product ${fileName}` });
         logger('INFO', `Uploaded files to product ${fileName}`);
 
         // Send a response back to the client.
-        res.end();
+        res.json({ new: newStorylines });
     });
 });
 
 // GET requests made to /retrieve/ID will be handled here.
-app.route('/retrieve/:id').get(function (req, res, next) {
+app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
     var archive = archiver('zip');
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
     const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
@@ -120,8 +131,13 @@ app.route('/retrieve/:id').get(function (req, res, next) {
                 archive.directory(PRODUCT_PATH, false);
                 archive.finalize();
 
+                responseMessages.push({ type: 'INFO', message: `Successfully loaded product ${req.params.id}` });
                 logger('INFO', `Successfully loaded product ${req.params.id}`);
             } else {
+                responseMessages.push({
+                    type: 'INFO',
+                    message: `Access attempt to ${req.params.id} failed, does not exist.`
+                });
                 logger('INFO', `Access attempt to ${req.params.id} failed, does not exist.`);
                 res.status(404).send({ status: 'Not Found' });
             }
@@ -130,8 +146,9 @@ app.route('/retrieve/:id').get(function (req, res, next) {
 });
 
 // GET requests made to /retrieve/ID/LANG will be handled here.
-app.route('/retrieve/:id/:lang').get(function (req, res) {
+app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
     const CONFIG_PATH = `${TARGET_PATH}/${req.params.id}/${req.params.id}_${req.params.lang}.json`;
+
     // obtain requested config file if it exists
     if (
         fs.access(CONFIG_PATH, (error) => {
@@ -140,22 +157,40 @@ app.route('/retrieve/:id/:lang').get(function (req, res) {
                     if (!err) {
                         // return JSON config file as response
                         const configJson = JSON.parse(data.toString());
+                        responseMessages.push({
+                            type: 'INFO',
+                            message: `Successfully loaded config file for ${req.params.id}, language ${req.params.lang}`
+                        });
                         logger(
                             'INFO',
                             `Successfully loaded config file for ${req.params.id}, language ${req.params.lang}`
                         );
                         res.json(configJson);
                     } else {
+                        responseMessages.push({
+                            type: 'INFO',
+                            message: `Access attempt to ${req.params.id} failed, error status ${err.status}`
+                        });
                         logger('INFO', `Access attempt to ${req.params.id} failed, error status ${err.status}`);
                         res.status(err.status);
                     }
                 });
             } else {
+                responseMessages.push({
+                    type: 'INFO',
+                    message: `Access attempt to ${req.params.id} failed, does not exist.`
+                });
                 logger('INFO', `Access attempt to ${req.params.id} failed, does not exist.`);
                 res.status(404).send({ status: 'Not Found' });
             }
         })
     );
+});
+
+// GET reuests made to /retrieveMessages will recieve all the responseMessages currently queued.
+app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
+    res.json({ messages: responseMessages });
+    responseMessages.length = 0;
 });
 
 /*
@@ -203,7 +238,7 @@ function logger(type, message) {
     console.log(`${currentDate} [${type}] ${message}`);
 }
 
-// Run the express app on port 6040.
-var server = app.listen(6040, function () {
-    logger('INFO', `Storylines Express Server Started, PORT: ${server.address().port}`);
+// Run the express app on the IIS Port.
+var server = app.listen(process.env.PORT, function () {
+    logger('INFO', `Storylines Express Server Started, PORT: ${process.env.PORT}`);
 });
