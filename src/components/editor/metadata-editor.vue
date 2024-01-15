@@ -232,6 +232,8 @@ export default class MetadataEditorV extends Vue {
     saving = false;
     unsavedChanges = false;
 
+    apiUrl = process.env.VUE_APP_CURR_ENV === 'Dev' ? process.env.VUE_APP_API_URL : 'http://localhost:6040';
+
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
@@ -389,7 +391,7 @@ export default class MetadataEditorV extends Vue {
     generateRemoteConfig(): void {
         this.loadStatus = 'loading';
         // Attempt to fetch the project from the server.
-        fetch(`http://localhost:6040/retrieve/${this.uuid}`)
+        fetch(this.apiUrl + `/retrieve/${this.uuid}`)
             .then((res: Response) => {
                 if (res.status === 404) {
                     // Product not found.
@@ -624,7 +626,7 @@ export default class MetadataEditorV extends Vue {
             const headers = { 'Content-Type': 'multipart/form-data' };
 
             axios
-                .post('http://localhost:6040/upload', formData, { headers })
+                .post(this.apiUrl + '/upload', formData, { headers })
                 .then((res: AxiosResponse) => {
                     res.data.files; // binary representation of the file
                     res.status; // HTTP status
@@ -736,7 +738,7 @@ export default class MetadataEditorV extends Vue {
 
     checkUuid(): void {
         if (!this.loadExisting) {
-            fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: Response) => {
+            fetch(this.apiUrl + `/retrieve/${this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
                     this.warning = true;
                 }

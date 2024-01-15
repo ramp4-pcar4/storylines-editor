@@ -7,12 +7,14 @@ var cors = require('cors');
 var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
+require('dotenv').config();
 
 // CONFIGURATION
 PORT = 6040; // the Express server will run on this port.
 UPLOAD_PATH = './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
 TARGET_PATH = './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
-LOG_PATH = 'logfile.txt'; // the path to the logfile
+LOG_PATH =  process.env.SERVER_CURR_ENV === 'Dev' ? process.env.SERVER_LOG_PATH : './logfile.txt'; // the path to the logfile
+ROUTE_PREFIX = process.env.SERVER_CURR_ENV === 'Dev' ? '/Storylines-Editor-STB-Server' : '';
 
 // Create express app.
 var app = express();
@@ -26,13 +28,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-// Used to test IISNode. Remove once ready to deploy.
-app.get('/', function(req, res){
-    res.send("Express server on IISNode");
-});
-
 // POST requests made to /upload will be handled here.
-app.route('/upload').post(function (req, res, next) {
+app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     const options = {
         uploadDir: UPLOAD_PATH,
         keepExtensions: true
@@ -91,7 +88,7 @@ app.route('/upload').post(function (req, res, next) {
 });
 
 // GET requests made to /retrieve/ID will be handled here.
-app.route('/retrieve/:id').get(function (req, res, next) {
+app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
     var archive = archiver('zip');
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
     const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
@@ -135,7 +132,7 @@ app.route('/retrieve/:id').get(function (req, res, next) {
 });
 
 // GET requests made to /retrieve/ID/LANG will be handled here.
-app.route('/retrieve/:id/:lang').get(function (req, res) {
+app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
     const CONFIG_PATH = `${TARGET_PATH}/${req.params.id}/${req.params.id}_${req.params.lang}.json`;
     // obtain requested config file if it exists
     if (
@@ -210,5 +207,5 @@ function logger(type, message) {
 
 // Run the express app on the IIS Port.
 var server = app.listen(process.env.PORT, function () {
-    logger('INFO', `Storylines Express Server Started, PORT: ${server.address().port}`);
+    logger('INFO', `Storylines Express Server Started, PORT: ${process.env.PORT}`);
 });
