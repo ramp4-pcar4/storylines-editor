@@ -1,8 +1,10 @@
-import './router/componentHooks';
-import Vue from 'vue';
+import { createApp } from 'vue';
 import App from './app.vue';
+
+import './router/componentHooks';
 import router from './router';
 import './style.css';
+import { i18n } from './lang';
 
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
@@ -15,38 +17,34 @@ VueMarkdownEditor.lang.use('en-US', enUS);
 VueMarkdownEditor.use(githubTheme, {
     Hljs: hljs
 });
-Vue.use(VueMarkdownEditor);
 
-import { i18n } from './lang';
-import VueTippy, { TippyComponent } from 'vue-tippy';
+import { createVfm } from 'vue-final-modal';
+const vfm = createVfm();
+import 'vue-final-modal/dist/style.css';
 
-Vue.use(VueTippy);
-Vue.component('tippy', TippyComponent);
+import VueTippy from 'vue-tippy';
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/dist/backdrop.css';
 
 import HighchartsVue from 'highcharts-vue';
-Vue.use(HighchartsVue);
-
-import VuePapaParse from 'vue-papa-parse';
-Vue.use(VuePapaParse);
-
-import VueProgressiveImage from 'vue-progressive-image';
-Vue.use(VueProgressiveImage);
-
-import VueFullScreen from 'vue-fullscreen';
-Vue.use(VueFullScreen);
-
-// @ts-expect-error: module does not have TS support :(
-import VueModal from 'vue2-modal';
-Vue.use(VueModal);
-
 import Message from 'vue-m-message';
-import 'vue-m-message/dist/index.css';
-Vue.use(Message);
+import 'vue-m-message/dist/style.css';
 
-Vue.config.productionTip = false;
+import StorylinesViewer from 'ramp-storylines';
+import 'ramp-storylines/dist/storylines-viewer.css';
 
-new Vue({
-    render: (h) => h(App),
-    i18n,
-    router
-}).$mount('#app');
+const app = createApp(App);
+
+app.use(router)
+    .use(i18n)
+    .use(VueTippy, {
+        directive: 'tippy',
+        component: 'tippy'
+    })
+    .use(HighchartsVue)
+    .use(Message)
+    .use(StorylinesViewer)
+    .use(VueMarkdownEditor)
+    .use(vfm);
+
+app.mount('#app');

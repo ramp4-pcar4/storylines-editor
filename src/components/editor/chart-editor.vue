@@ -37,15 +37,17 @@
                 handle=".handle"
                 @update="onChartsEdited"
                 class="flex flex-wrap list-none"
+                item-key="name"
             >
-                <ChartPreview
-                    v-for="(chart, idx) in chartConfigs"
-                    :key="`${chart.name}-${idx}`"
-                    :chart="chart"
-                    :configFileStructure="configFileStructure"
-                    @delete="$modals.show(`${chart.name}-${idx}`)"
-                    @edit="editChart"
-                ></ChartPreview>
+                <template #item="{ element, index }">
+                    <ChartPreview
+                        :key="`${element.name}-${index}`"
+                        :chart="element"
+                        :configFileStructure="configFileStructure"
+                        @edit="editChart"
+                        @delete="$vfm.open(`${element.name}-${index}`)"
+                    ></ChartPreview>
+                </template>
             </draggable>
         </ul>
         <confirmation-modal
@@ -53,22 +55,22 @@
             :key="`${chart.name}-${idx}`"
             :name="`${chart.name}-${idx}`"
             :message="$t('editor.chart.delete.confirm', { name: chart.name })"
-            @Ok="deleteChart(chart)"
+            @ok="deleteChart(chart)"
         ></confirmation-modal>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ChartConfig, ChartPanel, ConfigFileStructure, Highchart, SourceCounts } from '@/definitions';
-import ChartPanelV from '@/components/panels/chart-panel.vue';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
 
-@Component({
+@Options({
     components: {
-        'chart-panel': ChartPanelV,
+        // TODO: fix when storylines plugin updated to Vue 3
+        // 'chart-panel': ChartPanelV,
         ChartPreview: ChartPreviewV,
         'confirmation-modal': ConfirmationModalV,
         draggable
@@ -219,7 +221,7 @@ export default class ChartEditorV extends Vue {
 
     onChartsEdited(): void {
         this.edited = true;
-        this.$parent.$emit('slide-edit');
+        this.$emit('slide-edit');
     }
 }
 </script>

@@ -40,23 +40,21 @@
             v-show="!imagePreviewsLoading && imagePreviews.length"
             class="flex flex-wrap list-none border my-4"
             @update="onImagesEdited"
+            item-key="id"
         >
-            <ImagePreview
-                v-for="(image, idx) in imagePreviews"
-                :key="`${image.id}-${idx}`"
-                :imageFile="image"
-                @delete="deleteImage"
-            >
-                <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
-                    <input class="w-4/5" type="text" v-model="image.altText" @change="onImagesEdited" />
-                </div>
+            <template #item="{ element, index }">
+                <ImagePreview :key="`${element.id}-${index}`" :imageFile="element" @delete="deleteImage">
+                    <div class="flex mt-4 items-center w-full text-left">
+                        <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
+                        <input class="w-4/5" type="text" v-model="element.altText" @change="onImagesEdited" />
+                    </div>
 
-                <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
-                    <input class="w-4/5" type="text" v-model="image.caption" @change="onImagesEdited" />
-                </div>
-            </ImagePreview>
+                    <div class="flex mt-4 items-center w-full text-left">
+                        <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
+                        <input class="w-4/5" type="text" v-model="element.caption" @change="onImagesEdited" />
+                    </div>
+                </ImagePreview>
+            </template>
         </draggable>
 
         <div v-show="imagePreviews.length > 1" class="flex items-center w-full text-left">
@@ -67,12 +65,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, ImageFile, ImagePanel, PanelType, SlideshowPanel, SourceCounts } from '@/definitions';
 import draggable from 'vuedraggable';
 import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
 
-@Component({
+@Options({
     components: {
         ImagePreview: ImagePreviewV,
         draggable
@@ -219,7 +217,7 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$parent.$emit('slide-edit');
+        this.$emit('slide-edit');
     }
 }
 </script>

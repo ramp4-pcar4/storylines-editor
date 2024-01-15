@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     ChartConfig,
     ChartPanel,
@@ -108,7 +108,7 @@ import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 
-@Component({
+@Options({
     components: {
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,

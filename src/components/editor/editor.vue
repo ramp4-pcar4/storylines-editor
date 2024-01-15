@@ -1,9 +1,18 @@
 <template>
-    <!-- If the configuration file is being fetched, display a spinner to indicate loading. -->
     <div class="editor-container">
         <div class="editor-header sticky flex items-center border-b border-black bg-gray-200 py-2 px-2 z-10">
             <span class="mx-1">
-                <router-link :to="{ name: 'home' }" class="mt-1 flex justify-center h-full w-full" target>
+                <router-link
+                    :to="{ name: 'home' }"
+                    class="mt-1 flex justify-center h-full w-full"
+                    v-tippy="{
+                        delay: '200',
+                        placement: 'right',
+                        content: $t('editor.returnToLanding'),
+                        animateFill: true
+                    }"
+                    target
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18.001" viewBox="0 0 18 18.001">
                         <path
                             id="logout-Icon-SVG-098767893"
@@ -11,7 +20,6 @@
                             transform="translate(-0.5)"
                         />
                     </svg>
-                    <tippy delay="200" placement="right">{{ $t('editor.returnToLanding') }}</tippy>
                 </router-link>
             </span>
             <div class="ml-3 flex flex-col">
@@ -21,8 +29,14 @@
             <span class="ml-auto"></span>
             <button
                 v-if="unsavedChanges"
-                @click="$modals.show(`reload-config`)"
+                @click="$vfm.open(`reload-config`)"
                 class="border-2 border-red-700 text-red-700 rounded p-1 mr-2"
+                v-tippy="{
+                    delay: '200',
+                    placement: 'bottom',
+                    content: $t('editor.resetChanges'),
+                    animateFill: true
+                }"
             >
                 <svg class="inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px">
                     <path
@@ -30,7 +44,6 @@
                     />
                 </svg>
                 <span class="font-normal ml-1">{{ $t('editor.resetChanges') }}</span>
-                <tippy delay="200" placement="bottom">{{ $t('editor.resetChanges') }}</tippy>
             </button>
             <transition name="fade">
                 <span v-if="unsavedChanges" class="border-2 border-red-700 text-red-700 rounded p-1 mr-2">
@@ -61,15 +74,15 @@
             </button>
             <button @click="saveChanges" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
-                <span v-if="saving" class="align-middle inline-block px-1"
-                    ><spinner size="16px" background="#6B7280" color="#FFFFFF" stroke="2px" class="ml-1 mb-1"></spinner>
+                <span v-if="saving" class="align-middle inline-block px-1">
+                    <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
                 </span>
             </button>
         </div>
         <div class="flex">
             <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
                 <div class="flex items-center justify-center border-b p-2">
-                    <button @click.stop="$modals.show('metadata-edit-modal')">
+                    <button @click.stop="$vfm.open('metadata-edit-modal')">
                         <span class="align-middle inline-block px-1"
                             ><svg
                                 clip-rule="evenodd"
@@ -118,26 +131,26 @@
         <confirmation-modal
             :name="`reload-config`"
             :message="$t('editor.refreshChanges.modal')"
-            @Ok="$emit('refresh-config')"
+            @ok="$emit('refresh-config')"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ConfigFileStructure, MetadataContent, Slide, SourceCounts, StoryRampConfig } from '@/definitions';
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
+import { VueSpinnerOval } from 'vue3-spinners';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
-@Component({
+@Options({
     components: {
         'metadata-content': MetadataContentV,
         'confirmation-modal': ConfirmationModalV,
-        spinner: Circle2,
+        spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV
     }
@@ -157,6 +170,7 @@ export default class EditorV extends Vue {
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
+    loadSlides: undefined | Slide[] = undefined;
     currentSlide: Slide | string = '';
     slideIndex = -1;
 
@@ -171,7 +185,8 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
-        this.uuid = this.$route.params.uid;
+        this.loadSlides = this.slides;
+        this.uuid = this.$route.params.uid as string;
         window.addEventListener('beforeunload', this.beforeWindowUnload);
     }
 
@@ -194,7 +209,9 @@ export default class EditorV extends Vue {
     selectSlide(index: number): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as SlideEditorV).saveChanges();
+            this.$nextTick(() => {
+                (this.$refs.slide as SlideEditorV).saveChanges();
+            });
         }
 
         // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
@@ -204,7 +221,7 @@ export default class EditorV extends Vue {
         };
 
         setTimeout(() => {
-            this.currentSlide = index === -1 ? '' : (this.slides as Slide[])[index];
+            this.currentSlide = index === -1 ? '' : (this.loadSlides as Slide[])[index];
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             window.scrollTo(0, 0);
@@ -215,8 +232,8 @@ export default class EditorV extends Vue {
      * Updates slides after adding, removing, or reordering.
      */
     updateSlides(slides: Slide[]): void {
-        this.slides = slides;
-        this.slideIndex = this.slides.indexOf(this.currentSlide as Slide);
+        this.loadSlides = slides;
+        this.slideIndex = this.loadSlides.indexOf(this.currentSlide as Slide);
     }
 
     /**
@@ -225,20 +242,27 @@ export default class EditorV extends Vue {
     preview(): void {
         // save current slide final changes before previewing product
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as SlideEditorV).saveChanges();
+            this.$nextTick(() => {
+                (this.$refs.slide as SlideEditorV).saveChanges();
+            });
         }
-        const routeData = this.$router.resolve({ name: 'preview' });
-        const previewTab = window.open(routeData.href, '_blank');
-        (previewTab as Window).props = {
-            config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
-            configFileStructure: this.configFileStructure
-        };
+
+        setTimeout(() => {
+            const routeData = this.$router.resolve({ name: 'preview' });
+            const previewTab = window.open(routeData.href, '_blank');
+            (previewTab as Window).props = {
+                config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
+                configFileStructure: this.configFileStructure
+            };
+        }, 5);
     }
 
     saveChanges(): void {
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as SlideEditorV).saveChanges();
+            this.$nextTick(() => {
+                (this.$refs.slide as SlideEditorV).saveChanges();
+            });
         }
 
         // emit save changes event

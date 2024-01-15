@@ -5,7 +5,7 @@
                 class="bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-0 p-0 z-10 cursor-pointer"
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
-                v-tippy="{ placement: 'top', hideOnClick: false }"
+                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
             >
                 <svg
                     class="absolute transform -translate-x-1/2 -translate-y-1/2"
@@ -28,14 +28,14 @@
                 </svg>
             </button>
             <!-- chart component -->
-            <dqv-chart
+            <storylines-chart
                 class="w-full h-full"
                 :config="chartConfig"
                 :key="chartIdx"
                 :configFileStructure="configFileStructure"
                 @loaded="loadChart"
                 v-if="!loading"
-            ></dqv-chart>
+            ></storylines-chart>
         </div>
         <!-- chart description and edit  -->
         <div class="flex mt-4 items-center">
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import {
     ChartConfig,
     ConfigFileStructure,
@@ -69,13 +69,7 @@ import {
     PieDataRow,
     PieSeriesData
 } from '@/definitions';
-import ChartV from '@/components/panels/helpers/chart.vue';
 
-@Component({
-    components: {
-        'dqv-chart': ChartV
-    }
-})
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
     @Prop() configFileStructure!: ConfigFileStructure;
