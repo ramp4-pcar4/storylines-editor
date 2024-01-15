@@ -5,7 +5,7 @@
                 class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
                 @click="() => $emit('delete', imageFile)"
                 :content="$t('editor.image.delete')"
-                v-tippy="{ placement: 'top', hideOnClick: false }"
+                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
             >
                 <svg height="24px" width="24px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -27,10 +27,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import { ImageFile } from '@/definitions';
 
-@Component({})
 export default class ImagePreviewV extends Vue {
     @Prop() imageFile!: ImageFile;
 }

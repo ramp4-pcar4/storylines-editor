@@ -64,11 +64,8 @@
 
 <script lang="ts">
 import { TimeSliderConfig } from '@/definitions';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 
-@Component({
-    components: {}
-})
 export default class TimeSliderEditorV extends Vue {
     @Prop() config!: TimeSliderConfig;
     @Prop() error!: boolean;

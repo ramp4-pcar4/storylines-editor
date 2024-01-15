@@ -58,13 +58,7 @@
 
                     <!-- If config is loading, display a small spinner. -->
                     <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
-                        <spinner
-                            size="24px"
-                            background="#00D2D3"
-                            color="#009cd1"
-                            stroke="2px"
-                            class="mx-2 my-auto"
-                        ></spinner>
+                        <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
                     </div>
                 </div>
 
@@ -94,7 +88,7 @@
                         <button>{{ $t('editor.back') }}</button>
                     </router-link>
                     <button
-                        @click="!warning ? continueToEditor() : $modals.show(`confirm-uuid-overwrite`)"
+                        @click="!warning ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
                         class="bg-black text-white px-8"
                     >
                         {{ $t('editor.next') }}
@@ -102,7 +96,7 @@
                     <confirmation-modal
                         :name="`confirm-uuid-overwrite`"
                         :message="$t(`Are you sure you want to overwrite product '${uuid}'?`)"
-                        @Ok="continueToEditor()"
+                        @ok="continueToEditor()"
                     />
                 </div>
             </div>
@@ -124,19 +118,23 @@
                 ref="mainEditor"
             >
                 <template v-slot:langModal="slotProps">
-                    <button @click.stop="slotProps.unsavedChanges ? $modals.show(`change-lang`) : swapLang()">
+                    <button @click.stop="slotProps.unsavedChanges ? $vfm.open(`change-lang`) : swapLang()">
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                     <confirmation-modal
                         :name="`change-lang`"
                         :message="$t('editor.changeLang.modal')"
-                        @Ok="swapLang()"
+                        @ok="swapLang()"
                     />
                 </template>
 
                 <template v-slot:metadataModal>
-                    <vue-modal name="metadata-edit-modal" :outer-close="false" :hide-close-btn="true" size="xlg">
-                        <h2 slot="header" class="text-lg font-bold">Edit Project Metadata</h2>
+                    <vue-final-modal
+                        modalId="metadata-edit-modal"
+                        content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+                        class="flex justify-center items-center"
+                    >
+                        <h2 slot="header" class="text-lg font-bold">{{ $t('editor.editMetadata') }}</h2>
                         <metadata-content
                             :metadata="metadata"
                             @metadata-changed="updateMetadata"
@@ -148,7 +146,7 @@
                                 Done
                             </button>
                         </div>
-                    </vue-modal>
+                    </vue-final-modal>
                 </template>
             </editor>
         </template>
@@ -156,9 +154,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Route } from 'vue-router';
-import { Dictionary } from 'vue-router/types/router';
+import { Options, Prop, Vue } from 'vue-property-decorator';
+import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
 import {
     AudioPanel,
@@ -176,12 +173,14 @@ import {
     SourceCounts,
     StoryRampConfig
 } from '@/definitions';
+import { VueSpinnerOval } from 'vue3-spinners';
+import { VueFinalModal } from 'vue-final-modal';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
 const { v4: uuidv4 } = require('uuid');
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
+import Message from 'vue-m-message';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
@@ -200,16 +199,18 @@ interface RouteParams {
     metadata: MetadataContent;
     slides: Slide[];
     sourceCounts: SourceCounts;
+    existing: boolean;
 }
 
-@Component({
+@Options({
     components: {
         Editor: EditorV,
         'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
-        spinner: Circle2,
+        spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV
+        'slide-toc': SlideTocV,
+        'vue-final-modal': VueFinalModal
     }
 })
 export default class MetadataEditorV extends Vue {
@@ -219,6 +220,8 @@ export default class MetadataEditorV extends Vue {
         [key: string]: StoryRampConfig | undefined;
     } = { en: undefined, fr: undefined };
     configFileStructure: ConfigFileStructure | undefined = undefined;
+    loadExisting = false;
+    reloadExisting = false;
     loadStatus = 'waiting';
     loadEditor = false;
     error = false; // whether an error has occurred
@@ -251,16 +254,18 @@ export default class MetadataEditorV extends Vue {
     sourceCounts: SourceCounts = {};
 
     created(): void {
+        this.loadExisting = this.editExisting;
+
         // Generate UUID for new product
-        this.uuid = this.$route.params.uid ?? (this.editExisting ? undefined : uuidv4());
-        this.configLang = this.$route.params.configLang ? this.$route.params.configLang : 'en';
+        this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
+        this.configLang = this.$route.params.configLang ? (this.$route.params.configLang as string) : 'en';
 
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
 
         // set any metadata default values for creating new product
-        if (!this.editExisting) {
+        if (!this.loadExisting) {
             // set current date as default
             const curDate = new Date();
             const year = curDate.getFullYear();
@@ -272,20 +277,16 @@ export default class MetadataEditorV extends Vue {
         // Find which view to render based on route
         if (this.$route.name === 'editor') {
             this.loadEditor = true;
+            const props = this.$route.meta.data as RouteParams;
 
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
-            if (this.$route.params.configs && this.$route.params.configFileStructure) {
-                // declare props typing to get around TS warnings
-                const route = this.$route as Route & {
-                    params: RouteParams;
-                };
-
-                this.configs = route.params.configs;
-                this.configFileStructure = route.params.configFileStructure;
-                this.metadata = route.params.metadata;
-                this.slides = route.params.slides;
-                this.sourceCounts = route.params.sourceCounts;
-
+            if (props && props.configs && props.configFileStructure) {
+                this.configs = props.configs;
+                this.configFileStructure = props.configFileStructure;
+                this.metadata = props.metadata;
+                this.slides = props.slides;
+                this.sourceCounts = props.sourceCounts;
+                this.loadExisting = props.existing;
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
@@ -387,13 +388,12 @@ export default class MetadataEditorV extends Vue {
      */
     generateRemoteConfig(): void {
         this.loadStatus = 'loading';
-
         // Attempt to fetch the project from the server.
         fetch(`http://localhost:6040/retrieve/${this.uuid}`)
             .then((res: Response) => {
                 if (res.status === 404) {
                     // Product not found.
-                    this.$message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+                    Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
                     this.error = true;
                     this.loadStatus = 'waiting';
                     this.clearConfig();
@@ -408,7 +408,7 @@ export default class MetadataEditorV extends Vue {
                 }
             })
             .catch(() => {
-                this.$message.error(`Failed to load product, no response from server`);
+                Message.error(`Failed to load product, no response from server`);
                 this.loadStatus = 'loaded';
             });
     }
@@ -477,7 +477,7 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure = {
             uuid: this.uuid,
             zip: configZip,
-            configs: (this.configs as unknown) as { [key: string]: StoryRampConfig },
+            configs: this.configs as unknown as { [key: string]: StoryRampConfig },
             assets: {
                 en: assetsFolder.folder('en'),
                 fr: assetsFolder.folder('fr')
@@ -520,15 +520,15 @@ export default class MetadataEditorV extends Vue {
                 this.configs['fr'] = JSON.parse(res);
             });
         } catch {
-            this.$message.error(`The requested product '${this.uuid ?? ''}' is malformed.`);
+            Message.error(`The requested product '${this.uuid ?? ''}' is malformed.`);
             this.loadStatus = 'waiting';
             this.clearConfig();
             return;
         }
 
-        if (this.editExisting) {
+        if (this.loadExisting) {
             this.loadStatus = 'waiting';
-            this.$message.success('Successfully loaded storyline!');
+            Message.success('Successfully loaded storyline!');
         } else {
             this.loadStatus = 'loaded';
         }
@@ -537,9 +537,12 @@ export default class MetadataEditorV extends Vue {
         if (this.configs[this.configLang]) {
             this.useConfig(this.configs[this.configLang] as StoryRampConfig);
             this.findSources(this.configs);
-
             // Update router path
-            if (!this.editExisting) {
+            if (this.reloadExisting) {
+                this.loadEditor = true;
+                this.generateConfig();
+                this.updateEditorPath();
+            } else if (!this.loadExisting) {
                 this.loadEditor = true;
                 this.updateEditorPath();
             }
@@ -562,7 +565,7 @@ export default class MetadataEditorV extends Vue {
                     type: 'slideshow',
                     images: [slide.panel[1]]
                 };
-                Vue.set(slide.panel, 1, newSlide);
+                slide.panel[1] = newSlide;
             }
         });
 
@@ -626,11 +629,11 @@ export default class MetadataEditorV extends Vue {
                     res.data.files; // binary representation of the file
                     res.status; // HTTP status
                     this.unsavedChanges = false;
-                    this.editExisting = true; // if editExisting was false, we can now set it to true
-                    this.$message.success('Successfully saved changes!');
+                    this.loadExisting = true; // if editExisting was false, we can now set it to true
+                    Message.success('Successfully saved changes!');
                 })
                 .catch(() => {
-                    this.$message.error('Failed to save changes.');
+                    Message.error('Failed to save changes.');
                 })
                 .finally(() => {
                     // padding to prevent save button from being clicked rapidly
@@ -690,9 +693,7 @@ export default class MetadataEditorV extends Vue {
                 this.generateConfig();
             }
         }
-        if (this.$modals.isActive('metadata-edit-modal')) {
-            this.$modals.hide('metadata-edit-modal');
-        }
+        this.$vfm.close('metadata-edit-modal');
     }
 
     /**
@@ -724,13 +725,17 @@ export default class MetadataEditorV extends Vue {
             return;
         }
         this.loadConfig(this.configs[this.configLang]);
+
         if (this.loadEditor) {
-            (this.$refs.mainEditor as EditorV).selectSlide(-1);
+            (this.$refs.mainEditor as EditorV).updateSlides(this.slides);
+            this.$nextTick(() => {
+                (this.$refs.mainEditor as EditorV).selectSlide(-1);
+            });
         }
     }
 
     checkUuid(): void {
-        if (!this.editExisting) {
+        if (!this.loadExisting) {
             fetch(`http://localhost:6040/retrieve/${this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
                     this.warning = true;
@@ -743,9 +748,9 @@ export default class MetadataEditorV extends Vue {
     /**
      * React to param changes in URL.
      */
-    beforeRouteUpdate(to: Route, from: Route, next: () => void): void {
-        this.uuid = to.params.uid;
-        this.$i18n.locale = to.params.lang;
+    beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
+        this.uuid = to.params.uid as string;
+        this.$i18n.locale = to.params.lang as string;
 
         next();
     }
@@ -765,10 +770,10 @@ export default class MetadataEditorV extends Vue {
         isImgUrl(this.metadata.logoName).then((res) => {
             if (res) {
                 this.metadata.logoPreview = this.metadata.logoName;
-                this.$message.success('Successfully loaded logo image.');
+                Message.success('Successfully loaded logo image.');
             } else {
                 this.metadata.logoPreview = 'error';
-                this.$message.error('Failed to load logo image.');
+                Message.error('Failed to load logo image.');
             }
         });
     }
@@ -785,17 +790,21 @@ export default class MetadataEditorV extends Vue {
 
     updateEditorPath(): void {
         if (this.$route.name !== 'editor') {
-            const props = ({
-                uid: this.uuid,
-                configLang: this.configLang,
-                configs: this.configs,
-                configFileStructure: this.configFileStructure,
-                sourceCounts: this.sourceCounts,
-                metadata: this.metadata,
-                slides: this.slides
-            } as unknown) as Dictionary<string>;
+            this.$router.beforeEach((to: RouteLocationNormalized) => {
+                if (to.name === 'editor') {
+                    to.meta.data = {
+                        configLang: this.configLang,
+                        configs: this.configs,
+                        configFileStructure: this.configFileStructure,
+                        sourceCounts: this.sourceCounts,
+                        metadata: this.metadata,
+                        slides: this.slides,
+                        existing: this.editExisting
+                    };
+                }
+            });
 
-            this.$router.push({ name: 'editor', params: props });
+            this.$router.push({ name: 'editor', params: { uid: this.uuid } });
         }
     }
 
@@ -803,7 +812,7 @@ export default class MetadataEditorV extends Vue {
         // check if all required metadata fields are non-empty
         this.reqFields.uuid = !!this.uuid;
         if (Object.values(this.reqFields).some((field: boolean) => !field)) {
-            this.$message.error(`Please fill out the required fields before proceeding.`);
+            Message.error(`Please fill out the required fields before proceeding.`);
             return false;
         }
         return true;
@@ -816,16 +825,15 @@ export default class MetadataEditorV extends Vue {
         if (!this.checkRequiredFields()) {
             return;
         }
-
-        if (this.editExisting) {
+        if (this.loadExisting) {
             if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
                 this.updateEditorPath();
             } else {
-                this.$message.error('No config exists for storylines product.');
+                Message.error('No config exists for storylines product.');
             }
         } else if (!this.uuid) {
-            this.$message.error('Missing required field: UUID');
+            Message.error('Missing required field: UUID');
             this.error = true;
         } else {
             this.generateNewConfig();
@@ -841,25 +849,17 @@ export default class MetadataEditorV extends Vue {
 
     refreshConfig(): void {
         // Re-fetch the product from the server.
-        if (this.editExisting) {
-            this.loadEditor = false;
-            this.loadStatus = 'loading';
+        if (this.loadExisting) {
+            this.reloadExisting = true;
+            this.loadExisting = false;
             this.generateRemoteConfig();
         } else {
+            this.reloadExisting = false;
             this.generateNewConfig();
-            setTimeout(() => {
-                this.$router.push({
-                    name: 'metadata',
-                    params: ({
-                        lang: this.configLang,
-                        editExisting: false
-                    } as unknown) as Dictionary<string>
-                });
-            }, 100);
         }
     }
 
-    beforeRouteLeave(to: Route, from: Route, next: (cont?: boolean) => void): void {
+    beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
         const curEditor = this.$route.name === 'editor';
         const confirmationMessage = 'Leave the page? Changes made may not be saved.';
         if (this.unsavedChanges && curEditor && !window.confirm(confirmationMessage)) {
@@ -874,19 +874,14 @@ export default class MetadataEditorV extends Vue {
 <style lang="scss">
 $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-.storyramp-app {
+.storyramp-app,
+.vfm {
     h1,
     h2,
     h3,
     h4,
     h5,
-    h6,
-    .h1,
-    .h2,
-    .h3,
-    .h4,
-    .h5,
-    .h6 {
+    h6 {
         font-family: $font-list;
         line-height: 1.5;
         border-bottom: 0px;
@@ -896,7 +891,12 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0 auto;
     }
 
-    .editor-container label {
+    .vfm__content {
+        max-width: 80%;
+    }
+
+    .editor-container label,
+    .vfm__content label {
         width: 10vw;
         text-align: right;
         margin-right: 15px;
@@ -907,7 +907,8 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: larger;
     }
 
-    .editor-container input {
+    .editor-container input,
+    .vfm__content input {
         padding: 5px 10px;
         margin-top: 5px;
         border: 1px solid black;
@@ -918,46 +919,31 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         border: 1px solid red;
     }
 
-    .editor-container button {
+    .editor-container button,
+    .vfm__content button {
         padding: 5px 12px;
         margin: 0px 10px;
         font-weight: 600;
         transition-duration: 0.2s;
     }
 
-    .editor-container button:hover:enabled {
+    .editor-container button:hover:enabled,
+    .vfm__content button:hover:enabled {
         background-color: #dbdbdb;
         color: black;
     }
 
-    .editor-container button:disabled {
+    .editor-container button:disabled,
+    .vfm__content button:disabled {
         border: 1px solid gray;
         color: gray;
         cursor: not-allowed;
-    }
-
-    .editor-toc button {
-        background-color: #f3f4f6;
-        color: black;
-        border: none;
-        transition-duration: 0.2s;
-        padding: 0.25 0.25em !important;
     }
 
     .image-preview {
         max-width: 150px;
         max-height: 150px;
         display: inline;
-    }
-
-    .fade-enter-active,
-    .fade-leave-active {
-        transition: opacity 0.2s;
-    }
-
-    .fade-enter,
-    .fade-leave-to {
-        opacity: 0;
     }
 }
 </style>

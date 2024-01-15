@@ -29,7 +29,7 @@
                             class="rounded-none cursor-pointer w-4 h-4"
                             v-model="rightOnly"
                             :disabled="rightOnly && currentSlide.panel[panelIndex].type === 'dynamic'"
-                            @change.stop="$modals.show(`right-only-${slideIndex}`)"
+                            @change.stop="$vfm.open(`right-only-${slideIndex}`)"
                         />
                     </div>
                 </div>
@@ -186,8 +186,8 @@
                         <select
                             ref="typeSelector"
                             @input="
+                                $vfm.open(`change-slide-${slideIndex}`);
                                 newType = $event.target.value;
-                                $modals.show(`change-slide-${slideIndex}`);
                             "
                             :value="currentSlide.panel[panelIndex].type"
                         >
@@ -221,20 +221,20 @@
         <confirmation-modal
             :name="`change-slide-${slideIndex}`"
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
-            @Ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
+            @ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
             @Cancel="cancelTypeChange"
         />
         <confirmation-modal
             :name="`right-only-${slideIndex}`"
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
-            @Ok="toggleRightOnly()"
+            @ok="toggleRightOnly()"
             @Cancel="rightOnly = !rightOnly"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
     ChartConfig,
@@ -253,7 +253,6 @@ import {
     TextPanel
 } from '@/definitions';
 
-import Circle2 from 'vue-loading-spinner/src/components/Circle2.vue';
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
@@ -262,9 +261,8 @@ import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
-@Component({
+@Options({
     components: {
-        spinner: Circle2,
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
@@ -281,7 +279,7 @@ export default class SlideEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() uid!: string;
     @Prop() slideIndex!: number;
-    @Prop() isLast!: number;
+    @Prop() isLast!: boolean;
     @Prop() sourceCounts!: SourceCounts;
 
     panelIndex = 0;
@@ -345,10 +343,10 @@ export default class SlideEditorV extends Vue {
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
             this.panelIndex = 0;
-            Vue.set(this.currentSlide, 'panel', [startingConfig[newType as keyof DefaultConfigs]]);
+            this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
         } else {
             // Switching panel type when dynamic panels are not involved.
-            Vue.set(this.currentSlide.panel, this.panelIndex, startingConfig[newType as keyof DefaultConfigs]);
+            this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }
     }
 
@@ -419,9 +417,9 @@ export default class SlideEditorV extends Vue {
         this.saveChanges();
         if (this.rightOnly) {
             this.panelIndex = 0;
-            Vue.set(this.currentSlide, 'panel', [this.currentSlide.panel[1]]);
+            this.currentSlide['panel'] = [this.currentSlide.panel[1]];
         } else {
-            Vue.set(this.currentSlide, 'panel', [
+            this.currentSlide['panel'] = [
                 Object.assign(
                     {},
                     {
@@ -431,7 +429,7 @@ export default class SlideEditorV extends Vue {
                     }
                 ),
                 Object.assign({}, this.currentSlide.panel[0])
-            ]);
+            ];
         }
     }
 }

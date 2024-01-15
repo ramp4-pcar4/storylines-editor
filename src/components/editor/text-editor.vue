@@ -13,16 +13,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import { TextPanel } from '@/definitions';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;
 }
 
-@Component({
-    components: {}
-})
 export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
 

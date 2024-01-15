@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     pages: {
         index: {
@@ -20,16 +22,34 @@ module.exports = {
         }
     },
     publicPath: '',
+    configureWebpack: {
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src/')
+            }
+        }
+    },
     chainWebpack: (config) => {
         config.module
             .rule('lint')
             .test(/lang\.csv$/)
             .use('eslint')
             .loader('dsv-loader')
-            .end()
+            .end();
+
+        config.module
             .rule('html')
             .test(/(.)*.(html)$/)
             .use('html-loader')
-            .loader('html-loader');
+            .loader('html-loader')
+            .end();
+
+        config.module
+            .rule('cjs')
+            .test(/\.cjs$/)
+            .include.add(/node_modules/)
+            .end()
+            .use('babel-loader')
+            .loader('babel-loader');
     }
 };
