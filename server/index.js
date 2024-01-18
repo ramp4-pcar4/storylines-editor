@@ -11,8 +11,8 @@ require('dotenv').config();
 
 // CONFIGURATION
 PORT = 6040; // the Express server will run on this port.
-UPLOAD_PATH = './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
-TARGET_PATH = './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
+UPLOAD_PATH = process.env.SERVER_CURR_ENV === 'Dev' ? process.env.SERVER_UPLOAD_PATH : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
+TARGET_PATH = process.env.SERVER_CURR_ENV === 'Dev' ? process.env.SERVER_TARGET_PATH : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
 LOG_PATH =  process.env.SERVER_CURR_ENV === 'Dev' ? process.env.SERVER_LOG_PATH : './logfile.txt'; // the path to the logfile
 ROUTE_PREFIX = process.env.SERVER_CURR_ENV === 'Dev' ? '/Storylines-Editor-STB-Server' : '';
 
