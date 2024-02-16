@@ -7,6 +7,7 @@ var cors = require('cors');
 var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
+const axios = require('axios');
 require('dotenv').config();
 
 // CONFIGURATION
@@ -45,23 +46,24 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     form.parse(req, function (err, field, file) {
         const fileName = `${TARGET_PATH}/${file.data.originalFilename.split('.zip')[0]}`;
         const secureFilename = `${UPLOAD_PATH}/${file.data.newFilename}`;
-
+        const responseMessages = [];
         // SECURITY FEATURE (?): Check if the uploaded filename matches our Storylines UUID format. Prevents overwriting
         // other folders.
         //if (!projectNameRegex.test(fileName)) {
 
         // SECURITY FEATURE (temporary): Make sure the project name isn't `scripts`, or `help`, and doesn't contain . or / in order to prevent overwriting folders.
         if (fileName !== 'scripts' && fileName !== 'help' && !fileName.includes('/') && !fileName.includes('.')) {
-            logger('WARNING', 'Upload Aborted: file does not match Storylines UUID standards.');
-
+            responseMessages.push({type: 'WARNING', message:'Upload Aborted: file does not match Storylines UUID standards.'});
+            logger('WARNING',  'Upload Aborted: file does not match Storylines UUID standards.');
             // Delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
-            res.end();
+            res.json(responseMessages);
             return;
         }
 
         // Before unzipping, create the product folder in /public/ if it doesn't exist already.
         if (!fs.existsSync(fileName)) {
+            responseMessages.push({type: 'INFO', message:`Successfully created new product ${fileName}`});
             logger('INFO', `Successfully created new product ${fileName}`);
             fs.mkdirSync(fileName);
         }
@@ -80,10 +82,11 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
         // Finally, delete the uploaded zip file.
         safeRM(secureFilename, UPLOAD_PATH);
 
+        responseMessages.push({type: 'INFO', message:`Uploaded files to product ${fileName}`});
         logger('INFO', `Uploaded files to product ${fileName}`);
 
         // Send a response back to the client.
-        res.end();
+        res.json(responseMessages);
     });
 });
 

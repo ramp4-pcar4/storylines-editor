@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import App from './app.vue';
+import { createPinia } from 'pinia';
 
 import './router/componentHooks';
 import router from './router';
@@ -34,8 +35,10 @@ import StorylinesViewer from 'ramp-storylines';
 import 'ramp-storylines/dist/storylines-viewer.css';
 
 const app = createApp(App);
+const pinia = createPinia();
 
-app.use(router)
+app.use(pinia)
+    .use(router)
     .use(i18n)
     .use(VueTippy, {
         directive: 'tippy',

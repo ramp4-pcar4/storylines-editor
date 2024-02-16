@@ -13,20 +13,36 @@
                 </div>
 
                 <div class="border py-5 w-5/6">
-                    <label
-                        ><span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:</label
-                    >
-                    <input
-                        type="text"
-                        @input="
-                            error = false;
-                            reqFields.uuid = true;
-                            checkUuid();
-                        "
-                        v-model="uuid"
-                        class="w-1/3"
-                        :class="error || !reqFields.uuid ? 'input-error' : ''"
-                    />
+                    <label>
+                        <span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:
+                    </label>
+                    <div class="relative w-1/3 inline-block">
+                        <input
+                            type="text"
+                            @focus="showDropdown = true"
+                            @blur="showDropdown = false"
+                            @input="
+                                error = false;
+                                reqFields.uuid = true;
+                                checkUuid();
+                            "
+                            v-model="uuid"
+                            class="w-full"
+                            :class="{ 'input-error': error || !reqFields.uuid }"
+                        />
+                        <div class="absolute z-10 w-full bg-white border border-gray-200 mt-1" v-show="showDropdown">
+                            <ul>
+                                <li
+                                    v-for="storyline in userStorylines"
+                                    :key="storyline.uuid"
+                                    @mousedown.prevent="selectUuid(storyline.uuid)"
+                                    class="p-2 hover:bg-gray-100 cursor-pointer"
+                                >
+                                    {{ storyline.uuid }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     <span v-if="warning" class="text-yellow-500 rounded p-1 ml-2">
                         <span class="align-middle inline-block mr-1 pb-1 fill-current">
                             <svg
@@ -50,15 +66,13 @@
                     <button
                         @click="generateRemoteConfig"
                         class="bg-black text-white hover:bg-gray-800"
-                        :class="error ? 'input-error' : ''"
+                        :class="{ 'input-error': error }"
                         v-if="editExisting"
                     >
                         {{ $t('editor.load') }}
                     </button>
-
-                    <!-- If config is loading, display a small spinner. -->
                     <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
-                        <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                        <spinner size="24px" color="#009CD1" class="mx-2 my-auto"></spinner>
                     </div>
                 </div>
 
@@ -175,6 +189,7 @@ import {
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
+import { useUserStore } from '../../stores/userStore';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;
@@ -227,6 +242,7 @@ export default class MetadataEditorV extends Vue {
     error = false; // whether an error has occurred
     warning = false; // used for duplicate uuid warning
     configLang = 'en';
+    showDropdown = false;
 
     // Saving properties.
     saving = false;
@@ -628,11 +644,31 @@ export default class MetadataEditorV extends Vue {
             axios
                 .post(this.apiUrl + '/upload', formData, { headers })
                 .then((res: AxiosResponse) => {
-                    res.data.files; // binary representation of the file
-                    res.status; // HTTP status
+                    const responseData = res.data;
+                    responseData.files; // binary representation of the file
+                    responseData.status; // HTTP status
                     this.unsavedChanges = false;
                     this.loadExisting = true; // if editExisting was false, we can now set it to true
                     Message.success('Successfully saved changes!');
+
+                    if (process.env.VUE_APP_CURR_ENV === 'Dev') {
+                        axios
+                            .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
+                                uuid: this.uuid
+                            })
+                            .then((response: any) => {
+                                const userStore = useUserStore();
+                                userStore.fetchUserProfile();
+                                console.log(response);
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+
+                        axios
+                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                messages: responseData
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    }
                 })
                 .catch(() => {
                     Message.error('Failed to save changes.');
@@ -694,6 +730,9 @@ export default class MetadataEditorV extends Vue {
             if (publish) {
                 this.generateConfig();
             }
+
+            const userStore = useUserStore();
+            userStore.fetchUserProfile();
         }
         this.$vfm.close('metadata-edit-modal');
     }
@@ -869,6 +908,16 @@ export default class MetadataEditorV extends Vue {
         } else {
             next();
         }
+    }
+
+    get userStorylines() {
+        const userStore = useUserStore();
+        return userStore.userProfile.storylines || [];
+    }
+
+    selectUuid(uuid: string): void {
+        this.uuid = uuid;
+        this.showDropdown = false;
     }
 }
 </script>

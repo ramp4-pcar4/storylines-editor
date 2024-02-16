@@ -7,6 +7,7 @@
 <script lang="ts">
 import { Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
+import { useUserStore } from './stores/userStore';
 
 export default class App extends Vue {
     @Watch('$route', { immediate: true })
@@ -15,6 +16,11 @@ export default class App extends Vue {
         if (to.params.lang) {
             document.title = this.$t(to.meta.title);
         }
+    }
+
+    mounted() {
+        const userStore = useUserStore(this.$pinia);
+        userStore.fetchUserProfile();
     }
 }
 </script>
