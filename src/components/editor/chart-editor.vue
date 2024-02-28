@@ -137,8 +137,19 @@ export default class ChartEditorV extends Vue {
                 enabled: false
             }
         });
-
-        // resets and clears datatable section
+        if (this.lang === 'en') {
+            this.modalEditor.editor.chart.options.setAll({
+                lang: {
+                    thousandsSep: ','
+                }
+            });
+        } else {
+            this.modalEditor.editor.chart.options.setAll({
+                lang: {
+                    thousandsSep: ' '
+                }
+            });
+        } // resets and clears datatable section
         const defaultTableData = `"Column 1";"Column 2"\n" "";" "`;
         this.modalEditor.editor.dataTable.loadCSV({ csv: defaultTableData });
     }
@@ -163,7 +174,6 @@ export default class ChartEditorV extends Vue {
 
             // Add chart config to ZIP file.
             this.configFileStructure.charts[this.lang].file(`${chart.title.text}.json`, JSON.stringify(chart, null, 4));
-
             this.chartConfigs.push(chartConfig);
         }
         this.onChartsEdited();
