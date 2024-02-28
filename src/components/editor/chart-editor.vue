@@ -66,6 +66,7 @@ import { ChartConfig, ChartPanel, ConfigFileStructure, Highchart, SourceCounts }
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
+import { chart } from 'highcharts';
 
 @Options({
     components: {
@@ -126,7 +127,7 @@ export default class ChartEditorV extends Vue {
 
     clearEditor(): void {
         // reset to clear modal editor options
-        this.modalEditor.editor.chart.options.setAll({
+        let chart_options = {
             title: {
                 text: `Chart ${this.chartConfigs.length + 1}`
             },
@@ -136,8 +137,12 @@ export default class ChartEditorV extends Vue {
             credits: {
                 enabled: false
             }
-        });
-
+        };
+        chart_options =
+            this.lang === 'en'
+                ? Object.assign({}, chart_options, { lang: { thousandsSep: ',' } })
+                : Object.assign({}, chart_options, { lang: { thousandsSep: ' ' } });
+        this.modalEditor.editor.chart.options.setAll(chart_options);
         // resets and clears datatable section
         const defaultTableData = `"Column 1";"Column 2"\n" "";" "`;
         this.modalEditor.editor.dataTable.loadCSV({ csv: defaultTableData });
@@ -163,7 +168,6 @@ export default class ChartEditorV extends Vue {
 
             // Add chart config to ZIP file.
             this.configFileStructure.charts[this.lang].file(`${chart.title.text}.json`, JSON.stringify(chart, null, 4));
-
             this.chartConfigs.push(chartConfig);
         }
         this.onChartsEdited();
