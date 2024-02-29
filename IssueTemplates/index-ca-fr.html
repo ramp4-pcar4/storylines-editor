@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="fr" dir="ltr"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta content="width=device-width,initial-scale=1" name="viewport"><title>Scénarios de PCAR</title><script src="https://code.highcharts.com/highcharts.js" charset="utf-8"></script><script src="https://code.highcharts.com/modules/data.js" charset="utf-8"></script><script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"></script><script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-fr.js"></script><link rel="stylesheet" href="scripts/multi-ramp/rv-styles.css"><link rel="stylesheet" href="scripts/highcharts-editor/highcharts-editor.min.css"><noscript> <%= require('html-loader!../src/assets/static/cdts/refTop.html') %> </noscript><script>document.write(wet.builder.refTop({}));</script><link href="css/chunk-common.9b357ab4.css" rel="preload" as="style"><link href="css/chunk-vendors.df6dc1d3.css" rel="preload" as="style"><link href="js/chunk-common.5bf40e59.js" rel="preload" as="script"><link href="js/chunk-vendors.b53a107d.js" rel="preload" as="script"><link href="js/indexCanadaFr.6388bd67.js" rel="preload" as="script"><link href="css/chunk-vendors.df6dc1d3.css" rel="stylesheet"><link href="css/chunk-common.9b357ab4.css" rel="stylesheet"></head><body><div id="def-top">d<%= require('html-loader!../src/assets/static/cdts/top-fr.html') %></div><div id="wb-cont"><div id="app"></div></div><div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-fr.html') %></div><script>// URL Parsing for Language Switch
+            var url = new URL(window.location.href);
+            var hashParams = url.hash.split('/');
+
+            // If there's an empty item at the end of the paramater list (occurs if there's a trailing slash in the URL), clear it.
+            if (hashParams.at(-1).length === 0) {
+                hashParams.pop();
+            }
+
+            // If content after the last slash in the URL is an anchor, clear it.
+            if (hashParams.at(-1).startsWith('#')) {
+                hashParams.pop();
+            }
+
+            // Finally, extract the StoryRAMP ID from the URL. If it has an anchor tag in it, remove it since it's not useful on the new page.
+            var productID = hashParams.pop();
+
+            if (productID.includes('#')) {
+                productID = productID.split('#')[0];
+            }
+
+            // Check to see if the 'editor' route is included in the URL. If so, keep it.
+            var hasEditor = hashParams.pop() === 'editor';
+
+            // Build new URL route.
+            var newURLRoute = hasEditor ? 'editor/' + productID : productID;
+
+            var defTop = document.getElementById('def-top');
+            defTop.outerHTML = wet.builder.top({
+                lngLinks: [
+                    {
+                        lang: 'en',
+                        href: 'index-ca-en.html#/en/' + newURLRoute,
+                        text: 'English'
+                    }
+                ],
+                breadcrumbs: [
+                    {
+                        title: 'Environnement et ressources naturelles',
+                        href: 'https://www.canada.ca/fr/services/environnement/meteo.html'
+                    }
+                ]
+            });
+            document.querySelectorAll('.wb-sl').forEach(function (skipLink) {
+                skipLink.setAttribute('href', url.href.split(/#[^\/]/)[0] + '#' + skipLink.href.split('#')[1]);
+            });
+            var interval = setInterval(function () {
+                var links = document.querySelectorAll('.wb-sl');
+                if (links.length === 3) {
+                    clearInterval(interval);
+                    links[2].setAttribute('href', url.href.split(/#[^\/]/)[0] + '?' + links[2].href.split('?')[1]);
+                }
+            }, 200);</script><script>var defFooter = document.getElementById('def-footer');
+            defFooter.outerHTML = wet.builder.footer({});</script><script>document.write(wet.builder.refFooter({}));</script><script src="scripts/multi-ramp/legacy-api.js"></script><script src="scripts/multi-ramp/rv-main.js"></script><script src="scripts/highcharts-editor/highcharts-editor.complete.js"></script><style>html {
+                font-size: 16px;
+            }</style><script src="js/chunk-vendors.b53a107d.js"></script><script src="js/chunk-common.5bf40e59.js"></script><script src="js/indexCanadaFr.6388bd67.js"></script></body></html><noscript><div><img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="https://sdc.ncr.ec.gc.ca/dcs2kf7dq10000kzg8kpqz5gp_3q4i/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.environmental-maps.canada.ca"></div></noscript>
