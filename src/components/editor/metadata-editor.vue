@@ -131,7 +131,7 @@
                 <template v-slot:metadataModal>
                     <vue-final-modal
                         modalId="metadata-edit-modal"
-                        content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+                        content-class="flex flex-col max-h-full overflow-y-auto max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
                         class="flex justify-center items-center"
                     >
                         <h2 slot="header" class="text-lg font-bold">{{ $t('editor.editMetadata') }}</h2>
