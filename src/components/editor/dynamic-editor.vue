@@ -171,7 +171,9 @@ export default class DynamicEditorV extends Vue {
     }
 
     changePanel(target: string): void {
-        this.saveChanges();
+        if (this.editingStatus !== 'text') {
+            this.saveChanges();
+        }
         this.editingStatus = target;
     }
 
