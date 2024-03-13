@@ -71,6 +71,17 @@
             <i> {{ $t('editor.contextLabel.info') }}</i>
         </p>
         <br />
+        <label class="mr-15">{{ $t('editor.tocOrientation') }}:</label>
+        <select class="border-solid border border-black p-1" name="toc" id="toc" @change="metadataChanged">
+            <option value="vertical">{{ $t('editor.tocOrientation.vertical') }}</option>
+            <option value="horizontal">{{ $t('editor.tocOrientation.horizontal') }}</option>
+        </select>
+        <br />
+        <label class="mb-5"></label>
+        <p class="inline-block">
+            <i>{{ $t('editor.tocOrientation.info') }}</i>
+        </p>
+        <br />
         <label class="mb-5">{{ $t('editor.dateModified') }}:</label>
         <input type="date" name="dateModified" :value="metadata.dateModified" @change="metadataChanged" />
         <br /><br />
