@@ -112,3 +112,7 @@ editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slides.intro,Intro subtitle,1,Sous-titre de l’introduction,1
 editor.slides.title,Intro title,1,Titre de l’introduction,1
+editor.tocOrientation,Table of Contents Orientation,1,Orientation de la table des matières,0
+editor.tocOrientation.info,The table of contents orientation will be set to vertical in mobile view.,1,L'orientation de la table des matières sera définie sur verticale en vue mobile.,0
+editor.tocOrientation.vertical,Vertical,1,Vertical,0
+editor.tocOrientation.horizontal,Horizontal,1,Horizontal,0
