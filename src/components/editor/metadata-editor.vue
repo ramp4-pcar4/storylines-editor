@@ -71,20 +71,45 @@
                     >
                         {{ $t('editor.load') }}
                     </button>
+                    <button
+                        @click="fetchHistory"
+                        class="bg-black text-white hover:bg-gray-800"
+                        :class="{ 'input-error': error }"
+                        v-if="editExisting"
+                    >
+                        {{ $t('editor.viewHistory') }}
+                    </button>
                     <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
                         <spinner size="24px" color="#009CD1" class="mx-2 my-auto"></spinner>
                     </div>
+                    <div v-if="editExisting" class="inline-flex border py-5 ml-10">
+                        <ul>
+                            <li
+                                v-for="history in storylineHistory"
+                                :key="history.id"
+                                @click="selectHistory(history)"
+                                class="p-2 cursor-pointer"
+                                :class="{ 'bg-blue-200': selectedHistory && history.id === selectedHistory.id }"
+                            >
+                                {{ formatDate(history.created) }}
+                            </li>
+                        </ul>
+                        <button
+                            :disabled="!selectedHistory || selectedHistory.storylineUUID !== uuid"
+                            class="bg-black text-white hover:bg-gray-800"
+                            @click="loadHistory()"
+                        >
+                            {{ $t('editor.loadPrevious') }}
+                        </button>
+                    </div>
                 </div>
-
                 <br />
-
                 <div class="mb-4">
                     <h3>{{ $t('editor.productDetails') }}</h3>
                     <p>
                         {{ $t('editor.metadata.instructions') }}
                     </p>
                 </div>
-
                 <metadata-content
                     :metadata="metadata"
                     @metadata-changed="updateMetadata"
@@ -217,6 +242,12 @@ interface RouteParams {
     existing: boolean;
 }
 
+interface History {
+    id: number;
+    storylineUUID: string;
+    created: string;
+}
+
 @Options({
     components: {
         Editor: EditorV,
@@ -243,6 +274,9 @@ export default class MetadataEditorV extends Vue {
     warning = false; // used for duplicate uuid warning
     configLang = 'en';
     showDropdown = false;
+
+    storylineHistory: History[] = [];
+    selectedHistory: History | null = null;
 
     // Saving properties.
     saving = false;
@@ -424,11 +458,92 @@ export default class MetadataEditorV extends Vue {
                         });
                     });
                 }
+
+                fetch(this.apiUrl + `/retrieveMessages`)
+                    .then((res: any) => {
+                        if (res.ok) return res.json();
+                    })
+                    .then((data) => {
+                        axios
+                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                messages: data.messages
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    })
+                    .catch((error: any) => console.log(error.response || error));
             })
             .catch(() => {
                 Message.error(`Failed to load product, no response from server`);
                 this.loadStatus = 'loaded';
             });
+    }
+
+    fetchHistory(): void {
+        if (this.uuid === undefined) Message.error(`You must first enter a UUID`);
+
+        if (process.env.VUE_APP_CURR_ENV === 'Dev') {
+            axios
+                .get(process.env.VUE_APP_NET_API_URL + `/api/version/fetch/${this.uuid}`)
+                .then((response: any) => {
+                    this.storylineHistory = response.data;
+                })
+                .catch((error: any) => console.log(error.response || error));
+        }
+    }
+
+    selectHistory(selected: any): void {
+        this.selectedHistory = selected;
+    }
+
+    formatDate(created: string): string {
+        const date = new Date(created);
+        const estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'America/Toronto'
+        };
+
+        return new Intl.DateTimeFormat('en-US', options).format(estDate);
+    }
+
+    loadHistory(): void {
+        if (this.selectedHistory && process.env.VUE_APP_CURR_ENV === 'Dev') {
+            this.loadStatus = 'loading';
+
+            axios
+                .get(process.env.VUE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.id}`, {
+                    responseType: 'blob'
+                })
+                .then((response: any) => {
+                    const blob = response.data;
+
+                    JSZip.loadAsync(blob)
+                        .then((zip: any) => {
+                            this.configFileStructureHelper(zip);
+                        })
+                        .catch((jsZipError: any) => {
+                            console.error('Error processing ZIP file:', jsZipError);
+                            Message.error('Failed to process ZIP file');
+                        });
+                })
+                .catch((error: any) => {
+                    if (error.response && error.response.status === 404) {
+                        Message.error(`The requested version does not exist.`);
+                        this.error = true;
+                        this.loadStatus = 'waiting';
+                        this.clearConfig();
+                    } else {
+                        console.error('Failed to load version:', error);
+                        Message.error('Failed to load product, no response from server');
+                    }
+                    this.loadStatus = 'loaded';
+                });
+        }
     }
 
     findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
@@ -652,20 +767,45 @@ export default class MetadataEditorV extends Vue {
                     Message.success('Successfully saved changes!');
 
                     if (process.env.VUE_APP_CURR_ENV === 'Dev') {
-                        axios
-                            .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
-                                uuid: this.uuid
-                            })
-                            .then((response: any) => {
-                                const userStore = useUserStore();
-                                userStore.fetchUserProfile();
-                                console.log(response);
-                            })
-                            .catch((error: any) => console.log(error.response || error));
+                        if (responseData.new) {
+                            axios
+                                .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
+                                    uuid: this.uuid
+                                })
+                                .then((response: any) => {
+                                    const userStore = useUserStore();
+                                    userStore.fetchUserProfile();
+                                    console.log(response);
 
-                        axios
-                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
-                                messages: responseData
+                                    formData.append('uuid', this.uuid);
+                                    axios
+                                        .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
+                                        .then((response: any) => {
+                                            console.log('Version saved successfully.');
+                                        })
+                                        .catch((error: any) => console.log(error.response || error));
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        } else {
+                            formData.append('uuid', this.uuid);
+                            axios
+                                .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
+                                .then((response: any) => {
+                                    console.log('Version saved successfully.');
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        }
+
+                        fetch(this.apiUrl + `/retrieveMessages`)
+                            .then((res: any) => {
+                                if (res.ok) return res.json();
+                            })
+                            .then((data) => {
+                                axios
+                                    .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                        messages: data.messages
+                                    })
+                                    .catch((error: any) => console.log(error.response || error));
                             })
                             .catch((error: any) => console.log(error.response || error));
                     }
@@ -781,6 +921,19 @@ export default class MetadataEditorV extends Vue {
                 if (res.status !== 404) {
                     this.warning = true;
                 }
+
+                fetch(this.apiUrl + `/retrieveMessages`)
+                    .then((res: any) => {
+                        if (res.ok) return res.json();
+                    })
+                    .then((data) => {
+                        axios
+                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                messages: data.messages
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    })
+                    .catch((error: any) => console.log(error.response || error));
             });
         }
         this.warning = false;

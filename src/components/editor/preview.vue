@@ -75,6 +75,7 @@ export default class StoryPreviewV extends Vue {
         const uid = this.$route.params.uid as string;
         const lang = this.$route.params.lang as string;
         const JSZip = require('jszip');
+        const axios = require('axios').default;
 
         if (uid) {
             this.savedProduct = true;
@@ -124,6 +125,14 @@ export default class StoryPreviewV extends Vue {
                         });
                     });
                 }
+
+                fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
+                    axios
+                        .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                            messages: res.data.messages
+                        })
+                        .catch((error: any) => console.log(error.response || error));
+                });
             });
         } else {
             this.config = window.props.config;
