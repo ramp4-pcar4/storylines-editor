@@ -20,9 +20,9 @@
                     <span>
                         <div>{{ $t('editor.image.label.drag') }}</div>
                         <div>
-                            {{ $t('editor.image.label.or') }}
-                            <span class="text-blue-400 font-bold">{{ $t('editor.image.label.browse') }}</span>
-                            {{ $t('editor.image.label.upload') }}
+                            {{ $t('editor.label.or') }}
+                            <span class="text-blue-400 font-bold">{{ $t('editor.label.browse') }}</span>
+                            {{ $t('editor.label.upload') }}
                         </div>
                     </span>
                     <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
