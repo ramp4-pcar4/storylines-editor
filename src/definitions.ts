@@ -200,10 +200,13 @@ export interface ImagePanel extends BasePanel {
 
 export interface VideoPanel extends BasePanel {
     type: PanelType.Video;
+    title: string;
     width?: number;
     height?: number;
     src: string;
+    videoType: string;
     caption?: string;
+    transcript?: string;
 }
 
 export interface AudioPanel extends BasePanel {
@@ -243,10 +246,22 @@ export interface ImageFile {
     height?: number;
 }
 
+export interface VideoFile {
+    id: string;
+    title: string;
+    src: string;
+    videoType: 'local' | 'external' | 'YouTube';
+    caption?: string;
+    transcript?: string;
+    width?: number;
+    height?: number;
+}
+
 export interface DefaultConfigs {
     text: TextPanel;
     slideshow: SlideshowPanel;
     chart: ChartPanel;
     dynamic: DynamicPanel;
     map: MapPanel;
+    video: VideoPanel;
 }

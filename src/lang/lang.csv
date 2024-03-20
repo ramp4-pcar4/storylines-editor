@@ -49,6 +49,9 @@ editor.confirm,Confirm,1,Confirmer,1
 editor.cancel,Cancel,1,Annuler,1
 editor.unsavedChanges,Unsaved changes,1,Modifications non enregistrées,1
 editor.saveChanges,Save Changes,1,Enregistrer les modifications,1
+editor.label.or,or,1,ou,1
+editor.label.browse,browse,1,parcourir,1
+editor.label.upload,to upload,1,téléverser,1
 editor.savingChanges,Saving...,1,Enregistrement...,1
 editor.resetChanges,Reset Changes,1,Annuler les modifications,1
 editor.refreshChanges.modal,"Are you sure you want to reload the product? All unsaved changes will be lost.",1,"Voulez-vous vraiment recharger ce produit? Toute modification non enregistrée sera perdue.",1
@@ -58,14 +61,18 @@ editor.englishConfig,View English Config,1,Afficher la configuration en anglais,
 editor.returnToLanding,Return to Landing,1,Retour à la page d’accueil,1
 editor.image.delete,Delete Image,1,Supprimer l'image,1
 editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,1
-editor.image.label.or,or,1,ou,1
-editor.image.label.browse,browse,1,parcourir,1
-editor.image.label.upload,to upload,1,téléverser,1
 editor.image.label.caption,Caption,1,Légende,1
 editor.image.reorder,Click and drag to reorder images,1,Cliquez sur les images et faites-les glisser pour changer l’ordre.,1
 editor.image.altTag,Alt tag,1,Texte de remplacement,1
 editor.image.slideshowCaption,Slideshow Caption,1,Légende du diaporama,1
 editor.image.loadingError,An error occurred when trying to load image,1,Une erreur est survenue lors du chargement de l’image.,1
+editor.video.title,Video Title,1,Titre de la vidéo,1
+editor.video.label.drag,Drag your video file here,1,Glissez votre fichier vidéo ici,1
+editor.video.label.captions,Video Captions,1,Sous-titres,1
+editor.video.label.transcript,Video Transcript,1,Transcription,1
+editor.video.label.upload,Upload,1,Télécharger,1
+editor.video.delete,Delete Video,1,Supprimer la vidéo,1
+editor.video.pasteUrl,Paste the URL to a video,1,Paste the URL to a video,0
 editor.chart.delete,Delete Chart,1,Supprimer le graphique,1
 editor.chart.label.name,Name,1,Nom,1
 editor.chart.label.edit,Edit,1,Éditer,1
