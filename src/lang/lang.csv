@@ -71,7 +71,7 @@ editor.chart.label.name,Name,1,Nom,1
 editor.chart.label.edit,Edit,1,Éditer,1
 editor.chart.label.empty,Empty,1,Vide,1
 editor.chart.label.create,Add new chart,1,Ajouter un nouveau graphique,1
-editor.chart.label.info,Interactive charts ({num}),1,Graphiques interactifs ({num}),1
+editor.chart.label.info,Interactive chart,1,[FR] Interactive chart,0
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Voulez-vous vraiment supprimer le graphique {nom}?,1
 editor.map.title,Map title,1,Titre de la carte,1
 editor.map.edit.cancel,Cancel editing,1,Annuler les modifications,1
@@ -91,6 +91,11 @@ editor.map.timeslider.warning,⚠️Warning! Please ensure that:,1,⚠️Avertis
 editor.map.timeslider.warning.bullet1,All range and start values are positive integers.,1,Toutes les valeurs de la tranche et du début sont des nombres entiers positifs.,1
 editor.map.timeslider.warning.bullet2,The "to" value is greater than or equal to the "from" value.,1,La valeur « À » est supérieure ou égale à la valeur « De ».,1
 editor.map.timeslider.warning.end,"Otherwise, your time slider config cannot be saved.",1,Autrement, la configuration du curseur temporel ne pourra pas être enregistrée.,1
+editor.slideshow.label.info,Slideshow items ({num}),1,[FR] Slideshow items ({num}),0
+editor.slideshow.label.create,Add new item,1,[FR] Add new item,0
+editor.slideshow.label.edit,Edit existing item,1,[FR] Edit existing item,0
+editor.slideshow.label.type,Type,1,[FR] Type,0
+editor.slideshow.label.add,Add,1,[FR] Add,0
 editor.slides.title,SLIDES,1,DIAPOSITIVES,1
 editor.slides.addSlide,"New Slide",1,Nouvelle diapositive,1
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1

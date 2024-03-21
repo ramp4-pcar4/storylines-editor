@@ -30,8 +30,8 @@ import HighchartsVue from 'highcharts-vue';
 import Message from 'vue-m-message';
 import 'vue-m-message/dist/style.css';
 
-import StorylinesViewer from 'ramp-storylines';
-import 'ramp-storylines/dist/storylines-viewer.css';
+import StorylinesViewer from 'ramp-storylines_demo-scenarios-pcar';
+import 'ramp-storylines_demo-scenarios-pcar/dist/storylines-viewer.css';
 
 const app = createApp(App);
 
