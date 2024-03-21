@@ -1,0 +1,289 @@
+{
+    "schema": "ui",
+    "title": "UI",
+    "description": "Un lot de points de service utilisés par le visualisateur.",
+    "type": "object",
+    "properties": {
+        "fullscreen": {
+            "type": "boolean",
+            "default": false,
+            "description": "Indique si le visualisateur utilise l'entièreté de la fenêtre d'affichage.",
+            "title": "Plein écran"
+        },
+        "theme": {
+            "type": "string",
+            "enum": ["default"],
+            "default": "default",
+            "description": "Le thème de l'interface utilisateur du visualisateur.",
+            "title": "Thème"
+        },
+        "logoUrl": {
+            "type": "string",
+            "description": "(Optionnel)- Une image pour remplacer le logo utilisé par défaut par le visualisateur.",
+            "title": "URL du logo",
+            "default": ""
+        },
+        "failureFeedback": {
+            "type": "object",
+            "title": "Lors de la défaillance du visualisateur.",
+            "properties": {
+                "failureMessage": {
+                    "type": "string",
+                    "title": "Message d'échec",
+                    "description": "(Optionnel) - Un message à afficher en cas de défaillance.",
+                    "default": ""
+                },
+                "failureImageUrl": {
+                    "type": "string",
+                    "title": "URL image d'échec",
+                    "description": "(Optionnel) - Une image à utiliser en cas de défaillance.",
+                    "default": ""
+                }
+            }
+        },
+        "title": {
+            "type": "string",
+            "description": "(Optionnel) - Un titre pour remplacer celui utilisé par défaut par le visualisateur.",
+            "title": "Titre",
+            "default": ""
+        },
+        "appBar": {
+            "description": "Permet la configuration de la barre d'application principale. Pour masquer complètement la barre d'outils, fournissez les éléments suivants: Menu latéral: non coché, Géorecherche: non coché, Sélecteur de couches: non coché.",
+            "type": "object",
+            "properties": {
+                "sideMenu": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Affiche le bouton du menu latéral dans la barre d'application principale.",
+                    "title": "Menu latéral"
+                },
+                "geoSearch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Affiche le bouton de la géorecherche dans la barre d'application principale. Le bouton sera cachée si la géorecherche est désactivée ou si aucun URL n'est fourni.",
+                    "title": "Géorecherche"
+                },
+                "basemap": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Affiche le bouton du sélecteur de carte de base dans la barre d'application principale quand le menu couches est ouvert.",
+                    "title": "Sélecteur de carte de base"
+                },
+                "layers": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Affiche le bouton du sélecteur de couches dans la barre d'application principale.",
+                    "title": "Sélecteur de couches"
+                }
+            },
+            "default": { "sideMenu": true, "geoSearch": true, "layers": true },
+            "additionalProperties": false,
+            "title": "Barre d'application"
+        },
+        "navBar": {
+            "type": "object",
+            "description": "Permet de configurer la barre de navigation. Si rien n'est indiqué, la barre de navigation par défaut s'appliquera. L'ordre est défini par la séquence dans laquelle les éléments sont insérés dans la barre d'outils.",
+            "properties": {
+                "zoom": {
+                    "type": "string",
+                    "enum": ["all", "buttons", "slider"],
+                    "default": "buttons",
+                    "title": "Zoom"
+                },
+                "extra": {
+                    "default": ["fullscreen", "geoLocator", "home", "help"],
+                    "title": "Composantes de navigation en extra",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "geoLocator",
+                            "home",
+                            "basemap",
+                            "help",
+                            "fullscreen",
+                            "geoSearch",
+                            "sideMenu",
+                            "layers"
+                        ],
+                        "default": ["geoLocator", "home", "help", "fullscreen"]
+                    }
+                }
+            },
+            "required": ["zoom"],
+            "additionalProperties": false,
+            "title": "Barre de navigation"
+        },
+        "sideMenu": {
+            "type": "object",
+            "properties": {
+                "logo": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Indique si le logo doit être affiché dans le menu latéral à gauche.",
+                    "title": "Afficher le logo"
+                },
+                "items": {
+                    "type": "array",
+                    "default": [
+                        ["layers", "basemap"],
+                        ["fullscreen", "export", "share", "touch", "help", "about"],
+                        ["language"],
+                        ["plugins"]
+                    ],
+                    "items": {
+                        "type": "array",
+                        "title": "Items",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "layers",
+                                "basemap",
+                                "geoSearch",
+                                "about",
+                                "fullscreen",
+                                "export",
+                                "share",
+                                "touch",
+                                "help",
+                                "language",
+                                "plugins"
+                            ]
+                        }
+                    },
+                    "title": "Éléments du menu latéral"
+                }
+            },
+            "additionalProperties": false,
+            "description": "Spécifie quelles options sont offertes dans le menu latéral à gauche.",
+            "title": "Menu latéral"
+        },
+        "restrictNavigation": {
+            "type": "boolean",
+            "default": false,
+            "description": "Empêche l'utilisateur d'effectuer des déplacements au delà de l'étendue maximale.",
+            "title": "Navigation restreinte"
+        },
+        "about": {
+            "description": "L'à propos de la carte provenant du fichier de configuration ou d'un répertoire contenant un fichier de type Markdown.",
+            "title": "À propos de la carte",
+            "type": "object",
+            "subtype": "oneof",
+            "properties": {
+                "content": {
+                    "description": "À propos provenant d'un texte fourni (chaîne de caractères).",
+                    "title": "Texte",
+                    "type": "string",
+                    "required": false
+                },
+                "folderName": {
+                    "description": "À propos provenant d'un fichier de type Markdown. IMPORTANT: Ne peux pas être testé en mode aperçu. Ouvrir l'à propos va générer une erreur.",
+                    "title": "Dossier contenant le fichier Markdown",
+                    "type": "string",
+                    "required": false
+                },
+                "aboutChoice": {
+                    "description": "",
+                    "type": "enum",
+                    "enum": ["string", "folder"],
+                    "title": "Propriétés de l'à propos",
+                    "default": "string",
+                    "required": false
+                },
+                "additionalProperties": false
+            }
+        },
+        "help": {
+            "type": "object",
+            "description": "Propriétés de l'aide",
+            "properties": {
+                "folderName": {
+                    "type": "string",
+                    "description": "Nom du dossier contenant les fichiers d'aide et les images connexes. IMPORTANT: Ne peux pas être testé en mode aperçu. Ouvrir l'aide va générer une erreur.",
+                    "title": "Nom du dossier",
+                    "default": "default"
+                }
+            },
+            "required": ["folderName"],
+            "additionalProperties": false,
+            "title": "Fichier d'aide"
+        },
+        "legend": {
+            "type": "object",
+            "title": "Panneau des couches (Légende)",
+            "properties": {
+                "reorderable": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "indique si les éléments du panneau des couches (légende) sont réordonnables. Cette propriété est ignorée si la légende est du type structurée.",
+                    "title": "Est réordonnable"
+                },
+                "allowImport": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Indique si l'utilisateur peut ajouter des couches à partir de l'interface.",
+                    "title": "Permettre l'importation de couches"
+                },
+                "isOpen": {
+                    "type": "object",
+                    "description": "Indique si le panneau des couches (légende) est ouverte par défaut lors du chargement initial pour les fenêtres d'affichage restreinte, moyenne et étendue.",
+                    "properties": {
+                        "large": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Indique si le panneau des couches (légende) est ouverte par défaut lors du chargement initial pour une fenêtre d'affichage étendue.",
+                            "title": "Ouvrir par défaut dans l'affichage étendu"
+                        },
+                        "medium": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Indique si le panneau des couches (légende) est ouverte par défaut lors du chargement initial pour une fenêtre d'affichage moyenne.",
+                            "title": "Ouvrir par défaut dans l'affichage moyen"
+                        },
+                        "small": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Indique si le panneau des couches (légende) est ouverte par défaut lors du chargement initial pour une fenêtre d'affichage restreinte.",
+                            "title": "Ouvrir par défaut dans l'affichage restreint"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "title": "Options d'ouverture du panneau des couches (légende)"
+                }
+            }
+        },
+        "tableIsOpen": {
+            "type": "object",
+            "description": "Indique si la table est ouverte par défaut lors du chargement initial pour les fenêtres d'affichage restreinte, moyenne et étendue.",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "L'ID de la couche pour des fins de référencement à l'intérieur du visualisateur. Fonctionne seulement avec des couches de type \"feature layer\".",
+                    "title": "ID de la couche",
+                    "default": ""
+                },
+                "large": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indique si la table est ouverte par défaut lors du chargement initial pour une fenêtre d'affichage étendue.",
+                    "title": "Ouvrir par défaut dans l'affichage étendu"
+                },
+                "medium": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indique si la table est ouverte par défaut lors du chargement initial pour une fenêtre d'affichage moyenne.",
+                    "title": "Ouvrir par défaut dans l'affichage moyen"
+                },
+                "small": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indique si la table est ouverte par défaut lors du chargement initial pour une fenêtre d'affichage restreinte.",
+                    "title": "Ouvrir par défaut dans l'affichage restreint"
+                }
+            },
+            "additionalProperties": false,
+            "required": ["id"],
+            "title": "Options d'ouverture de la table"
+        }
+    }
+}
