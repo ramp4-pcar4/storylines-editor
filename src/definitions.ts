@@ -192,12 +192,9 @@ export interface ImagePanel extends BasePanel {
     src: string;
     width?: number;
     height?: number;
-    temp?: string;
-    class?: string;
     fullscreen?: boolean;
     altText?: string;
     caption?: string;
-    tooltip?: string;
 }
 
 export interface VideoPanel extends BasePanel {
@@ -219,16 +216,19 @@ export interface AudioPanel extends BasePanel {
 
 export interface SlideshowPanel extends BasePanel {
     type: PanelType.Slideshow;
-    images: ImagePanel[];
-    fullscreen?: boolean;
+    items: Array<ChartPanel | TextPanel | ImagePanel | MapPanel>;
     loop?: boolean;
     caption?: string;
+    userCreated?: boolean; // used to determine whether this was automatically converted to slideshow or not
 }
 
 export interface ChartPanel extends BasePanel {
     type: PanelType.Chart;
-    charts: ChartConfig[];
-    fullscreen?: boolean;
+    src: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    config?: any;
+    name?: string;
+    options?: DQVOptions;
 }
 
 export interface ChartConfig {
@@ -266,4 +266,5 @@ export interface DefaultConfigs {
     dynamic: DynamicPanel;
     map: MapPanel;
     video: VideoPanel;
+    image: ImagePanel;
 }

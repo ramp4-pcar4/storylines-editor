@@ -36,10 +36,10 @@
                 </tr>
                 <tr class="table-contents" v-for="(item, idx) in panel.children" :key="idx">
                     <td>{{ item.id }}</td>
-                    <td>{{ item.panel.type }}</td>
+                    <td>{{ determineEditorType(item.panel) }}</td>
                     <td>
                         <span @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</span> |
-                        <span @click="() => removeSlide(idx)">{{ $t('editor.remove') }}</span>
+                        <span @click="() => removeSlide(item, idx)">{{ $t('editor.remove') }}</span>
                     </td>
                 </tr>
                 <tr class="table-add-row">
@@ -49,10 +49,7 @@
                     </th>
                     <th>
                         <select v-model="newSlideType">
-                            <option
-                                v-for="thing in Object.keys(editors).filter((editor) => editor !== 'image')"
-                                :key="thing"
-                            >
+                            <option v-for="thing in Object.keys(editors)" :key="thing">
                                 {{ thing }}
                             </option>
                         </select>
@@ -69,14 +66,8 @@
                 ><br />
                 <component
                     ref="slide"
-                    :is="
-                        editors[
-                            panel.children[editingSlide].panel.type === 'image'
-                                ? 'slideshow'
-                                : panel.children[editingSlide].panel.type
-                        ]
-                    "
-                    :key="editingSlide + panel.children[editingSlide].panel.type"
+                    :is="editors[determineEditorType(panel.children[editingSlide].panel)]"
+                    :key="editingSlide + determineEditorType(panel.children[editingSlide].panel)"
                     :panel="panel.children[editingSlide].panel"
                     :configFileStructure="configFileStructure"
                     :lang="lang"
@@ -91,7 +82,7 @@
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
-    ChartConfig,
+    BasePanel,
     ChartPanel,
     ConfigFileStructure,
     DefaultConfigs,
@@ -102,6 +93,7 @@ import {
     PanelType,
     SlideshowPanel,
     SourceCounts,
+    TextPanel,
     VideoPanel
 } from '@/definitions';
 
@@ -110,12 +102,14 @@ import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
+import SlideshowEditorV from './slideshow-editor.vue';
 
 @Options({
     components: {
         'chart-editor': ChartEditorV,
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
+        'slideshow-editor': SlideshowEditorV,
         'dynamic-editor': DynamicEditorV,
         'map-editor': MapEditorV,
         'video-editor': VideoEditorV
@@ -130,7 +124,7 @@ export default class DynamicEditorV extends Vue {
     editors: Record<string, string> = {
         text: 'text-editor',
         image: 'image-editor',
-        slideshow: 'image-editor',
+        slideshow: 'slideshow-editor',
         chart: 'chart-editor',
         map: 'map-editor',
         video: 'video-editor'
@@ -151,11 +145,16 @@ export default class DynamicEditorV extends Vue {
         },
         slideshow: {
             type: PanelType.Slideshow,
-            images: []
+            items: [],
+            userCreated: true
+        },
+        image: {
+            type: PanelType.Image,
+            src: ''
         },
         chart: {
             type: PanelType.Chart,
-            charts: []
+            src: ''
         },
         map: {
             type: PanelType.Map,
@@ -192,19 +191,9 @@ export default class DynamicEditorV extends Vue {
         // Save slide changes if neccessary and switch to the newly selected slide.
         this.saveChanges();
         this.editingSlide = idx;
-
-        // Image Panel to Slideshow Panel Conversion
-        if (this.panel.children[this.editingSlide].panel.type === 'image') {
-            (this.panel.children[this.editingSlide].panel as SlideshowPanel) = {
-                type: PanelType.Slideshow,
-                images: [this.panel.children[this.editingSlide].panel as ImagePanel]
-            };
-        }
     }
 
-    removeSlide(item: number): void {
-        const panel = this.panel.children.find((panel: DynamicChildItem, idx: number) => idx === item)?.panel;
-
+    removeSlide(panel: BasePanel, index?: number): void {
         // Update source counts based on which panel is removed.
         switch (panel?.type) {
             case 'map': {
@@ -220,22 +209,27 @@ export default class DynamicEditorV extends Vue {
 
             case 'chart': {
                 const chartPanel = panel as ChartPanel;
-                chartPanel.charts.forEach((chart: ChartConfig) => {
-                    this.sourceCounts[chart.src] -= 1;
-                    if (this.sourceCounts[chart.src] === 0) {
-                        this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
-                    }
-                });
+                this.sourceCounts[chartPanel.src] -= 1;
+                if (this.sourceCounts[chartPanel.src] === 0) {
+                    this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
+                }
+                break;
+            }
+
+            case 'image': {
+                const imagePanel = panel as ImagePanel;
+
+                this.sourceCounts[imagePanel.src] -= 1;
+                if (this.sourceCounts[imagePanel.src] === 0) {
+                    this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
+                }
                 break;
             }
 
             case 'slideshow': {
                 const slideshowPanel = panel as SlideshowPanel;
-                slideshowPanel.images.forEach((image: ImagePanel) => {
-                    this.sourceCounts[image.src] -= 1;
-                    if (this.sourceCounts[image.src] === 0) {
-                        this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
-                    }
+                slideshowPanel.items.forEach((item: TextPanel | ImagePanel | MapPanel | ChartPanel) => {
+                    this.removeSlide(item);
                 });
                 break;
             }
@@ -254,12 +248,14 @@ export default class DynamicEditorV extends Vue {
             }
         }
 
-        // Remove the panel itself.
-        this.panel.children = this.panel.children.filter((panel: DynamicChildItem, idx: number) => idx !== item);
+        if (index) {
+            // Remove the panel itself.
+            this.panel.children = this.panel.children.filter((panel: DynamicChildItem, idx: number) => idx !== index);
 
-        // If the slide being removed is the currently selected slide, unselect it.
-        if (this.editingSlide === item) {
-            this.editingSlide = -1;
+            // If the slide being removed is the currently selected slide, unselect it.
+            if (this.editingSlide === index) {
+                this.editingSlide = -1;
+            }
         }
     }
 
@@ -273,6 +269,23 @@ export default class DynamicEditorV extends Vue {
 
         this.newSlideName = '';
         this.panel.children.push(newConfig);
+    }
+
+    determineEditorType(panel: BasePanel): string {
+        if (panel.type !== PanelType.Slideshow) return panel.type;
+        if ((panel as SlideshowPanel).items.length === 0 || (panel as SlideshowPanel).userCreated)
+            return PanelType.Slideshow;
+
+        // Determine whether the slideshow consists of only charts. If so, display the chart editor.
+        const allCharts = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Chart);
+        if (allCharts) return PanelType.Chart;
+
+        // Determine whether the slideshow consists of only images. If so, display the image editor.
+        const allImages = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Image);
+        if (allImages) return PanelType.Image;
+
+        // Otherwise display the slideshow editor.
+        return PanelType.Slideshow;
     }
 
     saveChanges(): void {
