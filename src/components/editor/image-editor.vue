@@ -25,7 +25,7 @@
                             {{ $t('editor.image.label.upload') }}
                         </div>
                     </span>
-                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
+                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple />
                 </span>
             </label>
         </div>
@@ -217,7 +217,7 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit');
+        this.$parent?.$emit('slide-edit');
     }
 }
 </script>

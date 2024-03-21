@@ -221,7 +221,7 @@ export default class ChartEditorV extends Vue {
 
     onChartsEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit');
+        this.$parent?.$emit('slide-edit');
     }
 }
 </script>
