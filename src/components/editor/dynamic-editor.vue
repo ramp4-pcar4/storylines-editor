@@ -4,14 +4,14 @@
         <div class="flex">
             <button
                 @click="() => changePanel('text')"
-                class="border hover:bg-gray-100"
+                class="editor-button border hover:bg-gray-100"
                 :class="editingStatus === 'text' ? 'border-black' : 'border-gray-300'"
             >
                 {{ $t('dynamic.textSection') }}
             </button>
             <button
                 @click="() => changePanel('panels')"
-                class="border hover:bg-gray-100"
+                class="editor-button border hover:bg-gray-100"
                 :class="editingStatus !== 'text' ? 'border-black' : 'border-gray-300'"
             >
                 {{ $t('dynamic.panel.collection') }}
@@ -44,7 +44,7 @@
                 </tr>
                 <tr class="table-add-row">
                     <th class="flex flex-col items-center">
-                        <input type="text" placeholder="Enter Panel ID" v-model="newSlideName" />
+                        <input class="editor-input" type="text" placeholder="Enter Panel ID" v-model="newSlideName" />
                         <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
                     </th>
                     <th>
@@ -54,7 +54,7 @@
                             </option>
                         </select>
                     </th>
-                    <th><button @click="createNewSlide" :disabled="idUsed">Add New</button></th>
+                    <th><button class="editor-button" @click="createNewSlide" :disabled="idUsed">Add New</button></th>
                 </tr>
             </table>
 

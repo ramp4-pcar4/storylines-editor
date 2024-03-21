@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-col mt-4">
-        <label class="text-left">{{ $t('editor.slides.panel.title') }}:</label>
-        <input type="text" v-model="panel.title" />
-        <label class="text-left mt-2">{{ $t('editor.slides.panel.body') }}:</label>
+        <label class="editor-label text-left">{{ $t('editor.slides.panel.title') }}:</label>
+        <input class="editor-input" type="text" v-model="panel.title" />
+        <label class="editor-label text-left mt-2">{{ $t('editor.slides.panel.body') }}:</label>
         <v-md-editor
             v-model="panel.content"
             height="400px"

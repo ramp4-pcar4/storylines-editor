@@ -4,19 +4,20 @@
         <template v-if="!loadEditor">
             <div class="px-20 py-5">
                 <div class="flex">
-                    <div class="flex text-2xl font-bold mb-5">
+                    <div class="flex flex-1 text-2xl font-bold mb-5">
                         {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
                     </div>
-                    <button @click="swapLang()">
+                    <button class="editor-button" @click="swapLang()">
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                 </div>
 
                 <div class="border py-5 w-5/6">
-                    <label
+                    <label class="editor-label"
                         ><span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:</label
                     >
                     <input
+                        class="editor-input w-1/3"
                         type="text"
                         @input="
                             error = false;
@@ -24,7 +25,6 @@
                             checkUuid();
                         "
                         v-model="uuid"
-                        class="w-1/3"
                         :class="error || !reqFields.uuid ? 'input-error' : ''"
                     />
                     <span v-if="warning" class="text-yellow-500 rounded p-1 ml-2">
@@ -49,7 +49,7 @@
                     </span>
                     <button
                         @click="generateRemoteConfig"
-                        class="bg-black text-white hover:bg-gray-800"
+                        class="editor-button bg-black text-white hover:bg-gray-800"
                         :class="error ? 'input-error' : ''"
                         v-if="editExisting"
                     >
@@ -65,7 +65,7 @@
                 <br />
 
                 <div class="mb-4">
-                    <h3>{{ $t('editor.productDetails') }}</h3>
+                    <h3 class="editor-h3">{{ $t('editor.productDetails') }}</h3>
                     <p>
                         {{ $t('editor.metadata.instructions') }}
                     </p>
@@ -80,16 +80,16 @@
             </div>
 
             <div class="flex mt-8">
-                <button v-if="editExisting" @click="saveMetadata(true)" class="pl-8">
+                <button v-if="editExisting" @click="saveMetadata(true)" class="editor-button">
                     {{ $t('editor.saveChanges') }}
                 </button>
                 <div class="ml-auto">
                     <router-link :to="{ name: 'home' }" target>
-                        <button>{{ $t('editor.back') }}</button>
+                        <button class="editor-button">{{ $t('editor.back') }}</button>
                     </router-link>
                     <button
                         @click="!warning ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
-                        class="bg-black text-white px-8"
+                        class="editor-button bg-black text-white"
                     >
                         {{ $t('editor.next') }}
                     </button>
@@ -118,7 +118,10 @@
                 ref="mainEditor"
             >
                 <template v-slot:langModal="slotProps">
-                    <button @click.stop="slotProps.unsavedChanges ? $vfm.open(`change-lang`) : swapLang()">
+                    <button
+                        class="editor-button"
+                        @click.stop="slotProps.unsavedChanges ? $vfm.open(`change-lang`) : swapLang()"
+                    >
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                     <confirmation-modal
@@ -142,7 +145,10 @@
                             @logo-source-changed="onLogoSourceInput"
                         ></metadata-content>
                         <div class="w-full flex justify-end">
-                            <button class="bg-black text-white hover:bg-gray-800" @click="saveMetadata(false)">
+                            <button
+                                class="editor-button bg-black text-white hover:bg-gray-800"
+                                @click="saveMetadata(false)"
+                            >
                                 Done
                             </button>
                         </div>
@@ -497,10 +503,7 @@ export default class MetadataEditorV extends Vue {
                 en: chartsFolder.folder('en'),
                 fr: chartsFolder.folder('fr')
             },
-            rampConfig: {
-                en: rampConfigFolder.folder('en'),
-                fr: rampConfigFolder.folder('fr')
-            }
+            rampConfig: rampConfigFolder
         };
 
         // If uploadLogo is set, upload the logo to the directory.
@@ -906,7 +909,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         max-width: 80%;
     }
 
-    .editor-container label,
     .vfm__content label {
         width: 10vw;
         text-align: right;
@@ -914,11 +916,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: inline-block;
     }
 
-    .editor-container h3 {
-        font-size: larger;
-    }
-
-    .editor-container input,
     .vfm__content input {
         padding: 5px 10px;
         margin-top: 5px;
@@ -926,11 +923,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: inline;
     }
 
-    .editor-container .input-error {
-        border: 1px solid red;
-    }
-
-    .editor-container button,
     .vfm__content button {
         padding: 5px 12px;
         margin: 0px 10px;
@@ -938,13 +930,11 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         transition-duration: 0.2s;
     }
 
-    .editor-container button:hover:enabled,
     .vfm__content button:hover:enabled {
         background-color: #dbdbdb;
         color: black;
     }
 
-    .editor-container button:disabled,
     .vfm__content button:disabled {
         border: 1px solid gray;
         color: gray;
