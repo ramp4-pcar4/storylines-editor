@@ -12,6 +12,7 @@
                 class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
                 id="modal-btn"
                 @click="clearEditor()"
+                v-if="allowMany || (!allowMany && chartConfigs.length === 0)"
             >
                 <div class="flex items-center">
                     <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
@@ -62,11 +63,18 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import { ChartConfig, ChartPanel, ConfigFileStructure, Highchart, SourceCounts } from '@/definitions';
+import {
+    ChartConfig,
+    ChartPanel,
+    ConfigFileStructure,
+    Highchart,
+    PanelType,
+    SlideshowPanel,
+    SourceCounts
+} from '@/definitions';
 import ChartPreviewV from '@/components/editor/helpers/chart-preview.vue';
 import ConfirmationModalV from '@/components/editor/helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
-import { chart } from 'highcharts';
 
 @Options({
     components: {
@@ -78,10 +86,11 @@ import { chart } from 'highcharts';
     }
 })
 export default class ChartEditorV extends Vue {
-    @Prop() panel!: ChartPanel;
+    @Prop() panel!: ChartPanel | SlideshowPanel;
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop({ default: true }) allowMany!: boolean;
 
     edited = false;
 
@@ -106,9 +115,17 @@ export default class ChartEditorV extends Vue {
             );
         });
 
+        // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
+        const charts =
+            this.panel.type === PanelType.Slideshow
+                ? (this.panel.items as Array<ChartPanel>)
+                : this.panel.src
+                ? [this.panel]
+                : [];
+
         // load charts from existing storylines product
-        if (this.panel.charts !== undefined && this.panel.charts.length) {
-            this.chartConfigs = this.panel.charts.map((chart: ChartConfig) => {
+        if (charts !== undefined && charts.length) {
+            this.chartConfigs = charts.map((chart: ChartPanel) => {
                 let chartName = '';
                 // extract chart name
                 if (chart.options && chart.options.title) {
@@ -218,8 +235,42 @@ export default class ChartEditorV extends Vue {
 
     saveChanges(): void {
         if (this.edited) {
-            this.panel.charts = this.chartConfigs; // option to delete config property as is redundant
+            // Delete the existing properties so we can rebuild the object.
+            Object.keys(this.panel).forEach((key) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                delete this.panel[key];
+            });
+
+            // Handle case where every image is deleted.
+            if (this.chartConfigs.length === 0) {
+                this.panel.type = PanelType.Chart;
+                (this.panel as ChartPanel).src = '';
+            } else if (this.chartConfigs.length === 1) {
+                this.panel.type = PanelType.Chart;
+
+                // Grab the one chart config from the array.
+                const newChart = this.chartConfigs[0];
+
+                // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
+                Object.keys(newChart).forEach((key) => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    (this.panel as ChartPanel)[key] = newChart[key];
+                });
+            } else {
+                this.panel.type = PanelType.Slideshow;
+
+                // Turn each of the chart configs into a chart panel and add them to the slideshow.
+                (this.panel as SlideshowPanel).items = this.chartConfigs.map((chart: ChartConfig) => {
+                    return {
+                        ...chart,
+                        type: PanelType.Chart
+                    } as ChartPanel;
+                });
+            }
         }
+
         this.edited = false;
     }
 

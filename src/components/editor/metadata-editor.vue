@@ -160,7 +160,6 @@ import { AxiosResponse } from 'axios';
 import {
     AudioPanel,
     BasePanel,
-    ChartConfig,
     ChartPanel,
     ConfigFileStructure,
     DynamicChildItem,
@@ -171,7 +170,8 @@ import {
     Slide,
     SlideshowPanel,
     SourceCounts,
-    StoryRampConfig
+    StoryRampConfig,
+    TextPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
@@ -435,22 +435,24 @@ export default class MetadataEditorV extends Vue {
                 });
                 break;
             case 'slideshow':
-                (panel as SlideshowPanel).images.forEach((image: ImagePanel) => {
-                    this.incrementSourceCount(image.src);
+                (panel as SlideshowPanel).items.forEach((item: ChartPanel | TextPanel | ImagePanel | MapPanel) => {
+                    this.panelSourceHelper(item);
                 });
                 break;
             case 'chart':
-                (panel as ChartPanel).charts.forEach((chart: ChartConfig) => {
-                    this.incrementSourceCount(chart.src);
-                });
+                this.incrementSourceCount((panel as ChartPanel).src);
                 break;
             case 'image':
+                this.incrementSourceCount((panel as ImagePanel).src);
+                break;
             case 'video':
             case 'audio':
                 this.incrementSourceCount((panel as AudioPanel).src);
                 break;
             case 'map':
                 this.incrementSourceCount((panel as MapPanel).config);
+                break;
+            case 'text':
                 break;
             default:
                 break;
@@ -557,17 +559,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.contextLabel = config.contextLabel;
         this.metadata.dateModified = config.dateModified;
 
-        // Conversion for individual image panels to slideshow for gallery display
         this.slides = config.slides;
-        this.slides.forEach((slide: Slide) => {
-            if (slide.panel.length === 2 && slide.panel[1].type === 'image') {
-                const newSlide = {
-                    type: 'slideshow',
-                    images: [slide.panel[1]]
-                };
-                slide.panel[1] = newSlide;
-            }
-        });
 
         const logo = config.introSlide.logo?.src;
         if (logo) {

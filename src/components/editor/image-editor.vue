@@ -7,6 +7,7 @@
             @dragover.prevent="() => (dragging = true)"
             @dragleave.prevent="() => (dragging = false)"
             @drop.prevent="dropImages($event)"
+            v-if="allowMany || (!allowMany && imagePreviews.length === 0)"
         >
             <label class="flex drag-label cursor-pointer">
                 <span class="align-middle inline-block pr-4">
@@ -25,12 +26,16 @@
                             {{ $t('editor.image.label.upload') }}
                         </div>
                     </span>
-                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
+                    <input type="file" class="cursor-pointer" @change="onFileChange" :multiple="!!allowMany" />
                 </span>
             </label>
         </div>
 
-        <span v-show="!imagePreviewsLoading && imagePreviews.length" class="flex justify-center">
+        <span
+            v-if="allowMany || (!allowMany && imagePreviews.length === 0)"
+            v-show="!imagePreviewsLoading && imagePreviews.length"
+            class="flex justify-center"
+        >
             <i> {{ $t('editor.image.reorder') }}</i>
         </span>
 
@@ -77,10 +82,11 @@ import ImagePreviewV from '@/components/editor/helpers/image-preview.vue';
     }
 })
 export default class ImageEditorV extends Vue {
-    @Prop() panel!: SlideshowPanel;
+    @Prop() panel!: ImagePanel | SlideshowPanel;
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop({ default: true }) allowMany!: boolean;
 
     dragging = false;
     edited = false;
@@ -95,12 +101,20 @@ export default class ImageEditorV extends Vue {
     }
 
     mounted(): void {
-        if (this.panel.images !== undefined && this.panel.images.length) {
+        // This basically allows us to access the image(s) using one consistent variable instead of needing to check panel type.
+        const images =
+            this.panel.type === PanelType.Slideshow
+                ? (this.panel.items as Array<ImagePanel>)
+                : this.panel.src
+                ? [this.panel]
+                : [];
+
+        if (images !== undefined && images.length) {
             // Set images as loading until they are all loaded and resolve.
             this.imagePreviewsLoading = true;
 
             // Process each existing image.
-            this.panel.images.map((image: ImagePanel) => {
+            images.map((image: ImagePanel) => {
                 // Check if the config file exists in the ZIP folder first.
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');
@@ -158,7 +172,13 @@ export default class ImageEditorV extends Vue {
 
     dropImages(e: DragEvent): void {
         if (e.dataTransfer !== null) {
-            const files = [...e.dataTransfer.files];
+            let files = [...e.dataTransfer.files];
+
+            // If allowMany is false, take the first one.
+            if (!this.allowMany) {
+                files = [files[0]];
+            }
+
             this.imagePreviews.push(
                 ...files.map((file: File) => {
                     // Add the uploaded images to the product ZIP file.
@@ -203,14 +223,48 @@ export default class ImageEditorV extends Vue {
 
     saveChanges(): void {
         if (this.edited) {
-            this.panel.images = this.imagePreviews.map((imageFile: ImageFile) => {
-                return {
-                    ...imageFile,
-                    src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`,
-                    type: PanelType.Image
-                };
+            // Delete the existing properties so we can rebuild the object.
+            Object.keys(this.panel).forEach((key) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                delete this.panel[key];
             });
-            this.panel.caption = this.slideshowCaption ?? undefined;
+
+            // Handle case where everything is deleted.
+            if (this.imagePreviews.length === 0) {
+                this.panel.type = PanelType.Image;
+                (this.panel as ImagePanel).src = '';
+            } else if (this.imagePreviews.length === 1) {
+                // If there's only one image uploaded, convert this to an image panel.
+                this.panel.type = PanelType.Image;
+
+                // Grab the one image from the array.
+                const imageFile = this.imagePreviews[0];
+
+                // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
+                Object.keys(imageFile).forEach((key) => {
+                    if (key === 'id') return; // we don't need this one.
+
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    (this.panel as ImagePanel)[key] = imageFile[key];
+                });
+
+                (this.panel as ImagePanel).src = `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`;
+            } else {
+                // Otherwise, convert this to a slideshow panel.
+                this.panel.type = PanelType.Slideshow;
+                this.panel.caption = this.slideshowCaption ?? undefined;
+
+                // Turn each of the image configs into an image panel and add them to the slidesow.
+                (this.panel as SlideshowPanel).items = this.imagePreviews.map((imageFile: ImageFile) => {
+                    return {
+                        ...imageFile,
+                        src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`,
+                        type: PanelType.Image
+                    } as ImagePanel;
+                });
+            }
         }
         this.edited = false;
     }
