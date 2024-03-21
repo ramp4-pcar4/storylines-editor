@@ -262,11 +262,10 @@ export default class EditorV extends Vue {
         if (this.$refs.slide !== undefined) {
             this.$nextTick(() => {
                 (this.$refs.slide as SlideEditorV).saveChanges();
+                // emit save changes event
+                this.$emit('save-changes');
             });
         }
-
-        // emit save changes event
-        this.$emit('save-changes');
     }
 
     beforeWindowUnload(e: BeforeUnloadEvent): void {

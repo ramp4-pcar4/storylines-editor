@@ -81,6 +81,7 @@
                     :configFileStructure="configFileStructure"
                     :lang="lang"
                     :sourceCounts="sourceCounts"
+                    @slide-edit="$emit('slide-edit')"
                 ></component>
             </div>
         </div>
