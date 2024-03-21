@@ -4,7 +4,7 @@
             <span class="flex items-center justify-center font-bold"> {{ $t('editor.slides.title') }}</span>
             <span class="flex-1"></span>
             <span class="ml-auto"></span>
-            <button v-on:click="addNewSlide">
+            <button class="editor-button" v-on:click="addNewSlide">
                 <span class="align-middle inline-block px-1"
                     ><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
                         <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
@@ -13,6 +13,7 @@
                 <span class="align-middle inline-block">{{ $t('editor.slides.addSlide') }}</span>
             </button>
             <button
+                class="editor-button"
                 @click.stop="$vfm.open(`copy-from-other-lang`)"
                 v-tippy="{
                     delay: '200',
@@ -35,7 +36,7 @@
                 <h2 slot="header" class="text-xl font-bold">{{ $t('editor.slides.copyFromLang') }}</h2>
                 <div class="flex flex-col">
                     <button
-                        class="w-32 h-12 ml-0"
+                        class="editor-toc-button editor-button w-32 h-12 ml-0"
                         @click="copyAllFromOtherLang(configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides)"
                     >
                         {{ $t('editor.slides.copyAll') }}
@@ -54,6 +55,7 @@
                         </select>
 
                         <button
+                            class="editor-toc-button"
                             @click="
                                 copyFromOtherLang(
                                     configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides[selectedForCopying]
@@ -87,14 +89,14 @@
                         </div>
                         <div class="flex">
                             <div class="flex flex-col">
-                                <button @click.stop="$vfm.open(`delete-slide-${index}`)">
+                                <button class="slide-toc-button" @click.stop="$vfm.open(`delete-slide-${index}`)">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                         <path
                                             d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
                                         />
                                     </svg>
                                 </button>
-                                <button @click.stop="copySlide(index)">
+                                <button class="slide-toc-button" @click.stop="copySlide(index)">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                                         <path
                                             d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z"
@@ -104,6 +106,7 @@
                             </div>
                             <div class="flex flex-col mr-2 ml-1 my-1">
                                 <button
+                                    class="slide-toc-button"
                                     :class="index == 0 ? 'text-gray-500 cursor-not-allowed' : ''"
                                     @click.stop="moveUp(index)"
                                     :disabled="index == 0"
@@ -113,7 +116,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="rotate-180 transform"
+                                    class="slide-toc-button rotate-180 transform"
                                     :class="index == slides.length - 1 ? 'text-gray-500 cursor-not-allowed' : ''"
                                     @click.stop="moveDown(index)"
                                     :disabled="index == slides.length - 1"
@@ -295,14 +298,14 @@ export default class SlideTocV extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.toc-slide button {
+.toc-slide-button {
     border: none !important;
     background: none !important;
     padding: 0 !important;
     margin: 0 !important;
 }
 
-.toc-slide button:hover {
+.toc-slide-button:hover {
     background: none !important;
 }
 

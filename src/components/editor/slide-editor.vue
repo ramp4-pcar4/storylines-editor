@@ -2,22 +2,27 @@
     <div class="sticky top-20 h-auto self-start flex-grow m-5">
         <div v-if="!!currentSlide">
             <div class="flex">
-                <div class="flex flex-col">
-                    <label>Slide title:</label>
+                <div class="flex flex-col w-full">
+                    <label class="editor-label">Slide title:</label>
                     <div class="flex">
-                        <input type="text" v-model="currentSlide.title" placeholder="Add a title" class="w-2/3" />
+                        <input
+                            type="text"
+                            v-model="currentSlide.title"
+                            placeholder="Add a title"
+                            class="editor-input w-2/3"
+                        />
                         <span class="ml-auto"></span>
                         <button
                             @click.stop="selectSlide(slideIndex - 1)"
                             :disabled="slideIndex === 0"
-                            class="border border-black"
+                            class="editor-button border border-black"
                         >
                             {{ $t('editor.slides.previousSlide') }}
                         </button>
                         <button
                             @click.stop="selectSlide(slideIndex + 1)"
                             :disabled="isLast"
-                            class="border border-black"
+                            class="editor-button border border-black"
                         >
                             {{ $t('editor.slides.nextSlide') }}
                         </button>
@@ -26,7 +31,7 @@
                         <span class="mx-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
                         <input
                             type="checkbox"
-                            class="rounded-none cursor-pointer w-4 h-4"
+                            class="editor-input rounded-none cursor-pointer w-4 h-4"
                             v-model="rightOnly"
                             :disabled="rightOnly && currentSlide.panel[panelIndex].type === 'dynamic'"
                             @change.stop="$vfm.open(`right-only-${slideIndex}`)"
@@ -43,7 +48,7 @@
                             saveChanges();
                         }
                     "
-                    class="border-t border-l border-r"
+                    class="editor-button border-t border-l border-r"
                     :class="panelIndex == 0 ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
@@ -89,7 +94,7 @@
                             saveChanges();
                         }
                     "
-                    class="border-t border-l border-r"
+                    class="editor-button border-t border-l border-r"
                     :class="panelIndex == 1 ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
@@ -137,7 +142,7 @@
                             saveChanges();
                         }
                     "
-                    class="border-t border-l border-r border-black"
+                    class="editor-button border-t border-l border-r border-black"
                 >
                     <span class="align-middle inline-block">
                         <svg
@@ -182,7 +187,7 @@
                     <span class="font-bold text-xl">{{ $t('editor.slides.content') }}:</span>
                     <span class="ml-auto flex-grow"></span>
                     <div v-if="panelIndex === 1 || rightOnly" class="flex flex-col mr-8">
-                        <label class="text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
+                        <label class="editor-label text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
                         <select
                             ref="typeSelector"
                             @input="
@@ -212,6 +217,7 @@
                     :lang="lang"
                     :uid="uid"
                     :sourceCounts="sourceCounts"
+                    @slide-edit="$emit('slide-edit')"
                 ></component>
             </div>
         </div>

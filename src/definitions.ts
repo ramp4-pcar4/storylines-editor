@@ -20,9 +20,7 @@ export interface ConfigFileStructure {
     charts: {
         [key: string]: JSZip;
     };
-    rampConfig: {
-        [key: string]: JSZip;
-    };
+    rampConfig: JSZip;
 }
 
 export interface SourceCounts {

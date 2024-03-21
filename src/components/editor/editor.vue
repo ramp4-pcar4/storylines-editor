@@ -30,7 +30,7 @@
             <button
                 v-if="unsavedChanges"
                 @click="$vfm.open(`reload-config`)"
-                class="border-2 border-red-700 text-red-700 rounded p-1 mr-2"
+                class="editor-button border-2 border-red-700 text-red-700 rounded p-1 mr-2"
                 v-tippy="{
                     delay: '200',
                     placement: 'bottom',
@@ -69,10 +69,10 @@
                 </span>
             </transition>
             <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
-            <button @click="preview" class="bg-white border border-black hover:bg-gray-100">
+            <button @click="preview" class="editor-button bg-white border border-black hover:bg-gray-100">
                 {{ $t('editor.preview') }}
             </button>
-            <button @click="saveChanges" class="bg-black text-white hover:bg-gray-900" :disabled="saving">
+            <button @click="saveChanges" class="editor-button bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
                 <span v-if="saving" class="align-middle inline-block px-1">
                     <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
@@ -82,7 +82,7 @@
         <div class="flex">
             <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
                 <div class="flex items-center justify-center border-b p-2">
-                    <button @click.stop="$vfm.open('metadata-edit-modal')">
+                    <button class="editor-toc-button editor-button" @click.stop="$vfm.open('metadata-edit-modal')">
                         <span class="align-middle inline-block px-1"
                             ><svg
                                 clip-rule="evenodd"
@@ -123,7 +123,7 @@
                 :isLast="slideIndex === slides.length - 1"
                 :uid="uuid"
                 @slide-change="selectSlide"
-                @slide-edit="onSlidesEdited"
+                @slide-edit="$emit('save-status', true)"
                 :sourceCounts="sourceCounts"
             ></slide-editor>
         </div>
@@ -242,9 +242,7 @@ export default class EditorV extends Vue {
     preview(): void {
         // save current slide final changes before previewing product
         if (this.$refs.slide !== undefined) {
-            this.$nextTick(() => {
-                (this.$refs.slide as SlideEditorV).saveChanges();
-            });
+            (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
         setTimeout(() => {
@@ -260,9 +258,7 @@ export default class EditorV extends Vue {
     saveChanges(): void {
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
-            this.$nextTick(() => {
-                (this.$refs.slide as SlideEditorV).saveChanges();
-            });
+            (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
         // emit save changes event
@@ -279,23 +275,23 @@ export default class EditorV extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .editor-container {
     margin: 0 auto;
 }
 
-.editor-container label {
+.editor-label {
     width: 10vw;
     text-align: right;
     margin-right: 15px;
     display: inline-block;
 }
 
-.editor-container h3 {
+.editor-h3 {
     font-size: larger;
 }
 
-.editor-container input {
+.editor-input {
     padding: 5px 10px;
     margin-top: 5px;
     border: 1px solid black;
@@ -306,25 +302,25 @@ export default class EditorV extends Vue {
     border: 1px solid red;
 }
 
-.editor-container button {
+.editor-button {
     padding: 5px 12px;
     margin: 0px 10px;
     font-weight: 600;
     transition-duration: 0.2s;
 }
 
-.editor-container button:hover:enabled {
+.editor-button:hover:enabled {
     background-color: #dbdbdb;
     color: black;
 }
 
-.editor-container button:disabled {
+.editor-button:disabled {
     border: 1px solid gray;
     color: gray;
     cursor: not-allowed;
 }
 
-.editor-toc button {
+.editor-toc-button {
     background-color: #f3f4f6;
     color: black;
     border: none;
