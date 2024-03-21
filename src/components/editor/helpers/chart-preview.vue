@@ -67,12 +67,15 @@ import {
     DQVChartConfig,
     LineSeriesData,
     PieDataRow,
-    PieSeriesData
+    PieSeriesData,
+    SourceCounts
 } from '@/definitions';
 
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
     @Prop() configFileStructure!: ConfigFileStructure;
+    @Prop() sourceCounts!: SourceCounts;
+    @Prop() lang!: string;
 
     loading = true;
     chartIdx = 0;
@@ -107,15 +110,30 @@ export default class ChartPreviewV extends Vue {
             },
             (newChart: string) => {
                 const chart = JSON.parse(newChart);
-                const chartConfig = {
-                    name: chart.title.text,
-                    config: chart,
-                    src: ''
-                };
-                this.$emit('edit', { oldChart: this.chart, newChart: chartConfig });
-                this.chartConfig = chartConfig;
-                this.chartName = chartConfig.name;
-                this.chartIdx += 1;
+                const newName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
+
+                // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
+                if (this.sourceCounts[newName] > 0 && chart.title.text != this.chart.name) {
+                    alert(
+                        this.$t('editor.chart.label.nameExists', {
+                            name: chart.title.text
+                        })
+                    );
+
+                    // Re-open the editor the the issue can be fixed.
+                    setTimeout(() => this.modalEditor.show(), 100);
+                } else {
+                    const chartConfig = {
+                        name: chart.title.text,
+                        config: chart,
+                        src: ''
+                    };
+
+                    this.$emit('edit', { oldChart: this.chart, newChart: chartConfig });
+                    this.chartConfig = chartConfig;
+                    this.chartName = chartConfig.name;
+                    this.chartIdx += 1;
+                }
             }
         );
 
