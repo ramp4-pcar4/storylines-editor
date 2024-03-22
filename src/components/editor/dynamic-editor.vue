@@ -101,13 +101,15 @@ import {
     MapPanel,
     PanelType,
     SlideshowPanel,
-    SourceCounts
+    SourceCounts,
+    VideoPanel
 } from '@/definitions';
 
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
+import VideoEditorV from './video-editor.vue';
 
 @Options({
     components: {
@@ -115,7 +117,8 @@ import MapEditorV from './map-editor.vue';
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
         'dynamic-editor': DynamicEditorV,
-        'map-editor': MapEditorV
+        'map-editor': MapEditorV,
+        'video-editor': VideoEditorV
     }
 })
 export default class DynamicEditorV extends Vue {
@@ -129,7 +132,8 @@ export default class DynamicEditorV extends Vue {
         image: 'image-editor',
         slideshow: 'image-editor',
         chart: 'chart-editor',
-        map: 'map-editor'
+        map: 'map-editor',
+        video: 'video-editor'
     };
 
     startingConfig: DefaultConfigs = {
@@ -158,6 +162,12 @@ export default class DynamicEditorV extends Vue {
             config: '',
             title: '',
             scrollguard: false
+        },
+        video: {
+            type: PanelType.Video,
+            title: '',
+            videoType: '',
+            src: ''
         }
     };
 
@@ -227,6 +237,19 @@ export default class DynamicEditorV extends Vue {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
                     }
                 });
+                break;
+            }
+
+            case 'video': {
+                const videoPanel = panel as VideoPanel;
+                if (videoPanel.videoType === 'local') {
+                    this.sourceCounts[videoPanel.src] -= 1;
+                    if (this.sourceCounts[videoPanel.src] === 0) {
+                        this.configFileStructure.zip.remove(
+                            `${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`
+                        );
+                    }
+                }
                 break;
             }
         }

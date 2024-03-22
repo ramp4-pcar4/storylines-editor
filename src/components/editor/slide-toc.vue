@@ -40,7 +40,7 @@
                     >
                         {{ $t('editor.slides.copyAll') }}
                     </button>
-                    <span class="text-lg font-bold my-6"> {{ $t('editor.image.label.or') }} </span>
+                    <span class="text-lg font-bold my-6"> {{ $t('editor.or') }} </span>
                     <div class="flex">
                         <select v-model="selectedForCopying" class="overflow-ellipsis copy-select">
                             <option
@@ -150,7 +150,8 @@ import {
     Slide,
     SlideshowPanel,
     SourceCounts,
-    TextPanel
+    TextPanel,
+    VideoPanel
 } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import cloneDeep from 'clone-deep';
@@ -270,6 +271,19 @@ export default class SlideTocV extends Vue {
                         this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
                     }
                 });
+                break;
+            }
+
+            case 'video': {
+                const videoPanel = panel as VideoPanel;
+                if (videoPanel.videoType === 'local') {
+                    this.sourceCounts[videoPanel.src] -= 1;
+                    if (this.sourceCounts[videoPanel.src] === 0) {
+                        this.configFileStructure.zip.remove(
+                            `${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`
+                        );
+                    }
+                }
                 break;
             }
 
