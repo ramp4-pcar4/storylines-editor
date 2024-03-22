@@ -212,6 +212,7 @@
                     :lang="lang"
                     :uid="uid"
                     :sourceCounts="sourceCounts"
+                    @slide-edit="$emit('slide-edit')"
                 ></component>
             </div>
         </div>

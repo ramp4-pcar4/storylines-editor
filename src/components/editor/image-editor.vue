@@ -25,7 +25,7 @@
                             {{ $t('editor.image.label.upload') }}
                         </div>
                     </span>
-                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple="multiple" />
+                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple />
                 </span>
             </label>
         </div>
