@@ -28,7 +28,7 @@
                             type="checkbox"
                             class="rounded-none cursor-pointer w-4 h-4"
                             v-model="rightOnly"
-                            :disabled="rightOnly && currentSlide.panel[panelIndex].type === 'dynamic'"
+                            :disabled="rightOnly && determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
                             @change.stop="$vfm.open(`right-only-${slideIndex}`)"
                         />
                     </div>
@@ -189,14 +189,12 @@
                                 $vfm.open(`change-slide-${slideIndex}`);
                                 newType = $event.target.value;
                             "
-                            :value="currentSlide.panel[panelIndex].type"
+                            :value="determineEditorType(currentSlide.panel[panelIndex])"
                         >
                             <option
-                                v-for="thing in Object.keys(editors).filter(
-                                    (editor) => editor !== 'slideshow' && editor !== 'loading'
-                                )"
+                                v-for="thing in Object.keys(editors).filter((editor) => editor !== 'loading')"
                                 :key="thing"
-                                :value="thing === 'image' ? 'slideshow' : thing"
+                                :value="thing"
                             >
                                 {{ thing }}
                             </option>
@@ -205,8 +203,8 @@
                 </div>
                 <component
                     ref="editor"
-                    :is="editors[currentSlide.panel[panelIndex].type]"
-                    :key="panelIndex + currentSlide.panel[panelIndex].type"
+                    :is="editors[determineEditorType(currentSlide.panel[panelIndex])]"
+                    :key="panelIndex + determineEditorType(currentSlide.panel[panelIndex])"
                     :panel="currentSlide.panel[panelIndex]"
                     :configFileStructure="configFileStructure"
                     :lang="lang"
@@ -222,7 +220,7 @@
         <confirmation-modal
             :name="`change-slide-${slideIndex}`"
             :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
-            @ok="changePanelType(currentSlide.panel[panelIndex].type, newType)"
+            @ok="changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType)"
             @Cancel="cancelTypeChange"
         />
         <confirmation-modal
@@ -258,6 +256,7 @@ import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
+import SlideshowEditorV from './slideshow-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
@@ -268,6 +267,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
         'map-editor': MapEditorV,
+        'slideshow-editor': SlideshowEditorV,
         'loading-page': LoadingPageV,
         'dynamic-editor': DynamicEditorV,
         'confirmation-modal': ConfirmationModalV
@@ -290,7 +290,7 @@ export default class SlideEditorV extends Vue {
     editors: Record<string, string> = {
         text: 'text-editor',
         image: 'image-editor',
-        slideshow: 'image-editor',
+        slideshow: 'slideshow-editor',
         chart: 'chart-editor',
         map: 'map-editor',
         loading: 'loading-page',
@@ -324,11 +324,16 @@ export default class SlideEditorV extends Vue {
             },
             slideshow: {
                 type: PanelType.Slideshow,
-                images: []
+                items: [],
+                userCreated: true
+            },
+            image: {
+                type: PanelType.Image,
+                src: ''
             },
             chart: {
                 type: PanelType.Chart,
-                charts: []
+                src: ''
             },
             map: {
                 type: PanelType.Map,
@@ -365,24 +370,30 @@ export default class SlideEditorV extends Vue {
                 break;
             }
 
+            case 'image': {
+                const imagePanel = panel as ImagePanel;
+                this.sourceCounts[imagePanel.src] -= 1;
+                if (this.sourceCounts[imagePanel.src] === 0) {
+                    this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
+                }
+
+                break;
+            }
+
             case 'chart': {
                 const chartPanel = panel as ChartPanel;
-                chartPanel.charts.forEach((chart: ChartConfig) => {
-                    this.sourceCounts[chart.src] -= 1;
-                    if (this.sourceCounts[chart.src] === 0) {
-                        this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
-                    }
-                });
+                this.sourceCounts[chartPanel.src] -= 1;
+                if (this.sourceCounts[chartPanel.src] === 0) {
+                    this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
+                }
+
                 break;
             }
 
             case 'slideshow': {
                 const slideshowPanel = panel as SlideshowPanel;
-                slideshowPanel.images.forEach((image: ImagePanel) => {
-                    this.sourceCounts[image.src] -= 1;
-                    if (this.sourceCounts[image.src] === 0) {
-                        this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
-                    }
+                slideshowPanel.items.forEach((item: TextPanel | ImagePanel | MapPanel | ChartPanel) => {
+                    this.removeSourceCounts(item);
                 });
                 break;
             }
@@ -392,6 +403,10 @@ export default class SlideEditorV extends Vue {
                 dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
                     this.removeSourceCounts(subPanel.panel);
                 });
+                break;
+            }
+
+            case 'text': {
                 break;
             }
         }
@@ -411,7 +426,26 @@ export default class SlideEditorV extends Vue {
     }
 
     cancelTypeChange(): void {
-        (this.$refs.typeSelector as HTMLSelectElement).value = this.currentSlide.panel[this.panelIndex].type;
+        (this.$refs.typeSelector as HTMLSelectElement).value = this.determineEditorType(
+            this.currentSlide.panel[this.panelIndex]
+        );
+    }
+
+    determineEditorType(panel: BasePanel): string {
+        if (panel.type !== PanelType.Slideshow) return panel.type;
+        if ((panel as SlideshowPanel).items.length === 0 || (panel as SlideshowPanel).userCreated)
+            return PanelType.Slideshow;
+
+        // Determine whether the slideshow consists of only charts. If so, display the chart editor.
+        const allCharts = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Chart);
+        if (allCharts) return PanelType.Chart;
+
+        // Determine whether the slideshow consists of only images. If so, display the image editor.
+        const allImages = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Image);
+        if (allImages) return PanelType.Image;
+
+        // Otherwise display the slideshow editor.
+        return PanelType.Slideshow;
     }
 
     toggleRightOnly(): void {

@@ -251,24 +251,30 @@ export default class SlideTocV extends Vue {
                 break;
             }
 
+            case 'image': {
+                const imagePanel = panel as ImagePanel;
+                this.sourceCounts[imagePanel.src] -= 1;
+                if (this.sourceCounts[imagePanel.src] === 0) {
+                    this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
+                }
+
+                break;
+            }
+
             case 'chart': {
                 const chartPanel = panel as ChartPanel;
-                chartPanel.charts.forEach((chart: ChartConfig) => {
-                    this.sourceCounts[chart.src] -= 1;
-                    if (this.sourceCounts[chart.src] === 0) {
-                        this.configFileStructure.zip.remove(`${chart.src.substring(chart.src.indexOf('/') + 1)}`);
-                    }
-                });
+                this.sourceCounts[chartPanel.src] -= 1;
+                if (this.sourceCounts[chartPanel.src] === 0) {
+                    this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
+                }
+
                 break;
             }
 
             case 'slideshow': {
                 const slideshowPanel = panel as SlideshowPanel;
-                slideshowPanel.images.forEach((image: ImagePanel) => {
-                    this.sourceCounts[image.src] -= 1;
-                    if (this.sourceCounts[image.src] === 0) {
-                        this.configFileStructure.zip.remove(`${image.src.substring(image.src.indexOf('/') + 1)}`);
-                    }
+                slideshowPanel.items.forEach((item: TextPanel | MapPanel | ChartPanel | ImagePanel) => {
+                    this.removeSourceHelper(item);
                 });
                 break;
             }
@@ -278,6 +284,10 @@ export default class SlideTocV extends Vue {
                 dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
                     this.removeSourceHelper(subPanel.panel);
                 });
+                break;
+            }
+
+            case 'text': {
                 break;
             }
         }
