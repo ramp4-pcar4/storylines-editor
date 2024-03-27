@@ -8,7 +8,10 @@
 
     <div v-else-if="loadStatus === 'loaded'">
         <div class="storyramp-app bg-white" v-if="config !== undefined">
-            <header class="sticky top-0 z-50 flex border-b border-black bg-gray-200 py-2 px-2 justify-between">
+            <header
+                id="story-header"
+                class="story-header sticky top-0 flex border-b border-black bg-gray-200 py-2 px-2 justify-between"
+            >
                 <div class="w-mobile-full truncate">
                     <span class="font-semibold text-lg m-1">{{ config.title }}</span>
                 </div>
@@ -22,6 +25,7 @@
                     :configFileStructure="configFileStructure"
                     :lang="lang"
                     :plugin="true"
+                    :headerHeight="headerHeight"
                     @step="updateActiveIndex"
                 />
             </div>
@@ -65,6 +69,7 @@ export default class StoryPreviewV extends Vue {
     loadStatus = 'loading';
     activeChapterIndex = -1;
     lang = 'en';
+    headerHeight = 0;
     uid = '';
 
     created(): void {
@@ -100,6 +105,11 @@ export default class StoryPreviewV extends Vue {
 
     updateActiveIndex(idx: number): void {
         this.activeChapterIndex = idx;
+        //determine header height
+        const headerH = document.getElementById('story-header');
+        if (headerH) {
+            this.headerHeight = headerH.clientHeight;
+        }
     }
 }
 </script>
@@ -123,6 +133,10 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-family: $font-list;
         line-height: 1.5;
         border-bottom: 0px;
+    }
+
+    .story-header {
+        z-index: 60;
     }
 
     .storyramp-modified {

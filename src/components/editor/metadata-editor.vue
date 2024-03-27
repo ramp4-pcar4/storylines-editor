@@ -244,6 +244,7 @@ export default class MetadataEditorV extends Vue {
         logoAltText: '',
         contextLink: '',
         contextLabel: '',
+        tocOrientation: '',
         dateModified: ''
     };
     // add more required metadata fields to here as needed
@@ -272,6 +273,8 @@ export default class MetadataEditorV extends Vue {
             const month = (curDate.getMonth() + 1).toString().padStart(2, '0');
             const day = curDate.getDate().toString().padStart(2, '0');
             this.metadata.dateModified = `${year}-${month}-${day}`;
+            // set vertical as the default table of contents orientation
+            this.metadata.tocOrientation = 'vertical';
         }
 
         // Find which view to render based on route
@@ -379,6 +382,7 @@ export default class MetadataEditorV extends Vue {
             slides: [],
             contextLabel: this.metadata.contextLabel,
             contextLink: this.metadata.contextLink,
+            tocOrientation: this.metadata.tocOrientation,
             dateModified: this.metadata.dateModified
         };
     }
@@ -555,6 +559,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.introSubtitle = config.introSlide.subtitle;
         this.metadata.contextLink = config.contextLink;
         this.metadata.contextLabel = config.contextLabel;
+        this.metadata.tocOrientation = config.tocOrientation;
         this.metadata.dateModified = config.dateModified;
 
         // Conversion for individual image panels to slideshow for gallery display
@@ -647,7 +652,14 @@ export default class MetadataEditorV extends Vue {
     }
 
     updateMetadata(
-        key: 'title' | 'introTitle' | 'introSubtitle' | 'contextLink' | 'contextLabel' | 'dateModified',
+        key:
+            | 'title'
+            | 'introTitle'
+            | 'introSubtitle'
+            | 'contextLink'
+            | 'contextLabel'
+            | 'tocOrientation'
+            | 'dateModified',
         value: string
     ): void {
         this.metadata[key] = value;
@@ -667,6 +679,7 @@ export default class MetadataEditorV extends Vue {
             config.introSlide.subtitle = this.metadata.introSubtitle;
             config.contextLink = this.metadata.contextLink;
             config.contextLabel = this.metadata.contextLabel;
+            config.tocOrientation = this.metadata.tocOrientation;
             config.dateModified = this.metadata.dateModified;
 
             // If the logo section is missing, create it here before overwriting values.
@@ -710,7 +723,8 @@ export default class MetadataEditorV extends Vue {
             dateModified: '',
             logoPreview: '',
             logoName: '',
-            logoAltText: ''
+            logoAltText: '',
+            tocOrientation: ''
         };
         this.configs = { en: undefined, fr: undefined };
         this.slides = [];

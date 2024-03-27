@@ -7,6 +7,7 @@ export interface StoryRampConfig {
     slides: Slide[];
     contextLink: string;
     contextLabel: string;
+    tocOrientation: string;
     dateModified: string;
 }
 
@@ -38,6 +39,7 @@ export interface MetadataContent {
     logoAltText: string;
     contextLink: string;
     contextLabel: string;
+    tocOrientation: string;
     dateModified: string;
 }
 
