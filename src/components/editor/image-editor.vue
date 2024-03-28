@@ -2,13 +2,13 @@
     <div class="block">
         <!-- Upload images area -->
         <div
-            class="upload-image text-center m-5 p-12 bg-blue-100 border-4 border-dashed border-blue-300"
+            class="upload-image flex items-center justify-center m-5 p-12 bg-blue-100 border-4 border-dashed border-blue-300"
             :class="{ dragging: isDragging }"
             @dragover.prevent="() => (dragging = true)"
             @dragleave.prevent="() => (dragging = false)"
             @drop.prevent="dropImages($event)"
         >
-            <label class="flex drag-label cursor-pointer">
+            <label class="editor-label flex drag-label cursor-pointer">
                 <span class="align-middle inline-block pr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
                         <path
@@ -25,7 +25,7 @@
                             {{ $t('editor.image.label.upload') }}
                         </div>
                     </span>
-                    <input type="file" class="cursor-pointer" @change="onFileChange" multiple />
+                    <input type="file" class="editor-input cursor-pointer" @change="onFileChange" multiple />
                 </span>
             </label>
         </div>
@@ -45,21 +45,31 @@
             <template #item="{ element, index }">
                 <ImagePreview :key="`${element.id}-${index}`" :imageFile="element" @delete="deleteImage">
                     <div class="flex mt-4 items-center w-full text-left">
-                        <label class="text-label">{{ $t('editor.image.altTag') }}:</label>
-                        <input class="w-4/5" type="text" v-model="element.altText" @change="onImagesEdited" />
+                        <label class="editor-label text-label">{{ $t('editor.image.altTag') }}:</label>
+                        <input
+                            class="editor-input w-4/5"
+                            type="text"
+                            v-model="element.altText"
+                            @change="onImagesEdited"
+                        />
                     </div>
 
                     <div class="flex mt-4 items-center w-full text-left">
-                        <label class="text-label">{{ $t('editor.image.label.caption') }}:</label>
-                        <input class="w-4/5" type="text" v-model="element.caption" @change="onImagesEdited" />
+                        <label class="editor-label text-label">{{ $t('editor.image.label.caption') }}:</label>
+                        <input
+                            class="editor-input w-4/5"
+                            type="text"
+                            v-model="element.caption"
+                            @change="onImagesEdited"
+                        />
                     </div>
                 </ImagePreview>
             </template>
         </draggable>
 
         <div v-show="imagePreviews.length > 1" class="flex items-center w-full text-left">
-            <label class="text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
-            <input class="w-3/5" type="text" v-model="slideshowCaption" @change="onImagesEdited" />
+            <label class="editor-label text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
+            <input class="editor-input w-3/5" type="text" v-model="slideshowCaption" @change="onImagesEdited" />
         </div>
     </div>
 </template>

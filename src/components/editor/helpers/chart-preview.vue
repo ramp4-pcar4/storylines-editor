@@ -2,7 +2,7 @@
     <li class="chart-item items-center mt-8 mx-5 overflow-hidden">
         <div class="relative border-solid border-2 items-center justify-center text-center w-full">
             <button
-                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-0 p-0 z-10 cursor-pointer"
+                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-0 p-0 z-10 cursor-pointer"
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
@@ -19,7 +19,9 @@
                     />
                 </svg>
             </button>
-            <button class="bg-white absolute h-6 w-6 leading-5 rounded-full bottom-2 -right-1 p-0 z-10 handle">
+            <button
+                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full bottom-2 -right-1 p-0 z-10 handle"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22px" height="22px" viewBox="0 0 24 24">
                     <path
                         fill-rule="evenodd"
@@ -39,11 +41,14 @@
         </div>
         <!-- chart description and edit  -->
         <div class="flex mt-4 items-center">
-            <label class="name-label font-bold flex-2"
+            <label class="editor-label name-label font-bold flex-2"
                 >{{ $t('editor.chart.label.name') }}: <span class="font-normal">{{ chartName }}</span></label
             >
             <!-- edit button -->
-            <button class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200" :id="`edit-${chart.name}-btn`">
+            <button
+                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
+                :id="`edit-${chart.name}-btn`"
+            >
                 <div class="flex items-center">
                     <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
                         <path

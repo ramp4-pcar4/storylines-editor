@@ -1,19 +1,16 @@
 <template>
     <div class="flex flex-col">
-        <label class="text-left">{{ $t('editor.map.title') }}:</label>
-        <input type="text" v-model="panel.title" />
+        <label class="editor-label text-left">{{ $t('editor.map.title') }}:</label>
+        <input class="editor-input" type="text" v-model="panel.title" />
 
-        <div v-if="status === 'editing'">
-            <label class="mt-6">{{ $t('editor.map.scrollguard.enable') }}:</label>
-            <input type="checkbox" @change="saveScrollguard" v-model="panel.scrollguard" />
-            <span class="ml-6"></span>
-            <label class="mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
-            <input type="checkbox" @change="saveTimeSlider" v-model="usingTimeSlider" />
+        <div>
+            <label class="editor-label mt-6">{{ $t('editor.map.timeslider.enable') }}</label>
+            <input class="editor-input" type="checkbox" @change="saveTimeSlider" v-model="usingTimeSlider" />
             <span class="mx-4"></span>
             <button
                 v-if="usingTimeSlider"
                 @click="$vfm.open('time-slider-edit-modal')"
-                class="bg-black text-white hover:bg-gray-800 mt-3"
+                class="editor-button bg-black text-white hover:bg-gray-800 mt-3"
             >
                 {{ $t('editor.map.timeslider.edit') }}
             </button>
@@ -21,44 +18,7 @@
 
             <div class="mb-4" v-if="usingTimeSlider"></div>
 
-            <div class="flex justify-between mb-4">
-                <label class="mt-2">{{ $t('editor.map.edit') }}:</label>
-                <button
-                    class="border border-black hover:bg-gray-100"
-                    @click="
-                        () => {
-                            status = 'default';
-                        }
-                    "
-                >
-                    {{ $t('editor.map.edit.cancel') }}
-                </button>
-            </div>
-            <iframe
-                src="scripts/ramp-editor/samples/fgpv-author.html"
-                style="width: 70vw; height: 100vh"
-                id="RAMPeditorframe"
-            ></iframe>
-        </div>
-        <div v-if="status === 'creating'">
-            <label class="text-left mt-2">{{ $t('editor.map.label.name') }}*:</label>
-            <div class="flex flex-row items-center"><input type="text" v-model="newFileName" />.json</div>
-
-            <ul class="flex flex-wrap list-none justify-center" v-if="newFileName != ''">
-                <li class="map-item items-center my-8 mx-5 overflow-hidden" @click="createNewConfig">
-                    <div class="add-map"></div>
-                    {{ $t('editor.map.label.create') }}
-                </li>
-            </ul>
-        </div>
-        <div v-if="status === 'default'">
-            <label class="text-left mt-2">{{ $t('editor.map.edit') }}:</label>
-            <ul class="flex flex-wrap list-none justify-center">
-                <li class="map-item items-center my-8 mx-5 overflow-hidden" @click="openEditor">
-                    <div class="edit-map"></div>
-                    {{ $t('editor.map.label.edit') }}
-                </li>
-            </ul>
+            <div class="ramp-editor mt-5" ref="editor" style="width: 70vw; height: 80vh"></div>
         </div>
         <vue-final-modal
             modalId="time-slider-edit-modal"
@@ -73,6 +33,7 @@
             ></time-slider-editor>
             <div class="w-full flex justify-end">
                 <button
+                    class="editor-button"
                     :class="timeSliderError ? '' : 'bg-black text-white hover:bg-gray-800'"
                     :disabled="timeSliderError"
                     @click="saveTimeSlider"
@@ -88,9 +49,10 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
-import defaultConfigEn from '../../../public/scripts/ramp-editor/samples/map_en.json';
-import defaultConfigFr from '../../../public/scripts/ramp-editor/samples/map_fr.json';
+import defaultConfig from '../../../public/ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
+import { createInstance } from 'ramp-config-editor_editeur-config-pcar';
+import 'ramp-config-editor_editeur-config-pcar/dist/style.css';
 
 @Options({
     components: {
@@ -104,6 +66,9 @@ export default class MapEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
 
+    // config editor
+    rampEditorApi: any = '';
+
     // For creating new files.
     newFileName = '';
 
@@ -112,11 +77,9 @@ export default class MapEditorV extends Vue {
     timeSliderError = false;
     timeSliderConf: TimeSliderConfig = { range: [], start: [], attribute: '' };
     status = this.panel.config !== '' ? 'default' : 'creating';
-    strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[3].split('.')[0] : '';
+    strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[2].split('.')[0] : '';
 
     mounted(): void {
-        // If a message is received, it means the map save button was pressed.
-        window.addEventListener('message', this.saveEditor);
         this.timeSliderConf = JSON.parse(
             JSON.stringify({
                 range: this.panel.timeSlider?.range ?? [1000, new Date().getFullYear()],
@@ -124,18 +87,27 @@ export default class MapEditorV extends Vue {
                 attribute: this.panel.timeSlider?.attribute ?? ''
             })
         );
+        window.addEventListener('ramp4-config-edited', this.onConfigEdit);
         this.validateTimeSlider();
+
+        if (this.status === 'creating') {
+            this.createNewConfig();
+        }
+
+        this.openEditor();
     }
 
     beforeDestroy(): void {
-        window.removeEventListener('message', this.saveEditor);
+        window.removeEventListener('ramp4-config-edited', this.onConfigEdit);
     }
 
     createNewConfig(): void {
         // Update the path to the new file.
         // TODO: ensure that this is not a name already in use?
-        this.panel.config = `${this.configFileStructure.uuid}/ramp-config/${this.lang}/${this.newFileName}.json`;
-        this.strippedFileName = this.panel.config.split('/')[3].split('.')[0];
+        this.panel.config = `${this.configFileStructure.uuid}/ramp-config/${this.configFileStructure.uuid}-map-${
+            this.getNumberOfMaps() + 1
+        }.json`;
+        this.strippedFileName = this.panel.config.split('/')[2].split('.')[0];
 
         if (this.sourceCounts[this.panel.config]) {
             this.sourceCounts[this.panel.config] += 1;
@@ -144,9 +116,9 @@ export default class MapEditorV extends Vue {
         }
 
         // Create the new map configuration file in the ZIP folder. Copies the `config-default.json` file from the `ramp-editor` folder and renames it.
-        this.configFileStructure.rampConfig[this.lang].file(
+        this.configFileStructure.rampConfig.file(
             `${this.strippedFileName}.json`,
-            JSON.stringify(this.lang === 'en' ? defaultConfigEn : defaultConfigFr, null, 4)
+            JSON.stringify(defaultConfig, null, 4)
         );
 
         // Display the normal edit page now.
@@ -167,33 +139,20 @@ export default class MapEditorV extends Vue {
 
             if (configFile) {
                 configFile.async('string').then((res: string) => {
-                    window.config = res;
-                    const iframe = document.getElementById('RAMPeditorframe') as HTMLIFrameElement;
-                    if (iframe.contentWindow) {
-                        iframe.contentWindow.config = res;
-                        iframe.contentWindow.configname = this.strippedFileName;
-                    }
+                    const conf = JSON.parse(res);
+                    this.rampEditorApi = createInstance(this.$refs.editor, conf);
                 });
             } else {
                 // If it does not exist in the ZIP folder, try and fetch from server.
                 fetch(this.panel.config).then((data) => {
                     data.json().then((res) => {
                         let stringResponse = JSON.stringify(res);
-
-                        window.config = stringResponse;
-                        const iframe = document.getElementById('RAMPeditorframe') as HTMLIFrameElement;
-                        if (iframe.contentWindow) {
-                            iframe.contentWindow.config = stringResponse;
-                            iframe.contentWindow.configname = this.strippedFileName;
-                        }
+                        const conf = JSON.parse(stringResponse);
+                        this.rampEditorApi = createInstance(this.$refs.editor, conf);
                     });
                 });
             }
         }
-    }
-
-    saveScrollguard($event: Event): void {
-        this.panel.scrollguard = ($event.target as HTMLInputElement).checked;
     }
 
     saveTimeSlider(): void {
@@ -204,18 +163,16 @@ export default class MapEditorV extends Vue {
         this.$vfm.close('time-slider-edit-modal');
     }
 
-    saveEditor(e: MessageEvent): void {
-        if (e.data === 'mapSaved') {
-            this.status = 'default';
+    saveChanges(): void {
+        // Add map config to ZIP file.
+        this.configFileStructure.rampConfig.file(
+            `${this.strippedFileName}.json`,
+            JSON.stringify(this.rampEditorApi.getConfig(), null, 4)
+        );
+    }
 
-            // Add chart config to ZIP file.
-            this.configFileStructure.rampConfig[this.lang].file(
-                `${this.strippedFileName}.json`,
-                JSON.stringify(JSON.parse(localStorage.RAMPconfig), null, 4)
-            );
-
-            this.$emit('slide-edit');
-        }
+    onConfigEdit(): void {
+        this.$emit('slide-edit');
     }
 
     onTimeSliderInput(property: 'range' | 'start' | 'attribute' | 'layers', index: number, value: string): void {
@@ -241,6 +198,14 @@ export default class MapEditorV extends Vue {
             this.timeSliderConf.start.some((val) => val < 0 || !Number.isInteger(val)) ||
             this.timeSliderConf.range[1] < this.timeSliderConf.range[0] ||
             this.timeSliderConf.start[1] < this.timeSliderConf.start[0];
+    }
+
+    getNumberOfMaps(): number {
+        let n = 0;
+        this.configFileStructure.rampConfig.forEach((f) => {
+            n += 1;
+        });
+        return n;
     }
 }
 </script>
@@ -281,5 +246,37 @@ select {
 
 input[type='number'] {
     width: 76px;
+}
+
+:deep(rv-basemap-item .rv-basemap-thumb img) {
+    max-width: none;
+}
+:deep(.rv-details-attrib-value a) {
+    white-space: unset !important;
+}
+
+$font-list: 'Montserrat', -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji,
+    Segoe UI Emoji;
+:deep(.ramp-app) {
+    height: 100%;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .h1,
+    .h2,
+    .h3,
+    .h4,
+    .h5,
+    .h6 {
+        font-family: $font-list;
+        line-height: 1.5;
+    }
+
+    input[type='checkbox'] {
+        margin-top: unset;
+    }
 }
 </style>

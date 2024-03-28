@@ -2,7 +2,7 @@
     <li class="image-item items-center my-8 mx-4 overflow-hidden">
         <div class="relative items-center justify-center text-center w-full grabbable">
             <button
-                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
+                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
                 @click="() => $emit('delete', imageFile)"
                 :content="$t('editor.image.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
