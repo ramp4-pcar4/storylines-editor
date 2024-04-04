@@ -187,7 +187,7 @@
                             ref="typeSelector"
                             @input="
                                 $vfm.open(`change-slide-${slideIndex}`);
-                                newType = $event.target.value;
+                                newType = ($event.target as HTMLInputElement).value;
                             "
                             :value="currentSlide.panel[panelIndex].type"
                         >
@@ -251,13 +251,15 @@ import {
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
-    TextPanel
+    TextPanel,
+    VideoPanel
 } from '@/definitions';
 
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
+import VideoEditorV from './video-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
@@ -268,6 +270,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
         'map-editor': MapEditorV,
+        'video-editor': VideoEditorV,
         'loading-page': LoadingPageV,
         'dynamic-editor': DynamicEditorV,
         'confirmation-modal': ConfirmationModalV
@@ -293,6 +296,7 @@ export default class SlideEditorV extends Vue {
         slideshow: 'image-editor',
         chart: 'chart-editor',
         map: 'map-editor',
+        video: 'video-editor',
         loading: 'loading-page',
         dynamic: 'dynamic-editor'
     };
@@ -335,6 +339,12 @@ export default class SlideEditorV extends Vue {
                 config: '',
                 title: '',
                 scrollguard: false
+            },
+            video: {
+                type: PanelType.Video,
+                title: '',
+                videoType: '',
+                src: ''
             }
         };
 
@@ -387,6 +397,19 @@ export default class SlideEditorV extends Vue {
                 break;
             }
 
+            case 'video': {
+                const videoPanel = panel as VideoPanel;
+                if (videoPanel.videoType === 'local') {
+                    this.sourceCounts[videoPanel.src] -= 1;
+                    if (this.sourceCounts[videoPanel.src] === 0) {
+                        this.configFileStructure.zip.remove(
+                            `${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`
+                        );
+                    }
+                }
+                break;
+            }
+
             case 'dynamic': {
                 const dynamicPanel = panel as DynamicPanel;
                 dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
@@ -400,9 +423,9 @@ export default class SlideEditorV extends Vue {
     saveChanges(): void {
         if (
             this.$refs.editor !== undefined &&
-            typeof (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges === 'function'
+            typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV).saveChanges === 'function'
         ) {
-            (this.$refs.editor as ImageEditorV | ChartEditorV).saveChanges();
+            (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV).saveChanges();
         }
     }
 

@@ -171,7 +171,8 @@ import {
     Slide,
     SlideshowPanel,
     SourceCounts,
-    StoryRampConfig
+    StoryRampConfig,
+    VideoPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
@@ -450,6 +451,10 @@ export default class MetadataEditorV extends Vue {
                 break;
             case 'image':
             case 'video':
+                if ((panel as VideoPanel).videoType === 'local') {
+                    this.incrementSourceCount((panel as VideoPanel).src);
+                }
+                break;
             case 'audio':
                 this.incrementSourceCount((panel as AudioPanel).src);
                 break;
