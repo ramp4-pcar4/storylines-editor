@@ -59,6 +59,7 @@ editor.changeLang.modal,"Are you sure you want to switch languages? Unsaved chan
 editor.frenchConfig,View French Config,1,Afficher la configuration en français,1
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,1
 editor.returnToLanding,Return to Landing,1,Retour à la page d’accueil,1
+editor.customConfig,Are you sure you want to overwrite slide config and save custom changes?,1,Are you sure you want to overwrite slide config and save custom changes?,0
 editor.image.delete,Delete Image,1,Supprimer l'image,1
 editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,1
 editor.image.label.caption,Caption,1,Légende,1
@@ -119,6 +120,7 @@ editor.slides.nextSlide,Next slide,1,Diapositive suivante,1
 editor.slides.leftPanel,Left panel,1,Panneau de gauche,1
 editor.slides.rightPanel,Right panel,1,Panneau de droite,1
 editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
+editor.slides.advanced,Advanced,1,Avancé,0
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1

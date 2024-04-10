@@ -124,6 +124,7 @@
                 :uid="uuid"
                 @slide-change="selectSlide"
                 @slide-edit="onSlidesEdited"
+                @custom-slide-updated="updateCustomSlide"
                 :sourceCounts="sourceCounts"
             ></slide-editor>
         </div>
@@ -225,8 +226,21 @@ export default class EditorV extends Vue {
             this.currentSlide = index === -1 ? '' : (this.loadSlides as Slide[])[index];
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
+            (this.$refs.slide as SlideEditorV).advancedEditorView = false;
             window.scrollTo(0, 0);
         }, 5);
+    }
+
+    /**
+     * Update slide for a custom config made through advanced editor.
+     */
+    updateCustomSlide(slideConfig: Slide, save?: boolean): void {
+        this.currentSlide = slideConfig;
+        // save changes emitted from advanced editor
+        if (save) {
+            this.slides[this.slideIndex] = slideConfig;
+            this.$emit('save-changes');
+        }
     }
 
     /**
@@ -273,7 +287,6 @@ export default class EditorV extends Vue {
         // show popup if when leaving page with unsaved changes
         if (this.unsavedChanges && !window.confirm()) {
             e.preventDefault();
-            e.returnValue = '';
         }
     }
 }

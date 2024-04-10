@@ -89,7 +89,7 @@
                     "type": "text"
                 },
                 {
-                    "images": [
+                    "items": [
                         {
                             "src": "00000000-0000-0000-0000-000000000000/assets/fr/substances/AuroraNorth_RelDisp_FR.PNG",
                             "type": "image"
@@ -135,9 +135,10 @@
                 },
                 {
                     "type": "chart",
-                    "charts": [
+                    "items": [
                         {
                             "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/1.Imperial Oil Resources Limited-Kearl Oil Sands Processing Plant and Mine.csv",
+                            "type": "chart",
                             "options": {
                                 "title": "Usine de Transformation e Mine Kearl D'imperial 2019 Rejets et Éliminations (tonnes)",
                                 "subtitle": "",
@@ -146,6 +147,7 @@
                         },
                         {
                             "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/2.Suncor Energy Oil Sands Limited Partnership-Suncor Energy Inc. Oil Sands.csv",
+                            "type": "chart",
                             "options": {
                                 "title": "Sables bitumineux de Suncor Energy Inc. 2019 Rejets et Éliminations (tonnes)",
                                 "subtitle": "",
@@ -154,6 +156,7 @@
                         },
                         {
                             "src": "410b88da-0ed1-4749-903f-5e76c24e2e5f/charts/fr/substances/3.Syncrude Canada Ltd.-Syncrude Canada Ltd.csv",
+                            "type": "chart",
                             "options": {
                                 "title": "Site de la Mine Syncrude Canada Ltd. 2019 Rejets et Éliminations (tonnes)",
                                 "subtitle": "",
@@ -215,7 +218,7 @@
                     "type": "text"
                 },
                 {
-                    "images": [
+                    "items": [
                         {
                             "src": "00000000-0000-0000-0000-000000000000/assets/fr/tailings/AuroraNorth_Tailings_FR.PNG",
                             "type": "image"

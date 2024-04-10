@@ -13,14 +13,20 @@
             "title": "Overview",
             "panel": [
                 {
-                    "title": "Overview",
+                    "title": "Overview 1",
                     "content": "**Oil Sands Extraction** is part of the National Pollutant Release Inventory's (NPRI) Sector Overview series. This sector overview explores NPRI substances released, disposed, and transferred by this industry. It also summarizes what steps facilities in this sector take to mitigate their environmental impacts.\n\nBusinesses, institutions and other facilities across Canada must report their releases, transfers and disposals of pollutants to air, water and land annually to the Government of Canada's NPRI. The information collected is public, helps governments set environmental priorities and monitor environmental performance, and provides Canadians with an opportunity to learn about pollution in their surroundings.",
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg",
-                    "type": "image",
-                    "caption": "This is a caption for the image."
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg",
+                            "type": "image",
+                            "caption": "This is a caption for the image.",
+                            "id": "NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg"
+                        }
+                    ]
                 }
             ]
         },
@@ -30,7 +36,7 @@
                 {
                     "title": "This Slide Is Dynamic!",
                     "type": "dynamic",
-                    "content": "You can click on one of the following links to change the right panel.\n\n- <a panel='panel-1'>Text Panel</a>\n- <a panel='panel-2'>Image Panel</a>\n- <a panel='panel-3'>Charts Panel</a>\n- <a panel='panel-4'>Map Panel</a>\n- <a panel='panel-5'>Longer text section with table</a>\n- <a href='#/en/00000000-0000-0000-0000-000000000000#2-oil-sands-deposits' target='_self'>Self target link</a>\n- <a panel='panel-6'>Video externally hosted</a>\n- <a panel='panel-7'>Video locally hosted</a>\n\nFun stuff.",
+                    "content": "You can click on one of the following links to change the right panel.\n\n- <a panel='panel-1'>Text Panel</a>\n- <a panel='panel-2'>Image Panel</a>\n- <a panel='panel-3'>Charts Panel</a>\n- <a panel='panel-4'>Map Panel</a>\n- <a panel='panel-5'>Longer text section with table</a> \n\nFun stuff.",
                     "children": [
                         {
                             "id": "panel-1",
@@ -43,20 +49,25 @@
                         {
                             "id": "panel-2",
                             "panel": {
-                                "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
-                                "type": "image"
+                                "type": "slideshow",
+                                "images": [
+                                    {
+                                        "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
+                                        "type": "image",
+                                        "id": "GettyImages-187242601__1554821467033__w1920.jpg"
+                                    }
+                                ]
                             }
                         },
                         {
                             "id": "panel-3",
                             "panel": {
                                 "type": "chart",
-                                "charts": [
+                                "items": [
                                     {
-                                        "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json"
-                                    },
-                                    {
-                                        "src": "ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene.glycol.release.trends.by.sector.2010-2019.tonnes.csv"
+                                        "name": "chartConfig",
+                                        "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json",
+                                        "type": "chart"
                                     }
                                 ]
                             }
@@ -74,30 +85,7 @@
                             "panel": {
                                 "type": "text",
                                 "title": "Longer-form text content with table",
-                                "content": "Barren-ground Caribou\n=====================\n\nSpecies' Status\n---------------\n\n*Dolphin and Union population*\n\n- Special concern in Northwest Territories (2015) and under the *Species at Risk Act* (SARA; 2011)\n\n- Not currently listed under Nunavut legislation\n\n- [The Committee on the Status of Endangered Wildlife in Canada (COSEWIC) assessed as endangered (2017)](https://species-registry.canada.ca/index-en.html#/documents/3366)\n\n*Barren-ground population*\n\n- No species at risk legislation in Yukon\n\n- Threatened in Northwest Territories (2018)\n\n- Accidental/Vagrant in Alberta (2015)\n\n- Migratory in Saskatchewan (2020)\n\n- Not listed under Manitoba and Nunavut legislation, or under SARA\n\n- [COSEWIC assessed as threatened (2016)](https://species-registry.canada.ca/index-en.html#/documents/3189)\n\nConservation Approach\n---------------------\n\n- All partners to facilitate trust-building and cooperation with Indigenous peoples through engagement and collaboration\n\n- Pursue and continue multi-partner venues to collaborate on the recovery of each population, including those that are regional-based (for example, Advisory Committee for Cooperation on Wildlife Management; Bathurst Caribou Advisory Committee; Beverly and Qamanirjuaq Caribou Management Board; Conference of Management Authorities (Northwest Territories)) and international (International Porcupine Caribou Board; Porcupine Caribou Management Board; Porcupine Caribou Technical Committee)\n\n- Pursue on-the-ground collaborative projects led by Indigenous communities, Wildlife Management Boards and other co-management partners, ENGOs, industry, local governments\n\nRecovery Goals\n--------------\n\n*Dolphin and Union population*\n\n- Adaptively co-manage using a community-based approach and fill knowledge gaps using Inuit Qaujimajatuqangit and Indigenous knowledge, community monitoring and scientific methods. Minimize habitat disturbance and preserve sea ice, and allow for local population levels sufficient to sustain traditional Indigenous harvesting activities\n\n*Barren-ground population*\n\n- Promote the conditions needed for recovery, and maintain or restore self-sustaining, resilient populations. Support and maintain the caribou-people relationship, and promote conditions that allow caribou to move and migrate across their historic ranges without barriers\n\nRecovery Planning\n-----------------\n\n*Dolphin and Union population*\n\n- [Dolphin and Union Caribou (*Rangifer tarandus groenlandicus*): Management Plan (2018)](https://species-registry.canada.ca/index-en.html#/consultations/3144); adopted under SARA\n\n*Barren-ground population*\n\nTerritorial and co-management partner recovery and policy documents:\n\n- A Management Plan for the Bathurst Caribou Herd (2004); update ongoing\n\n- [Bathurst Caribou Range Plan (2019)](https://www.enr.gov.nt.ca/en/services/caribou-de-la-toundra/bathurst-caribou-range-plan)\n\n- Belarewı́le Gots'ę́ Ɂekwę́ Caribou for All Time - A Délı̨nę Got'ı̨nę Plan of Action (2015)\n\n- Beverly and Qamanirjuaq Caribou Management Plan 2013-2022 (2014)\n\n- Łutsël K'é Dene Fırst Nation's Yúnethé X́á Ɂetthën Hádı (Caribou Stewardship Plan) (2020)\n\n- [Recovery Strategy for Barren-ground Caribou in the Northwest Territories (2020)](https://www.nwtspeciesatrisk.ca/sites/enr-species-at-risk/files/barren-ground_caribou_recovery_strategy_final_8april2020.pdf); all Northwest Territories herds minus Porcupine herd (English only)\n\n- [Consensus Agreement on Accepting the Recovery Strategy for Barren-ground Caribou in the Northwest Territories (2020)](https://www.nwtspeciesatrisk.ca/sites/enr-species-at-risk/files/consensus_agreement_bgc_recovery_strategy_signed_8apr2020.pdf) (English only)\n\n- [Taking Care of Caribou: The Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds Management Plan (2014)](https://www.enr.gov.nt.ca/sites/enr/files/rev_bluenose_caribou_herds_draft_management_plan_v10_final_signed_-_nov_4_2014_0.pdf) (English only)\n\n- [Technical Report on the Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds (2016)](https://www.enr.gov.nt.ca/sites/enr/files/150_file.pdf) (English only)\n\n- We have been Living with the Caribou all our Lives: a report on information recorded during community meetings for 'Taking Care of Caribou -- the Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds Management Plan' (2014)\n\n- 2020/2021 Action Plan: Bluenose-East (2020)\n\n- 2020/2021 Action Plan: Bluenose-West (2020)\n\n- 2020/2021 Action Plan: Cape Bathurst (2020)\n\n- Porcupine herd:         \n\n- Conservation Plan under development\n\n- [Harvest Management Plan for the Porcupine Caribou Herd in Canada (2010)](https://pcmb.ca/wp-content/uploads/2020/06/Harvest-Management-Plan-2010.pdf) (English only)\n\n- [Implementation Plan (2016)](https://pcmb.ca/wp-content/uploads/2020/06/Implementation-Plan-%E2%80%93-Revised-2016.pdf) (English only)\n\n- [Porcupine Caribou Herd Canadian Range-wide Native User Agreement (2019)](https://pcmb.ca/wp-content/uploads/2020/06/PCH-Range-Wide-Native-User-Agreement.pdf) (English only)\n\nProgress Indicators\n-------------------\n\n*Barren-ground caribou*\n\n- Over 27 million hectares (~12%) of barren-ground caribou range covered by protected areas\n\n*Dolphin and Union caribou*\n\n- Over 2.1 million hectares (~5.5%) of Dolphin and Union caribou range covered by protected areas\n\n- 100% of Dolphin and Union caribou sea-ice crossings covered by mitigation measures against ice-breaking activity through Transport Canada's Pro-active Vessel Management program\n\nAchievements and Future Milestones\n----------------------------------\n\n||Achievements|Ongoing Efforts and Planned Milestones|\n|-|-|-|\n|**Recovery**|*Dolphin and Union population*<p><ul><li>Initiated [Transport Canada's Pro-active Vessel Management program](https://tc.canada.ca/en/marine-transportation/navigation-marine-conditions/proactive-vessel-management) to mitigate shipping/ icebreaking impacts on sea ice crossings</li></ul></p>*Barren-ground population*<p><ul><li>On-the-ground actions for Northwest Territories, Nunavut and Yukon herds through management boards and Indigenous/territorial governments</li><li>On-the-ground partner-led projects, including Indigenous Protected and Conserved Areas initiatives relevant to barren-ground caribou</li></ul></p>|*Dolphin and Union population*<p><ul><li>Continue conservation planning to complete herd-specific plans</li><li>Continue engagement with Indigenous peoples on the Pan-Canadian Approach</li></ul></p>*Barren-ground population*<p><ul><li>Protection of freshwater crossings, access corridors, and calving/post-calving grounds in Nunavut</li><li>Continue conservation planning to complete herd-specific plans</li><li>Continue engagement with Indigenous peoples on the Pan-Canadian Approach</li></ul></p>|\n|**Knowledge**|*Dolphin and Union population*<p><ul><li>Identification of knowledge gaps in the national Management Plan and respectful inclusion of Indigenous knowledge in addressing these gaps through negotiated contribution agreementsBarren-ground population</li></ul></p><p><ul><li>Identification of knowledge gaps in herd management plans and respectful inclusion of Indigenous knowledge in addressing these gaps through negotiated contribution agreements</li></ul></p>|*Dolphin and Union population*<p><ul><li>Continue collaborative monitoring programs</li><li>Build on recovery actions identified in the national Management Plan to address additional knowledge gaps and priorities with key partners</li><li>Participate in the North American Caribou Workshop to facilitate knowledge sharing</li></ul></p>*Barren-ground population*<p><ul><li>Continue collaborative monitoring programs</li><li>Address and identify additional knowledge gaps and priorities with key partners</li><li>Participate in the North American Caribou Workshop to facilitate knowledge sharing</li></ul></p>|\n|**Reporting**|*Dolphin and Union population*<p><ul><li>Federal and territorial reporting on recovery implementation, including through various agreements’ annual reporting mechanisms and priority species dedicated web pages to communicate progress to Canadians</li></ul></p>*Barren-ground population*<p><ul><li>Federal, provincial, and territorial reporting on recovery implementation, including through various agreements’ annual reporting mechanisms and priority species dedicated web pages to communicate progress to Canadians</li><ul></p>|<ul><li>Ongoing reporting through existing mechanisms and priority species dedicated web pages</li></ul>|",
-                                "customStyles": "border: 2px solid black;"
-                            }
-                        },
-                        {
-                            "id": "panel-6",
-                            "panel": {
-                                "type": "video",
-                                "title": "Overtime job",
-                                "videoType": "external",
-                                "caption": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4.vtt",
-                                "src": "https://wet-boew.github.io/wet-boew-attachments/videos/video1-en.mp4"
-                            }
-                        },
-                        {
-                            "id": "panel-7",
-                            "panel": {
-                                "type": "video",
-                                "title": "Overtime job",
-                                "videoType": "local",
-                                "src": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4",
-                                "caption": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4.vtt",
-                                "transcript": "00000000-0000-0000-0000-000000000000/assets/en/cpts-lg-en.html",
-                                "height": 500
+                                "content": "Barren-ground Caribou\n=====================\n\nSpecies' Status\n---------------\n\n*Dolphin and Union population*\n\n- Special concern in Northwest Territories (2015) and under the *Species at Risk Act* (SARA; 2011)\n\n- Not currently listed under Nunavut legislation\n\n- [The Committee on the Status of Endangered Wildlife in Canada (COSEWIC) assessed as endangered (2017)](https://species-registry.canada.ca/index-en.html#/documents/3366)\n\n*Barren-ground population*\n\n- No species at risk legislation in Yukon\n\n- Threatened in Northwest Territories (2018)\n\n- Accidental/Vagrant in Alberta (2015)\n\n- Migratory in Saskatchewan (2020)\n\n- Not listed under Manitoba and Nunavut legislation, or under SARA\n\n- [COSEWIC assessed as threatened (2016)](https://species-registry.canada.ca/index-en.html#/documents/3189)\n\nConservation Approach\n---------------------\n\n- All partners to facilitate trust-building and cooperation with Indigenous peoples through engagement and collaboration\n\n- Pursue and continue multi-partner venues to collaborate on the recovery of each population, including those that are regional-based (for example, Advisory Committee for Cooperation on Wildlife Management; Bathurst Caribou Advisory Committee; Beverly and Qamanirjuaq Caribou Management Board; Conference of Management Authorities (Northwest Territories)) and international (International Porcupine Caribou Board; Porcupine Caribou Management Board; Porcupine Caribou Technical Committee)\n\n- Pursue on-the-ground collaborative projects led by Indigenous communities, Wildlife Management Boards and other co-management partners, ENGOs, industry, local governments\n\nRecovery Goals\n--------------\n\n*Dolphin and Union population*\n\n- Adaptively co-manage using a community-based approach and fill knowledge gaps using Inuit Qaujimajatuqangit and Indigenous knowledge, community monitoring and scientific methods. Minimize habitat disturbance and preserve sea ice, and allow for local population levels sufficient to sustain traditional Indigenous harvesting activities\n\n*Barren-ground population*\n\n- Promote the conditions needed for recovery, and maintain or restore self-sustaining, resilient populations. Support and maintain the caribou-people relationship, and promote conditions that allow caribou to move and migrate across their historic ranges without barriers\n\nRecovery Planning\n-----------------\n\n*Dolphin and Union population*\n\n- [Dolphin and Union Caribou (*Rangifer tarandus groenlandicus*): Management Plan (2018)](https://species-registry.canada.ca/index-en.html#/consultations/3144); adopted under SARA\n\n*Barren-ground population*\n\nTerritorial and co-management partner recovery and policy documents:\n\n- A Management Plan for the Bathurst Caribou Herd (2004); update ongoing\n\n- [Bathurst Caribou Range Plan (2019)](https://www.enr.gov.nt.ca/en/services/caribou-de-la-toundra/bathurst-caribou-range-plan)\n\n- Belarewı́le Gots'ę́ Ɂekwę́ Caribou for All Time - A Délı̨nę Got'ı̨nę Plan of Action (2015)\n\n- Beverly and Qamanirjuaq Caribou Management Plan 2013-2022 (2014)\n\n- Łutsël K'é Dene Fırst Nation's Yúnethé X́á Ɂetthën Hádı (Caribou Stewardship Plan) (2020)\n\n- [Recovery Strategy for Barren-ground Caribou in the Northwest Territories (2020)](https://www.nwtspeciesatrisk.ca/sites/enr-species-at-risk/files/barren-ground_caribou_recovery_strategy_final_8april2020.pdf); all Northwest Territories herds minus Porcupine herd (English only)\n\n- [Consensus Agreement on Accepting the Recovery Strategy for Barren-ground Caribou in the Northwest Territories (2020)](https://www.nwtspeciesatrisk.ca/sites/enr-species-at-risk/files/consensus_agreement_bgc_recovery_strategy_signed_8apr2020.pdf) (English only)\n\n- [Taking Care of Caribou: The Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds Management Plan (2014)](https://www.enr.gov.nt.ca/sites/enr/files/rev_bluenose_caribou_herds_draft_management_plan_v10_final_signed_-_nov_4_2014_0.pdf) (English only)\n\n- [Technical Report on the Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds (2016)](https://www.enr.gov.nt.ca/sites/enr/files/150_file.pdf) (English only)\n\n- We have been Living with the Caribou all our Lives: a report on information recorded during community meetings for 'Taking Care of Caribou -- the Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds Management Plan' (2014)\n\n- 2020/2021 Action Plan: Bluenose-East (2020)\n\n- 2020/2021 Action Plan: Bluenose-West (2020)\n\n- 2020/2021 Action Plan: Cape Bathurst (2020)\n\n- Porcupine herd:         \n\n- Conservation Plan under development\n\n- [Harvest Management Plan for the Porcupine Caribou Herd in Canada (2010)](https://pcmb.ca/wp-content/uploads/2020/06/Harvest-Management-Plan-2010.pdf) (English only)\n\n- [Implementation Plan (2016)](https://pcmb.ca/wp-content/uploads/2020/06/Implementation-Plan-%E2%80%93-Revised-2016.pdf) (English only)\n\n- [Porcupine Caribou Herd Canadian Range-wide Native User Agreement (2019)](https://pcmb.ca/wp-content/uploads/2020/06/PCH-Range-Wide-Native-User-Agreement.pdf) (English only)\n\nProgress Indicators\n-------------------\n\n*Barren-ground caribou*\n\n- Over 27 million hectares (~12%) of barren-ground caribou range covered by protected areas\n\n*Dolphin and Union caribou*\n\n- Over 2.1 million hectares (~5.5%) of Dolphin and Union caribou range covered by protected areas\n\n- 100% of Dolphin and Union caribou sea-ice crossings covered by mitigation measures against ice-breaking activity through Transport Canada's Pro-active Vessel Management program\n\nAchievements and Future Milestones\n----------------------------------\n\n||Achievements|Ongoing Efforts and Planned Milestones|\n|-|-|-|\n|**Recovery**|*Dolphin and Union population*<p><ul><li>Initiated [Transport Canada's Pro-active Vessel Management program](https://tc.canada.ca/en/marine-transportation/navigation-marine-conditions/proactive-vessel-management) to mitigate shipping/ icebreaking impacts on sea ice crossings</li></ul></p>*Barren-ground population*<p><ul><li>On-the-ground actions for Northwest Territories, Nunavut and Yukon herds through management boards and Indigenous/territorial governments</li><li>On-the-ground partner-led projects, including Indigenous Protected and Conserved Areas initiatives relevant to barren-ground caribou</li></ul></p>|*Dolphin and Union population*<p><ul><li>Continue conservation planning to complete herd-specific plans</li><li>Continue engagement with Indigenous peoples on the Pan-Canadian Approach</li></ul></p>*Barren-ground population*<p><ul><li>Protection of freshwater crossings, access corridors, and calving/post-calving grounds in Nunavut</li><li>Continue conservation planning to complete herd-specific plans</li><li>Continue engagement with Indigenous peoples on the Pan-Canadian Approach</li></ul></p>|\n|**Knowledge**|*Dolphin and Union population*<p><ul><li>Identification of knowledge gaps in the national Management Plan and respectful inclusion of Indigenous knowledge in addressing these gaps through negotiated contribution agreementsBarren-ground population</li></ul></p><p><ul><li>Identification of knowledge gaps in herd management plans and respectful inclusion of Indigenous knowledge in addressing these gaps through negotiated contribution agreements</li></ul></p>|*Dolphin and Union population*<p><ul><li>Continue collaborative monitoring programs</li><li>Build on recovery actions identified in the national Management Plan to address additional knowledge gaps and priorities with key partners</li><li>Participate in the North American Caribou Workshop to facilitate knowledge sharing</li></ul></p>*Barren-ground population*<p><ul><li>Continue collaborative monitoring programs</li><li>Address and identify additional knowledge gaps and priorities with key partners</li><li>Participate in the North American Caribou Workshop to facilitate knowledge sharing</li></ul></p>|\n|**Reporting**|*Dolphin and Union population*<p><ul><li>Federal and territorial reporting on recovery implementation, including through various agreements’ annual reporting mechanisms and priority species dedicated web pages to communicate progress to Canadians</li></ul></p>*Barren-ground population*<p><ul><li>Federal, provincial, and territorial reporting on recovery implementation, including through various agreements’ annual reporting mechanisms and priority species dedicated web pages to communicate progress to Canadians</li><ul></p>|<ul><li>Ongoing reporting through existing mechanisms and priority species dedicated web pages</li></ul>|"
                             }
                         }
                     ]
@@ -105,18 +93,17 @@
             ]
         },
         {
-            "title": "Video Panel",
+            "title": "Oil sands deposits",
             "panel": [
                 {
-                    "title": "Video Test for YoutTube content",
-                    "content": "Are you ready for the ultimate revelation, the key to unlocking the secrets of the universe? Brace yourself for mind-blowing knowledge, the kind that will reshape your existence. Picture this: an extraordinary video awaits, a masterpiece of epic proportions. Click that link below, and you'll embark on an unforgettable journey of enlightenment and wisdom. Prepare to have your world turned upside down, as the profound truths of the cosmos are unveiled... Never gonna give you up, never gonna let you down!",
+                    "title": "Oil sands deposits",
+                    "content": "There are three large oil sands deposits in Canada:\n\n- The Athabasca;\n- Peace River; and\n- Cold Lake.\n\nAll three of the deposits are located in northern Alberta except for a small portion of the Cold Lake deposit, which extends into Saskatchewan. Together, these deposits cover [142,000 square kilometres](https://www.nrcan.gc.ca/our-natural-resources/energy-sources-distribution/clean-fossil-fuels/technical-overview/5851?_ga=2.92936030.219303224.1637701004-1958057264.1607712157) and are estimated to contain 166.3 billion barrels.\n\nThe oil sands extraction sector is a major contributor to Canada’s economy, with more than 528,000 people deriving direct, indirect and induced employment from the oil sands and its supporting sectors. To date, an estimated $325 billion of capital expenditures has been invested in the oil sands industry, and the sector produces 2.95 million barrels of oil per day.\n\nThis map shows a generalized potential extent of the three oil sands areas. The actual geological deposits themselves cover larger areas.",
                     "type": "text"
                 },
                 {
-                    "type": "video",
-                    "title": "Special YouTube video",
-                    "videoType": "YouTube",
-                    "src": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsDeposits.json",
+                    "type": "map",
+                    "scrollguard": true
                 }
             ]
         },
@@ -129,9 +116,16 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
-                    "type": "image",
-                    "fullscreen": false
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "id": "OilSands___1565005967929__w774.png",
+                            "altText": "",
+                            "caption": "",
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/OilSands___1565005967929__w774.png",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -144,8 +138,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 3 - mine vs insitu.jpg",
-                    "type": "image"
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 3 - mine vs insitu.jpg",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -173,7 +172,7 @@
                     "type": "text"
                 },
                 {
-                    "images": [
+                    "items": [
                         {
                             "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/1_AuroraNorth_RelDisp.PNG",
                             "type": "image"
@@ -210,6 +209,45 @@
             ]
         },
         {
+            "title": "Chart gallery sample test",
+            "panel": [
+                {
+                    "title": "Reported mine tailings from oil sands surface mining facilities",
+                    "content": "Similar to comparing release and transfer profiles, it is difficult to compare the seven oil sands surface mining facilities in terms of what they dispose of in their tailings impoundment areas. These facilities vary greatly in their size and in how much bitumen processing occurs on-site. Breakdowns of reported tailings for each facility are provided below.\n\n- Canadian Natural Resources Muskeg River and Jackpine Mines, and Horizon Oil Sands Processing Plant and Mine;\n- Fort Hills Oil Sands Mine;\n- Imperial Oil Kearl Processing Plant and Mine;\n- Suncor Energy Inc. Oil Sands; and\n- Syncrude Canada Aurora North Mine Site, and Syncrude Canada Ltd. (formerly Mildred Lake).",
+                    "type": "text"
+                },
+                {
+                    "type": "chart",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/Criteria air contaminant releases from oil sands mines_3.csv",
+                            "type": "chart",
+                            "options": {
+                                "title": "Syncrude Canada Ltd., Aurora North Mine Site 2019 Tailings (Tonnes)",
+                                "subtitle": ""
+                            }
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/Mine tailings reported.csv",
+                            "type": "chart",
+                            "options": {
+                                "title": "Fort Hill Energy L.P., Fort Hills Oil Sands 2019 Tailings (Tonnes)",
+                                "subtitle": "",
+                                "type": "pie"
+                            }
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/NPRI releases from thermal in-situ facilities_1.csv",
+                            "options": {
+                                "title": "Canadian Natural Resources Limited, Horizon Oil Sands Processing Plant and Mine 2019 Tailings (Tonnes)",
+                                "subtitle": ""
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "title": "NPRI substances reported for oil sands mining facilities",
             "panel": [
                 {
@@ -232,8 +270,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/slide 6 - mining trends.jpg",
-                    "type": "image"
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/slide 6 - mining trends.jpg",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -246,8 +289,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Top10SubstancesTailings2019.png",
-                    "type": "image"
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Top10SubstancesTailings2019.png",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -260,7 +308,7 @@
                     "type": "text"
                 },
                 {
-                    "images": [
+                    "items": [
                         {
                             "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/AuroraNorth_Tailings.PNG",
                             "type": "image"
@@ -311,7 +359,7 @@
             ]
         },
         {
-            "title": "Trends in mine tailings reported from surface mining facilities (Time Slider)",
+            "title": "Trends in mine tailings reported from surface mining facilities",
             "panel": [
                 {
                     "title": "Trends in mine tailings reported from surface mining facilities",
@@ -320,12 +368,7 @@
                 },
                 {
                     "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/TailingsfromMiningFacilities2010to2019(timeslider).json",
-                    "type": "map",
-                    "timeSlider": {
-                        "range": [2010, 2019],
-                        "start": [2010, 2019],
-                        "attribute": "Reporting_Year___Année"
-                    }
+                    "type": "map"
                 }
             ]
         },
@@ -338,8 +381,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 10 - SAGD vs CSS.jpg",
-                    "type": "image"
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 10 - SAGD vs CSS.jpg",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -367,7 +415,18 @@
                 },
                 {
                     "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasestoAirbyInSituFacilitiesforAllSubstances2010to2019(timeslider).json",
-                    "type": "map"
+                    "type": "map",
+                    "timeSlider": {
+                        "range": [
+                            2010,
+                            2019
+                        ],
+                        "start": [
+                            2010,
+                            2019
+                        ],
+                        "attribute": "Reporting_Year___Année"
+                    }
                 }
             ]
         },
@@ -380,8 +439,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg",
-                    "type": "image"
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide%2013%20-%20InSitu%20Trends__1554406944277__w594.jpg",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -394,8 +458,13 @@
                     "type": "text"
                 },
                 {
-                    "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-516166467__1554821531978__w1920.jpg",
-                    "type": "image"
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-516166467__1554821531978__w1920.jpg",
+                            "type": "image"
+                        }
+                    ]
                 }
             ]
         },
@@ -405,14 +474,12 @@
                 {
                     "title": "Pollution in your neighbourhood",
                     "content": "You can identify the facilities and pollutants in your community by entering your postal code in the NPRI online data search. For further analysis, check out [other NPRI maps and datasets](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html).",
-                    "type": "text",
-                    "customStyles": "border: 2px solid #555; border-radius: 10px; margin-right: 5px;"
+                    "type": "text"
                 },
                 {
                     "title": "NPRI data",
                     "content": "We have packaged the data in different ways for different uses. You can search the entire database, download subsets of data, or view the data on maps.\n\n### Search NPRI data\n\n[Search our database](https://pollution-waste.canada.ca/national-release-inventory/archives/index.cfm?lang=En) for 1994 to 2017 pollutant releases in your area, as well as information about the facility(s).\n\n### Download NPRI data\n\nThese easy-to-use files let you dig deeper into the data in a variety of ways\n\n- [Single year tables](https://open.canada.ca/data/en/dataset/1fb7d8d4-7713-4ec6-b957-4a882a84fed3 'Single year tables'),\n\t- annual tables of our most popular data fields. One table for each of the last 3 years\n- [Five year summaries](https://open.canada.ca/data/en/dataset/ea0dc8ae-d93c-4e24-9f61-946f1736a26f 'Five year summaries')\n\t- summaries by air, water or land releases grouped by province, industry type or substance\n- [All years datasets](https://open.canada.ca/data/en/dataset/40e01423-7728-429c-ac9d-2954385ccdfb 'All years datasets')\n\t- annual data since 1994 on pollutant quantities, comments and geolocations\n- [Complete reported datasets](https://open.canada.ca/data/en/dataset/06022cc0-a31e-4b4c-850d-d4dccda5f3ac 'Complete reported datasets')\n\t- comprehensive datasets going back to 1994",
-                    "type": "text",
-                    "customStyles": "border: 2px solid black;"
+                    "type": "text"
                 }
             ]
         },
@@ -420,23 +487,142 @@
             "title": "DQV Chart Gallery",
             "panel": [
                 {
-                    "title": "DQV Chart Gallery Featuring Hybrid and External Charts",
+                    "title": "DQV Chart",
                     "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris rhoncus, magna in pulvinar tincidunt, magna velit feugiat sem, nec rhoncus lectus tortor quis turpis. Vivamus erat velit, feugiat at nisl lacinia, pulvinar tempus nunc. Nulla suscipit vulputate dapibus. Fusce tincidunt neque nunc, sed porta lacus elementum vitae. Suspendisse imperdiet interdum ipsum, id aliquet lectus aliquet sit amet. Aliquam erat volutpat. Nulla convallis nisl sodales nunc ullamcorper pulvinar. Nulla ornare justo id sapien porta gravida. Cras condimentum, felis id pretium malesuada, lorem lorem viverra nisi, sit amet molestie mi nulla nec velit. Integer semper lorem scelerisque tellus iaculis finibus. Aliquam efficitur sodales elit nec sodales. Sed vitae ipsum quis eros vulputate luctus.",
                     "type": "text"
                 },
                 {
                     "type": "chart",
-                    "charts": [
+                    "items": [
                         {
+                            "type": "chart",
                             "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json"
                         },
                         {
-                            "src": "00000000-0000-0000-0000-000000000000/charts/en/csvUrlChart.json"
-                        },
+                            "type": "chart",
+                            "src": "ea24000c-7dc3-49a9-baac-c55d28dcaeb9/charts/en/Ethlyene.glycol.release.trends.by.sector.2010-2019.tonnes.csv"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "DQV Chart with CSV input",
+            "panel": [
+                {
+                    "title": "DQV Chart with CSV input",
+                    "content": "Test (╯°□°)╯︵ ┻━┻",
+                    "type": "text"
+                },
+                {
+                    "type": "chart",
+                    "items": [
                         {
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/NPRI releases from thermal in-situ facilities_1.csv",
+                            "type": "chart",
+                            "options": {
+                                "xAxisLabel": "X Axis Test From Config",
+                                "yAxisLabel": "Y Axis Test From Config",
+                                "title": "Hello World",
+                                "subtitle": "I am a DQVChart and this is from the config file"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Hybrid chart with bar and line",
+            "panel": [
+                {
+                    "title": "Hybrid chart with bar and line",
+                    "content": "Demo of a hybrid chart consisting of both a bar and line chart using a custom configured highcharts json file.",
+                    "type": "text"
+                },
+                {
+                    "type": "chart",
+                    "items": [
+                        {
+                            "type": "chart",
                             "src": "00000000-0000-0000-0000-000000000000/charts/en/hybridChartConfig.json"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "title": "Chart with external CSV remote-hosted file",
+            "panel": [
+                {
+                    "title": "Chart with external CSV remote-hosted file",
+                    "content": "Demo of a chart containing external CSV file and using fetch()",
+                    "type": "text"
+                },
+                {
+                    "type": "chart",
+                    "items": [
+                        {
+                            "name": "csvUrlChart",
+                            "type": "chart",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/csvUrlChart.json"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Video panel",
+            "panel": [
+                {
+                    "type": "text",
+                    "title": "YouTube",
+                    "content": ""
+                },
+                {
+                    "type": "video",
+                    "title": "YT",
+                    "videoType": "local",
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4",
+                    "caption": "",
+                    "transcript": ""
+                }
+            ]
+        },
+        {
+            "title": "Dynamic Slideshow",
+            "panel": [
+                {
+                    "type": "text",
+                    "title": "Slideshow test",
+                    "content": ""
+                },
+                {
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "type": "image",
+                            "altText": "",
+                            "caption": "",
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/church.JPG"
+                        },
+                        {
+                            "type": "chart",
+                            "name": "1999",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/1999.json"
+                        },
+                        {
+                            "type": "text",
+                            "title": "1231241",
+                            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vulputate odio non mattis iaculis. Morbi condimentum volutpat eros ac pharetra. Quisque pretium condimentum purus, id ullamcorper turpis mollis ut. Mauris a lobortis magna. Nulla facilisi. Nullam varius velit urna, id hendrerit tellus facilisis a. Ut in lorem nulla. In at felis mi. Aliquam erat volutpat. Quisque id risus mattis, scelerisque sapien nec, pulvinar metus. In malesuada nunc id dui egestas, in ornare dui mattis. Mauris scelerisque arcu consequat neque ultrices suscipit id non risus. Morbi tristique quam sed dolor molestie, eget dapibus nibh bibendum. Cras scelerisque imperdiet hendrerit. Mauris consectetur eleifend ipsum, a placerat lectus tempus sed. Nulla ipsum arcu, sodales id aliquam sed, lacinia at metus.\n\nMorbi et elementum eros, eu placerat purus. Etiam tristique velit non eleifend porta. Proin accumsan non erat nec consectetur. Cras id leo quis justo hendrerit vestibulum. Morbi quis auctor massa. Mauris commodo magna lacus, ac sodales augue tristique vel. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec aliquam vitae ex non vestibulum. Curabitur id nunc id nisi vulputate consectetur id ornare dui. Praesent justo orci, volutpat in quam eu, hendrerit maximus nisi. Aliquam volutpat feugiat feugiat. Nullam a ullamcorper ligula.\n\nVestibulum sodales est turpis, egestas laoreet augue hendrerit sodales. In laoreet metus eu mauris tristique efficitur. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi laoreet odio at dolor posuere maximus. Morbi luctus ligula a ex aliquam porta et sed odio. Aenean nec turpis lacinia, mattis purus rhoncus, consequat lacus. Cras elit augue, interdum quis elementum id, blandit nec sapien. Aliquam ipsum ex, malesuada euismod lacus ut, ullamcorper accumsan justo. Fusce sollicitudin interdum eros, at efficitur ipsum tincidunt in. Nunc placerat, lacus eget venenatis auctor, lacus dui sollicitudin tortor, non condimentum urna mauris finibus ipsum. Phasellus vel magna hendrerit, sollicitudin dolor id, laoreet velit.\n\nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; In viverra turpis sit amet nunc posuere pretium. Sed consequat placerat diam, vitae euismod erat. Nam ac lectus leo. Curabitur id enim vel turpis suscipit aliquet sit amet at odio. Integer ac mollis quam, quis gravida justo. Integer in diam laoreet, porttitor purus sit amet, tincidunt justo. Aenean iaculis fermentum tortor, sed fringilla quam pulvinar pretium.\n\nEtiam maximus vehicula hendrerit. Nunc sed nunc risus. Praesent dignissim orci eu tincidunt pulvinar. Aenean facilisis erat sit amet dolor condimentum vestibulum non id augue. Phasellus id hendrerit sapien. Maecenas ut tellus eu diam porta aliquet. Aenean nunc turpis, imperdiet blandit nibh at, convallis ultricies ante."
+                        },
+                        {
+                            "type": "chart",
+                            "name": "FR",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/FR.json"
+                        }
+                    ],
+                    "userCreated": true,
+                    "caption": "Mixed charts/images"
                 }
             ]
         }
@@ -444,5 +630,6 @@
     "contextLink": "https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html",
     "contextLabel": "Explore National Pollutant Release Inventory data",
     "lang": "en",
-    "dateModified": "2022-02-14"
+    "dateModified": "2022-02-14",
+    "tocOrientation": "vertical"
 }
