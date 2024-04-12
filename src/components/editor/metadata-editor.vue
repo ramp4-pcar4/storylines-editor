@@ -201,6 +201,7 @@ interface RouteParams {
     slides: Slide[];
     sourceCounts: SourceCounts;
     existing: boolean;
+    unsavedChanges: boolean;
 }
 
 @Options({
@@ -291,6 +292,7 @@ export default class MetadataEditorV extends Vue {
                 this.slides = props.slides;
                 this.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
+                this.unsavedChanges = props.unsavedChanges;
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
@@ -810,7 +812,8 @@ export default class MetadataEditorV extends Vue {
                         sourceCounts: this.sourceCounts,
                         metadata: this.metadata,
                         slides: this.slides,
-                        existing: this.editExisting
+                        existing: this.editExisting,
+                        unsavedChanges: this.unsavedChanges
                     };
                 }
             });
@@ -839,6 +842,7 @@ export default class MetadataEditorV extends Vue {
         if (this.loadExisting) {
             if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
+                this.saveMetadata(false);
                 this.updateEditorPath();
             } else {
                 Message.error('No config exists for storylines product.');
