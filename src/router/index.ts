@@ -12,7 +12,9 @@ const routes = [
     },
     {
         path: '/:lang/editor/:uid',
-        redirect: '/:lang/editor-metadata/:uid'
+        redirect: (to: RouteLocationNormalized) => {
+            return '/' + to.params.lang + '/editor-metadata/' + to.params.uid;
+        }
     },
     {
         path: '/:lang/editor-metadata',
