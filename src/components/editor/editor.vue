@@ -187,6 +187,7 @@ export default class EditorV extends Vue {
     created(): void {
         this.loadSlides = this.slides;
         this.uuid = this.$route.params.uid as string;
+
         window.addEventListener('beforeunload', this.beforeWindowUnload);
     }
 
