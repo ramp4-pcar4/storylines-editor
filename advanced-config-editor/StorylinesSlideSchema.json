@@ -60,6 +60,11 @@
                 "type": {
                     "type": "string",
                     "enum": ["text"]
+                },
+                "textColour": {
+                    "type": "string",
+                    "description": "The colour of the text. Defaults to black.",
+                    "default": "#000000"
                 }
             },
             "required": ["content", "type", "title"]
@@ -93,6 +98,11 @@
                 "type": {
                     "type": "string",
                     "enum": ["dynamic"]
+                },
+                "textColour": {
+                    "type": "string",
+                    "description": "The colour of the text. Defaults to black.",
+                    "default": "#000000"
                 }
             },
             "required": ["content", "type", "children", "title"]
@@ -402,6 +412,10 @@
         },
         "panel": {
             "$ref": "#/$defs/panel"
+        },
+        "backgroundImage": {
+            "type": "string",
+            "description": "An image to display in the background of the slide."
         }
     },
 
