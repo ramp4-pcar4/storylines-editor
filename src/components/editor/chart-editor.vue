@@ -9,7 +9,7 @@
             }}</span>
             <!-- add chart button -->
             <button
-                class="chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
+                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
                 id="modal-btn"
                 @click="clearEditor()"
                 :disabled="!allowMany && chartConfigs.length > 0"
@@ -37,7 +37,7 @@
                 v-model="chartConfigs"
                 handle=".handle"
                 @update="onChartsEdited"
-                class="flex flex-wrap list-none"
+                class="w-full flex flex-wrap list-none"
                 item-key="name"
             >
                 <template #item="{ element, index }">
