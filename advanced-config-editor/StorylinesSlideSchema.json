@@ -272,7 +272,7 @@
                 },
                 "videoType": {
                     "type": "string",
-                    "enum": ["local", "external", "YouTube"]
+                    "enum": ["", "local", "external", "YouTube"]
                 },
                 "thumbnailUrl": {
                     "type": "string",
@@ -316,6 +316,9 @@
                             },
                             {
                                 "$ref": "#/$defs/chartPanel"
+                            },
+                            {
+                                "$ref": "#/$defs/multimediaVideo"
                             }
                         ]
                     },
