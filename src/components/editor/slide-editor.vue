@@ -186,7 +186,7 @@
                 <div class="flex mt-4">
                     <span class="font-bold text-xl">{{ $t('editor.slides.content') }}:</span>
                     <span class="ml-auto flex-grow"></span>
-                    <div v-if="panelIndex === 1 || rightOnly" class="flex flex-col mr-8">
+                    <div class="flex flex-col mr-8">
                         <label class="editor-label text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
                         <select
                             ref="typeSelector"
@@ -224,13 +224,21 @@
         </div>
         <confirmation-modal
             :name="`change-slide-${slideIndex}`"
-            :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
+            :message="
+                $t('editor.slides.changeSlide.confirm', {
+                    title: currentSlide.title
+                })
+            "
             @ok="changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType)"
             @Cancel="cancelTypeChange"
         />
         <confirmation-modal
             :name="`right-only-${slideIndex}`"
-            :message="$t('editor.slides.changeSlide.confirm', { title: currentSlide.title })"
+            :message="
+                $t('editor.slides.changeSlide.confirm', {
+                    title: currentSlide.title
+                })
+            "
             @ok="toggleRightOnly()"
             @Cancel="rightOnly = !rightOnly"
         />
