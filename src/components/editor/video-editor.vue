@@ -98,6 +98,8 @@ export default class VideoEditorV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop({ default: false }) centerSlide!: boolean;
+    @Prop({ default: false }) dynamicSelected!: boolean;
 
     dragging = false;
     edited = false;
@@ -147,6 +149,11 @@ export default class VideoEditorV extends Vue {
                     src: this.panel.src
                 };
             }
+        }
+        if (this.centerSlide && this.dynamicSelected) {
+            this.panel.customStyles += 'text-align: left !important;';
+        } else if (!this.centerSlide && this.dynamicSelected) {
+            this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
         }
     }
 

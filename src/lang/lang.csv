@@ -111,6 +111,8 @@ editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les d
 editor.slides.deleteSlide.confirm,"Are you sure you want to delete the slide {title}?",1,"Voulez-vous vraiment supprimer la diapositive {titre}?",1
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
 editor.slides.makeFull,Make the right panel the full slide,1,Mettre la diapositive complète dans le panneau de droite,1
+editor.slides.centerPanel,Center panel content,1,Contenu de la diapositive centrale,0
+editor.slides.centerSlide,Center slide content,1,Contenu du panneau central,0
 editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1

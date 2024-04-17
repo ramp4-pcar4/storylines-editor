@@ -65,6 +65,8 @@ export default class MapEditorV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop({ default: false }) centerSlide!: boolean;
+    @Prop({ default: false }) dynamicSelected!: boolean;
 
     // config editor
     rampEditorApi: any = '';
@@ -92,6 +94,12 @@ export default class MapEditorV extends Vue {
 
         if (this.status === 'creating') {
             this.createNewConfig();
+        }
+
+        if (this.centerSlide && this.dynamicSelected) {
+            this.panel.customStyles += 'text-align: left !important;';
+        } else if (!this.centerSlide && this.dynamicSelected) {
+            this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
         }
 
         this.openEditor();
