@@ -72,6 +72,8 @@
                     :configFileStructure="configFileStructure"
                     :lang="lang"
                     :sourceCounts="sourceCounts"
+                    :centerSlide="centerSlide"
+                    :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit')"
                 ></component>
             </div>
@@ -120,6 +122,8 @@ export default class DynamicEditorV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop() centerSlide!: boolean;
+    @Prop() dynamicSelected!: boolean;
 
     editors: Record<string, string> = {
         text: 'text-editor',

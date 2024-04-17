@@ -36,6 +36,22 @@
                             :disabled="rightOnly && determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
                             @change.stop="$vfm.open(`right-only-${slideIndex}`)"
                         />
+                        <span class="mx-2 font-bold">{{ $t('editor.slides.centerSlide') }}</span>
+                        <input
+                            type="checkbox"
+                            class="rounded-none cursor-pointer w-4 h-4"
+                            v-model="centerSlide"
+                            :disabled="centerPanel"
+                            @change.stop="toggleCenterSlide()"
+                        />
+                        <span class="mx-2 font-bold">{{ $t('editor.slides.centerPanel') }}</span>
+                        <input
+                            type="checkbox"
+                            class="rounded-none cursor-pointer w-4 h-4"
+                            v-model="centerPanel"
+                            :disabled="centerSlide"
+                            @change.stop="toggleCenterPanel()"
+                        />
                     </div>
                 </div>
             </div>
@@ -215,6 +231,8 @@
                     :lang="lang"
                     :uid="uid"
                     :sourceCounts="sourceCounts"
+                    :centerSlide="centerSlide"
+                    :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit')"
                 ></component>
             </div>
@@ -229,7 +247,11 @@
                     title: currentSlide.title
                 })
             "
-            @ok="changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType)"
+            @ok="
+                changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
+                toggleCenterPanel();
+                toggleCenterSlide();
+            "
             @Cancel="cancelTypeChange"
         />
         <confirmation-modal
@@ -302,6 +324,9 @@ export default class SlideEditorV extends Vue {
     panelIndex = 0;
     newType = '';
     rightOnly = false;
+    centerSlide = false;
+    centerPanel = false;
+    dynamicSelected = false;
 
     editors: Record<string, string> = {
         text: 'text-editor',
@@ -373,6 +398,7 @@ export default class SlideEditorV extends Vue {
         if (newType === 'dynamic') {
             this.panelIndex = 0;
             this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
+            this.dynamicSelected = true;
         } else {
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
@@ -501,6 +527,65 @@ export default class SlideEditorV extends Vue {
                 ),
                 Object.assign({}, this.currentSlide.panel[0])
             ];
+        }
+    }
+
+    toggleCenterSlide(): void {
+        if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
+            if (this.centerSlide) {
+                this.currentSlide.panel[0].customStyles = 'text-align: right;';
+            } else {
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                    'text-align: right;',
+                    ''
+                );
+            }
+        } else if (this.rightOnly) {
+            if (this.centerSlide) {
+                this.currentSlide.panel[0].customStyles = 'text-align: center;';
+            } else {
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                    'text-align: right;',
+                    ''
+                );
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                    'text-align: left;',
+                    ''
+                );
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                    'text-align: center;',
+                    ''
+                );
+            }
+        } else {
+            if (this.centerSlide) {
+                this.currentSlide.panel[0].customStyles = 'text-align: right;';
+                this.currentSlide.panel[1].customStyles = 'text-align: left;';
+            } else {
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                    'text-align: right;',
+                    ''
+                );
+                this.currentSlide.panel[1].customStyles = (this.currentSlide.panel[1].customStyles || '').replace(
+                    'text-align: left;',
+                    ''
+                );
+            }
+        }
+    }
+
+    toggleCenterPanel(): void {
+        if (this.centerPanel) {
+            for (const p in this.currentSlide.panel) {
+                this.currentSlide.panel[p].customStyles = 'text-align: center;';
+            }
+        } else {
+            for (const p in this.currentSlide.panel) {
+                this.currentSlide.panel[p].customStyles = (this.currentSlide.panel[p].customStyles || '').replace(
+                    'text-align: center;',
+                    ''
+                );
+            }
         }
     }
 }

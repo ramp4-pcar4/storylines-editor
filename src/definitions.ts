@@ -148,6 +148,7 @@ export enum PanelType {
 export interface BasePanel {
     type: string;
     width?: number;
+    customStyles?: string;
 }
 
 export interface TextPanel extends BasePanel {
@@ -155,6 +156,7 @@ export interface TextPanel extends BasePanel {
     title: string;
     titleTag?: string;
     content: string; // in md format
+    customStyles?: string;
 }
 
 export interface MapPanel extends BasePanel {
@@ -164,6 +166,7 @@ export interface MapPanel extends BasePanel {
     timeSlider?: TimeSliderConfig;
     title: string;
     scrollguard: boolean;
+    customStyles?: string;
 }
 export interface TimeSliderConfig {
     range: number[];
@@ -178,6 +181,7 @@ export interface DynamicPanel extends BasePanel {
     titleTag?: string;
     content: string;
     children: DynamicChildItem[];
+    customStyles?: string;
 }
 
 export interface DynamicChildItem {
@@ -193,6 +197,7 @@ export interface ImagePanel extends BasePanel {
     fullscreen?: boolean;
     altText?: string;
     caption?: string;
+    customStyles?: string;
 }
 
 export interface VideoPanel extends BasePanel {
@@ -204,12 +209,14 @@ export interface VideoPanel extends BasePanel {
     videoType: string;
     caption?: string;
     transcript?: string;
+    customStyles?: string;
 }
 
 export interface AudioPanel extends BasePanel {
     type: PanelType.Audio;
     src: string;
     caption?: string;
+    customStyles?: string;
 }
 
 export interface SlideshowPanel extends BasePanel {
@@ -218,6 +225,7 @@ export interface SlideshowPanel extends BasePanel {
     loop?: boolean;
     caption?: string;
     userCreated?: boolean; // used to determine whether this was automatically converted to slideshow or not
+    customStyles?: string;
 }
 
 export interface ChartPanel extends BasePanel {
@@ -227,6 +235,7 @@ export interface ChartPanel extends BasePanel {
     config?: any;
     name?: string;
     options?: DQVOptions;
+    customStyles?: string;
 }
 
 export interface ChartConfig {

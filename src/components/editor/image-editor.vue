@@ -97,6 +97,8 @@ export default class ImageEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
     @Prop({ default: true }) allowMany!: boolean;
+    @Prop({ default: false }) centerSlide!: boolean;
+    @Prop({ default: false }) dynamicSelected!: boolean;
 
     dragging = false;
     edited = false;
@@ -118,6 +120,16 @@ export default class ImageEditorV extends Vue {
                 : this.panel.src
                 ? [this.panel]
                 : [];
+
+        if (this.centerSlide && this.dynamicSelected) {
+            for (const i in images) {
+                images[i].customStyles += 'text-align: left;';
+            }
+        } else if (!this.centerSlide && this.dynamicSelected) {
+            for (const i in images) {
+                images[i].customStyles = (images[i].customStyles || '').replace('text-align: left;', '');
+            }
+        }
 
         if (images !== undefined && images.length) {
             // Set images as loading until they are all loaded and resolve.
