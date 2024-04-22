@@ -41,6 +41,13 @@ export interface MetadataContent {
     dateModified: string;
 }
 
+export interface HelpSection {
+    header: string;
+    info: string;
+    drawn: boolean;
+    expanded: boolean;
+}
+
 // unofficial interface: add properties as needed (just to make TS warnings disappear)
 export interface Highchart {
     toString(): string;
