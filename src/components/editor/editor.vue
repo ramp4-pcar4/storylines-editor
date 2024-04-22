@@ -78,6 +78,22 @@
                     <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
                 </span>
             </button>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            />
+            <button
+                @click="$vfm.open(`help-panel`)"
+                class="p-1 bg-white border border-black rounded-full hover:bg-gray-100"
+                v-tippy="{
+                    delay: '200',
+                    placement: 'top',
+                    content: $t('help.title'),
+                    animateFill: true
+                }"
+            >
+                <span class="material-symbols-outlined bottom-0"> question_mark </span>
+            </button>
         </div>
         <div class="flex">
             <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
@@ -128,6 +144,7 @@
             ></slide-editor>
         </div>
         <slot name="metadataModal"></slot>
+        <help-panel :helpSections="helpSections" :originalTextArray="originalTextArray"></help-panel>
         <confirmation-modal
             :name="`reload-config`"
             :message="$t('editor.refreshChanges.modal')"
@@ -138,13 +155,17 @@
 
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
-import { ConfigFileStructure, MetadataContent, Slide, SourceCounts, StoryRampConfig } from '@/definitions';
+import { ConfigFileStructure, HelpSection, MetadataContent, Slide, SourceCounts, StoryRampConfig } from '@/definitions';
+import axios from 'axios';
+import { marked } from 'marked';
 
 import { VueSpinnerOval } from 'vue3-spinners';
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import HelpPanelV from './help-panel.vue';
+import HelpSectionV from './helpers/help-section.vue';
 
 @Options({
     components: {
@@ -152,7 +173,9 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
         'confirmation-modal': ConfirmationModalV,
         spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV
+        'slide-toc': SlideTocV,
+        'help-panel': HelpPanelV,
+        'help-section': HelpSectionV
     }
 })
 export default class EditorV extends Vue {
@@ -173,6 +196,9 @@ export default class EditorV extends Vue {
     loadSlides: undefined | Slide[] = undefined;
     currentSlide: Slide | string = '';
     slideIndex = -1;
+    helpSections: HelpSection[] = [];
+    helpMd = '';
+    originalTextArray: string[] = [];
 
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
@@ -189,6 +215,8 @@ export default class EditorV extends Vue {
         this.uuid = this.$route.params.uid as string;
 
         window.addEventListener('beforeunload', this.beforeWindowUnload);
+
+        this.fetchMarkdown();
     }
 
     mounted(): void {
@@ -235,6 +263,36 @@ export default class EditorV extends Vue {
     updateSlides(slides: Slide[]): void {
         this.loadSlides = slides;
         this.slideIndex = this.loadSlides.indexOf(this.currentSlide as Slide);
+    }
+
+    /**
+     * Fetch markdown content for help panel.
+     */
+    fetchMarkdown(): void {
+        const url = 'https://raw.githubusercontent.com/ramp4-pcar4/ramp4-pcar4/main/public/help/en.md'; // Construct the URL to the Markdown file
+        axios.get(url).then((r) => {
+            const reg = /^#\s(.*)\n{2}(?:.+|\n(?!\n{2,}))*/gm;
+            const renderer = new marked.Renderer();
+            renderer.image = (href: string, title: string, text: string) => {
+                if (href.indexOf('http') === -1) {
+                    href = 'https://github.com/ramp4-pcar4/ramp4-pcar4/blob/main/public/help/' + 'images/' + href;
+                }
+                return `<img src="${href}" alt="${text}">`;
+            };
+            this.helpMd = r.data.replace(new RegExp(String.fromCharCode(13), 'g'), '');
+            let section;
+            while ((section = reg.exec(this.helpMd))) {
+                const info_results = marked(section[0].split('\n').splice(2).join('\n'), { renderer }) as string;
+                this.helpSections.push({
+                    header: section[1],
+                    info: info_results,
+                    drawn: true,
+                    expanded: false
+                });
+                //copy of the original text to refer to after highlighting
+                this.originalTextArray.push(info_results);
+            }
+        });
     }
 
     /**
@@ -342,5 +400,9 @@ export default class EditorV extends Vue {
 .fade-enter,
 .fade-leave-to {
     opacity: 0;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 </style>
