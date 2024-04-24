@@ -11,99 +11,181 @@
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                     </button>
                 </div>
-
-                <div class="flex items-center border py-5 w-5/6">
-                    <label class="editor-label">
-                        <span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:
-                    </label>
-                    <div class="relative w-1/3 inline-block">
+                <div class="border py-5 w-5/6">
+                    <div v-if="renaming" class="flex flex-row items-center">
+                        <label class="editor-label"> {{ $t('editor.uuid.new') }}: </label>
                         <input
+                            class="editor-input w-1/3 mt-0"
                             type="text"
-                            @focus="showDropdown = true"
-                            @blur="showDropdown = false"
                             @input="
                                 error = false;
-                                reqFields.uuid = true;
-                                checkUuid();
+                                checkUuid(true);
                             "
-                            v-model="uuid"
-                            class="editor-input w-full mt-0"
+                            v-model="changeUuid"
                             :class="{ 'input-error': error || !reqFields.uuid }"
                         />
-                        <div class="absolute z-10 w-full bg-white border border-gray-200 mt-1" v-show="showDropdown">
+                        <button
+                            @click="renameProduct"
+                            class="editor-button bg-black text-white hover:bg-gray-800"
+                            :class="{ 'input-error': error }"
+                        >
+                            {{ $t('editor.rename') }}
+                        </button>
+                    </div>
+                    <div v-else class="flex flex-row items-center">
+                        <label class="editor-label">
+                            <span class="text-red-500" v-if="'uuid' in reqFields">*</span>
+                            {{ $t('editor.uuid') }}:
+                        </label>
+                        <div class="relative w-1/3 inline-block">
+                            <input
+                                class="editor-input w-full mt-0"
+                                type="text"
+                                @input="
+                                    error = false;
+                                    reqFields.uuid = true;
+                                    checkUuid();
+                                "
+                                v-model="uuid"
+                                @focus="showDropdown = true"
+                                @blur="showDropdown = false"
+                                :class="{ 'input-error': error || !reqFields.uuid }"
+                            />
+                            <div
+                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1"
+                                v-show="showDropdown"
+                            >
+                                <ul>
+                                    <li
+                                        v-for="storyline in getStorylines"
+                                        :key="storyline.uuid"
+                                        @mousedown.prevent="selectUuid(storyline.uuid)"
+                                        :class="[
+                                            'p-2 hover:bg-gray-100 cursor-pointer',
+                                            storyline.isUserStoryline ? 'bg-gray-200' : ''
+                                        ]"
+                                    >
+                                        {{ storyline.uuid }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <button
+                            @click="generateRemoteConfig"
+                            class="editor-button bg-black text-white hover:bg-gray-800"
+                            :class="{ 'input-error': error }"
+                            v-if="editExisting"
+                        >
+                            {{ $t('editor.load') }}
+                        </button>
+
+                        <button
+                            @click="fetchHistory"
+                            class="bg-black editor-button text-white hover:bg-gray-800"
+                            :class="{ 'input-error': error }"
+                            v-if="editExisting"
+                        >
+                            {{ $t('editor.viewHistory') }}
+                        </button>
+
+                        <!-- If config is loading, display a small spinner. -->
+                        <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
+                            <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                        </div>
+
+                        <div v-if="editExisting" class="ml-10">
                             <ul>
                                 <li
-                                    v-for="storyline in getStorylines"
-                                    :key="storyline.uuid"
-                                    @mousedown.prevent="selectUuid(storyline.uuid)"
-                                    :class="[
-                                        'p-2 hover:bg-gray-100 cursor-pointer',
-                                        storyline.isUserStoryline ? 'bg-gray-200' : ''
-                                    ]"
+                                    v-for="history in storylineHistory"
+                                    :key="history.id"
+                                    @click="selectHistory(history)"
+                                    class="p-2 cursor-pointer"
+                                    :class="{ 'bg-blue-200': selectedHistory && history.id === selectedHistory.id }"
                                 >
-                                    {{ storyline.uuid }}
+                                    {{ formatDate(history.created) }}
                                 </li>
                             </ul>
+                            <button
+                                :disabled="!selectedHistory || selectedHistory.storylineUUID !== uuid"
+                                class="editor-button bg-black text-white hover:bg-gray-800"
+                                @click="loadHistory()"
+                            >
+                                {{ $t('editor.loadPrevious') }}
+                            </button>
                         </div>
                     </div>
-                    <span v-if="warning" class="text-yellow-500 rounded p-1 ml-2">
-                        <span class="align-middle inline-block mr-1 pb-1 fill-current">
-                            <svg
-                                clip-rule="evenodd"
-                                fill-rule="evenodd"
-                                stroke-linejoin="round"
-                                stroke-miterlimit="2"
-                                viewBox="0 0 24 24"
-                                width="18"
-                                height="18"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="m2.095 19.886 9.248-16.5c.133-.237.384-.384.657-.384.272 0 .524.147.656.384l9.248 16.5c.064.115.096.241.096.367 0 .385-.309.749-.752.749h-18.496c-.44 0-.752-.36-.752-.749 0-.126.031-.252.095-.367zm9.907-6.881c-.414 0-.75.336-.75.75v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5c0-.414-.336-.75-.75-.75zm-.002-3c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1z"
-                                    fill-rule="nonzero"
-                                />
-                            </svg>
+                    <div>
+                        <!-- Display a warning if there is one. -->
+                        <span v-if="warning !== 'none'" class="text-yellow-500 rounded p-1">
+                            <div class="editor-label"></div>
+                            <span class="align-middle inline-block mr-1 pb-1 fill-current">
+                                <svg
+                                    clip-rule="evenodd"
+                                    fill-rule="evenodd"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="2"
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    height="18"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="m2.095 19.886 9.248-16.5c.133-.237.384-.384.657-.384.272 0 .524.147.656.384l9.248 16.5c.064.115.096.241.096.367 0 .385-.309.749-.752.749h-18.496c-.44 0-.752-.36-.752-.749 0-.126.031-.252.095-.367zm9.907-6.881c-.414 0-.75.336-.75.75v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5c0-.414-.336-.75-.75-.75zm-.002-3c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1z"
+                                        fill-rule="nonzero"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="align-center inline-block select-none text-sm">{{
+                                $t(`editor.warning.${warning}`)
+                            }}</span
+                            ><br />
                         </span>
-                        <span class="align-center inline-block select-none">{{ $t('editor.uuid.exists') }}</span>
-                    </span>
-                    <button
-                        @click="generateRemoteConfig"
-                        class="editor-button bg-black text-white hover:bg-gray-800"
-                        :class="{ 'input-error': error }"
-                        v-if="editExisting"
-                    >
-                        {{ $t('editor.load') }}
-                    </button>
-                    <button
-                        @click="fetchHistory"
-                        class="bg-black editor-button text-white hover:bg-gray-800"
-                        :class="{ 'input-error': error }"
-                        v-if="editExisting"
-                    >
-                        {{ $t('editor.viewHistory') }}
-                    </button>
-                    <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
-                        <spinner size="24px" color="#009CD1" class="mx-2 my-auto"></spinner>
-                    </div>
-                    <div v-if="editExisting" class="ml-10">
-                        <ul>
-                            <li
-                                v-for="history in storylineHistory"
-                                :key="history.id"
-                                @click="selectHistory(history)"
-                                class="p-2 cursor-pointer"
-                                :class="{ 'bg-blue-200': selectedHistory && history.id === selectedHistory.id }"
+
+                        <!-- Warning displayed if product is being renamed. -->
+                        <span v-if="!renaming && renamed" class="text-yellow-500 rounded p-1">
+                            <div class="editor-label"></div>
+                            <span class="align-middle inline-block mr-1 pb-1 fill-current">
+                                <svg
+                                    clip-rule="evenodd"
+                                    fill-rule="evenodd"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="2"
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    height="18"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="m2.095 19.886 9.248-16.5c.133-.237.384-.384.657-.384.272 0 .524.147.656.384l9.248 16.5c.064.115.096.241.096.367 0 .385-.309.749-.752.749h-18.496c-.44 0-.752-.36-.752-.749 0-.126.031-.252.095-.367zm9.907-6.881c-.414 0-.75.336-.75.75v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5c0-.414-.336-.75-.75-.75zm-.002-3c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1z"
+                                        fill-rule="nonzero"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="align-center inline-block select-none text-sm"
+                                >{{
+                                    $t('editor.changingUuid', {
+                                        baseUuid: baseUuid,
+                                        changeUuid: renamed
+                                    })
+                                }} </span
+                            ><br />
+                        </span>
+
+                        <!-- Button to switch between loading and renaming product UUIDs. -->
+                        <span v-if="editExisting && loadStatus == 'loaded'" class="p-1">
+                            <div class="editor-label"></div>
+                            <button
+                                class="align-center inline-block select-none text-sm"
+                                @click="
+                                    renaming = !renaming;
+                                    changeUuid = '';
+                                    warning = warning == 'rename' ? 'none' : warning;
+                                "
                             >
-                                {{ formatDate(history.created) }}
-                            </li>
-                        </ul>
-                        <button
-                            :disabled="!selectedHistory || selectedHistory.storylineUUID !== uuid"
-                            class="editor-button bg-black text-white hover:bg-gray-800"
-                            @click="loadHistory()"
-                        >
-                            {{ $t('editor.loadPrevious') }}
-                        </button>
+                                {{ renaming ? $t('editor.cancel') : $t('editor.changeUuid') }}
+                            </button>
+                        </span>
                     </div>
                 </div>
                 <br />
@@ -130,14 +212,18 @@
                         <button class="editor-button">{{ $t('editor.back') }}</button>
                     </router-link>
                     <button
-                        @click="!warning ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
+                        @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
                         class="editor-button bg-black text-white"
                     >
                         {{ $t('editor.next') }}
                     </button>
                     <confirmation-modal
                         :name="`confirm-uuid-overwrite`"
-                        :message="$t(`Are you sure you want to overwrite product '${uuid}'?`)"
+                        :message="
+                            $t('editor.confirmOverwrite', {
+                                uuid: uuid
+                            })
+                        "
                         @ok="continueToEditor()"
                     />
                 </div>
@@ -215,6 +301,7 @@ import {
     ImagePanel,
     MapPanel,
     MetadataContent,
+    PanelType,
     Slide,
     SlideshowPanel,
     SourceCounts,
@@ -282,7 +369,7 @@ export default class MetadataEditorV extends Vue {
     loadStatus = 'waiting';
     loadEditor = false;
     error = false; // whether an error has occurred
-    warning = false; // used for duplicate uuid warning
+    warning: 'none' | 'uuid' | 'rename' = 'none'; // used for duplicate uuid warning
     configLang = 'en';
     showDropdown = false;
 
@@ -297,6 +384,10 @@ export default class MetadataEditorV extends Vue {
 
     // Form properties.
     uuid = '';
+    baseUuid = ''; // to save the original UUID
+    changeUuid = '';
+    renaming = false;
+    renamed = '';
     logoImage: undefined | File = undefined;
     metadata: MetadataContent = {
         title: '',
@@ -456,6 +547,12 @@ export default class MetadataEditorV extends Vue {
      */
     generateRemoteConfig(): void {
         this.loadStatus = 'loading';
+
+        // Reset fields
+        this.baseUuid = this.uuid;
+        this.renamed = '';
+        this.changeUuid = '';
+
         // Attempt to fetch the project from the server.
         fetch(this.apiUrl + `/retrieve/${this.uuid}`)
             .then((res: Response) => {
@@ -562,6 +659,80 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
+    async renameProduct(): Promise<void> {
+        if (!this.configFileStructure) {
+            return;
+        }
+
+        // Fetch the two existing configuration files.
+        const enFile = this.configFileStructure?.zip.file(`${this.uuid}_en.json`);
+        const frFile = this.configFileStructure?.zip.file(`${this.uuid}_fr.json`);
+
+        if (enFile && frFile) {
+            // Remove the files from the ZIP folder.
+            this.configFileStructure?.zip.remove(enFile.name);
+            this.configFileStructure?.zip.remove(frFile.name);
+
+            // Fetch the contents of the two files, and perform a find/replace on the UUID for each source.
+            const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
+            const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
+            [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
+
+            // Convert the configs back into a string and re-add them to the ZIP with the new UUID.
+            this.configFileStructure?.zip.file(`${this.changeUuid}_en.json`, JSON.stringify(englishConfig, null, 4));
+            this.configFileStructure?.zip.file(`${this.changeUuid}_fr.json`, JSON.stringify(frenchConfig, null, 4));
+
+            this.uuid = this.changeUuid;
+
+            // Reset source counts and re-generate the config file structure.
+            this.sourceCounts = {};
+            this.configFileStructureHelper(this.configFileStructure.zip);
+        }
+
+        this.renaming = false;
+        this.renamed = this.uuid;
+    }
+
+    // Given a Storylines config, replace instances of the current UUID with a new UUID.
+    renameSources(config: StoryRampConfig): void {
+        const _renameHelper = (panel: any): any => {
+            switch (panel.type) {
+                case PanelType.Dynamic:
+                    (panel as DynamicPanel).children.forEach((child) => {
+                        _renameHelper(child.panel);
+                    });
+                    break;
+                case PanelType.Slideshow:
+                    (panel as SlideshowPanel).items.forEach((child) => {
+                        _renameHelper(child);
+                    });
+                    break;
+                default:
+                    // Base case. This is a panel that doesn't have any children (i.e., not dynamic, slideshow).
+                    // Rename the source.
+                    if (panel.src) {
+                        panel.src = panel.src.replace(`${this.uuid}/`, `${this.changeUuid}/`);
+                    }
+                    if (panel.config && typeof panel.config === 'string') {
+                        panel.config = panel.config.replace(`${this.uuid}/`, `${this.changeUuid}/`);
+                    }
+            }
+        };
+
+        if (config?.introSlide.logo?.src) {
+            config.introSlide.logo.src = config.introSlide.logo.src.replace(
+                `${this.uuid}/assets/`,
+                `${this.changeUuid}/assets/`
+            );
+        }
+
+        config.slides.forEach((slide) => {
+            slide.panel.forEach((panel) => {
+                _renameHelper(panel);
+            });
+        });
+    }
+
     findSources(configs: { [key: string]: StoryRampConfig | undefined }): void {
         ['en', 'fr'].forEach((lang) => {
             if (configs[lang]?.introSlide.logo?.src) {
@@ -578,34 +749,34 @@ export default class MetadataEditorV extends Vue {
 
     panelSourceHelper(panel: BasePanel): void {
         switch (panel.type) {
-            case 'dynamic':
+            case PanelType.Dynamic:
                 (panel as DynamicPanel).children.forEach((subPanel: DynamicChildItem) => {
                     this.panelSourceHelper(subPanel.panel);
                 });
                 break;
-            case 'slideshow':
+            case PanelType.Slideshow:
                 (panel as SlideshowPanel).items.forEach((item: ChartPanel | TextPanel | ImagePanel | MapPanel) => {
                     this.panelSourceHelper(item);
                 });
                 break;
-            case 'chart':
+            case PanelType.Chart:
                 this.incrementSourceCount((panel as ChartPanel).src);
                 break;
-            case 'image':
+            case PanelType.Image:
                 this.incrementSourceCount((panel as ImagePanel).src);
                 break;
-            case 'video':
+            case PanelType.Video:
                 if ((panel as VideoPanel).videoType === 'local') {
                     this.incrementSourceCount((panel as VideoPanel).src);
                 }
                 break;
-            case 'audio':
+            case PanelType.Audio:
                 this.incrementSourceCount((panel as AudioPanel).src);
                 break;
-            case 'map':
+            case PanelType.Map:
                 this.incrementSourceCount((panel as MapPanel).config);
                 break;
-            case 'text':
+            case PanelType.Text:
                 break;
             default:
                 break;
@@ -678,7 +849,7 @@ export default class MetadataEditorV extends Vue {
             return;
         }
 
-        if (this.loadExisting) {
+        if (this.loadExisting && !this.renamed) {
             this.loadStatus = 'waiting';
             Message.success('Successfully loaded storyline!');
         } else {
@@ -934,11 +1105,11 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    checkUuid(): void {
-        if (!this.loadExisting) {
-            fetch(this.apiUrl + `/retrieve/${this.uuid}`).then((res: Response) => {
+    checkUuid(rename?: boolean): void {
+        if (!this.loadExisting || rename) {
+            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
-                    this.warning = true;
+                    this.warning = rename ? 'rename' : 'uuid';
                 }
 
                 fetch(this.apiUrl + `/retrieveMessages`)
@@ -955,7 +1126,7 @@ export default class MetadataEditorV extends Vue {
                     .catch((error: any) => console.log(error.response || error));
             });
         }
-        this.warning = false;
+        this.warning = 'none';
     }
 
     /**
