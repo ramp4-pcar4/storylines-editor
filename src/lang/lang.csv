@@ -28,7 +28,11 @@ editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées d’un pr
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
 editor.metadata.instructions,Fill in metadata details about your new Storylines product. Use the "Preview" button to see what your slides will look like.,1,Inscrivez les métadonnées de votre nouveau produit de scénario. Utilisez la fonction « Afficher l’aperçu » pour voir à quoi ressemblent vos diapositives.,1
 editor.uuid,UUID,1,UUID,0
-editor.uuid.exists,UUID already exists. Saving this will overwrite existing product.,1,L’IDUU existe déjà. Enregistrer ce produit écrasera le produit existant.,1
+editor.uuid.new,New UUID,1,New UUID,0
+editor.warning.uuid,UUID already exists. Saving this will overwrite existing product.,1,L’IDUU existe déjà. Enregistrer ce produit écrasera le produit existant.,1
+editor.warning.rename,UUID already in use. Proceeding will overwrite the existing product.,1,UUID already in use. Proceeding will overwrite the existing product.,0
+editor.changeUuid,Click here to change UUID,1,Click here to change UUID,0
+editor.changingUuid,You are changing this product UUID from {baseUuid} to {changeUuid}. Save changes required.,1,You are changing this product UUID from {baseUuid} to {changeUuid}. Save changes required.,0
 editor.title,Title,1,Titre,1
 editor.logo,Logo,1,Logo,1
 editor.logoPreview,Logo Preview,1,Aperçu du logo,1
@@ -40,6 +44,7 @@ editor.contextLabel,Context Label,1,Étiquette de contexte,1
 editor.contextLabel.info,Context label shows up before the context link to explain what the link is for,1,L’étiquette de contexte apparaît avant le lien contextuel et explique à quoi sert le lien.,1
 editor.dateModified,Date Modified,1,Date de modification,1
 editor.load,Load,1,Charger,1
+editor.rename,Rename,1,Rename,0
 editor.browse,Browse,1,Parcourir,1
 editor.remove,Remove,1,Supprimer,1
 editor.back,Back,1,Retour,1
@@ -53,6 +58,7 @@ editor.label.or,or,1,ou,1
 editor.label.browse,browse,1,parcourir,1
 editor.label.upload,to upload,1,téléverser,1
 editor.savingChanges,Saving...,1,Enregistrement...,1
+editor.confirmOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Are you sure you want to overwrite product '{uuid}'?,0
 editor.resetChanges,Reset Changes,1,Annuler les modifications,1
 editor.refreshChanges.modal,"Are you sure you want to reload the product? All unsaved changes will be lost.",1,"Voulez-vous vraiment recharger ce produit? Toute modification non enregistrée sera perdue.",1
 editor.changeLang.modal,"Are you sure you want to switch languages? Unsaved changes may be lost.",1,"Voulez-vous vraiment changer de langue? Toute modification non enregistrée sera perdue.",1
