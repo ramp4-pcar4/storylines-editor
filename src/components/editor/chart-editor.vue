@@ -80,8 +80,6 @@ import draggable from 'vuedraggable';
 
 @Options({
     components: {
-        // TODO: fix when storylines plugin updated to Vue 3
-        // 'chart-panel': ChartPanelV,
         ChartPreview: ChartPreviewV,
         'confirmation-modal': ConfirmationModalV,
         draggable

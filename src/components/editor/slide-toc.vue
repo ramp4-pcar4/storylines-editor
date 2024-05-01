@@ -143,7 +143,6 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
-    ChartConfig,
     ChartPanel,
     ConfigFileStructure,
     DynamicChildItem,

@@ -45,11 +45,12 @@
                     @click="
                         () => {
                             panelIndex = 0;
+                            advancedEditorView = false;
                             saveChanges();
                         }
                     "
                     class="editor-button border-t border-l border-r"
-                    :class="panelIndex == 0 ? 'border-black' : 'border-white'"
+                    :class="panelIndex == 0 && !advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
                         <svg
@@ -91,11 +92,12 @@
                     @click="
                         () => {
                             panelIndex = 1;
+                            advancedEditorView = false;
                             saveChanges();
                         }
                     "
                     class="editor-button border-t border-l border-r"
-                    :class="panelIndex == 1 ? 'border-black' : 'border-white'"
+                    :class="panelIndex == 1 && !advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
                         <svg
@@ -134,15 +136,29 @@
 
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.rightPanel') }}</span>
                 </button>
+                <button
+                    @click="
+                        () => {
+                            advancedEditorView = true;
+                            saveChanges();
+                        }
+                    "
+                    class="editor-button border-t border-l border-r"
+                    :class="advancedEditorView ? 'border-black' : 'border-white'"
+                >
+                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
+                </button>
             </div>
             <div v-else class="border-b border-black">
                 <button
                     @click="
                         () => {
+                            advancedEditorView = false;
                             saveChanges();
                         }
                     "
-                    class="editor-button border-t border-l border-r border-black"
+                    class="editor-button border-t border-l border-r"
+                    :class="!advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
                         <svg
@@ -181,12 +197,24 @@
 
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.fullscreenPanel') }}</span>
                 </button>
+                <button
+                    @click="
+                        () => {
+                            advancedEditorView = true;
+                            saveChanges();
+                        }
+                    "
+                    class="border-t border-l border-r"
+                    :class="advancedEditorView ? 'border-black' : 'border-white'"
+                >
+                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
+                </button>
             </div>
             <div>
                 <div class="flex mt-4">
                     <span class="font-bold text-xl">{{ $t('editor.slides.content') }}:</span>
                     <span class="ml-auto flex-grow"></span>
-                    <div class="flex flex-col mr-8">
+                    <div v-if="(panelIndex === 1 && !advancedEditorView) || rightOnly" class="flex flex-col mr-8">
                         <label class="editor-label text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
                         <select
                             ref="typeSelector"
@@ -206,6 +234,15 @@
                         </select>
                     </div>
                 </div>
+                <custom-editor
+                    ref="editor"
+                    :config="currentSlide"
+                    :lang="lang"
+                    :slideIndex="slideIndex"
+                    @slide-edit="$emit('slide-edit')"
+                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save)"
+                    v-if="advancedEditorView"
+                ></custom-editor>
                 <component
                     ref="editor"
                     :is="editors[determineEditorType(currentSlide.panel[panelIndex])]"
@@ -216,6 +253,7 @@
                     :uid="uid"
                     :sourceCounts="sourceCounts"
                     @slide-edit="$emit('slide-edit')"
+                    v-else
                 ></component>
             </div>
         </div>
@@ -249,7 +287,6 @@
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
-    ChartConfig,
     ChartPanel,
     ConfigFileStructure,
     DefaultConfigs,
@@ -267,6 +304,7 @@ import {
 } from '@/definitions';
 
 import ChartEditorV from './chart-editor.vue';
+import CustomEditorV from './helpers/custom-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
@@ -279,6 +317,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
 @Options({
     components: {
         'chart-editor': ChartEditorV,
+        'custom-editor': CustomEditorV,
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
         'map-editor': MapEditorV,
@@ -300,6 +339,7 @@ export default class SlideEditorV extends Vue {
     @Prop() sourceCounts!: SourceCounts;
 
     panelIndex = 0;
+    advancedEditorView = false;
     newType = '';
     rightOnly = false;
 
@@ -451,9 +491,10 @@ export default class SlideEditorV extends Vue {
     saveChanges(): void {
         if (
             this.$refs.editor !== undefined &&
-            typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV).saveChanges === 'function'
+            typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV).saveChanges ===
+                'function'
         ) {
-            (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV).saveChanges();
+            (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV).saveChanges();
         }
     }
 

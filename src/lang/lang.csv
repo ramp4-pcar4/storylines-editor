@@ -119,6 +119,7 @@ editor.slides.nextSlide,Next slide,1,Diapositive suivante,1
 editor.slides.leftPanel,Left panel,1,Panneau de gauche,1
 editor.slides.rightPanel,Right panel,1,Panneau de droite,1
 editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
+editor.slides.advanced,Advanced,1,Avancé,0
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1
