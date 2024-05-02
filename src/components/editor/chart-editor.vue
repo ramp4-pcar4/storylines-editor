@@ -91,6 +91,8 @@ export default class ChartEditorV extends Vue {
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
     @Prop({ default: true }) allowMany!: boolean;
+    @Prop({ default: false }) centerSlide!: boolean;
+    @Prop({ default: false }) dynamicSelected!: boolean;
 
     edited = false;
 
@@ -122,6 +124,16 @@ export default class ChartEditorV extends Vue {
                 : this.panel.src
                 ? [this.panel]
                 : [];
+
+        if (this.centerSlide && this.dynamicSelected) {
+            for (const c in charts) {
+                charts[c].customStyles += 'text-align: left;';
+            }
+        } else if (!this.centerSlide && this.dynamicSelected) {
+            for (const c in charts) {
+                charts[c].customStyles = (charts[c].customStyles || '').replace('text-align: left;', '');
+            }
+        }
 
         // load charts from existing storylines product
         if (charts !== undefined && charts.length) {
