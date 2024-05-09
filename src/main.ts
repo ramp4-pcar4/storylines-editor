@@ -20,8 +20,8 @@ VueMarkdownEditor.use(githubTheme, {
 });
 
 import { createVfm } from 'vue-final-modal';
+import 'vue-final-modal/style.css'
 const vfm = createVfm();
-import 'vue-final-modal/dist/style.css';
 
 import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';
