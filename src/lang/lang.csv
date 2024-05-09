@@ -21,6 +21,7 @@ timeslider.play,Play,1,Lecture,1
 timeslider.pause,Pause,1,Pause,1
 fullscreen.activate,Enter Fullscreen,1,Afficher le mode plein écran,1
 fullscreen.deactivate,Exit Fullscreen,1,Quitter le mode plein écran,1
+editor.feedback,Send Us Feedback,1,[FR] Send Us Feedback,0
 editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1

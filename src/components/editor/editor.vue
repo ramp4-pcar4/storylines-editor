@@ -128,6 +128,13 @@
                 :sourceCounts="sourceCounts"
             ></slide-editor>
         </div>
+        <div class="footer text-right pr-5 editor-button">
+            <a
+                href="mailto:applicationsdecartographieweb-webmappingapplications@ec.gc.ca?subject=Storylines Editor Feedback"
+            >
+                {{ $t('editor.feedback') }}
+            </a>
+        </div>
         <slot name="metadataModal"></slot>
         <confirmation-modal
             :name="`reload-config`"
