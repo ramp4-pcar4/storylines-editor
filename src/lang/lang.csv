@@ -24,6 +24,7 @@ fullscreen.deactivate,Exit Fullscreen,1,Quitter le mode plein écran,1
 editor.feedback,Send Us Feedback,1,Envoyez-nous vos commentaires,0
 editor.feedback.subject,Storylines Editor Feedback,1,Commentaires de l'éditeur de scénarios,0
 editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
+editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,[FR] Are you sure you want to overwrite product '{uuid}'?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
 editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées d’un projet,1
@@ -83,8 +84,8 @@ editor.chart.label.edit,Edit,1,Éditer,1
 editor.chart.label.empty,Empty,1,Vide,1
 editor.chart.label.create,Add new chart,1,Ajouter un nouveau graphique,1
 editor.chart.label.info,Interactive chart,1,[FR] Interactive chart,0
-editor.chart.label.nameExists,There is already an existing chart with the name {name}.,1,There is already an existing chart with the name {name}.,0
 editor.chart.label.info,Interactive charts ({num}),1,Graphiques interactifs ({num}),1
+editor.chart.label.nameExists,There is already an existing chart with the name {name}.,1,There is already an existing chart with the name {name}.,0
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Voulez-vous vraiment supprimer le graphique {nom}?,1
 editor.map.title,Map title,1,Titre de la carte,1
 editor.map.edit.cancel,Cancel editing,1,Annuler les modifications,1
