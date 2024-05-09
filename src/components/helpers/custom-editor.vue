@@ -22,7 +22,7 @@
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { Vue3JsonEditor } from 'vue3-json-editor';
-import { Validator } from '@/definitions';
+import { Validator } from 'jsonschema';
 
 @Options({
     components: {
@@ -38,8 +38,7 @@ export default class CustomEditorV extends Vue {
     updatedConfig = '';
     edited = false;
 
-    jsonValidator = require('jsonschema').Validator;
-    validator: Validator = new this.jsonValidator();
+    validator: Validator = new Validator();
     storylinesSchema = '';
 
     mounted(): void {
@@ -61,7 +60,7 @@ export default class CustomEditorV extends Vue {
 
     onJsonSave(): void {
         // TODO: add any missing properties in schema as required (e.g. chart options)
-        const checkValidation = this.validator.validate(this.updatedConfig, this.storylinesSchema);
+        const checkValidation = this.validator.validate(this.updatedConfig, this.storylinesSchema as any);
         if (checkValidation.valid) {
             this.$emit('config-edited', this.updatedConfig, true);
         } else {
