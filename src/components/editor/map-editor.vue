@@ -75,13 +75,17 @@ export default class MapEditorV extends Vue {
     newFileName = '';
 
     // TimeSlider
-    usingTimeSlider = !!this.panel.timeSlider;
+    usingTimeSlider = false;
     timeSliderError = false;
     timeSliderConf: TimeSliderConfig = { range: [], start: [], attribute: '' };
-    status = this.panel.config !== '' ? 'default' : 'creating';
-    strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[2].split('.')[0] : '';
+    status = 'default';
+    strippedFileName = '';
 
     mounted(): void {
+        this.usingTimeSlider = !!this.panel.timeSlider;
+        this.status = this.panel.config !== '' ? 'default' : 'creating';
+        this.strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[2].split('.')[0] : '';
+
         this.timeSliderConf = JSON.parse(
             JSON.stringify({
                 range: this.panel.timeSlider?.range ?? [1000, new Date().getFullYear()],

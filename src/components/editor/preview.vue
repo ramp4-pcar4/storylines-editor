@@ -71,25 +71,70 @@ export default class StoryPreviewV extends Vue {
     lang = 'en';
     headerHeight = 0;
     uid = '';
+    apiUrl = process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#' ? process.env.VUE_APP_API_URL : 'http://localhost:6040';
+    configs: {
+        [key: string]: StoryRampConfig | undefined;
+    } = { en: undefined, fr: undefined };
 
     created(): void {
         const uid = this.$route.params.uid as string;
         const lang = this.$route.params.lang as string;
+        const JSZip = require('jszip');
+        const axios = require('axios').default;
+
         if (uid) {
             this.savedProduct = true;
             // attempt to fetch saved config file from the server (TODO: setup as express route?)
-            fetch(`http://localhost:6040/retrieve/${uid}/${lang}`).then((res: Response) => {
+            fetch(this.apiUrl + `/retrieve/${uid}`).then((res: Response) => {
                 if (res.status === 404) {
                     console.error(`There does not exist a saved product with UID ${uid}.`);
                     // redirect to canada.ca 404 page on invalid URL params
                     // window.location.href = 'https://www.canada.ca/errors/404.html';
                 } else {
-                    res.json().then((config: StoryRampConfig) => {
-                        this.config = config;
-                        this.loadStatus = 'loaded';
-                        document.title = this.config.title + ' - Canada.ca';
+                    const configZip = new JSZip();
+                    // Files retrieved. Convert them into a JSZip object.
+                    res.blob().then((file: Blob) => {
+                        configZip.loadAsync(file).then(() => {
+                            const assetsFolder = configZip.folder('assets');
+                            const chartsFolder = configZip.folder('charts');
+                            const rampConfigFolder = configZip.folder('ramp-config');
+
+                            this.configFileStructure = {
+                                uuid: uid,
+                                zip: configZip,
+                                configs: this.configs as unknown as { [key: string]: StoryRampConfig },
+                                assets: {
+                                    en: assetsFolder.folder('en'),
+                                    fr: assetsFolder.folder('fr')
+                                },
+                                charts: {
+                                    en: chartsFolder.folder('en'),
+                                    fr: chartsFolder.folder('fr')
+                                },
+                                rampConfig: rampConfigFolder
+                            };
+
+                            const filePath = `${uid}_${lang}.json`;
+                            configZip
+                                .file(filePath)
+                                .async('string')
+                                .then((configContent: string) => {
+                                    const config = JSON.parse(configContent) as StoryRampConfig;
+                                    this.config = config;
+                                    this.loadStatus = 'loaded';
+                                    document.title = this.config.title + ' - Canada.ca';
+                                });
+                        });
                     });
                 }
+
+                fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
+                    axios
+                        .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                            messages: res.data.messages
+                        })
+                        .catch((error: any) => console.log(error.response || error));
+                });
             });
         } else {
             this.config = window.props.config;

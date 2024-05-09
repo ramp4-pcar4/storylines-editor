@@ -7,6 +7,7 @@
 <script lang="ts">
 import { Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
+import { useUserStore } from './stores/userStore';
 
 export default class App extends Vue {
     @Watch('$route', { immediate: true })
@@ -14,6 +15,14 @@ export default class App extends Vue {
         this.$i18n.locale = (to.params.lang as string) ?? 'en';
         if (to.params.lang) {
             document.title = this.$t(to.meta.title);
+        }
+    }
+
+    mounted() {
+        const userStore = useUserStore(this.$pinia);
+        // We can mock the user's profile for local development here if needed.
+        if (process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
+            userStore.fetchUserProfile();
         }
     }
 }
