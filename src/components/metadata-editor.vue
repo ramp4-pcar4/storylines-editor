@@ -325,9 +325,9 @@ import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
 import { useUserStore } from '../stores/userStore';
 
-const JSZip = require('jszip');
-const axios = require('axios').default;
-const { v4: uuidv4 } = require('uuid');
+import JSZip from 'jszip';
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 import Message from 'vue-m-message';
 import SlideEditorV from './slide-editor.vue';
@@ -820,14 +820,14 @@ export default class MetadataEditorV extends Vue {
             zip: configZip,
             configs: this.configs as unknown as { [key: string]: StoryRampConfig },
             assets: {
-                en: assetsFolder.folder('en'),
-                fr: assetsFolder.folder('fr')
+                en: (assetsFolder as JSZip).folder('en') as JSZip,
+                fr: (assetsFolder as JSZip).folder('fr') as JSZip
             },
             charts: {
-                en: chartsFolder.folder('en'),
-                fr: chartsFolder.folder('fr')
+                en: (chartsFolder as JSZip).folder('en') as JSZip,
+                fr: (chartsFolder as JSZip).folder('fr') as JSZip
             },
-            rampConfig: rampConfigFolder
+            rampConfig: rampConfigFolder as JSZip
         };
 
         // If uploadLogo is set, upload the logo to the directory.

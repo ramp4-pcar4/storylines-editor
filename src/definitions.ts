@@ -46,11 +46,6 @@ export interface Highchart {
     toString(): string;
 }
 
-export interface Validator {
-    addSchema(): void;
-    validate(json: string, schema: string): any;
-}
-
 export interface DQVOptions {
     title: string;
     subtitle: string;
