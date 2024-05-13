@@ -259,12 +259,16 @@ export default class SlideshowEditorV extends Vue {
             itemConfig = (this.$refs.slideEditor as any).panel;
         }
 
-        if (itemConfig.type !== PanelType.Text && itemConfig.type !== PanelType.Map) {
+        if (itemConfig.type !== PanelType.Text) {
             if (
                 this.$refs.slideEditor !== undefined &&
                 typeof (this.$refs.slideEditor as ImageEditorV | ChartEditorV).saveChanges === 'function'
             ) {
                 (this.$refs.slideEditor as ImageEditorV | ChartEditorV).saveChanges();
+
+                if (itemConfig.type === PanelType.Map) {
+                    this.$emit('slide-edit');
+                }
             }
         }
 
