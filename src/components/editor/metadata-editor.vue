@@ -12,8 +12,8 @@
                     </button>
                 </div>
 
-                <div class="border py-5 w-5/6">
-                    <label>
+                <div class="flex items-center border py-5 w-5/6">
+                    <label class="editor-label">
                         <span class="text-red-500" v-if="'uuid' in reqFields">*</span> {{ $t('editor.uuid') }}:
                     </label>
                     <div class="relative w-1/3 inline-block">
@@ -27,7 +27,7 @@
                                 checkUuid();
                             "
                             v-model="uuid"
-                            class="w-full"
+                            class="editor-input w-full mt-0"
                             :class="{ 'input-error': error || !reqFields.uuid }"
                         />
                         <div class="absolute z-10 w-full bg-white border border-gray-200 mt-1" v-show="showDropdown">
@@ -76,7 +76,7 @@
                     </button>
                     <button
                         @click="fetchHistory"
-                        class="bg-black text-white hover:bg-gray-800"
+                        class="bg-black editor-button text-white hover:bg-gray-800"
                         :class="{ 'input-error': error }"
                         v-if="editExisting"
                     >
@@ -85,7 +85,7 @@
                     <div class="inline-flex align-middle mb-1" v-if="loadStatus === 'loading'">
                         <spinner size="24px" color="#009CD1" class="mx-2 my-auto"></spinner>
                     </div>
-                    <div v-if="editExisting" class="inline-flex border py-5 ml-10">
+                    <div v-if="editExisting" class="ml-10">
                         <ul>
                             <li
                                 v-for="history in storylineHistory"
@@ -99,7 +99,7 @@
                         </ul>
                         <button
                             :disabled="!selectedHistory || selectedHistory.storylineUUID !== uuid"
-                            class="bg-black text-white hover:bg-gray-800"
+                            class="editor-button bg-black text-white hover:bg-gray-800"
                             @click="loadHistory()"
                         >
                             {{ $t('editor.loadPrevious') }}
@@ -1129,7 +1129,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         max-width: 80%;
     }
 
-    .editor-container label,
     .vfm__content label {
         width: 10vw;
         text-align: right;
@@ -1141,7 +1140,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: larger;
     }
 
-    .editor-container input,
     .vfm__content input {
         padding: 5px 10px;
         margin-top: 5px;
@@ -1153,7 +1151,6 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         border: 1px solid red;
     }
 
-    .editor-container button,
     .vfm__content button {
         padding: 5px 12px;
         margin: 0px 10px;
@@ -1161,13 +1158,11 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         transition-duration: 0.2s;
     }
 
-    .editor-container button:hover:enabled,
     .vfm__content button:hover:enabled {
         background-color: #dbdbdb;
         color: black;
     }
 
-    .editor-container button:disabled,
     .vfm__content button:disabled {
         border: 1px solid gray;
         color: gray;
