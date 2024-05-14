@@ -6,6 +6,9 @@ import path from 'path';
 
 export default defineConfig({
     plugins: [vue(), dsv()],
+    define: {
+        'process.env': process.env
+    },
     base: './',
     resolve: {
         alias: {
