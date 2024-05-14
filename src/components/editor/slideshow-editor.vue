@@ -9,7 +9,10 @@
             }}</span>
 
             <!-- add item button -->
-            <button class="bg-gray-100 cursor-pointer hover:bg-gray-200" @click="editingStatus = 'create'">
+            <button
+                class="editor-button bg-gray-100 cursor-pointer hover:bg-gray-200"
+                @click="editingStatus = 'create'"
+            >
                 <div class="flex items-center">
                     <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
@@ -23,8 +26,8 @@
         <hr class="border-solid border-t-2 border-gray-300 my-2" />
         <!-- Metadata Editor -->
         <div class="flex items-center w-full text-left">
-            <label class="text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
-            <input class="w-1/3" type="text" v-model="panel.caption" /><br />
+            <label class="editor-label text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
+            <input class="editor-input w-1/3" type="text" v-model="panel.caption" /><br />
         </div>
         <table class="w-2/3 mt-5">
             <thead>
@@ -70,7 +73,7 @@
                         :allowMany="false"
                     ></component>
                     <div class="mt-3 w-full flex justify-end">
-                        <button class="bg-black text-white hover:bg-gray-800" @click="saveItem(true)">
+                        <button class="editor-button bg-black text-white hover:bg-gray-800" @click="saveItem(true)">
                             {{ $t('editor.slideshow.label.add') }}
                         </button>
                     </div>
@@ -88,7 +91,7 @@
                         :allowMany="false"
                     ></component>
                     <div class="mt-3 w-full flex justify-end">
-                        <button class="bg-black text-white hover:bg-gray-800" @click="saveItem()">
+                        <button class="editor-button bg-black text-white hover:bg-gray-800" @click="saveItem()">
                             {{ $t('editor.saveChanges') }}
                         </button>
                     </div>

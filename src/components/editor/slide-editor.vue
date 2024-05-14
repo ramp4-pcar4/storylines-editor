@@ -220,7 +220,7 @@
                             saveChanges();
                         }
                     "
-                    class="border-t border-l border-r"
+                    class="editor-button border-t border-l border-r"
                     :class="advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
