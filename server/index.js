@@ -7,16 +7,15 @@ var cors = require('cors');
 var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
-const axios = require('axios');
 const responseMessages = [];
 require('dotenv').config();
 
 // CONFIGURATION
-PORT = 6040; // the Express server will run on this port.
-UPLOAD_PATH = process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_UPLOAD_PATH : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
-TARGET_PATH = process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_TARGET_PATH : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
-LOG_PATH = process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_LOG_PATH : './logfile.txt'; // the path to the logfile
-ROUTE_PREFIX = process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? '/Storylines-Editor-STB-Server' : '';
+PORT = process.env.port ? process.env.port : 6040; // the Express server will run on this port.
+UPLOAD_PATH = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_UPLOAD_PATH : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
+TARGET_PATH = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_TARGET_PATH : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
+LOG_PATH = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_LOG_PATH : './logfile.txt'; // the path to the logfile
+ROUTE_PREFIX = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? '/Storylines-Editor-STB-Server' : '';
 
 // Create express app.
 var app = express();
@@ -107,7 +106,6 @@ app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
         fs.access(PRODUCT_PATH, (error) => {
             if (!error) {
                 const output = fs.createWriteStream(uploadLocation);
-
                 // This event listener is fired when the write stream has finished. This means that the
                 // ZIP file should be correctly populated. Now, we can set the correct headers and send the
                 // ZIP file to the client.
@@ -239,6 +237,6 @@ function logger(type, message) {
 }
 
 // Run the express app on the IIS Port.
-var server = app.listen(process.env.PORT, function () {
-    logger('INFO', `Storylines Express Server Started, PORT: ${process.env.PORT}`);
+var server = app.listen(PORT, function () {
+    logger('INFO', `Storylines Express Server Started, PORT: ${PORT}`);
 });
