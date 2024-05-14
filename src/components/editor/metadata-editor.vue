@@ -137,9 +137,11 @@
                     </button>
                     <confirmation-modal
                         :name="`confirm-uuid-overwrite`"
-                        :message="$t('editor.configOverwrite', {
-                            uuid: uuid
-                        })"
+                        :message="
+                            $t('editor.configOverwrite', {
+                                uuid: uuid
+                            })
+                        "
                         @ok="continueToEditor()"
                     />
                 </div>
@@ -295,7 +297,10 @@ export default class MetadataEditorV extends Vue {
     saving = false;
     unsavedChanges = false;
 
-    apiUrl = process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#' ? process.env.VUE_APP_API_URL : 'http://localhost:6040';
+    apiUrl =
+        import.meta.env.VITE_APP_CURR_ENV && import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#'
+            ? import.meta.env.VITE_APP_API_URL
+            : 'http://localhost:6040';
 
     // Form properties.
     uuid = '';
@@ -482,11 +487,13 @@ export default class MetadataEditorV extends Vue {
                         if (res.ok) return res.json();
                     })
                     .then((data) => {
-                        axios
-                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
-                                messages: data.messages
-                            })
-                            .catch((error: any) => console.log(error.response || error));
+                        if (import.meta.env.VITE_APP_CURR_ENV && import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#') {
+                            axios
+                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                    messages: data.messages
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        }
                     })
                     .catch((error: any) => console.log(error.response || error));
             })
@@ -499,9 +506,9 @@ export default class MetadataEditorV extends Vue {
     fetchHistory(): void {
         if (this.uuid === undefined) Message.error(`You must first enter a UUID`);
 
-        if (process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
+        if (import.meta.env.VITE_APP_CURR_ENV && import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#') {
             axios
-                .get(process.env.VUE_APP_NET_API_URL + `/api/version/fetch/${this.uuid}`)
+                .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/fetch/${this.uuid}`)
                 .then((response: any) => {
                     this.storylineHistory = response.data;
                 })
@@ -530,11 +537,15 @@ export default class MetadataEditorV extends Vue {
     }
 
     loadHistory(): void {
-        if (this.selectedHistory && process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
+        if (
+            this.selectedHistory &&
+            import.meta.env.VITE_APP_CURR_ENV &&
+            import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#'
+        ) {
             this.loadStatus = 'loading';
 
             axios
-                .get(process.env.VUE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.id}`, {
+                .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.id}`, {
                     responseType: 'blob'
                 })
                 .then((response: any) => {
@@ -778,10 +789,10 @@ export default class MetadataEditorV extends Vue {
                     this.loadExisting = true; // if editExisting was false, we can now set it to true
                     Message.success('Successfully saved changes!');
 
-                    if (process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
+                    if (import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#') {
                         if (responseData.new) {
                             axios
-                                .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
+                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
                                     uuid: this.uuid
                                 })
                                 .then((response: any) => {
@@ -791,7 +802,7 @@ export default class MetadataEditorV extends Vue {
 
                                     formData.append('uuid', this.uuid);
                                     axios
-                                        .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
+                                        .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
                                             console.log('Version saved successfully.');
                                         })
@@ -801,7 +812,7 @@ export default class MetadataEditorV extends Vue {
                         } else {
                             formData.append('uuid', this.uuid);
                             axios
-                                .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
+                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
                                     console.log('Version saved successfully.');
                                 })
@@ -814,7 +825,7 @@ export default class MetadataEditorV extends Vue {
                             })
                             .then((data) => {
                                 axios
-                                    .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                                    .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
                                         messages: data.messages
                                     })
                                     .catch((error: any) => console.log(error.response || error));
@@ -949,7 +960,7 @@ export default class MetadataEditorV extends Vue {
                     })
                     .then((data) => {
                         axios
-                            .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
                                 messages: data.messages
                             })
                             .catch((error: any) => console.log(error.response || error));

@@ -57,6 +57,9 @@ import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 
+import JSZip from 'jszip';
+import axios from 'axios';
+
 @Options({
     components: {
         spinner: VueSpinnerOval
@@ -71,7 +74,10 @@ export default class StoryPreviewV extends Vue {
     lang = 'en';
     headerHeight = 0;
     uid = '';
-    apiUrl = process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#' ? process.env.VUE_APP_API_URL : 'http://localhost:6040';
+    apiUrl =
+        import.meta.env.VUE_APP_CURR_ENV && import.meta.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#'
+            ? import.meta.env.VUE_APP_API_URL
+            : 'http://localhost:6040';
     configs: {
         [key: string]: StoryRampConfig | undefined;
     } = { en: undefined, fr: undefined };
@@ -79,8 +85,6 @@ export default class StoryPreviewV extends Vue {
     created(): void {
         const uid = this.$route.params.uid as string;
         const lang = this.$route.params.lang as string;
-        const JSZip = require('jszip');
-        const axios = require('axios').default;
 
         if (uid) {
             this.savedProduct = true;
@@ -104,33 +108,30 @@ export default class StoryPreviewV extends Vue {
                                 zip: configZip,
                                 configs: this.configs as unknown as { [key: string]: StoryRampConfig },
                                 assets: {
-                                    en: assetsFolder.folder('en'),
-                                    fr: assetsFolder.folder('fr')
+                                    en: (assetsFolder as JSZip).folder('en') as JSZip,
+                                    fr: (assetsFolder as JSZip).folder('fr') as JSZip
                                 },
                                 charts: {
-                                    en: chartsFolder.folder('en'),
-                                    fr: chartsFolder.folder('fr')
+                                    en: (chartsFolder as JSZip).folder('en') as JSZip,
+                                    fr: (chartsFolder as JSZip).folder('fr') as JSZip
                                 },
-                                rampConfig: rampConfigFolder
+                                rampConfig: rampConfigFolder as JSZip
                             };
 
-                            const filePath = `${uid}_${lang}.json`;
-                            configZip
-                                .file(filePath)
-                                .async('string')
-                                .then((configContent: string) => {
-                                    const config = JSON.parse(configContent) as StoryRampConfig;
-                                    this.config = config;
-                                    this.loadStatus = 'loaded';
-                                    document.title = this.config.title + ' - Canada.ca';
-                                });
+                            const configFile = configZip.file(`${uid}_${lang}.json`);
+                            configFile?.async('string').then((configContent: string) => {
+                                const config = JSON.parse(configContent) as StoryRampConfig;
+                                this.config = config;
+                                this.loadStatus = 'loaded';
+                                document.title = this.config.title + ' - Canada.ca';
+                            });
                         });
                     });
                 }
 
                 fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
                     axios
-                        .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
+                        .post(import.meta.env.VUE_APP_NET_API_URL + '/api/log/create', {
                             messages: res.data.messages
                         })
                         .catch((error: any) => console.log(error.response || error));

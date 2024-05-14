@@ -1,3 +1,20 @@
+import {
+    createInstance,
+    geo,
+    configUpgrade,
+    layerConfigUpgrade,
+    version
+    // @ts-ignore
+} from '../scripts/ramp4/ramp.esm.js';
+// @ts-ignore
+window.RAMP = {
+    createInstance,
+    geo,
+    configUpgrade,
+    layerConfigUpgrade,
+    version
+};
+
 import { createApp } from 'vue';
 import App from './app.vue';
 import { createPinia } from 'pinia';
@@ -20,7 +37,7 @@ VueMarkdownEditor.use(githubTheme, {
 });
 
 import { createVfm } from 'vue-final-modal';
-import 'vue-final-modal/style.css'
+import 'vue-final-modal/style.css';
 const vfm = createVfm();
 
 import VueTippy from 'vue-tippy';
