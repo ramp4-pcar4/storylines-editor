@@ -26,7 +26,7 @@ editor.lang.fr,French,1,Français,1
 editor.feedback,Send Us Feedback,1,Envoyez-nous vos commentaires,0
 editor.feedback.subject,Storylines Editor Feedback,1,Commentaires de l'éditeur de scénarios,0
 editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
-editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,[FR] Are you sure you want to overwrite product '{uuid}'?,0
+editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Êtes-vous sûr de vouloir remplacer le produit « {uuid} » ?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
 editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées d’un projet,1
@@ -49,9 +49,9 @@ editor.contextLabel,Context Label,1,Étiquette de contexte,1
 editor.contextLabel.info,Context label shows up before the context link to explain what the link is for,1,L’étiquette de contexte apparaît avant le lien contextuel et explique à quoi sert le lien.,1
 editor.dateModified,Date Modified,1,Date de modification,1
 editor.load,Load,1,Charger,1
-editor.loadPrevious,Load Previous,1,[FR] Load Previous,0
-editor.viewHistory,View Previous,1,[FR] View Previous,0
 editor.rename,Rename,1,Rename,0
+editor.loadPrevious,Load Previous,1,Charger le précédent,0
+editor.viewHistory,View Previous,1,Voir précédent,0
 editor.browse,Browse,1,Parcourir,1
 editor.remove,Remove,1,Supprimer,1
 editor.back,Back,1,Retour,1
@@ -85,15 +85,15 @@ editor.video.label.captions,Video Captions,1,Sous-titres,1
 editor.video.label.transcript,Video Transcript,1,Transcription,1
 editor.video.label.upload,Upload,1,Télécharger,1
 editor.video.delete,Delete Video,1,Supprimer la vidéo,1
-editor.video.pasteUrl,Paste the URL to a video,1,Paste the URL to a video,0
+editor.video.pasteUrl,Paste the URL to a video,1,Collez l'url d'une vidéo,0
 editor.chart.delete,Delete Chart,1,Supprimer le graphique,1
 editor.chart.label.name,Name,1,Nom,1
 editor.chart.label.edit,Edit,1,Éditer,1
 editor.chart.label.empty,Empty,1,Vide,1
 editor.chart.label.create,Add new chart,1,Ajouter un nouveau graphique,1
-editor.chart.label.info,Interactive chart,1,[FR] Interactive chart,0
+editor.chart.label.info,Interactive chart,1,Graphique interactif,0
+editor.chart.label.nameExists,There is already an existing chart with the name {name}.,1,Il existe déjà un graphique portant le nom {name}.,0
 editor.chart.label.info,Interactive charts ({num}),1,Graphiques interactifs ({num}),1
-editor.chart.label.nameExists,There is already an existing chart with the name {name}.,1,There is already an existing chart with the name {name}.,0
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Voulez-vous vraiment supprimer le graphique {nom}?,1
 editor.map.title,Map title,1,Titre de la carte,1
 editor.map.edit.cancel,Cancel editing,1,Annuler les modifications,1
@@ -107,17 +107,17 @@ editor.map.timeslider.edit,Edit Time Slider Config,1,Modifier la configuration d
 editor.map.timeslider.range,Range:,1,Tranche:,1
 editor.map.timeslider.start,Start:,1,Début:,1
 editor.map.timeslider.attribute,Attribute:,1,Caractéristique:,1
-editor.map.timeslider.layers,(OPTIONAL) Comma separated Layer IDs:,1,(OPTIONAL) Comma separated Layer IDs:,0
-editor.map.timeslider.to,to,1,to,0
+editor.map.timeslider.layers,(OPTIONAL) Comma separated Layer IDs:,1,(FACULTATIF) ID de couche séparés par des virgules :,0
+editor.map.timeslider.to,to,1,à,1
 editor.map.timeslider.warning,⚠️Warning! Please ensure that:,1,⚠️Avertissement! Veuillez vous assurer de ce qui suit:,1
 editor.map.timeslider.warning.bullet1,All range and start values are positive integers.,1,Toutes les valeurs de la tranche et du début sont des nombres entiers positifs.,1
 editor.map.timeslider.warning.bullet2,The "to" value is greater than or equal to the "from" value.,1,La valeur « À » est supérieure ou égale à la valeur « De ».,1
 editor.map.timeslider.warning.end,"Otherwise, your time slider config cannot be saved.",1,Autrement, la configuration du curseur temporel ne pourra pas être enregistrée.,1
-editor.slideshow.label.info,Slideshow items ({num}),1,[FR] Slideshow items ({num}),0
-editor.slideshow.label.create,Add new item,1,[FR] Add new item,0
-editor.slideshow.label.edit,Edit existing item,1,[FR] Edit existing item,0
-editor.slideshow.label.type,Type,1,[FR] Type,0
-editor.slideshow.label.add,Add,1,[FR] Add,0
+editor.slideshow.label.info,Slideshow items ({num}),1,Éléments du diaporama ({num}),0
+editor.slideshow.label.create,Add new item,1,Ajoute un nouvel objet,0
+editor.slideshow.label.edit,Edit existing item,1,Modifier un élément existant,0
+editor.slideshow.label.type,Type,1,Type,0
+editor.slideshow.label.add,Add,1,Ajouter,1
 editor.slides.title,SLIDES,1,DIAPOSITIVES,1
 editor.slides.addSlide,"New Slide",1,Nouvelle diapositive,1
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1

@@ -1,11 +1,23 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import dsv from '@rollup/plugin-dsv';
-// import VitePluginI18n from './scripts/vite-plugin-i18n';
 import path from 'path';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-    plugins: [vue(), dsv()],
+    plugins: [
+        vue(),
+        dsv(),
+        viteStaticCopy({
+            targets: [
+                { src: 'scripts/*', dest: './scripts' },
+                { src: 'help', dest: './' }
+            ]
+        })
+    ],
+    define: {
+        'process.env': process.env
+    },
     base: './',
     resolve: {
         alias: {
@@ -13,6 +25,13 @@ export default defineConfig({
         }
     },
     build: {
+        rollupOptions: {
+            input: {
+                main: '/index.html',
+                en: '/index-ca-en.html',
+                fr: '/index-ca-fr.html'
+            }
+        },
         target: 'esnext'
     },
     server: {
