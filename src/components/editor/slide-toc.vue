@@ -68,7 +68,7 @@
                 </div>
             </vue-final-modal>
         </div>
-        <ul>
+        <ul class="max-h-screen overflow-y-auto">
             <draggable v-model="slides" @update="$emit('slides-updated', slides)" item-key="title">
                 <template #item="{ element, index }">
                     <li
