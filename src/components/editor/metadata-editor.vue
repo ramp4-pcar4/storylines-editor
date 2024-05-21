@@ -322,7 +322,7 @@ export default class MetadataEditorV extends Vue {
 
         // Generate UUID for new product
         this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
-        this.configLang = this.$route.params.configLang ? (this.$route.params.configLang as string) : 'en';
+        this.configLang = this.$route.params.lang ? (this.$route.params.lang as string) : 'en';
 
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };

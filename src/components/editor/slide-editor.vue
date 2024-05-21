@@ -253,7 +253,6 @@
                 <custom-editor
                     ref="editor"
                     :config="currentSlide"
-                    :lang="lang"
                     :slideIndex="slideIndex"
                     @slide-edit="$emit('slide-edit')"
                     @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save)"

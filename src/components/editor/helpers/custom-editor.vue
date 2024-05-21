@@ -2,7 +2,7 @@
     <div class="mt-4">
         <json-editor
             v-model="updatedConfig"
-            :lang="lang"
+            lang="en"
             :mode="'text'"
             :show-btns="true"
             :expandedOnStart="true"
@@ -32,7 +32,6 @@ import { Validator } from '@/definitions';
 export default class CustomEditorV extends Vue {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Prop() config!: string;
-    @Prop() lang!: string;
     @Prop() slideIndex!: number;
 
     schemaUrl = './StorylinesSlideSchema.json';
