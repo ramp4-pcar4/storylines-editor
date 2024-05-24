@@ -317,7 +317,7 @@ import {
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
-import { useUserStore } from '../../stores/userStore';
+import { useUserStore } from '../stores/userStore';
 
 const JSZip = require('jszip');
 const axios = require('axios').default;

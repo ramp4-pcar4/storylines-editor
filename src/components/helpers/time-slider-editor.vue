@@ -6,14 +6,14 @@
                 class="editor-input"
                 type="number"
                 :value="config.range[0]"
-                @input="$emit('time-slider-changed', 'range', 0, $event.target.value)"
+                @input="$emit('time-slider-changed', 'range', 0, ($event.target as HTMLInputElement).value)"
             />
             <span class="mx-3"> {{ $t('editor.map.timeslider.to') }} </span>
             <input
                 class="editor-input"
                 type="number"
                 :value="config.range[1]"
-                @input="$emit('time-slider-changed', 'range', 1, $event.target.value)"
+                @input="$emit('time-slider-changed', 'range', 1, ($event.target as HTMLInputElement).value)"
             />
         </div>
         <br />
@@ -23,14 +23,14 @@
                 class="editor-input ml-3"
                 type="number"
                 :value="config.start[0]"
-                @input="$emit('time-slider-changed', 'start', 0, $event.target.value)"
+                @input="$emit('time-slider-changed', 'start', 0, ($event.target as HTMLInputElement).value)"
             />
             <span class="mx-3"> {{ $t('editor.map.timeslider.to') }} </span>
             <input
                 class="editor-input"
                 type="number"
                 :value="config.start[1]"
-                @input="$emit('time-slider-changed', 'start', 1, $event.target.value)"
+                @input="$emit('time-slider-changed', 'start', 1, ($event.target as HTMLInputElement).value)"
             />
         </div>
         <br />
@@ -49,7 +49,7 @@
             <input
                 class="editor-input"
                 :value="config.attribute"
-                @input="$emit('time-slider-changed', 'attribute', undefined, $event.target.value)"
+                @input="$emit('time-slider-changed', 'attribute', undefined, ($event.target as HTMLInputElement).value)"
             />
         </div>
         <br />
@@ -59,7 +59,7 @@
             <input
                 class="editor-input w-full"
                 :value="config.layers || ''"
-                @input="$emit('time-slider-changed', 'layers', undefined, $event.target.value)"
+                @input="$emit('time-slider-changed', 'layers', undefined, ($event.target as HTMLInputElement).value)"
             />
         </div>
         <br /><br />

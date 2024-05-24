@@ -49,7 +49,7 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
-import defaultConfig from '../../../public/ramp-default.json';
+import defaultConfig from '../../public/ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 import { createInstance } from 'ramp-config-editor_editeur-config-pcar';
 import 'ramp-config-editor_editeur-config-pcar/dist/style.css';
@@ -246,12 +246,12 @@ select {
     }
 }
 .edit-map {
-    content: url('../../assets/edit-icon.svg');
+    content: url('../assets/edit-icon.svg');
     margin: 0 auto;
     margin-bottom: 20px;
 }
 .add-map {
-    content: url('../../assets/add.svg');
+    content: url('../assets/add.svg');
     margin: 0 auto;
     margin-bottom: 20px;
 }

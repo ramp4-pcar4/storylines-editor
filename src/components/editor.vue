@@ -149,8 +149,8 @@
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ConfigFileStructure, MetadataContent, Slide, SourceCounts, StoryRampConfig } from '@/definitions';
-
 import { VueSpinnerOval } from 'vue3-spinners';
+
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc.vue';
 import MetadataContentV from './helpers/metadata-content.vue';
