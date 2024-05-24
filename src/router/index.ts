@@ -1,13 +1,20 @@
-import LandingV from '@/components/editor/landing.vue';
-import MetadataEditorV from '@/components/editor/metadata-editor.vue';
-import StoryPreviewV from '@/components/editor/preview.vue';
+import LandingV from '@/components/landing.vue';
+import HomeV from '@/components/home.vue';
+import MetadataEditorV from '@/components/metadata-editor.vue';
+import StoryPreviewV from '@/components/preview.vue';
 import { createRouter, createWebHashHistory, RouteLocationNormalized } from 'vue-router';
 
 const routes = [
     {
+        path: '/',
+        name: 'landing',
+        component: LandingV,
+        meta: { title: 'editor.window.title' }
+    },
+    {
         path: '/:lang/editor',
         name: 'home',
-        component: LandingV,
+        component: HomeV,
         meta: { title: 'editor.window.title' }
     },
     {

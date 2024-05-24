@@ -86,8 +86,9 @@
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, SourceCounts, VideoFile, VideoPanel } from '@/definitions';
+
 import draggable from 'vuedraggable';
-import VideoPreviewV from '@/components/editor/helpers/video-preview.vue';
+import VideoPreviewV from './helpers/video-preview.vue';
 
 @Options({
     components: {

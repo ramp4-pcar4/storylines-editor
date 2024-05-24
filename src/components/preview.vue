@@ -56,6 +56,7 @@
 import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
+import { AxiosError } from 'axios';
 
 @Options({
     components: {
@@ -128,12 +129,13 @@ export default class StoryPreviewV extends Vue {
                     });
                 }
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
                     axios
                         .post(process.env.VUE_APP_NET_API_URL + '/api/log/create', {
                             messages: res.data.messages
                         })
-                        .catch((error: any) => console.log(error.response || error));
+                        .catch((error: AxiosError) => console.log(error.response || error));
                 });
             });
         } else {
@@ -197,7 +199,7 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .prose a:not([panel])::after {
-        content: url('../../assets/popout.svg');
+        content: url('../assets/popout.svg');
     }
 
     .w-mobile-full {
