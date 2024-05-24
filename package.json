@@ -58,7 +58,7 @@
         "pinia": "^2.1.7",
         "postcss": "^7.0.35",
         "prettier": "^2.2.1",
-        "ramp-storylines_demo-scenarios-pcar": "^3.1.5",
+        "ramp-storylines_demo-scenarios-pcar": "^3.1.6",
         "sass": "^1.32.11",
         "sass-loader": "^8.0.2",
         "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2",
