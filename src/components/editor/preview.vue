@@ -78,7 +78,7 @@ export default class StoryPreviewV extends Vue {
 
     created(): void {
         const uid = this.$route.params.uid as string;
-        const lang = this.$route.params.lang as string;
+        this.lang = this.$route.params.lang as string;
         const JSZip = require('jszip');
         const axios = require('axios').default;
 
@@ -114,7 +114,7 @@ export default class StoryPreviewV extends Vue {
                                 rampConfig: rampConfigFolder
                             };
 
-                            const filePath = `${uid}_${lang}.json`;
+                            const filePath = `${uid}_${this.lang}.json`;
                             configZip
                                 .file(filePath)
                                 .async('string')
