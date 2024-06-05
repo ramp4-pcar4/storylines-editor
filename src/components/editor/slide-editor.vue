@@ -515,7 +515,7 @@ export default class SlideEditorV extends Vue {
 
     saveChanges(): void {
         if (
-            this.$refs.editor !== undefined &&
+            this.$refs.editor != null &&
             typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV).saveChanges ===
                 'function'
         ) {

@@ -265,7 +265,7 @@ export default class EditorV extends Vue {
      */
     preview(): void {
         // save current slide final changes before previewing product
-        if (this.$refs.slide !== undefined) {
+        if (this.$refs.slide != null && this.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
