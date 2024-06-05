@@ -446,6 +446,7 @@ export default class MetadataEditorV extends Vue {
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
             if (props && props.configs && props.configFileStructure) {
                 this.configs = props.configs;
+                this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
                 this.slides = props.slides;
