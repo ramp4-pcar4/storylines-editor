@@ -20,10 +20,10 @@
 
 <script lang="ts">
 import { Vue } from 'vue-property-decorator';
-import { useUserStore } from '../../stores/userStore';
+import { useUserStore } from '../stores/userStore';
 
-export default class LandingV extends Vue {
-    get userName() {
+export default class HomeV extends Vue {
+    get userName(): string {
         const userStore = useUserStore();
         return userStore.userProfile.userName || 'Guest';
     }
