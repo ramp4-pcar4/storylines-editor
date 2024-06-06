@@ -72,8 +72,8 @@
             <draggable v-model="slides" @update="$emit('slides-updated', slides)" item-key="title">
                 <template #item="{ element, index }">
                     <li
-                        class="toc-slide border-t flex px-2 cursor-pointer hover:bg-gray-100"
-                        :class="currentSlide === element ? 'bg-gray-100' : ''"
+                        class="toc-slide border-t flex px-2 cursor-pointer hover:bg-gray-300"
+                        :class="currentSlide === element ? 'bg-gray-300' : ''"
                         @click="selectSlide(index)"
                         :key="element.title + index"
                         v-tippy="{
