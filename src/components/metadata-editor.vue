@@ -959,7 +959,8 @@ export default class MetadataEditorV extends Vue {
                         if (responseData.new) {
                             axios
                                 .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
-                                    uuid: this.uuid
+                                    uuid: this.uuid,
+                                    title: this.metadata.title ?? ''
                                 })
                                 .then((response: any) => {
                                     const userStore = useUserStore();
