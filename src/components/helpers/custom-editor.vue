@@ -4,7 +4,7 @@
             v-model="updatedConfig"
             lang="en"
             :mode="'text'"
-            :show-btns="true"
+            :show-btns="false"
             :expandedOnStart="true"
             @json-change="
                 (json: any) => {
