@@ -58,7 +58,7 @@
                                 :class="{ 'input-error': error || !reqFields.uuid }"
                             />
                             <div
-                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1"
+                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1 max-h-96 overflow-y-auto"
                                 v-show="showDropdown"
                             >
                                 <ul>
@@ -71,7 +71,7 @@
                                             storyline.isUserStoryline ? 'bg-gray-200' : ''
                                         ]"
                                     >
-                                        {{ storyline.uuid }}
+                                        {{ storyline.uuid + ' - ' + storyline.title }}
                                     </li>
                                 </ul>
                             </div>
@@ -944,6 +944,7 @@ export default class MetadataEditorV extends Vue {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
             const headers = { 'Content-Type': 'multipart/form-data' };
+            Message.warning('Please wait. This may take several minutes.');
 
             axios
                 .post(this.apiUrl + '/upload', formData, { headers })
@@ -953,13 +954,13 @@ export default class MetadataEditorV extends Vue {
                     responseData.status; // HTTP status
                     this.unsavedChanges = false;
                     this.loadExisting = true; // if editExisting was false, we can now set it to true
-                    Message.success('Successfully saved changes!');
 
                     if (process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
                         if (responseData.new) {
                             axios
                                 .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
-                                    uuid: this.uuid
+                                    uuid: this.uuid,
+                                    title: this.metadata.title ?? ''
                                 })
                                 .then((response: any) => {
                                     const userStore = useUserStore();
@@ -970,9 +971,15 @@ export default class MetadataEditorV extends Vue {
                                     axios
                                         .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
-                                            console.log('Version saved successfully.');
+                                            Message.success('Successfully saved changes!');
                                         })
-                                        .catch((error: any) => console.log(error.response || error));
+                                        .catch((error: any) => console.log(error.response || error))
+                                        .finally(() => {
+                                            // padding to prevent save button from being clicked rapidly
+                                            setTimeout(() => {
+                                                this.saving = false;
+                                            }, 500);
+                                        });
                                 })
                                 .catch((error: any) => console.log(error.response || error));
                         } else {
@@ -980,9 +987,15 @@ export default class MetadataEditorV extends Vue {
                             axios
                                 .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
-                                    console.log('Version saved successfully.');
+                                    Message.success('Successfully saved changes!');
                                 })
-                                .catch((error: any) => console.log(error.response || error));
+                                .catch((error: any) => console.log(error.response || error))
+                                .finally(() => {
+                                    // padding to prevent save button from being clicked rapidly
+                                    setTimeout(() => {
+                                        this.saving = false;
+                                    }, 500);
+                                });
                         }
 
                         fetch(this.apiUrl + `/retrieveMessages`)
@@ -1001,12 +1014,6 @@ export default class MetadataEditorV extends Vue {
                 })
                 .catch(() => {
                     Message.error('Failed to save changes.');
-                })
-                .finally(() => {
-                    // padding to prevent save button from being clicked rapidly
-                    setTimeout(() => {
-                        this.saving = false;
-                    }, 500);
                 });
         });
 
