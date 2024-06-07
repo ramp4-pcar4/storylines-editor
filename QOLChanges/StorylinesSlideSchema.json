@@ -1,0 +1,426 @@
+{
+    "title": "Storylines Slide Config Schema",
+    "type": "object",
+    "additionalProperties": false,
+
+    "$defs": {
+        "panel": {
+            "type": "array",
+            "description": "A single slide component",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/$defs/textPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/mapPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/multimediaPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/chartPanel"
+                    },
+                    {
+                        "$ref": "#/$defs/dynamicPanel"
+                    }
+                ]
+            },
+            "properties": {
+                "width": {
+                    "type": "number",
+                    "description": "The width of the panel inside the slide (between 0 and 100)."
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
+                }
+            },
+            "minItems": 1,
+            "maxItems": 2
+        },
+
+        "textPanel": {
+            "type": "object",
+            "description": "A text slide component.",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title for the text panel."
+                },
+                "titleTag": {
+                    "type": "string",
+                    "description": "An optional tag to use for the panel title. If not supplied h2 is used.",
+                    "default": "h2"
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The main text body."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["text"]
+                },
+                "textColour": {
+                    "type": "string",
+                    "description": "The colour of the text. Defaults to black.",
+                    "default": "#000000"
+                }
+            },
+            "required": ["content", "type", "title"]
+        },
+
+        "dynamicPanel": {
+            "type": "object",
+            "description": "A dynamic slide component.",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title for the text panel."
+                },
+                "titleTag": {
+                    "type": "string",
+                    "description": "An optional tag to use for the panel title. If not supplied h2 is used.",
+                    "default": "h2"
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The main text body."
+                },
+                "children": {
+                    "type": "array",
+                    "description": "The panels to display dynamically.",
+                    "items": {
+                        "$ref": "#/$defs/dynamicChildItem"
+                    },
+                    "minItems": 1
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["dynamic"]
+                },
+                "textColour": {
+                    "type": "string",
+                    "description": "The colour of the text. Defaults to black.",
+                    "default": "#000000"
+                }
+            },
+            "required": ["content", "type", "children", "title"]
+        },
+
+        "dynamicChildItem": {
+            "type": "object",
+            "description": "A child screen of a dynamic panel. Contains an ID and a panel config.",
+            "properties": {
+                "id": "string",
+                "panel": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/textPanel"
+                        },
+                        {
+                            "$ref": "#/$defs/mapPanel"
+                        },
+                        {
+                            "$ref": "#/$defs/multimediaPanel"
+                        },
+                        {
+                            "$ref": "#/$defs/chartPanel"
+                        }
+                    ]
+                }
+            },
+            "required": ["id", "panel"]
+        },
+
+        "multimediaPanel": {
+            "type": "object",
+            "description": "A multimedia slide component.",
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/multimediaImage"
+                },
+                {
+                    "$ref": "#/$defs/multimediaVideo"
+                },
+                {
+                    "$ref": "#/$defs/multimediaSlideshow"
+                }
+            ],
+            "properties": {
+                "fullscreen": {
+                    "type": "boolean",
+                    "description": "Specifies whether the panel can be expanded to full screen.",
+                    "default": true
+                }
+            }
+        },
+
+        "mapPanel": {
+            "type": "object",
+            "description": "A map slide component.",
+            "properties": {
+                "config": {
+                    "type": "string",
+                    "description": "A relative path to a JSON file containing the map config.",
+                    "default": ""
+                },
+                "fullscreen": {
+                    "type": "boolean",
+                    "description": "Specifies whether the panel can be expanded to full screen.",
+                    "default": true
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["map"]
+                },
+                "scrollguard": {
+                    "type": "boolean",
+                    "description": "Whether or not CTRL is required to scroll this map.",
+                    "default": false
+                },
+                "title": {
+                    "type": "string",
+                    "description": "A title that is displayed centered above this map."
+                }
+            },
+            "required": ["config", "type"]
+        },
+
+        "chartPanel": {
+            "type": "object",
+            "description": "A chart slide component.",
+            "properties": {
+                "src": {
+                    "type": "string",
+                    "description": "The source containing the chart json config."
+                },
+                "config": {
+                    "type": "object",
+                    "description": "Configured Highcharts JSON object (from editor)."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["chart"]
+                },
+                "options": {
+                    "$ref": "#/$defs/chartOptions"
+                }
+            },
+            "required": ["src", "type"]
+        },
+
+        "multimediaImage": {
+            "type": "object",
+            "description": "A multimedia image component.",
+            "properties": {
+                "width": {
+                    "type": "number",
+                    "description": "The image width."
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The image height."
+                },
+                "src": {
+                    "type": "string",
+                    "description": "The source for the image."
+                },
+                "altText": {
+                    "type": "string",
+                    "description": "The supporting text for the image."
+                },
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the image."
+                },
+                "class": {
+                    "type": "string",
+                    "description": "Styling class properties for the image."
+                },
+                "tooltip": {
+                    "type": "string",
+                    "description": "Tooltip content for the image."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["image"]
+                }
+            },
+            "required": ["src", "type"]
+        },
+
+        "multimediaVideo": {
+            "type": "object",
+            "description": "A multimedia video component.",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title for the video."
+                },
+                "width": {
+                    "type": "number",
+                    "description": "The video width."
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The video height. Only for Youtube videos. Changing height for external/local videos won't work due to the aspect ratio of the original video needing to be kept the same."
+                },
+                "src": {
+                    "type": "string",
+                    "description": "The source for the video. External and YouTube videos should be a URL, while local video files must be contained in the assets folder."
+                },
+                "videoType": {
+                    "type": "string",
+                    "enum": ["", "local", "external", "YouTube"]
+                },
+                "thumbnailUrl": {
+                    "type": "string",
+                    "description": "Optional link for providing URL for video thumbnail image. Limited to non-YouTube videos."
+                },
+                "transcript": {
+                    "type": "string",
+                    "description": "The source for the transcript in HTML/Markdown."
+                },
+                "caption": {
+                    "type": "string",
+                    "description": "Overlaying subtitles on the video, input should be a .vtt file."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["video"]
+                }
+            },
+            "required": ["src", "type", "videoType"]
+        },
+
+        "multimediaSlideshow": {
+            "type": "object",
+            "description": "A multimedia slideshow component.",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": "An array of items to display in the slideshow.",
+                    "items": {
+                        "type": "object",
+                        "description": "A config representing one of the following panel types.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/multimediaImage"
+                            },
+                            {
+                                "$ref": "#/$defs/mapPanel"
+                            },
+                            {
+                                "$ref": "#/$defs/textPanel"
+                            },
+                            {
+                                "$ref": "#/$defs/chartPanel"
+                            },
+                            {
+                                "$ref": "#/$defs/multimediaVideo"
+                            }
+                        ]
+                    },
+                    "minItems": 1
+                },
+                "loop": {
+                    "type": "boolean",
+                    "description": "Determines whether the slideshow loops back around to the beginning when you reach the end.",
+                    "default": false
+                },
+                "caption": {
+                    "type": "text",
+                    "description": "A caption to display below the slideshow."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["slideshow"]
+                }
+            },
+            "required": ["items", "type"]
+        },
+
+        "chartOptions": {
+            "type": "object",
+            "description": "Configuration for a chart (highcharts).",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title of the chart."
+                },
+                "subtitle": {
+                    "type": "string",
+                    "description": "The subtitle of the chart."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "The type of chart.",
+                    "enum": [
+                        "line",
+                        "spline",
+                        "area",
+                        "areaspline",
+                        "column",
+                        "bar",
+                        "pie",
+                        "scatter",
+                        "gauge",
+                        "arearange",
+                        "areasplinerange",
+                        "columnrange"
+                    ]
+                },
+                "width": {
+                    "type": "number",
+                    "description": "The width of the chart (will not exceed panel container width)."
+                },
+                "height": {
+                    "type": "number",
+                    "description": "The height of chart (will not exceed panel container height on mobile resolutions)."
+                },
+                "colours": {
+                    "type": "array",
+                    "description": "A list of colors to display chart data that corresponds to the order of columns in CSV file.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean",
+                    "description": "Specify whether export menu options are enabled.",
+                    "default": true
+                },
+                "credits": {
+                    "type": "boolean",
+                    "description": "Specify whether credits are enabled.",
+                    "default": false
+                },
+                "xAxisLabel": {
+                    "type": "string",
+                    "description": "The title of the x-axis."
+                },
+                "yAxisLabel": {
+                    "type": "string",
+                    "description": "The title of the y-axis."
+                }
+            }
+        }
+    },
+
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "The title for the slide."
+        },
+        "panel": {
+            "$ref": "#/$defs/panel"
+        },
+        "backgroundImage": {
+            "type": "string",
+            "description": "An image to display in the background of the slide."
+        }
+    },
+
+    "required": ["title", "panel"]
+}
