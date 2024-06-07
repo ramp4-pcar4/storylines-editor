@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 
 interface Storyline {
     uuid: string;
-    title: string;
+    titleEN: string;
+    titleFR: string;
     isUserStoryline?: boolean;
 }
 
