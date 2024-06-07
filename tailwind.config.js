@@ -22,6 +22,9 @@ module.exports = {
             flex: {
                 2: '2 2 0%'
             },
+            maxHeight:{
+                '60vh': '60vh'
+            },
             maxWidth: {
                 '8xl': '90rem',
                 '9xl': '110rem'
