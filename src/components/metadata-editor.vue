@@ -55,23 +55,29 @@
                                 v-model="uuid"
                                 @focus="showDropdown = true"
                                 @blur="showDropdown = false"
+                                @keydown.down.prevent="highlightNext"
+                                @keydown.up.prevent="highlightPrevious"
+                                @keydown.enter.prevent="selectHighlighted"
                                 :class="{ 'input-error': error || !reqFields.uuid }"
                             />
                             <div
-                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1 max-h-96 overflow-y-auto"
+                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1 max-h-60vh overflow-y-auto"
                                 v-show="showDropdown"
                             >
                                 <ul>
                                     <li
-                                        v-for="storyline in getStorylines"
+                                        v-for="(storyline, index) in getStorylines"
                                         :key="storyline.uuid"
                                         @mousedown.prevent="selectUuid(storyline.uuid)"
                                         :class="[
                                             'p-2 hover:bg-gray-100 cursor-pointer',
-                                            storyline.isUserStoryline ? 'bg-gray-200' : ''
+                                            storyline.isUserStoryline ? 'bg-gray-200' : '',
+                                            { 'bg-gray-300': highlightedIndex === index }
                                         ]"
                                     >
-                                        {{ storyline.uuid + ' - ' + storyline.title }}
+                                        <div>
+                                            {{ storyline.uuid }} - <b>{{ storyline.title }}</b>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -379,6 +385,7 @@ export default class MetadataEditorV extends Vue {
     warning: 'none' | 'uuid' | 'rename' = 'none'; // used for duplicate uuid warning
     configLang = 'en';
     showDropdown = false;
+    highlightedIndex = -1;
 
     storylineHistory: History[] = [];
     selectedHistory: History | null = null;
@@ -677,26 +684,37 @@ export default class MetadataEditorV extends Vue {
         const frFile = this.configFileStructure?.zip.file(`${this.uuid}_fr.json`);
 
         if (enFile && frFile) {
-            // Remove the files from the ZIP folder.
-            this.configFileStructure?.zip.remove(enFile.name);
-            this.configFileStructure?.zip.remove(frFile.name);
+            axios
+                .post(process.env.VUE_APP_NET_API_URL + '/api/version/update', {
+                    uuid: this.uuid,
+                    changeUuid: this.changeUuid
+                })
+                .then(async (response: any) => {
+                    // Marking the arrow function as async here
+                    // Remove the files from the ZIP folder.
+                    this.configFileStructure?.zip.remove(enFile.name);
+                    this.configFileStructure?.zip.remove(frFile.name);
+                    // Fetch the contents of the two files, and perform a find/replace on the UUID for each source.
+                    const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
+                    const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
+                    [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
 
-            // Fetch the contents of the two files, and perform a find/replace on the UUID for each source.
-            const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
-            const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
-            [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
+                    // Convert the configs back into a string and re-add them to the ZIP with the new UUID.
+                    this.configFileStructure?.zip.file(
+                        `${this.changeUuid}_en.json`,
+                        JSON.stringify(englishConfig, null, 4)
+                    );
+                    this.configFileStructure?.zip.file(
+                        `${this.changeUuid}_fr.json`,
+                        JSON.stringify(frenchConfig, null, 4)
+                    );
+                    this.uuid = this.changeUuid;
+                    // Reset source counts and re-generate the config file structure.
+                    this.sourceCounts = {};
 
-            // Convert the configs back into a string and re-add them to the ZIP with the new UUID.
-            this.configFileStructure?.zip.file(`${this.changeUuid}_en.json`, JSON.stringify(englishConfig, null, 4));
-            this.configFileStructure?.zip.file(`${this.changeUuid}_fr.json`, JSON.stringify(frenchConfig, null, 4));
-
-            this.uuid = this.changeUuid;
-
-            // Reset source counts and re-generate the config file structure.
-            this.sourceCounts = {};
-            this.configFileStructureHelper(this.configFileStructure.zip);
+                    if (this.configFileStructure?.zip) this.configFileStructureHelper(this.configFileStructure.zip);
+                });
         }
-
         this.renaming = false;
         this.renamed = this.uuid;
     }
@@ -1147,6 +1165,7 @@ export default class MetadataEditorV extends Vue {
             });
         }
         this.warning = 'none';
+        this.highlightedIndex = -1;
     });
 
     /**
@@ -1275,16 +1294,49 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
+    highlightNext() {
+        if (this.highlightedIndex < this.getStorylines.length - 1) {
+            this.highlightedIndex++;
+            this.scrollIntoView();
+        }
+    }
+
+    highlightPrevious() {
+        if (this.highlightedIndex > 0) {
+            this.highlightedIndex--;
+            this.scrollIntoView();
+        }
+    }
+
+    selectHighlighted() {
+        if (this.highlightedIndex !== -1) {
+            const selectedStoryline = this.getStorylines[this.highlightedIndex];
+            this.selectUuid(selectedStoryline.uuid);
+        }
+    }
+
+    scrollIntoView() {
+        this.$nextTick(() => {
+            const container = this.$el.querySelector('.overflow-y-auto');
+            const activeItem = container.querySelector('li.bg-gray-300');
+            if (activeItem) container.scrollTop = activeItem.offsetTop - container.offsetTop;
+        });
+    }
+
     get getStorylines() {
         const userStore = useUserStore();
         const userStorylines = userStore.userProfile.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
         const allStorylines =
             userStore.userProfile.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
-
         let combined = [...userStorylines, ...allStorylines];
 
-        if (this.uuid)
-            combined = combined.filter((storyline) => storyline.uuid.toLowerCase().includes(this.uuid.toLowerCase()));
+        if (this.uuid) {
+            combined = combined.filter(
+                (storyline) =>
+                    storyline.uuid.toLowerCase().includes(this.uuid.toLowerCase()) ||
+                    (storyline.title && storyline.title.toLowerCase().includes(this.uuid.toLowerCase()))
+            );
+        }
 
         return combined;
     }
