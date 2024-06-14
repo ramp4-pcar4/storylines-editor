@@ -55,23 +55,29 @@
                                 v-model="uuid"
                                 @focus="showDropdown = true"
                                 @blur="showDropdown = false"
+                                @keydown.down.prevent="highlightNext"
+                                @keydown.up.prevent="highlightPrevious"
+                                @keydown.enter.prevent="selectHighlighted"
                                 :class="{ 'input-error': error || !reqFields.uuid }"
                             />
                             <div
-                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1"
+                                class="absolute z-10 w-full bg-white border border-gray-200 mt-1 max-h-60vh overflow-y-auto"
                                 v-show="showDropdown"
                             >
                                 <ul>
                                     <li
-                                        v-for="storyline in getStorylines"
+                                        v-for="(storyline, index) in getStorylines"
                                         :key="storyline.uuid"
                                         @mousedown.prevent="selectUuid(storyline.uuid)"
                                         :class="[
                                             'p-2 hover:bg-gray-100 cursor-pointer',
-                                            storyline.isUserStoryline ? 'bg-gray-200' : ''
+                                            storyline.isUserStoryline ? 'bg-gray-200' : '',
+                                            { 'bg-gray-300': highlightedIndex === index }
                                         ]"
                                     >
-                                        {{ storyline.uuid }}
+                                        <div>
+                                            {{ storyline.uuid }} - <b>{{ storyline.title }}</b>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -379,6 +385,7 @@ export default class MetadataEditorV extends Vue {
     warning: 'none' | 'uuid' | 'rename' = 'none'; // used for duplicate uuid warning
     configLang = 'en';
     showDropdown = false;
+    highlightedIndex = -1;
 
     storylineHistory: History[] = [];
     selectedHistory: History | null = null;
@@ -944,6 +951,7 @@ export default class MetadataEditorV extends Vue {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
             const headers = { 'Content-Type': 'multipart/form-data' };
+            Message.warning('Please wait. This may take several minutes.');
 
             axios
                 .post(this.apiUrl + '/upload', formData, { headers })
@@ -953,13 +961,13 @@ export default class MetadataEditorV extends Vue {
                     responseData.status; // HTTP status
                     this.unsavedChanges = false;
                     this.loadExisting = true; // if editExisting was false, we can now set it to true
-                    Message.success('Successfully saved changes!');
 
                     if (process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
                         if (responseData.new) {
                             axios
                                 .post(process.env.VUE_APP_NET_API_URL + '/api/user/register', {
-                                    uuid: this.uuid
+                                    uuid: this.uuid,
+                                    title: this.metadata.title ?? ''
                                 })
                                 .then((response: any) => {
                                     const userStore = useUserStore();
@@ -970,9 +978,15 @@ export default class MetadataEditorV extends Vue {
                                     axios
                                         .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
-                                            console.log('Version saved successfully.');
+                                            Message.success('Successfully saved changes!');
                                         })
-                                        .catch((error: any) => console.log(error.response || error));
+                                        .catch((error: any) => console.log(error.response || error))
+                                        .finally(() => {
+                                            // padding to prevent save button from being clicked rapidly
+                                            setTimeout(() => {
+                                                this.saving = false;
+                                            }, 500);
+                                        });
                                 })
                                 .catch((error: any) => console.log(error.response || error));
                         } else {
@@ -980,9 +994,15 @@ export default class MetadataEditorV extends Vue {
                             axios
                                 .post(process.env.VUE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
-                                    console.log('Version saved successfully.');
+                                    Message.success('Successfully saved changes!');
                                 })
-                                .catch((error: any) => console.log(error.response || error));
+                                .catch((error: any) => console.log(error.response || error))
+                                .finally(() => {
+                                    // padding to prevent save button from being clicked rapidly
+                                    setTimeout(() => {
+                                        this.saving = false;
+                                    }, 500);
+                                });
                         }
 
                         fetch(this.apiUrl + `/retrieveMessages`)
@@ -1001,12 +1021,6 @@ export default class MetadataEditorV extends Vue {
                 })
                 .catch(() => {
                     Message.error('Failed to save changes.');
-                })
-                .finally(() => {
-                    // padding to prevent save button from being clicked rapidly
-                    setTimeout(() => {
-                        this.saving = false;
-                    }, 500);
                 });
         });
 
@@ -1140,6 +1154,7 @@ export default class MetadataEditorV extends Vue {
             });
         }
         this.warning = 'none';
+        this.highlightedIndex = -1;
     });
 
     /**
@@ -1268,16 +1283,49 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
+    highlightNext() {
+        if (this.highlightedIndex < this.getStorylines.length - 1) {
+            this.highlightedIndex++;
+            this.scrollIntoView();
+        }
+    }
+
+    highlightPrevious() {
+        if (this.highlightedIndex > 0) {
+            this.highlightedIndex--;
+            this.scrollIntoView();
+        }
+    }
+
+    selectHighlighted() {
+        if (this.highlightedIndex !== -1) {
+            const selectedStoryline = this.getStorylines[this.highlightedIndex];
+            this.selectUuid(selectedStoryline.uuid);
+        }
+    }
+
+    scrollIntoView() {
+        this.$nextTick(() => {
+            const container = this.$el.querySelector('.overflow-y-auto');
+            const activeItem = container.querySelector('li.bg-gray-300');
+            if (activeItem) container.scrollTop = activeItem.offsetTop - container.offsetTop;
+        });
+    }
+
     get getStorylines() {
         const userStore = useUserStore();
         const userStorylines = userStore.userProfile.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
         const allStorylines =
             userStore.userProfile.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
-
         let combined = [...userStorylines, ...allStorylines];
 
-        if (this.uuid)
-            combined = combined.filter((storyline) => storyline.uuid.toLowerCase().includes(this.uuid.toLowerCase()));
+        if (this.uuid) {
+            combined = combined.filter(
+                (storyline) =>
+                    storyline.uuid.toLowerCase().includes(this.uuid.toLowerCase()) ||
+                    (storyline.title && storyline.title.toLowerCase().includes(this.uuid.toLowerCase()))
+            );
+        }
 
         return combined;
     }
