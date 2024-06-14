@@ -1,6 +1,18 @@
-# RAMP Storylines (formerly StoryRAMP)
+# RAMP Storylines Editor (formerly StoryRAMP)
 
-This project is an implementation of [RAMP2 FGP Visualiser](https://github.com/fgpv-vpgf/fgpv-vpgf), [Highcharts](https://www.highcharts.com/), and a number of other libraries, with the goal to provide a standards and guidelines compliant alternative to ArcGIS StoryMap, suitable for use in the Government of Canada's web presence. 
+RAMP Storylines Editor is an implementation of [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) (the mapping framework), [RAMP4 Config Editor](https://github.com/ramp4-pcar4/config-editor) (used to create map configurations), [Highcharts Editor](https://www.highcharts.com/blog/products/highcharts-editor/) (used to create interactive charts and graphs), and [Storylines](https://github.com/ramp4-pcar4/story-ramp) (used to host and display the created product).
+
+The Storylines Editor is an easy-to-use, interactive narrative authoring tool used to produce and edit Storylines products that adhere to Government of Canada and Treasury Board web content standards and guidelines. The Editor allows for the customization of interactive maps and charts, and other multimedia to tell engaging stories about your data, and provides assistance in constructing complete configuration folders without the need to manually create and code configs.
+
+This project is a work in progress.
+
+For more information please see the [RAMP marketing site](https://ramp4-pcar4.github.io/ramp-pcar/#/?lang=en) or contact [applicationsdecartographieweb-webmapping@ec.gc.ca](mailto:applicationsdecartographieweb-webmappingapplications@ec.gc.ca).
+
+> This is an unsupported product. If you require a supported version please contact applicationsdecartographieweb-webmappingapplications@ec.gc.ca for a cost estimate. The software and code samples available on this website are provided "as is" without warranty of any kind, either express or implied. Use at your own risk. Access to this GitHub repository could become unavailable at any point in time.
+
+## Usage
+
+General usage documentation will be available in the future.
 
 ## Project setup
 
@@ -23,14 +35,3 @@ npm run build
 ### Customize configuration
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
-## Live examples
-
-- [NPRI Sector Overview: Oil Sands Extraction](https://environmental-maps.canada.ca/RAMP-Storylines/index-ca-en.html#/en/410b88da-0ed1-4749-903f-5e76c24e2e5f)
-- [NPRI Sector Overview: Pulp and Paper](https://environmental-maps.canada.ca/RAMP-Storylines/index-ca-en.html#/en/f6f7baf4-cccb-4521-a037-b4691b0f0d49)
-- [NPRI Substance Overview: Ethylene Glycol](https://environmental-maps.canada.ca/RAMP-Storylines/index-ca-en.html#/en/ea24000c-7dc3-49a9-baac-c55d28dcaeb9)
-
-## Future goals
-
-- [ ] use [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) mapping platform
-- [ ] development of a web-based editor
