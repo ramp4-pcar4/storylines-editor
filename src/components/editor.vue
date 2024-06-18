@@ -245,9 +245,9 @@ export default class EditorV extends Vue {
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean): void {
         this.currentSlide = slideConfig;
+        this.slides[this.slideIndex] = slideConfig;
         // save changes emitted from advanced editor
         if (save) {
-            this.slides[this.slideIndex] = slideConfig;
             this.$emit('save-changes');
         }
     }
