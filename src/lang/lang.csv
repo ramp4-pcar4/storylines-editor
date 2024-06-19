@@ -134,6 +134,10 @@ editor.slides.leftPanel,Left panel,1,Panneau de gauche,1
 editor.slides.rightPanel,Right panel,1,Panneau de droite,1
 editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
 editor.slides.advanced,Advanced,1,Avancé,0
+editor.slides.advanced.good,Configuration adheres to Storylines schema.,1,La configuration adhère au schéma Storylines.,0
+editor.slides.advanced.broken,This configuration violates the Storylines schema.,1,Cette configuration viole le schéma Storylines.,0
+editor.slides.advanced.details,Click here for more details.,1,Cliquez ici pour plus de détails.,0
+editor.slides.advanced.error,This configuration contains one or more errors. Leaving it as-is may cause unexpected behaviour in the editor and published product.,1,Cette configuration contient une ou plusieurs erreurs. La laisser telle quelle peut entraîner un comportement inattendu dans l'éditeur et dans le produit publié.,0
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1
