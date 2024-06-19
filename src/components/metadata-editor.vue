@@ -1364,6 +1364,9 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     .vfm__content {
         max-width: 80%;
+        min-width: 70%;
+        max-height: 90%;
+        padding: 12px;
     }
 
     .vfm__content label {
