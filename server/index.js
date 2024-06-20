@@ -34,7 +34,8 @@ app.use(cors());
 app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     const options = {
         uploadDir: UPLOAD_PATH,
-        keepExtensions: true
+        keepExtensions: true,
+        maxFileSize: 300 * 1024 * 1024
     };
 
     const form = new formidable.IncomingForm(options);
@@ -45,6 +46,12 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
 
     // Upload the file to the server, into the /files/ folder.
     form.parse(req, function (err, field, file) {
+        if (err) {
+            logger('WARNING', 'Upload Aborted: an error has occurred while parsing the uploaded form: ', err);
+            res.status(500).send({ status: 'Internal Server Error' });
+            return;
+        }
+
         const fileName = `${TARGET_PATH}/${file.data.originalFilename.split('.zip')[0]}`;
         const secureFilename = `${UPLOAD_PATH}/${file.data.newFilename}`;
         let newStorylines = false;
@@ -52,7 +59,6 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
         // SECURITY FEATURE (?): Check if the uploaded filename matches our Storylines UUID format. Prevents overwriting
         // other folders.
         //if (!projectNameRegex.test(fileName)) {
-
         // SECURITY FEATURE (temporary): Make sure the project name isn't `scripts`, or `help`, and doesn't contain . or / in order to prevent overwriting folders.
         if (fileName !== 'scripts' && fileName !== 'help' && !fileName.includes('/') && !fileName.includes('.')) {
             responseMessages.push({
@@ -83,16 +89,15 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
             // files.forEach((file) => {
             //     validateFile(file, fileName);
             // });
+            responseMessages.push({ type: 'INFO', message: `Uploaded files to product ${fileName}` });
+            logger('INFO', `Uploaded files to product ${fileName}`);
+
+            // Finally, delete the uploaded zip file.
+            safeRM(secureFilename, UPLOAD_PATH);
+
+            // Send a response back to the client.
+            res.json({ new: newStorylines });
         });
-
-        // Finally, delete the uploaded zip file.
-        safeRM(secureFilename, UPLOAD_PATH);
-
-        responseMessages.push({ type: 'INFO', message: `Uploaded files to product ${fileName}` });
-        logger('INFO', `Uploaded files to product ${fileName}`);
-
-        // Send a response back to the client.
-        res.json({ new: newStorylines });
     });
 });
 
