@@ -30,10 +30,6 @@
                 "width": {
                     "type": "number",
                     "description": "The width of the panel inside the slide (between 0 and 100)."
-                },
-                "customStyles": {
-                    "type": "string",
-                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
             "minItems": 1,
@@ -65,8 +61,13 @@
                     "type": "string",
                     "description": "The colour of the text. Defaults to black.",
                     "default": "#000000"
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["content", "type", "title"]
         },
 
@@ -103,8 +104,13 @@
                     "type": "string",
                     "description": "The colour of the text. Defaults to black.",
                     "default": "#000000"
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["content", "type", "children", "title"]
         },
 
@@ -112,7 +118,10 @@
             "type": "object",
             "description": "A child screen of a dynamic panel. Contains an ID and a panel config.",
             "properties": {
-                "id": "string",
+                "id": {
+                    "type": "string",
+                    "description": "An ID representing a dynamic child."
+                },
                 "panel": {
                     "oneOf": [
                         {
@@ -130,6 +139,7 @@
                     ]
                 }
             },
+            "additionalProperties": false,
             "required": ["id", "panel"]
         },
 
@@ -182,8 +192,42 @@
                 "title": {
                     "type": "string",
                     "description": "A title that is displayed centered above this map."
+                },
+                "timeSlider": {
+                    "type": "object",
+                    "description": "Configuration for a time slider on the map.",
+                    "properties": {
+                        "range": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "start": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "attribute": {
+                            "type": "string"
+                        },
+                        "layers": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": ["range", "start", "attribute"]
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["config", "type"]
         },
 
@@ -205,8 +249,17 @@
                 },
                 "options": {
                     "$ref": "#/$defs/chartOptions"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the chart."
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["src", "type"]
         },
 
@@ -214,6 +267,10 @@
             "type": "object",
             "description": "A multimedia image component.",
             "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The image ID."
+                },
                 "width": {
                     "type": "number",
                     "description": "The image width."
@@ -245,8 +302,17 @@
                 "type": {
                     "type": "string",
                     "enum": ["image"]
+                },
+                "fullscreen": {
+                    "type": "boolean",
+                    "description": "Specifies whether the image can be fullscreened or not."
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["src", "type"]
         },
 
@@ -289,8 +355,13 @@
                 "type": {
                     "type": "string",
                     "enum": ["video"]
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["src", "type", "videoType"]
         },
 
@@ -333,11 +404,21 @@
                     "type": "text",
                     "description": "A caption to display below the slideshow."
                 },
+                "userCreated": {
+                    "type": "boolean",
+                    "description": "Specifies whether this slideshow was automatically created from an image panel or if this is actually a slideshow panel.",
+                    "default": false
+                },
                 "type": {
                     "type": "string",
                     "enum": ["slideshow"]
+                },
+                "customStyles": {
+                    "type": "string",
+                    "description": "Additional CSS styles to apply to the panel."
                 }
             },
+            "additionalProperties": false,
             "required": ["items", "type"]
         },
 
