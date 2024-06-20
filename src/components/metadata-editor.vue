@@ -1017,6 +1017,11 @@ export default class MetadataEditorV extends Vue {
                                     .catch((error: any) => console.log(error.response || error));
                             })
                             .catch((error: any) => console.log(error.response || error));
+                    } else {
+                        // padding to prevent save button from being clicked rapidly
+                        setTimeout(() => {
+                            this.saving = false;
+                        }, 500);
                     }
                 })
                 .catch(() => {
