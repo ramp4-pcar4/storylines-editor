@@ -20,9 +20,9 @@ export const useUserStore = defineStore('user', {
     actions: {
         async fetchUserProfile() {
             const apiUrl =
-                process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#'
-                    ? process.env.VUE_APP_NET_API_URL
-                    : 'https://localhost:44371';
+                import.meta.env.VITE_APP_CURR_ENV && import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#'
+                    ? import.meta.env.VITE_APP_NET_API_URL
+                    : 'https://localhost:6040';
             try {
                 const response = await fetch(apiUrl + '/api/user/profile', {
                     method: 'GET',

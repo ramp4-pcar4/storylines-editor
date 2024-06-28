@@ -1,3 +1,16 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { configUpgrade, createInstance, geo, layerConfigUpgrade, version } from '../scripts/ramp4/ramp.esm.js';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+window.RAMP = {
+    createInstance,
+    geo,
+    configUpgrade,
+    layerConfigUpgrade,
+    version
+};
+
 import { createApp } from 'vue';
 import App from './app.vue';
 import { createPinia } from 'pinia';
@@ -20,8 +33,8 @@ VueMarkdownEditor.use(githubTheme, {
 });
 
 import { createVfm } from 'vue-final-modal';
+import 'vue-final-modal/style.css';
 const vfm = createVfm();
-import 'vue-final-modal/dist/style.css';
 
 import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';

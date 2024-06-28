@@ -21,7 +21,7 @@ export default class App extends Vue {
     mounted() {
         const userStore = useUserStore(this.$pinia);
         // We can mock the user's profile for local development here if needed.
-        if (process.env.VUE_APP_CURR_ENV !== '#{CURR_ENV}#') {
+        if (import.meta.env.VITE_APP_CURR_ENV && import.meta.env.VITE_APP_CURR_ENV !== '#{CURR_ENV}#') {
             userStore.fetchUserProfile();
         }
     }

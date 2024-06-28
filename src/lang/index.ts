@@ -5,7 +5,7 @@ interface LocaleMessages {
     [key: string]: { [name: string]: string };
 }
 
-const rows = require('./lang.csv');
+import rows from './lang.csv';
 
 const lang = document.documentElement.getAttribute('lang');
 

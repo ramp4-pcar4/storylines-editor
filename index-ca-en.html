@@ -9,6 +9,7 @@
 
         <script src="https://code.highcharts.com/highcharts.js" type="text/javascript" charset="utf-8"></script>
         <script src="https://code.highcharts.com/modules/data.js" type="text/javascript" charset="utf-8"></script>
+        <script src="scripts/highcharts-editor/highcharts-editor.complete.js" type="text/javascript"></script>
 
         <!-- replace `rn` in the url with a version number ("v4_0_30" for example) if desired -->
         <script
@@ -20,24 +21,21 @@
             src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"
         ></script>
         <link rel="stylesheet" href="scripts/highcharts-editor/highcharts-editor.min.css" />
-        <link rel="stylesheet" href="scripts/ramp4/ramp.css" />
 
-        <!-- top reference links and no-script fallback -->
-        <noscript> <%= require('html-loader!../src/assets/static/cdts/refTop.html') %> </noscript>
         <script type="text/javascript">
             document.write(wet.builder.refTop({}));
         </script>
     </head>
     <body>
         <!-- template top and no-script fallback -->
-        <div id="def-top">d<%= require('html-loader!../src/assets/static/cdts/top-en.html') %></div>
+        <div id="def-top"></div>
 
         <div id="wb-cont">
             <div id="app"></div>
         </div>
 
         <!-- template footer and no-script fallback -->
-        <div id="def-footer"><%= require('html-loader!../src/assets/static/cdts/footer-en.html') %></div>
+        <div id="def-footer"></div>
 
         <script type="text/javascript">
             // URL Parsing for Language Switch
@@ -104,8 +102,7 @@
             document.write(wet.builder.refFooter({}));
         </script>
 
-        <script src="scripts/highcharts-editor/highcharts-editor.complete.js"></script>
-        <script src="scripts/ramp4/ramp.js"></script>
+        <script type="module" src="/src/main.ts"></script>
 
         <style>
             html {
