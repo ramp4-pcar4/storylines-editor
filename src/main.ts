@@ -34,6 +34,8 @@ import 'vue-m-message/dist/style.css';
 import StorylinesViewer from 'ramp-storylines_demo-scenarios-pcar';
 import 'ramp-storylines_demo-scenarios-pcar/dist/storylines-viewer.css';
 
+import { FocusContainer, FocusItem, FocusList } from '@/directives/focus-list';
+
 const app = createApp(App);
 const pinia = createPinia();
 
@@ -49,4 +51,8 @@ app.use(pinia)
     .use(StorylinesViewer)
     .use(VueMarkdownEditor)
     .use(vfm);
+
+app.directive('focus-container', FocusContainer);
+app.directive('focus-list', FocusList);
+app.directive('focus-item', FocusItem);
 app.mount('#app');
