@@ -220,9 +220,7 @@ export default class EditorV extends Vue {
     selectSlide(index: number): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
-            this.$nextTick(() => {
-                (this.$refs.slide as SlideEditorV).saveChanges();
-            });
+            (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
         // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
