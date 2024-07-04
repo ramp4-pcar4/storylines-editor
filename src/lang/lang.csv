@@ -126,6 +126,7 @@ editor.slides.makeFull,Make the right panel the full slide,1,Mettre la diapositi
 editor.slides.centerPanel,Center panel content,1,Contenu de la diapositive centrale,0
 editor.slides.centerSlide,Center slide content,1,Contenu du panneau central,0
 editor.slides.copyAll,Copy all,1,Copier tout,1
+editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
 editor.slides.previousSlide,Previous slide,1,Diapositive précédente,1
@@ -145,6 +146,8 @@ editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slides.intro,Intro subtitle,1,Sous-titre de l’introduction,1
 editor.slides.title,Intro title,1,Titre de l’introduction,1
+editor.slide.untitled,Untitled slide,1,Diapositive sans titre,0
+editor.slide.copy.success,Slide copied successfully!,1,Diapositive copiée avec succès !,0
 editor.tocOrientation,Table of Contents Orientation,1,Orientation de la table des matières,0
 editor.tocOrientation.info,The table of contents orientation will be set to vertical in mobile view.,1,L'orientation de la table des matières sera définie sur verticale en vue mobile.,0
 editor.tocOrientation.vertical,Vertical,1,Vertical,0
