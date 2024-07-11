@@ -49,10 +49,10 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
-import defaultConfig from '../../public/ramp-default.json';
+import defaultConfig from '../../ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 import { createInstance } from 'ramp-config-editor_editeur-config-pcar';
-import 'ramp-config-editor_editeur-config-pcar/dist/style.css';
+import 'ramp-config-editor_editeur-config-pcar/style.css';
 
 @Options({
     components: {

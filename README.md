@@ -1,4 +1,4 @@
-# RAMP Storylines Editor (formerly StoryRAMP)
+# RAMP Storylines Editor
 
 RAMP Storylines Editor is an implementation of [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) (the mapping framework), [RAMP4 Config Editor](https://github.com/ramp4-pcar4/config-editor) (used to create map configurations), [Highcharts Editor](https://www.highcharts.com/blog/products/highcharts-editor/) (used to create interactive charts and graphs), and [Storylines](https://github.com/ramp4-pcar4/story-ramp) (used to host and display the created product).
 
@@ -23,7 +23,7 @@ npm install
 ### Compiles and hot-reloads for development
 
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
