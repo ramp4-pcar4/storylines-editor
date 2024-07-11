@@ -35,36 +35,37 @@
             >
                 <h2 slot="header" class="text-xl font-bold">{{ $t('editor.slides.copyFromLang') }}</h2>
                 <div class="flex flex-col">
-                    <button
-                        class="editor-toc-button editor-button w-32 h-12 ml-0"
-                        @click="copyAllFromOtherLang(configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides)"
-                    >
+                    <button class="editor-toc-button editor-button h-12 ml-0" @click="$vfm.open(`confirm-copy-all`)">
                         {{ $t('editor.slides.copyAll') }}
                     </button>
-                    <span class="text-lg font-bold my-6"> {{ $t('editor.or') }} </span>
-                    <div class="flex">
-                        <select v-model="selectedForCopying" class="overflow-ellipsis copy-select">
-                            <option
-                                v-for="(slide, index) in configFileStructure.configs[lang === 'en' ? 'fr' : 'en']
-                                    .slides"
-                                :value="index"
-                                :key="slide.title + index"
-                            >
-                                {{ $t('editor.slides.slide') }} {{ index + ': ' + slide.title }}
-                            </option>
-                        </select>
+                    <span class="text-lg font-bold my-3 text-center"> {{ $t('editor.label.or') }} </span>
 
-                        <button
-                            class="editor-toc-button"
-                            @click="
-                                copyFromOtherLang(
-                                    configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides[selectedForCopying]
-                                )
-                            "
+                    <select v-model="selectedForCopying" class="overflow-ellipsis copy-select border-2 p-2">
+                        <option
+                            v-for="(slide, index) in configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides"
+                            :value="index"
+                            :key="slide.title + index"
                         >
-                            {{ $t('editor.slides.copy') }}
-                        </button>
-                    </div>
+                            {{ $t('editor.slides.slide') + ` ${index}: ` }}
+                            {{ slide.title ? slide.title : $t('editor.slide.untitled') }}
+                        </option>
+                    </select>
+
+                    <button
+                        class="editor-toc-button"
+                        @click="
+                            copyFromOtherLang(
+                                configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides[selectedForCopying]
+                            )
+                        "
+                    >
+                        {{ $t('editor.slides.copy') }}
+                    </button>
+                    <confirmation-modal
+                        :name="`confirm-copy-all`"
+                        :message="$t('editor.slides.copyAll.confirm')"
+                        @ok="copyAllFromOtherLang(configFileStructure.configs[lang === 'en' ? 'fr' : 'en'].slides)"
+                    />
                 </div>
             </vue-final-modal>
         </div>
@@ -156,6 +157,8 @@ import {
     TextPanel,
     VideoPanel
 } from '@/definitions';
+
+import Message from 'vue-m-message';
 import { VueFinalModal } from 'vue-final-modal';
 import cloneDeep from 'clone-deep';
 import draggable from 'vuedraggable';
@@ -209,6 +212,7 @@ export default class SlideTocV extends Vue {
         if (slide) {
             this.slides.splice(this.slides.length, 0, cloneDeep(slide));
             this.$emit('slides-updated', this.slides);
+            Message.success(this.$t('editor.slide.copy.success'));
         }
     }
 
@@ -216,12 +220,14 @@ export default class SlideTocV extends Vue {
         if (slides) {
             this.slides.splice(this.slides.length, 0, ...slides.map((slide) => cloneDeep(slide)));
             this.$emit('slides-updated', this.slides);
+            Message.success(this.$t('editor.slide.copy.success'));
         }
     }
 
     copySlide(index: number): void {
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
         this.$emit('slides-updated', this.slides);
+        Message.success(this.$t('editor.slide.copy.success'));
     }
 
     removeSlide(index: number): void {
@@ -336,7 +342,12 @@ export default class SlideTocV extends Vue {
 .copy-select {
     width: 450px;
 }
+
 .focused {
     outline: 2px solid black;
+}
+
+.editor-toc-button {
+    margin: 10px 0px 0px 0px !important;
 }
 </style>
