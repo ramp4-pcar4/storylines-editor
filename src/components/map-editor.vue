@@ -51,7 +51,7 @@ import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@
 import { VueFinalModal } from 'vue-final-modal';
 import defaultConfig from '../../ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
-import { createInstance } from 'ramp-config-editor_editeur-config-pcar';
+import { createInstance } from 'ramp-pcar';
 import 'ramp-config-editor_editeur-config-pcar/style.css';
 
 @Options({
