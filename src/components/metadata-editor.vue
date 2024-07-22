@@ -52,7 +52,7 @@
                                     reqFields.uuid = true;
                                     checkUuid();
                                 "
-                                v-model="uuid"
+                                v-model.trim="uuid"
                                 @focus="showDropdown = true"
                                 @blur="showDropdown = false"
                                 @keydown.down.prevent="highlightNext"
@@ -76,7 +76,7 @@
                                         ]"
                                     >
                                         <div>
-                                            {{ storyline.uuid }} - <b>{{ storyline.title }}</b>
+                                            {{ storyline.uuid }} - <b>{{ getTitle(storyline) }}</b>
                                         </div>
                                     </li>
                                 </ul>
@@ -686,26 +686,39 @@ export default class MetadataEditorV extends Vue {
         const frFile = this.configFileStructure?.zip.file(`${this.uuid}_fr.json`);
 
         if (enFile && frFile) {
-            // Remove the files from the ZIP folder.
-            this.configFileStructure?.zip.remove(enFile.name);
-            this.configFileStructure?.zip.remove(frFile.name);
+            axios
+                .post(process.env.VUE_APP_NET_API_URL + '/api/version/update', {
+                    uuid: this.uuid,
+                    changeUuid: this.changeUuid
+                })
+                .then(async (response: any) => {
+                    // Remove the files from the ZIP folder.
+                    this.configFileStructure?.zip.remove(enFile.name);
+                    this.configFileStructure?.zip.remove(frFile.name);
 
-            // Fetch the contents of the two files, and perform a find/replace on the UUID for each source.
-            const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
-            const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
-            [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
+                    // Fetch the contents of the two files, and perform a find/replace on the UUID for each source.
+                    const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
+                    const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
+                    [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
 
-            // Convert the configs back into a string and re-add them to the ZIP with the new UUID.
-            this.configFileStructure?.zip.file(`${this.changeUuid}_en.json`, JSON.stringify(englishConfig, null, 4));
-            this.configFileStructure?.zip.file(`${this.changeUuid}_fr.json`, JSON.stringify(frenchConfig, null, 4));
+                    // Convert the configs back into a string and re-add them to the ZIP with the new UUID.
+                    this.configFileStructure?.zip.file(
+                        `${this.changeUuid}_en.json`,
+                        JSON.stringify(englishConfig, null, 4)
+                    );
+                    this.configFileStructure?.zip.file(
+                        `${this.changeUuid}_fr.json`,
+                        JSON.stringify(frenchConfig, null, 4)
+                    );
 
-            this.uuid = this.changeUuid;
+                    this.uuid = this.changeUuid;
 
-            // Reset source counts and re-generate the config file structure.
-            this.sourceCounts = {};
-            this.configFileStructureHelper(this.configFileStructure.zip);
+                    // Reset source counts and re-generate the config file structure.
+                    this.sourceCounts = {};
+
+                    if (this.configFileStructure?.zip) this.configFileStructureHelper(this.configFileStructure.zip);
+                });
         }
-
         this.renaming = false;
         this.renamed = this.uuid;
     }
@@ -969,7 +982,8 @@ export default class MetadataEditorV extends Vue {
                             axios
                                 .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
                                     uuid: this.uuid,
-                                    title: this.metadata.title ?? ''
+                                    titleEn: this.configs['en']?.title ?? '',
+                                    titleFr: this.configs['fr']?.title ?? ''
                                 })
                                 .then((response: any) => {
                                     const userStore = useUserStore();
@@ -977,6 +991,8 @@ export default class MetadataEditorV extends Vue {
                                     console.log(response);
 
                                     formData.append('uuid', this.uuid);
+                                    formData.append('titleEn', this.configs['en']?.title ?? '');
+                                    formData.append('titleFr', this.configs['fr']?.title ?? '');
                                     axios
                                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
@@ -993,6 +1009,8 @@ export default class MetadataEditorV extends Vue {
                                 .catch((error: any) => console.log(error.response || error));
                         } else {
                             formData.append('uuid', this.uuid);
+                            formData.append('titleEn', this.configs['en']?.title ?? '');
+                            formData.append('titleFr', this.configs['fr']?.title ?? '');
                             axios
                                 .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
@@ -1328,11 +1346,16 @@ export default class MetadataEditorV extends Vue {
             combined = combined.filter(
                 (storyline) =>
                     storyline.uuid.toLowerCase().includes(this.uuid.toLowerCase()) ||
-                    (storyline.title && storyline.title.toLowerCase().includes(this.uuid.toLowerCase()))
+                    (storyline.titleEN && storyline.titleEN.toLowerCase().includes(this.uuid.toLowerCase())) ||
+                    (storyline.titleFR && storyline.titleFR.toLowerCase().includes(this.uuid.toLowerCase()))
             );
         }
 
         return combined;
+    }
+
+    getTitle(storyline: { titleEN: string; titleFR: string }): string {
+        return this.configLang === 'en' ? storyline.titleEN : storyline.titleFR;
     }
 
     selectUuid(uuid: string): void {
