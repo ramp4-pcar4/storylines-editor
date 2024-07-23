@@ -50,15 +50,9 @@ const routes = [
         meta: { title: 'editor.window.title' }
     },
     {
-        path: '/:lang/editor-preview',
-        component: StoryPreviewV,
-        name: 'preview',
-        props: true,
-        meta: { title: 'story.window.title' }
-    },
-    {
         path: '/:lang/editor-preview/:uid',
         component: StoryPreviewV,
+        name: 'preview',
         meta: { title: 'story.window.title' }
     }
 ];
