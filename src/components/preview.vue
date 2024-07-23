@@ -15,6 +15,10 @@
                 <div class="w-mobile-full truncate">
                     <span class="font-semibold text-lg m-1">{{ config.title }}</span>
                 </div>
+
+                <button @click="changeLang" class="editor-button bg-black text-white hover:bg-gray-900">
+                    <span class="inline-block">{{ lang === 'en' ? $t('editor.lang.fr') : $t('editor.lang.en') }}</span>
+                </button>
             </header>
 
             <storylines-intro :config="config.introSlide" :configFileStructure="configFileStructure" />
@@ -81,15 +85,20 @@ export default class StoryPreviewV extends Vue {
     } = { en: undefined, fr: undefined };
 
     created(): void {
-        const uid = this.$route.params.uid as string;
+        this.uid = this.$route.params.uid as string;
         this.lang = this.$route.params.lang as string;
 
-        if (uid) {
+        // if config file structure passed from session (from main editor page)
+        if (window.props) {
+            this.config = window.props.config;
+            this.configFileStructure = window.props.configFileStructure;
+            this.loadStatus = 'loaded';
+        } else {
             this.savedProduct = true;
             // attempt to fetch saved config file from the server (TODO: setup as express route?)
-            fetch(this.apiUrl + `/retrieve/${uid}`).then((res: Response) => {
+            fetch(this.apiUrl + `/retrieve/${this.uid}`).then((res: Response) => {
                 if (res.status === 404) {
-                    console.error(`There does not exist a saved product with UID ${uid}.`);
+                    console.error(`There does not exist a saved product with UID ${this.uid}.`);
                     // redirect to canada.ca 404 page on invalid URL params
                     // window.location.href = 'https://www.canada.ca/errors/404.html';
                 } else {
@@ -102,7 +111,7 @@ export default class StoryPreviewV extends Vue {
                             const rampConfigFolder = configZip.folder('ramp-config');
 
                             this.configFileStructure = {
-                                uuid: uid,
+                                uuid: this.uid,
                                 zip: configZip,
                                 configs: this.configs as unknown as { [key: string]: StoryRampConfig },
                                 assets: {
@@ -116,7 +125,7 @@ export default class StoryPreviewV extends Vue {
                                 rampConfig: rampConfigFolder as JSZip
                             };
 
-                            const configFile = configZip.file(`${uid}_${this.lang}.json`);
+                            const configFile = configZip.file(`${this.uid}_${this.lang}.json`);
                             configFile?.async('string').then((configContent: string) => {
                                 const config = JSON.parse(configContent) as StoryRampConfig;
                                 this.config = config;
@@ -136,10 +145,6 @@ export default class StoryPreviewV extends Vue {
                         .catch((error: AxiosError) => console.log(error.response || error));
                 });
             });
-        } else {
-            this.config = window.props.config;
-            this.configFileStructure = window.props.configFileStructure;
-            this.loadStatus = 'loaded';
         }
 
         // set page lang
@@ -148,9 +153,16 @@ export default class StoryPreviewV extends Vue {
         this.$i18n.locale = this.lang;
     }
 
+    // reload preview page with FR config
+    changeLang(): void {
+        this.$router
+            .push({ name: 'preview', params: { lang: this.lang === 'en' ? 'fr' : 'en', uid: this.uid } })
+            .then(() => this.$router.go(0));
+    }
+
     updateActiveIndex(idx: number): void {
         this.activeChapterIndex = idx;
-        //determine header height
+        // determine header height
         const headerH = document.getElementById('story-header');
         if (headerH) {
             this.headerHeight = headerH.clientHeight;
