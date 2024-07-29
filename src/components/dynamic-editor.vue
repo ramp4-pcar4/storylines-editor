@@ -39,8 +39,14 @@
                     <td>{{ determineEditorType(item.panel) }}</td>
                     <td>
                         <span @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</span> |
-                        <span @click="() => removeSlide(item, idx)">{{ $t('editor.remove') }}</span>
+                        <span @click="$vfm.open(`delete-item-${idx}`)">{{ $t('editor.remove') }}</span>
                     </td>
+
+                    <confirmation-modal
+                        :name="`delete-item-${idx}`"
+                        :message="$t('dynamic.panel.remove')"
+                        @ok="() => removeSlide(item as any, idx)"
+                    />
                 </tr>
                 <tr class="table-add-row">
                     <th class="flex flex-col items-center">
@@ -54,7 +60,11 @@
                             </option>
                         </select>
                     </th>
-                    <th><button class="editor-button" @click="createNewSlide" :disabled="idUsed">Add New</button></th>
+                    <th>
+                        <button class="editor-button" @click="createNewSlide" :disabled="idUsed || !newSlideName">
+                            {{ $t('dynamic.panel.add') }}
+                        </button>
+                    </th>
                 </tr>
             </table>
 
@@ -105,6 +115,7 @@ import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
 import SlideshowEditorV from './slideshow-editor.vue';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
@@ -114,7 +125,8 @@ import SlideshowEditorV from './slideshow-editor.vue';
         'slideshow-editor': SlideshowEditorV,
         'dynamic-editor': DynamicEditorV,
         'map-editor': MapEditorV,
-        'video-editor': VideoEditorV
+        'video-editor': VideoEditorV,
+        'confirmation-modal': ConfirmationModalV
     }
 })
 export default class DynamicEditorV extends Vue {
@@ -252,7 +264,7 @@ export default class DynamicEditorV extends Vue {
             }
         }
 
-        if (index) {
+        if (index !== undefined) {
             // Remove the panel itself.
             this.panel.children = this.panel.children.filter((panel: DynamicChildItem, idx: number) => idx !== index);
 
