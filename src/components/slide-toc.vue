@@ -70,7 +70,7 @@
             </vue-final-modal>
         </div>
         <ul class="max-h-screen overflow-y-auto">
-            <draggable v-model="slides" @update="$emit('slides-updated', slides)" item-key="title" v-focus-list>
+            <draggable v-model="slides" @update="$emit('slides-updated', slides)" item-key="title" v-focus-list :disabled="true">
                 <template #item="{ element, index }">
                     <li
                         class="toc-slide border-t flex px-2 cursor-pointer hover:bg-gray-300"
