@@ -155,6 +155,7 @@
                 <button
                     @click="
                         () => {
+                            panelIndex = 0;
                             advancedEditorView = true;
                             saveChanges();
                         }
@@ -230,7 +231,7 @@
                 <div class="flex mt-4">
                     <span class="font-bold text-xl">{{ $t('editor.slides.content') }}:</span>
                     <span class="ml-auto flex-grow"></span>
-                    <div v-if="!advancedEditorView || rightOnly" class="flex flex-col mr-8">
+                    <div v-if="!advancedEditorView" class="flex flex-col mr-8">
                         <label class="editor-label text-left text-lg">{{ $t('editor.slides.contentType') }}:</label>
                         <select
                             ref="typeSelector"
@@ -253,7 +254,6 @@
                 <custom-editor
                     ref="editor"
                     :config="currentSlide"
-                    :slideIndex="slideIndex"
                     @slide-edit="$emit('slide-edit')"
                     @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save)"
                     v-if="advancedEditorView"

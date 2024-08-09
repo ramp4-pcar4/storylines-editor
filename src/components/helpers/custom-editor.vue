@@ -49,16 +49,9 @@
             :mode="'text'"
             :show-btns="false"
             :expandedOnStart="true"
-            @has-error="(err: string) => { jsonError = err; this.validate()}"
+            @has-error="(err: string) => { jsonError = err; validate()}"
             @json-change="
-                (json: any) => {
-                    // library does not 2-way v-model binding so need to set manually
-                    updatedConfig = json;
-                    edited = true;
-                    jsonError = '';
-                    this.validate();
-                    $emit('slide-edit');
-                }
+                (json: any) => onJsonChange(json)
             "
         ></json-editor>
     </div>
@@ -77,7 +70,6 @@ import { Validator } from 'jsonschema';
 export default class CustomEditorV extends Vue {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Prop() config!: string;
-    @Prop() slideIndex!: number;
 
     schemaUrl = './StorylinesSlideSchema.json';
     updatedConfig = '';
@@ -108,12 +100,29 @@ export default class CustomEditorV extends Vue {
         this.updatedConfig = this.config;
     }
 
-    validate(): void {
+    // returns true if no validation errors, false if errors
+    validate(): boolean {
         // TODO: add any missing properties in schema as required (e.g. chart options)
         const checkValidation = this.validator.validate(this.updatedConfig, this.storylinesSchema as any);
         this.validatorErrors = checkValidation.errors;
         if (this.jsonError) {
             this.validatorErrors.push(this.jsonError);
+            return false;
+        }
+        return true;
+    }
+
+    onJsonChange(json: any): void {
+        // json editor library does not contain 2-way v-model binding so need to set manually
+        this.updatedConfig = json;
+        this.edited = true;
+        this.jsonError = '';
+        this.$emit('slide-edit');
+
+        // if there are no validation errors update the slide config
+        const valid = this.validate();
+        if (valid) {
+            this.$emit('config-edited', this.updatedConfig);
         }
     }
 
