@@ -9,17 +9,14 @@
             }}</span>
 
             <!-- add item button -->
-            <button
-                class="editor-button bg-gray-100 cursor-pointer hover:bg-gray-200"
-                @click="editingStatus = editingStatus === 'create' ? 'none' : 'create'"
-            >
+            <button class="editor-button bg-gray-100 cursor-pointer hover:bg-gray-200" @click="this.changeEditStatus()">
                 <div class="flex items-center">
                     <svg
                         height="18px"
                         width="18px"
                         viewBox="0 0 23 21"
                         xmlns="http://www.w3.org/2000/svg"
-                        v-if="editingStatus === 'none'"
+                        v-if="editingStatus !== 'create'"
                     >
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
@@ -74,7 +71,7 @@
             <div>
                 <div v-if="editingStatus === 'create'">
                     <!-- Creating new slide -->
-                    <label class="mb-5 text-left">{{ $t('editor.slideshow.label.type') }}:</label>
+                    <label class="mb-5 text-left">{{ $t('editor.slideshow.label.type') }}: </label>
                     <select @input="onTypeInput" :value="newSlideType">
                         <option v-for="thing in Object.keys(editors)" :key="thing" :value="thing">
                             {{ thing }}
@@ -91,7 +88,11 @@
                         :allowMany="false"
                     ></component>
                     <div class="mt-3 w-full flex justify-end">
-                        <button class="editor-button bg-black text-white hover:bg-gray-800" @click="saveItem(true)">
+                        <button
+                            id="add-new-item"
+                            class="editor-button bg-black text-white hover:bg-gray-800"
+                            @click="saveItem(true)"
+                        >
                             {{ $t('editor.slideshow.label.add') }}
                         </button>
                     </div>
@@ -298,6 +299,19 @@ export default class SlideshowEditorV extends Vue {
 
     saveChanges(): void {
         return;
+    }
+
+    changeEditStatus(): void {
+        if (this.editingStatus === 'create') {
+            this.editingStatus = 'none';
+        } else {
+            this.editingStatus = 'create';
+
+            // After switching the edit status, scroll to the add button.
+            this.$nextTick(() => {
+                document.getElementById('add-new-item')?.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
     }
 }
 </script>
