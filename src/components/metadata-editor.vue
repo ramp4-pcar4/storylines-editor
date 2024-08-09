@@ -1306,28 +1306,28 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    highlightNext() {
+    highlightNext(): void {
         if (this.highlightedIndex < this.getStorylines.length - 1) {
             this.highlightedIndex++;
             this.scrollIntoView();
         }
     }
 
-    highlightPrevious() {
+    highlightPrevious(): void {
         if (this.highlightedIndex > 0) {
             this.highlightedIndex--;
             this.scrollIntoView();
         }
     }
 
-    selectHighlighted() {
+    selectHighlighted(): void {
         if (this.highlightedIndex !== -1) {
             const selectedStoryline = this.getStorylines[this.highlightedIndex];
             this.selectUuid(selectedStoryline.uuid);
         }
     }
 
-    scrollIntoView() {
+    scrollIntoView(): void {
         this.$nextTick(() => {
             const container = this.$el.querySelector('.overflow-y-auto');
             const activeItem = container.querySelector('li.bg-gray-300');

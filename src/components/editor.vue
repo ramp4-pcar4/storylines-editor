@@ -324,10 +324,13 @@ export default class EditorV extends Vue {
         }
 
         setTimeout(() => {
-            const routeData = this.$router.resolve({ name: 'preview' });
+            const routeData = this.$router.resolve({
+                name: 'preview',
+                params: { lang: this.configLang, uid: this.uuid }
+            });
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
-                config: JSON.parse(JSON.stringify(this.configs[this.configLang])),
+                configs: this.configs,
                 configFileStructure: this.configFileStructure
             };
         }, 5);
