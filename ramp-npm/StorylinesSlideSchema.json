@@ -93,8 +93,7 @@
                     "description": "The panels to display dynamically.",
                     "items": {
                         "$ref": "#/$defs/dynamicChildItem"
-                    },
-                    "minItems": 1
+                    }
                 },
                 "type": {
                     "type": "string",
