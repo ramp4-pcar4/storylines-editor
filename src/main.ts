@@ -33,7 +33,7 @@ import Message from 'vue-m-message';
 import 'vue-m-message/dist/style.css';
 
 import StorylinesViewer from 'ramp-storylines_demo-scenarios-pcar';
-import 'ramp-storylines_demo-scenarios-pcar/dist/storylines-viewer.css';
+import 'ramp-storylines_demo-scenarios-pcar/dist/style.css';
 
 import { FocusContainer, FocusItem, FocusList } from '@/directives/focus-list';
 
@@ -47,7 +47,7 @@ app.use(pinia)
         directive: 'tippy',
         component: 'tippy'
     })
-    .use(HighchartsVue)
+    .use(HighchartsVue, { tagName: 'charts' })
     .use(Message)
     .use(StorylinesViewer)
     .use(VueMarkdownEditor)

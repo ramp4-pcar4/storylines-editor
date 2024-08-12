@@ -76,6 +76,15 @@ import {
     SourceCounts
 } from '@/definitions';
 
+import Highcharts from 'highcharts';
+import dataModule from 'highcharts/modules/data';
+import exporting from 'highcharts/modules/exporting';
+import exportData from 'highcharts/modules/export-data';
+
+dataModule(Highcharts);
+exporting(Highcharts);
+exportData(Highcharts);
+
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
     @Prop() configFileStructure!: ConfigFileStructure;
