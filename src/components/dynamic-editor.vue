@@ -49,22 +49,29 @@
                     />
                 </tr>
                 <tr class="table-add-row">
-                    <th class="flex flex-col items-center">
-                        <input class="editor-input" type="text" placeholder="Enter Panel ID" v-model="newSlideName" />
+                    <td class="flex flex-col items-center">
+                        <input
+                            id="panelId"
+                            class="editor-input"
+                            type="text"
+                            :placeholder="$t('dynamic.panel.enterID')"
+                            v-model="newSlideName"
+                            :aria-label="$t('dynamic.panel.enterID')"
+                        />
                         <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
-                    </th>
-                    <th>
+                    </td>
+                    <td>
                         <select v-model="newSlideType">
                             <option v-for="thing in Object.keys(editors)" :key="thing">
                                 {{ thing }}
                             </option>
                         </select>
-                    </th>
-                    <th>
+                    </td>
+                    <td>
                         <button class="editor-button" @click="createNewSlide" :disabled="idUsed || !newSlideName">
                             {{ $t('dynamic.panel.add') }}
                         </button>
-                    </th>
+                    </td>
                 </tr>
             </table>
 
@@ -329,7 +336,7 @@ export default class DynamicEditorV extends Vue {
     background-color: #eee;
     cursor: pointer;
 }
-.table-add-row th {
+.table-add-row td {
     vertical-align: top;
     text-align: center;
     border-top: 1px solid #ddd;
