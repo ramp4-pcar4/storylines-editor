@@ -6,6 +6,7 @@
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
+                :aria-label="$t('editor.chart.delete')"
             >
                 <svg
                     class="absolute transform -translate-x-1/2 -translate-y-1/2"
@@ -21,6 +22,7 @@
             </button>
             <button
                 class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full bottom-2 -right-1 p-0 z-10 handle"
+                :aria-label="$t('editor.chart.delete')"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22px" height="22px" viewBox="0 0 24 24">
                     <path
