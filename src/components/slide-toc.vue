@@ -21,6 +21,7 @@
                     content: $t('editor.slides.copyFromLang'),
                     animateFill: true
                 }"
+                :aria-label="$t('editor.slides.copyFromLang')"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                     <path
@@ -87,7 +88,9 @@
                     >
                         <div class="self-center overflow-ellipsis whitespace-nowrap overflow-hidden flex-grow ml-2">
                             {{ $t('editor.slides.slide') }} {{ index + 1 }}:
-                            <span class="font-bold overflow-hidden">{{ element.title || 'Add a title' }}</span>
+                            <span class="font-bold overflow-hidden">{{
+                                element.title || $t('editor.slides.addSlideTitle')
+                            }}</span>
                         </div>
                         <div class="flex">
                             <div class="flex flex-col">
