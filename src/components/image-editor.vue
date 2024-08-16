@@ -22,7 +22,7 @@
                         <div>{{ $t('editor.image.label.drag') }}</div>
                         <div>
                             {{ $t('editor.label.or') }}
-                            <span class="text-blue-400 font-bold">{{ $t('editor.label.browse') }}</span>
+                            <span class="text-blue-700 font-bold">{{ $t('editor.label.browse') }}</span>
                             {{ $t('editor.label.upload') }}
                         </div>
                     </span>
@@ -50,8 +50,9 @@
             <template #item="{ element, index }">
                 <ImagePreview :key="`${element.id}-${index}`" :imageFile="element" @delete="deleteImage">
                     <div class="flex mt-4 items-center w-full text-left">
-                        <label class="editor-label text-label">{{ $t('editor.image.altTag') }}:</label>
+                        <label class="editor-label text-label" for="altTag">{{ $t('editor.image.altTag') }}:</label>
                         <input
+                            id="altTag"
                             class="editor-input w-4/5"
                             type="text"
                             v-model="element.altText"
@@ -60,8 +61,11 @@
                     </div>
 
                     <div class="flex mt-4 items-center w-full text-left">
-                        <label class="editor-label text-label">{{ $t('editor.image.label.caption') }}:</label>
+                        <label class="editor-label text-label" for="imgCaption"
+                            >{{ $t('editor.image.label.caption') }}:</label
+                        >
                         <input
+                            id="imgCaption"
                             class="editor-input w-4/5"
                             type="text"
                             v-model="element.caption"
@@ -73,8 +77,16 @@
         </draggable>
 
         <div v-show="imagePreviews.length > 1" class="flex items-center w-full text-left">
-            <label class="editor-label text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
-            <input class="editor-input w-3/5" type="text" v-model="slideshowCaption" @change="onImagesEdited" />
+            <label class="editor-label text-label" for="imageSlideshowCaption"
+                >{{ $t('editor.image.slideshowCaption') }}:</label
+            >
+            <input
+                id="imageSlideshowCaption"
+                class="editor-input w-3/5"
+                type="text"
+                v-model="slideshowCaption"
+                @change="onImagesEdited"
+            />
         </div>
     </div>
 </template>

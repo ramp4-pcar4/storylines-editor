@@ -49,8 +49,15 @@
                     />
                 </tr>
                 <tr class="table-add-row">
-                    <th class="flex flex-col items-center">
-                        <input class="editor-input" type="text" placeholder="Enter Panel ID" v-model="newSlideName" />
+                    <th class="flex flex-col items-center" aria-label="Enter Panel ID">
+                        <label for="panelId" aria-label="Enter Panel ID"></label>
+                        <input
+                            id="panelId"
+                            class="editor-input"
+                            type="text"
+                            placeholder="Enter Panel ID"
+                            v-model="newSlideName"
+                        />
                         <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
                     </th>
                     <th>
