@@ -6,6 +6,7 @@
                 @click="() => $emit('delete', file)"
                 :content="$t('editor.video.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
+                :aria-label="$t('editor.video.delete')"
             >
                 <svg height="24px" width="24px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
                     <path

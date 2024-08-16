@@ -44,13 +44,15 @@
         <hr class="border-solid border-t-2 border-gray-300 my-2" />
         <!-- Metadata Editor -->
         <div class="flex items-center w-full text-left">
-            <label class="editor-label text-label">{{ $t('editor.image.slideshowCaption') }}:</label>
-            <input class="editor-input w-1/3" type="text" v-model="panel.caption" /><br />
+            <label class="editor-label text-label" for="slideshowCaption"
+                >{{ $t('editor.image.slideshowCaption') }}:</label
+            >
+            <input id="slideshowCaption" class="editor-input w-1/3" type="text" v-model="panel.caption" /><br />
         </div>
         <table class="w-2/3 mt-5">
             <thead>
                 <tr class="table-header">
-                    <th></th>
+                    <th :aria-label="$t('editor.slideshow.label.slideNumber')"></th>
                     <th>{{ $t('editor.slideshow.label.type') }}</th>
                     <th>{{ $t('dynamic.panel.actions') }}</th>
                 </tr>
