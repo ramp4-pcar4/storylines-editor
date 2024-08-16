@@ -3,12 +3,13 @@
         <div v-if="!!currentSlide">
             <div class="flex">
                 <div class="flex flex-col w-full">
-                    <label class="editor-label">Slide title:</label>
+                    <label class="editor-label" for="slideTitle">{{ $t('editor.slides.slideTitle') }}:</label>
                     <div class="flex">
                         <input
                             type="text"
+                            id="slideTitle"
                             v-model="currentSlide.title"
-                            placeholder="Add a title"
+                            :placeholder="$t('editor.slides.addSlideTitle')"
                             class="editor-input w-2/3"
                         />
                         <span class="ml-auto"></span>
@@ -28,25 +29,34 @@
                         </button>
                     </div>
                     <div class="flex mt-3">
-                        <span class="mx-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
+                        <label class="ml-0" for="fullSlide">
+                            <span class="mr-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
+                        </label>
                         <input
                             type="checkbox"
+                            id="fullSlide"
                             class="editor-input rounded-none cursor-pointer w-4 h-4"
                             v-model="rightOnly"
                             :disabled="rightOnly && determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
                             @change.stop="$vfm.open(`right-only-${slideIndex}`)"
                         />
-                        <span class="mx-2 font-bold">{{ $t('editor.slides.centerSlide') }}</span>
+                        <label class="ml-0" for="centerSlide">
+                            <span class="mr-2 font-bold">{{ $t('editor.slides.centerSlide') }}</span>
+                        </label>
                         <input
                             type="checkbox"
+                            id="centerSlide"
                             class="editor-input rounded-none cursor-pointer w-4 h-4"
                             v-model="centerSlide"
                             :disabled="centerPanel"
                             @change.stop="toggleCenterSlide()"
                         />
-                        <span class="mx-2 font-bold">{{ $t('editor.slides.centerPanel') }}</span>
+                        <label class="ml-0" for="centerPanel">
+                            <span class="mr-2 font-bold">{{ $t('editor.slides.centerPanel') }}</span>
+                        </label>
                         <input
                             type="checkbox"
+                            id="centerPanel"
                             class="editor-input rounded-none cursor-pointer w-4 h-4"
                             v-model="centerPanel"
                             :disabled="centerSlide"

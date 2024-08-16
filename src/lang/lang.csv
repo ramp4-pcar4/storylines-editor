@@ -16,6 +16,7 @@ dynamic.panel.actions,Panel Actions,1,Actions du panneau,1
 dynamic.panel.idTaken,Panel ID is already in use,1,Le nom du panneau est déjà utilisé,1
 dynamic.panel.editor,Panel Editor:,1,Éditeur de panneaux:,1
 dynamic.panel.remove,Are you sure you want to remove this panel?,1,Etes-vous sûr de vouloir supprimer ce panneau?,0
+dynamic.panel.enterID,Enter Panel ID,1,Entrez l'ID du panneau,0
 dynamic.panel.add,Add New,1,Ajouter un nouveau,0
 timeslider.expand,Expand,1,Développer,1
 timeslider.minimize,Minimize,1,Réduire,1
@@ -120,6 +121,7 @@ editor.slideshow.label.create,Add new item,1,Ajoute un nouvel objet,0
 editor.slideshow.label.edit,Edit existing item,1,Modifier un élément existant,0
 editor.slideshow.label.type,Type,1,Type,0
 editor.slideshow.label.add,Add,1,Ajouter,1
+editor.slideshow.label.slideNumber,Slide Number,1,Numéro de diapositive,0
 editor.slides.title,SLIDES,1,DIAPOSITIVES,1
 editor.slides.addSlide,"New Slide",1,Nouvelle diapositive,1
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
@@ -137,6 +139,8 @@ editor.slides.nextSlide,Next slide,1,Diapositive suivante,1
 editor.slides.leftPanel,Left panel,1,Panneau de gauche,1
 editor.slides.rightPanel,Right panel,1,Panneau de droite,1
 editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
+editor.slides.slideTitle,Slide Title,1,Titre de la diapositive,0
+editor.slides.addSlideTitle,Add a title,1,Ajoutez un titre,0
 editor.slides.advanced,Advanced,1,Avancé,0
 editor.slides.advanced.good,Configuration adheres to Storylines schema.,1,La configuration adhère au schéma Storylines.,0
 editor.slides.advanced.broken,This configuration violates the Storylines schema.,1,Cette configuration viole le schéma Storylines.,0
