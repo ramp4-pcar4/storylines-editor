@@ -364,7 +364,7 @@
                         "name": "Lambert Maps",
                         "extentSetId": "EXT_NRCAN_Lambert_3978",
                         "lodSetId": "LOD_NRCAN_Lambert_3978",
-                        "thumbnailTileUrls": [],
+                        "thumbnailTileUrls": ["/tile/8/285/268", "/tile/8/285/269"],
                         "hasNorthPole": true
                     },
                     {
@@ -372,7 +372,7 @@
                         "name": "Web Mercator Maps",
                         "extentSetId": "EXT_ESRI_World_AuxMerc_3857",
                         "lodSetId": "LOD_ESRI_World_AuxMerc_3857",
-                        "thumbnailTileUrls": [],
+                        "thumbnailTileUrls": ["/tile/8/91/74", "/tile/8/91/75"],
                         "hasNorthPole": false
                     }
                 ],
