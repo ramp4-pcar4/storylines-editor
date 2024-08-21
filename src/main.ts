@@ -1,16 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { configUpgrade, createInstance, geo, layerConfigUpgrade, version } from '../scripts/ramp4/ramp.esm.js';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-window.RAMP = {
-    createInstance,
-    geo,
-    configUpgrade,
-    layerConfigUpgrade,
-    version
-};
-
 import { createApp } from 'vue';
 import App from './app.vue';
 import { createPinia } from 'pinia';
@@ -20,6 +7,7 @@ import router from './router';
 import './style.css';
 import { i18n } from './lang';
 
+import 'ramp-pcar/dist/lib/ramp.css';
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
@@ -45,7 +33,7 @@ import Message from 'vue-m-message';
 import 'vue-m-message/dist/style.css';
 
 import StorylinesViewer from 'ramp-storylines_demo-scenarios-pcar';
-import 'ramp-storylines_demo-scenarios-pcar/dist/storylines-viewer.css';
+import 'ramp-storylines_demo-scenarios-pcar/dist/style.css';
 
 import { FocusContainer, FocusItem, FocusList } from '@/directives/focus-list';
 
@@ -59,7 +47,7 @@ app.use(pinia)
         directive: 'tippy',
         component: 'tippy'
     })
-    .use(HighchartsVue)
+    .use(HighchartsVue, { tagName: 'charts' })
     .use(Message)
     .use(StorylinesViewer)
     .use(VueMarkdownEditor)
