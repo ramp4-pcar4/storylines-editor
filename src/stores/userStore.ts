@@ -4,6 +4,7 @@ interface Storyline {
     uuid: string;
     titleEN: string;
     titleFR: string;
+    lastModified: Date;
     isUserStoryline?: boolean;
 }
 
@@ -16,7 +17,7 @@ interface UserProfile {
 
 export const useUserStore = defineStore('user', {
     state: () => ({
-        userProfile: {} as UserProfile
+        userProfie: {} as UserProfile
     }),
     actions: {
         async fetchUserProfile() {
