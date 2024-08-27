@@ -30,7 +30,14 @@ editor.feedback.subject,Storylines Editor Feedback,1,Commentaires de l'éditeur 
 editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
 editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Êtes-vous sûr de vouloir remplacer le produit « {uuid} » ?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
-editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
+editor.loadProduct,Load Existing Storylines Product,1,Charger un produit Storylines existant,0
+editor.chooseOption,What would you like to do?,1,Qu'aimeriez-vous faire?, 0
+editor.dashboard,Dashboard,1,Tableau de bord,0
+editor.previousProducts,Previously Edited Products,1,Produits précédemment édités,0
+editor.previousProducts.productInfo,Project Information,1,Informations sur le projet,0
+editor.previousProducts.productInfo.title,Title,1,Titre,0
+editor.previousProducts.lastModified,Last Modified,1,Dernière modification,0
+editor.previousProducts.actions,Actions,1,Actes,0
 editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées d’un projet,1
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
 editor.metadata.instructions,Fill in metadata details about your new Storylines product. Use the "Preview" button to see what your slides will look like.,1,Inscrivez les métadonnées de votre nouveau produit de scénario. Utilisez la fonction « Afficher l’aperçu » pour voir à quoi ressemblent vos diapositives.,1
@@ -41,6 +48,7 @@ editor.warning.rename,UUID already in use. Please choose a different ID.,1,UUID 
 editor.changeUuid,Click here to change UUID,1,Click here to change UUID,0
 editor.changingUuid,You are changing this product UUID to {changeUuid}. Save changes required.,1,You are changing this product UUID to {changeUuid}. Save changes required.,0
 editor.title,Title,1,Titre,1
+editor.respectTitle,RAMP Storylines Editor & Creation Tool,1,Éditeur et outil de création de scénarios RAMP,0
 editor.logo,Logo,1,Logo,1
 editor.logoPreview,Logo Preview,1,Aperçu du logo,1
 editor.logoAltText,Logo Alt Text,1,Lien contextuel,1

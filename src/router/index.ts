@@ -15,6 +15,7 @@ const routes = [
         path: '/:lang/editor',
         name: 'home',
         component: HomeV,
+        props: { template: 'default' },
         meta: { title: 'editor.window.title' }
     },
     {
