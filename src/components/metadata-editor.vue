@@ -5,7 +5,7 @@
             <div class="px-20 py-5">
                 <div class="flex">
                     <div class="flex flex-1 text-2xl font-bold mb-5">
-                        {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                        {{ editExisting ? $t('editor.loadProduct') : $t('editor.createProduct') }}
                     </div>
                     <button class="editor-button" @click="swapLang()">
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
