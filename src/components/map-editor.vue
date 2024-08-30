@@ -51,7 +51,7 @@ import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@
 import { VueFinalModal } from 'vue-final-modal';
 import defaultConfig from '../../ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
-import { createInstance } from 'ramp-config-editor_editeur-config-pcar';
+import { createInstance as createRampEditorInstance } from 'ramp-config-editor_editeur-config-pcar';
 import 'ramp-config-editor_editeur-config-pcar/style.css';
 
 @Options({
@@ -152,7 +152,7 @@ export default class MapEditorV extends Vue {
             if (configFile) {
                 configFile.async('string').then((res: string) => {
                     const conf = JSON.parse(res);
-                    this.rampEditorApi = createInstance(this.$refs.editor, conf);
+                    this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
                 });
             } else {
                 // If it does not exist in the ZIP folder, try and fetch from server.
@@ -160,7 +160,7 @@ export default class MapEditorV extends Vue {
                     data.json().then((res) => {
                         let stringResponse = JSON.stringify(res);
                         const conf = JSON.parse(stringResponse);
-                        this.rampEditorApi = createInstance(this.$refs.editor, conf);
+                        this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
                     });
                 });
             }
