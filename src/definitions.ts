@@ -156,6 +156,7 @@ export interface BasePanel {
     type: string;
     width?: number;
     customStyles?: string;
+    modified?: boolean;
 }
 
 export interface TextPanel extends BasePanel {
@@ -282,3 +283,43 @@ export interface DefaultConfigs {
     video: VideoPanel;
     image: ImagePanel;
 }
+
+export const BaseStartingConfig: DefaultConfigs = {
+    text: {
+        type: PanelType.Text,
+        title: '',
+        content: ''
+    },
+    dynamic: {
+        type: PanelType.Dynamic,
+        title: '',
+        titleTag: '',
+        content: '',
+        children: []
+    },
+    slideshow: {
+        type: PanelType.Slideshow,
+        items: [],
+        userCreated: true
+    },
+    image: {
+        type: PanelType.Image,
+        src: ''
+    },
+    chart: {
+        type: PanelType.Chart,
+        src: ''
+    },
+    map: {
+        type: PanelType.Map,
+        config: '',
+        title: '',
+        scrollguard: false
+    },
+    video: {
+        type: PanelType.Video,
+        title: '',
+        videoType: '',
+        src: ''
+    }
+};
