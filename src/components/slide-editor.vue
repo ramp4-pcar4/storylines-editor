@@ -34,7 +34,13 @@
                             class="editor-input rounded-none cursor-pointer w-4 h-4"
                             v-model="rightOnly"
                             :disabled="rightOnly && determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
-                            @change.stop="$vfm.open(`right-only-${slideIndex}`)"
+                            @change.stop="
+                                if (currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])) {
+                                    $vfm.open(`right-only-${slideIndex}`);
+                                } else {
+                                    toggleRightOnly();
+                                }
+                            "
                         />
                         <span class="mx-2 font-bold">{{ $t('editor.slides.centerSlide') }}</span>
                         <input
@@ -236,8 +242,18 @@
                         <select
                             ref="typeSelector"
                             @input="
-                                $vfm.open(`change-slide-${slideIndex}`);
                                 newType = ($event.target as HTMLInputElement).value;
+                                if (
+                                    panelModified(currentSlide.panel[panelIndex]) ||
+                                    // Changing to dynamic deletes content of both panels. Therefore, warn if ANY panel has changes.
+                                    (newType === 'dynamic' && currentSlide.panel.some((panel) => panelModified(panel)))
+                                ) {
+                                    $vfm.open(`change-slide-${slideIndex}`);
+                                } else {
+                                    changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
+                                    toggleCenterPanel();
+                                    toggleCenterSlide();
+                                }
                             "
                             :value="determineEditorType(currentSlide.panel[panelIndex])"
                         >
@@ -269,7 +285,15 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
-                    @slide-edit="$emit('slide-edit')"
+                    @slide-edit="(changedFromDefault: boolean = true) => {
+                        $emit('slide-edit');
+
+                        // changedFromDefault should hold a boolean indicating whether the panel is actually modified 
+                        // (different from initial state). Only needed for some multimedia editors; text editors
+                        // write directly to currentSlide constantly, which is handled by panelModified().
+                        currentSlide.panel[panelIndex].modified = changedFromDefault || undefined;
+                    }
+                    "
                     v-else
                 ></component>
             </div>
@@ -308,6 +332,7 @@
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
+    BaseStartingConfig,
     ChartPanel,
     ConfigFileStructure,
     DefaultConfigs,
@@ -334,6 +359,7 @@ import SlideshowEditorV from './slideshow-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import { toRaw } from 'vue';
 
 @Options({
     components: {
@@ -383,13 +409,21 @@ export default class SlideEditorV extends Vue {
         this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
     }
 
-    changePanelType(prevType: string, newType: string): void {
-        const startingConfig: DefaultConfigs = {
-            text: {
-                type: PanelType.Text,
-                title: '',
-                content: ''
-            },
+    /**
+     * Determines whether a given panel has been modified from the default configuration of its type.
+     * Note that some editors (e.g. text) write directly to currentSlide after each change,
+     * while other editors (e.g. image) do not. The first type is handled completely in
+     * panelModified; the second type requires you to set `panel.modified` for the given panel beforehand,
+     * indicating whether changes have been made from the specific editor sub-component (see
+     * `<component>`'s `@slide-edit` event handler).
+     * @param {BasePanel} panel The panel to analyze.
+     * @returns {boolean} Whether panel has been modified.
+     */
+    panelModified(panel: BasePanel): boolean {
+        const prevType = this.currentSlide.panel[this.panelIndex].type;
+
+        let startingConfig = {
+            ...JSON.parse(JSON.stringify(BaseStartingConfig)),
             dynamic: {
                 type: PanelType.Dynamic,
                 title:
@@ -403,30 +437,42 @@ export default class SlideEditorV extends Vue {
                         : '',
                 children: []
             },
-            slideshow: {
-                type: PanelType.Slideshow,
-                items: [],
-                userCreated: true
-            },
-            image: {
-                type: PanelType.Image,
-                src: ''
-            },
-            chart: {
-                type: PanelType.Chart,
-                src: ''
-            },
             map: {
                 type: PanelType.Map,
-                config: '',
+                config: `${this.configFileStructure.uuid}/ramp-config/${
+                    this.configFileStructure.uuid
+                }-map-${this.getNumberOfMaps()}.json`,
                 title: '',
                 scrollguard: false
-            },
-            video: {
-                type: PanelType.Video,
-                title: '',
-                videoType: '',
-                src: ''
+            }
+        };
+
+        const oldStartingConfig = startingConfig[panel.type as keyof DefaultConfigs];
+
+        let newConfig = Object.assign({}, toRaw(panel));
+        newConfig.customStyles = newConfig.customStyles || undefined;
+
+        return (
+            JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig) ||
+            this.currentSlide.panel[this.panelIndex].modified === true
+        );
+    }
+
+    changePanelType(prevType: string, newType: string): void {
+        let startingConfig = {
+            ...JSON.parse(JSON.stringify(BaseStartingConfig)),
+            dynamic: {
+                type: PanelType.Dynamic,
+                title:
+                    this.currentSlide.panel[0] && prevType === 'text'
+                        ? (this.currentSlide.panel[0] as TextPanel).title
+                        : '',
+                titleTag: '',
+                content:
+                    this.currentSlide.panel[0] && prevType === 'text'
+                        ? (this.currentSlide.panel[0] as TextPanel).content
+                        : '',
+                children: []
             }
         };
 
@@ -627,6 +673,14 @@ export default class SlideEditorV extends Vue {
                 );
             }
         }
+    }
+
+    getNumberOfMaps(): number {
+        let n = 0;
+        this.configFileStructure.rampConfig.forEach((f) => {
+            n += 1;
+        });
+        return n;
     }
 }
 </script>

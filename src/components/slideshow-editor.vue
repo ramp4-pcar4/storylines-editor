@@ -124,6 +124,7 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
+    BaseStartingConfig,
     ChartPanel,
     ConfigFileStructure,
     DefaultConfigs,
@@ -163,43 +164,17 @@ export default class SlideshowEditorV extends Vue {
         video: 'video-editor'
     };
 
-    // TODO: we use this and a few other functions (updating source counts, etc.) in multiple places. We should probably look in to putting this somewhere else.
     startingConfig: DefaultConfigs = {
-        text: {
-            type: PanelType.Text,
-            title: '',
-            content: ''
-        },
-        dynamic: {
-            type: PanelType.Dynamic,
-            title: '',
-            titleTag: '',
-            content: '',
-            children: []
-        },
+        ...JSON.parse(JSON.stringify(BaseStartingConfig)),
         slideshow: {
             type: PanelType.Slideshow,
             items: []
-        },
-        chart: {
-            type: PanelType.Chart,
-            src: ''
-        },
-        image: {
-            type: PanelType.Image,
-            src: ''
         },
         map: {
             type: PanelType.Map,
             config: '',
             title: '',
             scrollguard: true // default to ON for slideshows. Allows users to use the cursor to switch slides.
-        },
-        video: {
-            type: PanelType.Video,
-            title: '',
-            videoType: '',
-            src: ''
         }
     };
 
@@ -289,7 +264,7 @@ export default class SlideshowEditorV extends Vue {
                 (this.$refs.slideEditor as ImageEditorV | ChartEditorV).saveChanges();
 
                 if (itemConfig.type === PanelType.Map) {
-                    this.$emit('slide-edit');
+                    this.$emit('slide-edit', false);
                 }
             }
         }
