@@ -893,7 +893,7 @@ export default class MetadataEditorV extends Vue {
             // Update router path
             if (this.reloadExisting) {
                 this.loadEditor = true;
-                this.generateConfig();
+                this.unsavedChanges = false;
                 this.updateEditorPath();
             } else if (!this.loadExisting) {
                 this.loadEditor = true;
