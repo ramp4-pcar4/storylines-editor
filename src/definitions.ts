@@ -8,6 +8,7 @@ export interface StoryRampConfig {
     contextLink: string;
     contextLabel: string;
     tocOrientation: string;
+    returnTop: boolean;
     dateModified: string;
 }
 
@@ -38,6 +39,7 @@ export interface MetadataContent {
     contextLink: string;
     contextLabel: string;
     tocOrientation: string;
+    returnTop: boolean;
     dateModified: string;
 }
 
@@ -138,6 +140,7 @@ export interface Slide {
     // tuple definition to restrict array size
     // panel: [BasePanel, BasePanel | undefined];
     panel: BasePanel[];
+    includeInToc?: boolean;
 }
 
 export enum PanelType {

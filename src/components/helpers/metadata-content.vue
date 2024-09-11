@@ -115,6 +115,13 @@
             <option value="vertical">{{ $t('editor.tocOrientation.vertical') }}</option>
             <option value="horizontal">{{ $t('editor.tocOrientation.horizontal') }}</option>
         </select>
+        <label class="editor-label ml-25">{{ $t('editor.returnTop') }}</label>
+        <input
+            type="checkbox"
+            class="editor-input rounded-none cursor-pointer w-4 h-4"
+            v-model="metadata.returnTop"
+            @change="metadataChanged"
+        />
         <br />
         <label class="editor-label mb-5"></label>
         <p class="inline-block">
@@ -134,21 +141,11 @@
 </template>
 
 <script lang="ts">
+import { MetadataContent } from '@/definitions';
 import { Prop, Vue } from 'vue-property-decorator';
 
 export default class MetadataEditorV extends Vue {
-    @Prop() metadata!: {
-        title: string;
-        introTitle: string;
-        introSubtitle: string;
-        logoName: string;
-        logoPreview: string;
-        logoAltText: string;
-        contextLink: string;
-        contextLabel: string;
-        tocOrientation: string;
-        dateModified: string;
-    };
+    @Prop() metadata!: MetadataContent;
 
     openFileSelector(): void {
         document.getElementById('logoUpload')?.click();

@@ -413,6 +413,7 @@ export default class MetadataEditorV extends Vue {
         contextLink: '',
         contextLabel: '',
         tocOrientation: '',
+        returnTop: true,
         dateModified: ''
     };
     // add more required metadata fields to here as needed
@@ -443,6 +444,7 @@ export default class MetadataEditorV extends Vue {
             this.metadata.dateModified = `${year}-${month}-${day}`;
             // set vertical as the default table of contents orientation
             this.metadata.tocOrientation = 'vertical';
+            this.metadata.returnTop = true;
         }
 
         // Find which view to render based on route
@@ -553,6 +555,7 @@ export default class MetadataEditorV extends Vue {
             contextLabel: this.metadata.contextLabel,
             contextLink: this.metadata.contextLink,
             tocOrientation: this.metadata.tocOrientation,
+            returnTop: this.metadata.returnTop,
             dateModified: this.metadata.dateModified
         };
     }
@@ -909,6 +912,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.contextLink = config.contextLink;
         this.metadata.contextLabel = config.contextLabel;
         this.metadata.tocOrientation = config.tocOrientation;
+        this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.dateModified = config.dateModified;
 
         this.slides = config.slides;
@@ -1052,17 +1056,7 @@ export default class MetadataEditorV extends Vue {
         return this.configFileStructure as ConfigFileStructure;
     }
 
-    updateMetadata(
-        key:
-            | 'title'
-            | 'introTitle'
-            | 'introSubtitle'
-            | 'contextLink'
-            | 'contextLabel'
-            | 'tocOrientation'
-            | 'dateModified',
-        value: string
-    ): void {
+    updateMetadata<K extends keyof MetadataContent>(key: K, value: MetadataContent[K]): void {
         this.metadata[key] = value;
         this.unsavedChanges = true;
     }
@@ -1081,6 +1075,7 @@ export default class MetadataEditorV extends Vue {
             config.contextLink = this.metadata.contextLink;
             config.contextLabel = this.metadata.contextLabel;
             config.tocOrientation = this.metadata.tocOrientation;
+            config.returnTop = this.metadata.returnTop;
             config.dateModified = this.metadata.dateModified;
 
             // If the logo section is missing, create it here before overwriting values.
@@ -1128,7 +1123,8 @@ export default class MetadataEditorV extends Vue {
             logoPreview: '',
             logoName: '',
             logoAltText: '',
-            tocOrientation: ''
+            tocOrientation: '',
+            returnTop: true
         };
         this.configs = { en: undefined, fr: undefined };
         this.slides = [];
