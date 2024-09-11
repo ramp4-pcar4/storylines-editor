@@ -149,12 +149,14 @@ editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slides.intro,Intro subtitle,1,Sous-titre de l’introduction,1
 editor.slides.title,Intro title,1,Titre de l’introduction,1
+editor.slides.includeInToc,Include in table of contents,1,Inclure dans la table des matières,0
 editor.slide.untitled,Untitled slide,1,Diapositive sans titre,0
 editor.slide.copy.success,Slide copied successfully!,1,Diapositive copiée avec succès !,0
 editor.tocOrientation,Table of Contents Orientation,1,Orientation de la table des matières,0
 editor.tocOrientation.info,The table of contents orientation will be set to vertical in mobile view.,1,L'orientation de la table des matières sera définie sur verticale en vue mobile.,0
 editor.tocOrientation.vertical,Vertical,1,Vertical,0
 editor.tocOrientation.horizontal,Horizontal,1,Horizontal,0
+editor.returnTop,Include return to top navigation,1,Inclure le retour en haut de la navigation,0
 editor.landing.greeting,Hello,1,Bonjour,1
 help.title,Help,1,Aide,1
 help.search,Search Help,1,Aide à la recherche,1
