@@ -12,10 +12,22 @@ require('dotenv').config();
 
 // CONFIGURATION
 PORT = process.env.port ? process.env.port : 6040; // the Express server will run on this port.
-UPLOAD_PATH = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_UPLOAD_PATH : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
-TARGET_PATH = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_TARGET_PATH : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
-LOG_PATH = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? process.env.SERVER_LOG_PATH : './logfile.txt'; // the path to the logfile
-ROUTE_PREFIX = process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? '/Storylines-Editor-STB-Server' : '';
+UPLOAD_PATH =
+    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? process.env.SERVER_UPLOAD_PATH
+        : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
+TARGET_PATH =
+    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? process.env.SERVER_TARGET_PATH
+        : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
+LOG_PATH =
+    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? process.env.SERVER_LOG_PATH
+        : './logfile.txt'; // the path to the logfile
+ROUTE_PREFIX =
+    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? '/Storylines-Editor-STB-Server'
+        : '';
 
 // Create express app.
 var app = express();
@@ -135,7 +147,10 @@ app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
 
                 // Write the product data to the ZIP file.
                 archive.pipe(output);
-                archive.directory(PRODUCT_PATH, false);
+                archive.glob('**', {
+                    cwd: PRODUCT_PATH,
+                    ignore: ['**/Thumbs.db']
+                });
                 archive.finalize();
 
                 responseMessages.push({ type: 'INFO', message: `Successfully loaded product ${req.params.id}` });
