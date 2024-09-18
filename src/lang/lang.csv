@@ -33,14 +33,46 @@ editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Ê
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
 editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées d’un projet,1
+editor.editMetadata.load.cancel,Cancel load,1,Annuler le chargement,0
+editor.editMetadata.editExistingHeader,Choose Storylines Product,1,Choisissez le produit Storylines,0
+editor.editMetadata.input.tooltip,Press Esc to erase field.,1,Appuyez sur Esc pour effacer le champ.,0
+editor.editMetadata.loading,Storyline product is loading. Larger products can take a while to load. Thank you for your patience.,1,Le produit Storyline est en cours de chargement. Le chargement des produits plus volumineux peut prendre un certain temps. Merci pour votre patience.,0
+editor.editMetadata.message.error.noConfig,No config exists for storylines product.,1,Aucune configuration n'existe pour le produit Storylines.,0
+editor.editMetadata.message.error.failedZipFile,Failed to process ZIP file.,1,Échec du traitement du fichier ZIP.,0
+editor.editMetadata.message.error.noRequestedVersion,The requested version does not exist.,1,La version demandée n'existe pas.,0
+editor.editMetadata.message.error.noResponseFromServer,"Failed to load product, no response from server",1,"Échec du chargement du produit, aucune réponse du serveur",0
+editor.editMetadata.message.error.malformedProduct,The requested product {uuid} is malformed.,1,Le produit demandé {uuid} est mal formé.,0
+editor.editMetadata.message.error.failedSave,Failed to save changes.,1,Échec de l'enregistrement des modifications.,0
+editor.editMetadata.message.error.logoFailedLoad,Failed to load logo image.,1,Échec du chargement de l'image du logo.,0
+editor.editMetadata.message.error.requiredFieldsNotFilled,Please fill out the required fields before proceeding.,1,Veuillez remplir les champs obligatoires avant de continuer.,0
+editor.editMetadata.message.logoSuccessfulLoad,Successfully loaded logo image.,1,Image du logo chargée avec succès.,0
+editor.editMetadata.message.successfulLoad,Successfully loaded storyline!,1,Scénario chargé avec succès!,0
+editor.editMetadata.message.successfulSave,Successfully saved changes!,1,Modifications enregistrées avec succès!,0
+editor.editMetadata.message.wait,Please wait. This may take several minutes.,1,"S'il vous plaît, attendez. Cela peut prendre plusieurs minutes.",0
+editor.editMetadata.versionHistory.buttonShow,Show previous versions of product,1,Afficher les versions précédentes du produit,0
+editor.editMetadata.versionHistory.buttonHide,Hide previous versions,1,Masquer les versions précédentes,0
+editor.editMetadata.versionHistory.header,Version History,1,Historique des versions,0
+editor.editMetadata.versionHistory.resultsFound,"We detected previous versions of this storylines product. If you wish to restore a previous version, please click 'Show previous versions of product'.",1,"Nous avons détecté des versions précédentes de ce produit Storylines. Si vous souhaitez restaurer une version précédente, veuillez cliquer sur « Afficher les versions précédentes du produit ».",0
+editor.editMetadata.versionHistory.noResults,There are no previous versions of this storylines product.,1,Il n’existe aucune version précédente de ce produit Storylines.,0
+editor.editMetadata.versionHistory.load,Load this version,1,Charger cette version,0
+editor.editMetadata.versionHistory.actions,Actions,1,Actes,0
+editor.editMetadata.versionHistory.saveDate,Save Date,1,Enregistrer la date,0
+editor.editMetadata.retrievalAborted,Product retrieval manually aborted.,1,Récupération du produit interrompue manuellement.,0
+editor.done,Done,1,Fini,0
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
 editor.metadata.instructions,Fill in metadata details about your new Storylines product. Use the "Preview" button to see what your slides will look like.,1,Inscrivez les métadonnées de votre nouveau produit de scénario. Utilisez la fonction « Afficher l’aperçu » pour voir à quoi ressemblent vos diapositives.,1
-editor.uuid,UUID,1,UUID,1
+editor.uuid,UUID,1,UUID,0
+editor.uuid.required,(required),1,(obligatoire),0
 editor.uuid.new,New UUID,1,New UUID,0
+editor.warning.mustEnterUuid,You must first enter a UUID.,1,Vous devez d'abord saisir un UUID.,0
+editor.warning.retrievalFailed,"Failed to load product, no response from server.",1,"Échec du chargement du produit, aucune réponse du serveur.",0
 editor.warning.uuid,UUID already exists. Saving this will overwrite existing product.,1,L’IDUU existe déjà. Enregistrer ce produit écrasera le produit existant.,1
+editor.warning.uuidNotFound,The requested UUID '{uuid}' does not exist.,1,L'UUID '{uuid}' ​​demandé n'existe pas,0
+editor.metadata.uuidInstructions,"Please enter the UUID of an existing storylines product, then click the 'Load' button.",1,"Veuillez saisir l'UUID d'un produit de scénario existant, puis cliquez sur le bouton « Charger ».",0
+editor.metadata.newUuidInstructions,"Enter a unique ID for your new storyline. One has been auto-generated for you, but you can also enter your own.",1,"Entrez un identifiant unique pour votre nouveau scénario. Un a été généré automatiquement pour vous, mais vous pouvez également saisir le vôtre.",0
 editor.warning.rename,UUID already in use. Please choose a different ID.,1,UUID déjà utilisé. Veuillez choisir un autre identifiant.,0
-editor.changeUuid,Click here to change UUID,1,Click here to change UUID,0
-editor.changingUuid,You are changing this product UUID to {changeUuid}. Save changes required.,1,You are changing this product UUID to {changeUuid}. Save changes required.,0
+editor.changeUuid,Click here to change UUID,1,Cliquez ici pour changer,0
+editor.changingUuid,You are changing this product UUID to '{changeUuid}'. Save changes required.,1,Vous modifiez l'UUID de ce produit en '{changeUuid}'. Enregistrez les modifications requises.,0
 editor.title,Title,1,Titre,1
 editor.logo,Logo,1,Logo,1
 editor.logoPreview,Logo Preview,1,Aperçu du logo,1
