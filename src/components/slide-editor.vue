@@ -52,6 +52,13 @@
                             :disabled="centerSlide"
                             @change.stop="toggleCenterPanel()"
                         />
+                        <span class="mx-2 font-bold"> {{ $t('editor.slides.includeInToc') }}</span>
+                        <input
+                            type="checkbox"
+                            class="editor-input rounded-none cursor-pointer w-4 h-4"
+                            v-model="includeInToc"
+                            @change.stop="toggleIncludeInToc()"
+                        />
                     </div>
                 </div>
             </div>
@@ -365,6 +372,7 @@ export default class SlideEditorV extends Vue {
     rightOnly = false;
     centerSlide = false;
     centerPanel = false;
+    includeInToc = true;
     dynamicSelected = false;
 
     editors: Record<string, string> = {
@@ -381,6 +389,10 @@ export default class SlideEditorV extends Vue {
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
         this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
+        this.centerPanel = this.currentSlide.centerPanel ?? false;
+        this.centerSlide = this.currentSlide.centerSlide ?? false;
+        this.includeInToc = this.currentSlide.includeInToc ?? true;
+        this.rightOnly = this.currentSlide.rightOnly ?? false;
     }
 
     changePanelType(prevType: string, newType: string): void {
@@ -551,6 +563,7 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleRightOnly(): void {
+        this.currentSlide.rightOnly = this.rightOnly;
         this.saveChanges();
         if (this.rightOnly) {
             this.panelIndex = 0;
@@ -571,6 +584,7 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleCenterSlide(): void {
+        this.currentSlide.centerSlide = this.centerSlide;
         if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].customStyles = 'text-align: right;';
@@ -615,6 +629,7 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleCenterPanel(): void {
+        this.currentSlide.centerPanel = this.centerPanel;
         if (this.centerPanel) {
             for (const p in this.currentSlide.panel) {
                 this.currentSlide.panel[p].customStyles = 'text-align: center;';
@@ -627,6 +642,10 @@ export default class SlideEditorV extends Vue {
                 );
             }
         }
+    }
+
+    toggleIncludeInToc(): void {
+        this.currentSlide.includeInToc = this.includeInToc;
     }
 }
 </script>
