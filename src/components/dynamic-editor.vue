@@ -95,6 +95,7 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
+    BaseStartingConfig,
     ChartPanel,
     ConfigFileStructure,
     DefaultConfigs,
@@ -146,45 +147,7 @@ export default class DynamicEditorV extends Vue {
         video: 'video-editor'
     };
 
-    startingConfig: DefaultConfigs = {
-        text: {
-            type: PanelType.Text,
-            title: '',
-            content: ''
-        },
-        dynamic: {
-            type: PanelType.Dynamic,
-            title: '',
-            titleTag: '',
-            content: '',
-            children: []
-        },
-        slideshow: {
-            type: PanelType.Slideshow,
-            items: [],
-            userCreated: true
-        },
-        image: {
-            type: PanelType.Image,
-            src: ''
-        },
-        chart: {
-            type: PanelType.Chart,
-            src: ''
-        },
-        map: {
-            type: PanelType.Map,
-            config: '',
-            title: '',
-            scrollguard: false
-        },
-        video: {
-            type: PanelType.Video,
-            title: '',
-            videoType: '',
-            src: ''
-        }
-    };
+    startingConfig: DefaultConfigs = JSON.parse(JSON.stringify(BaseStartingConfig));
 
     editingStatus = 'text';
     editingSlide = -1;
