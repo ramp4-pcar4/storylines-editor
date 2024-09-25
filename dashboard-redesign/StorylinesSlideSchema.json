@@ -499,6 +499,11 @@
         "backgroundImage": {
             "type": "string",
             "description": "An image to display in the background of the slide."
+        },
+        "includeInToc": {
+            "type": "boolean",
+            "description": "Optional attribute that indicates whether or not to include slide in table of contents. Defaults to true.",
+            "default": true
         }
     },
 
