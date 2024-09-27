@@ -39,14 +39,15 @@
                         </div>
                     </div>
                     <div v-else class="flex flex-row items-center">
-                        <label class="editor-label">
-                            <span class="text-red-500" v-if="'uuid' in reqFields">*</span>
+                        <label class="editor-label" for="uuid">
+                            <span class="text-red-600" v-if="'uuid' in reqFields">*</span>
                             {{ $t('editor.uuid') }}:
                         </label>
                         <div class="relative w-1/3 inline-block">
                             <input
                                 class="editor-input w-full mt-0"
                                 type="text"
+                                id="uuid"
                                 @input="
                                     error = false;
                                     reqFields.uuid = true;

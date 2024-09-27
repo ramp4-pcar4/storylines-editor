@@ -2,8 +2,14 @@
     <div class="block">
         <!-- Upload video area -->
         <div class="flex mt-4 items-center w-full text-left">
-            <label class="editor-label text-label">{{ $t('editor.video.title') }}:</label>
-            <input class="editor-input w-3/5" type="text" v-model="videoPreview.title" @change="onVideoEdited" />
+            <label class="editor-label text-label" for="videoTitle">{{ $t('editor.video.title') }}:</label>
+            <input
+                id="videoTitle"
+                class="editor-input w-3/5"
+                type="text"
+                v-model="videoPreview.title"
+                @change="onVideoEdited"
+            />
         </div>
 
         <!-- Option 1: upload video file -->
@@ -28,7 +34,7 @@
                         <div>{{ $t('editor.video.label.drag') }}</div>
                         <div>
                             {{ $t('editor.label.or') }}
-                            <span class="text-blue-400 font-bold">{{ $t('editor.label.browse') }}</span>
+                            <span class="text-blue-700 font-bold">{{ $t('editor.label.browse') }}</span>
                             {{ $t('editor.label.upload') }}
                         </div>
                     </span>
@@ -39,17 +45,18 @@
 
         <!-- Option 2: provide URL to external or YT link -->
         <div class="flex mt-4 items-center w-full text-left">
-            <label class="editor-label text-label"
+            <label class="editor-label text-label" for="videoURL"
                 >{{ $t('editor.label.or') + ' ' + $t('editor.video.pasteUrl') }}:</label
             >
             <input
                 ref="videoUrl"
+                id="videoURL"
                 class="editor-input w-3/5"
                 type="search"
                 v-model="videoPreview.src"
                 v-if="videoPreview.videoType !== 'local'"
             />
-            <input ref="videoUrl" class="editor-input w-3/5" type="search" v-else />
+            <input ref="videoUrl" id="videoURL" class="editor-input w-3/5" type="search" v-else />
             <button @click="uploadVideoUrl" class="editor-button bg-white border border-black hover:bg-gray-100">
                 {{ $t('editor.video.label.upload') }}
             </button>
