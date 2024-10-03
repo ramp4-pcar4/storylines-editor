@@ -950,6 +950,9 @@ export default class MetadataEditorV extends Vue {
                     }
                 });
             }
+        } else {
+            // If there's no logo, mark the product as loaded.
+            this.loadStatus = 'loaded';
         }
     }
 
