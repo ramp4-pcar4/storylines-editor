@@ -489,15 +489,17 @@ export default class SlideEditorV extends Vue {
             }
         };
 
-        // Before swapping panel type, update sources from the to-be-deleted config.
-        this.currentSlide.panel.forEach((panel: BasePanel) => this.removeSourceCounts(panel));
-
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
+            // Remove source content of both panels
+            this.currentSlide.panel.forEach((panel: BasePanel) => this.removeSourceCounts(panel));
             this.panelIndex = 0;
             this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
             this.dynamicSelected = true;
         } else {
+            // Remove source content of panel having its type swapped
+            this.removeSourceCounts(this.currentSlide.panel[this.panelIndex]);
+
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }

@@ -154,7 +154,6 @@ export default class ImageEditorV extends Vue {
                 // Check if the config file exists in the ZIP folder first.
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');
-
                 const assetFile = this.configFileStructure.zip.file(assetSrc);
                 if (assetFile) {
                     this.imagePreviewPromises.push(
