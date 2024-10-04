@@ -32,6 +32,7 @@ editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
 editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Êtes-vous sûr de vouloir remplacer le produit « {uuid} » ?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.loadProduct,Load Existing Storylines Product,1,Charger un produit Storylines existant,0
+editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées,1
 editor.chooseOption,What would you like to do?,1,Qu'aimeriez-vous faire?, 0
 editor.dashboard,Dashboard,1,Tableau de bord,0
 editor.previousProducts,Previously Edited Products,1,Produits précédemment édités,0
@@ -66,6 +67,8 @@ editor.editMetadata.versionHistory.actions,Actions,1,Actes,0
 editor.editMetadata.versionHistory.saveDate,Save Date,1,Enregistrer la date,0
 editor.editMetadata.retrievalAborted,Product retrieval manually aborted.,1,Récupération du produit interrompue manuellement.,0
 editor.done,Done,1,Fini,0
+editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
+editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées,1
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
 editor.metadata.instructions,Fill in metadata details about your new Storylines product. Use the "Preview" button to see what your slides will look like.,1,Inscrivez les métadonnées de votre nouveau produit de scénario. Utilisez la fonction « Afficher l’aperçu » pour voir à quoi ressemblent vos diapositives.,1
 editor.uuid,UUID,1,UUID,0
@@ -163,8 +166,9 @@ editor.slideshow.label.edit,Edit existing item,1,Modifier un élément existant,
 editor.slideshow.label.type,Type,1,Type,0
 editor.slideshow.label.add,Add,1,Ajouter,1
 editor.slideshow.label.slideNumber,Slide Number,1,Numéro de diapositive,0
-editor.slides.title,SLIDES,1,DIAPOSITIVES,1
-editor.slides.addSlide,"New Slide",1,Nouvelle diapositive,1
+editor.slides.title,Intro title,1,Titre de l’introduction,1
+editor.slides.addSlide,"New blank slide",1,Nouvelle diapositive,0
+editor.slides.currentLangLabel,({lang} slide),1,(Diapositive en {lang}),0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
 editor.slides.deleteSlide.confirm,"Are you sure you want to delete the slide {title}?",1,"Voulez-vous vraiment supprimer la diapositive {titre}?",1
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
@@ -175,6 +179,22 @@ editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
+editor.slides.toc.copySlide,Copy Slide,1,Copier la diapositive,0
+editor.slides.toc.deleteSlide,Delete Slide,1,Supprimer la diapositive,0
+editor.slides.toc.newENGSlideText,New ENG Slide *,1,Nouvelle diapositive ANG *,0
+editor.slides.toc.newFRSlideText,New FR Slide *,1,Novelle diapositive FR *,0
+editor.slides.toc.noENGslide,(No English Config),1,(Pas de configuration Anglais),0
+editor.slide.toc.noFRSlide,(No French Config),1,(Pas de configuration française),0
+editor.slides.toc.prevEngDNE,Cannot create this config if previous slide EN config does not exist.,1,Impossible de créer cette configuration si la configuration EN de la diapositive précédente n'existe pas.,0
+editor.slide.toc.prevFrDNE,Cannot create this config if previous slide FR config does not exist.,1,Impossible de créer cette configuration si la configuration FR de la diapositive précédente n'existe pas.,0
+editor.slides.toc.newBlankConfig,Create new blank config,1,Créer une nouvelle configuration vierge,0
+editor.slides.toc.newConfigFromFR,Copy config from French slide,1,Copier la configuration à partir de la diapositive française,0
+editor.slides.toc.newConfigFromEng,Copy config from English slide,1,Copier la configuration à partir de la diapositive anglais,0
+editor.slides.toc.moveSlideUp,Move slide up,1,Déplacer la diapositive vers le haut,0
+editor.slides.toc.moveSlideDown,Move slide down,1,Déplacer la diapositive vers le bas,0
+editor.slides.toc.isolatedUndefinedFRconfig,This is an isolated undefined config; ALL existing FR configs in below slides will be automatically moved up upon save & reload! Configs MUST be defined continuously without undefined breaks.,1,Il s'agit d'une configuration non définie isolée ; TOUTES les configurations FR existantes dans les diapositives ci-dessous seront automatiquement déplacées vers le haut lors de l'enregistrement et du rechargement ! Les configurations DOIVENT être définies en continu sans interruptions indéfinies.,0
+editor.slides.toc.isolatedUndefinedENGconfig,This is an isolated undefined config; ALL existing EN configs in below slides will be automatically moved up upon save & reload! Configs MUST be defined continuously without undefined breaks.,1,Il s'agit d'une configuration non définie isolée ; TOUTES les configurations EN existantes dans les diapositives ci-dessous seront automatiquement déplacées vers le haut lors de l'enregistrement et du rechargement ! Les configurations DOIVENT être définies en continu sans interruptions indéfinies.,0
+editor.slides.toc.deleteConfig,Delete Config (You can delete the last configs for each lang),1,Supprimer la configuration (vous pouvez supprimer les dernières configurations pour chaque langue),0
 editor.slides.previousSlide,Previous slide,1,Diapositive précédente,1
 editor.slides.nextSlide,Next slide,1,Diapositive suivante,1
 editor.slides.leftPanel,Left panel,1,Panneau de gauche,1
@@ -194,6 +214,7 @@ editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slides.intro,Intro subtitle,1,Sous-titre de l’introduction,1
 editor.slides.title,Intro title,1,Titre de l’introduction,1
+editor.slides.slideHeader,SLIDES,1,DIAPOSITIVES,0
 editor.slides.includeInToc,Include in table of contents,1,Inclure dans la table des matières,0
 editor.slide.untitled,Untitled slide,1,Diapositive sans titre,0
 editor.slide.copy.success,Slide copied successfully!,1,Diapositive copiée avec succès !,0

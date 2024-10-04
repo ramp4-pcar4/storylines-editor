@@ -399,7 +399,7 @@
                 :configFileStructure="configFileStructure"
                 :sourceCounts="sourceCounts"
                 :metadata="metadata"
-                :slides="slides"
+                :bothLanguageSlides="bothLanguageSlides"
                 :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
@@ -408,6 +408,7 @@
                 @refresh-config="refreshConfig"
                 ref="mainEditor"
             >
+<<<<<<< HEAD
                 <template v-slot:langModal="slotProps">
                     <button
                         class="editor-button editor-forms-button"
@@ -422,6 +423,8 @@
                     />
                 </template>
 
+=======
+>>>>>>> 665cd2c (Implement ToC redesign/refactor, both-language previews)
                 <template v-slot:metadataModal>
                     <vue-final-modal
                         modalId="metadata-edit-modal"
@@ -467,6 +470,7 @@ import {
     MetadataContent,
     PanelType,
     Slide,
+    SlideForBothLanguages,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -579,6 +583,8 @@ export default class MetadataEditorV extends Vue {
         uuid: true
     };
     slides: Slide[] = [];
+    bothLanguageSlides: SlideForBothLanguages[] = [];
+
     sourceCounts: SourceCounts = {};
 
     mounted(): void {
@@ -627,6 +633,22 @@ export default class MetadataEditorV extends Vue {
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
+
+                const frSlides = props.configs.en?.slides.map((engSlide) => {
+                    return {
+                        en: engSlide
+                    };
+                });
+                const engSlides = props.configs.fr?.slides.map((frSlide) => {
+                    return {
+                        fr: frSlide
+                    };
+                });
+
+                const maxLength = Math.max(frSlides!.length ?? 0, engSlides!.length ?? 0);
+                this.bothLanguageSlides = Array.from({ length: maxLength }, (_, index) =>
+                    Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+                );
 
                 if (logo) {
                     const logoFile = this.configFileStructure?.zip.file(logoSrc);
@@ -1091,6 +1113,22 @@ export default class MetadataEditorV extends Vue {
 
         this.slides = config.slides;
 
+        const frSlides = this.configs.fr?.slides.map((frSlide) => {
+            return {
+                fr: frSlide
+            };
+        });
+        const engSlides = this.configs.en?.slides.map((enSlide) => {
+            return {
+                en: enSlide
+            };
+        });
+
+        const maxLength = Math.max(frSlides!.length ?? 0, engSlides!.length ?? 0);
+        this.bothLanguageSlides = Array.from({ length: maxLength }, (_, index) =>
+            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+        );
+
         const logo = config.introSlide.logo?.src;
         if (logo) {
             // Set the alt text for the logo.
@@ -1136,11 +1174,15 @@ export default class MetadataEditorV extends Vue {
     generateConfig(): ConfigFileStructure {
         this.saving = true;
 
-        // Update the configuration file.
-        const fileName = `${this.uuid}_${this.configLang}.json`;
-        const formattedConfigFile = JSON.stringify(this.configs[this.configLang], null, 4);
+        // Update the configuration files, for both languages.
+        const engFileName = `${this.uuid}_en.json`;
+        const frFileName = `${this.uuid}_fr.json`;
 
-        this.configFileStructure?.zip.file(fileName, formattedConfigFile);
+        const engFormattedConfigFile = JSON.stringify(this.configs.en, null, 4);
+        const frFormattedConfigFile = JSON.stringify(this.configs.fr, null, 4);
+
+        this.configFileStructure?.zip.file(engFileName, engFormattedConfigFile);
+        this.configFileStructure?.zip.file(frFileName, frFormattedConfigFile);
 
         // Upload the ZIP file.
         this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
@@ -1304,7 +1346,7 @@ export default class MetadataEditorV extends Vue {
             returnTop: true
         };
         this.configs = { en: undefined, fr: undefined };
-        this.slides = [];
+        this.bothLanguageSlides = [];
     }
 
     /**
@@ -1318,7 +1360,7 @@ export default class MetadataEditorV extends Vue {
         this.loadConfig(this.configs[this.configLang]);
 
         if (this.loadEditor) {
-            (this.$refs.mainEditor as EditorV).updateSlides(this.slides);
+            (this.$refs.mainEditor as EditorV).updateSlides(this.bothLanguageSlides);
             (this.$refs.mainEditor as EditorV).selectSlide(-1);
         }
     }
