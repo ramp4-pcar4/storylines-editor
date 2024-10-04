@@ -70,9 +70,36 @@
                 </span>
             </transition>
             <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
-            <button @click="preview" class="editor-button bg-white border border-black hover:bg-gray-100">
-                {{ $t('editor.preview') }}
-            </button>
+            <!-- Preview dropdown -->
+            <div class="dropdown editor-button">
+                <button class="dropbtn flex gap-2 items-center">
+                    <p>{{ $t('editor.preview') }}</p>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 122.88 66.91"
+                        style="enable-background: new 0 0 122.88 66.91"
+                        xml:space="preserve"
+                        height="12"
+                        width="12"
+                        class="fill-current transform rotate-180"
+                    >
+                        <g>
+                            <path
+                                d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
+                            />
+                        </g>
+                    </svg>
+                </button>
+                <div class="dropdown-content">
+                    <button @click.stop="preview('en')" class="border-b border-gray-400">
+                        {{ $t('editor.lang.en') }}
+                    </button>
+                    <button @click.stop="preview('fr')">{{ $t('editor.lang.fr') }}</button>
+                </div>
+            </div>
             <button @click="saveChanges" class="editor-button bg-black text-white hover:bg-gray-900" :disabled="saving">
                 <span class="inline-block">{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span>
                 <span v-if="saving" class="align-middle inline-block px-1">
@@ -95,8 +122,8 @@
         <div class="flex">
             <div class="w-80 flex-shrink-0 border-r border-black editor-toc">
                 <div class="flex items-center justify-center border-b p-2">
-                    <button class="editor-toc-button editor-button" @click.stop="$vfm.open('metadata-edit-modal')">
-                        <span class="align-middle inline-block px-1"
+                    <button class="toc-popup-button" @click.stop="$vfm.open('metadata-edit-modal')">
+                        <span class="align-middle inline-block pr-1"
                             ><svg
                                 clip-rule="evenodd"
                                 fill-rule="evenodd"
@@ -117,7 +144,7 @@
                     </button>
                 </div>
                 <slide-toc
-                    :slides="slides"
+                    :bothLanguageSlides="bothLanguageSlides"
                     :currentSlide="currentSlide"
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
@@ -127,29 +154,33 @@
                     :sourceCounts="sourceCounts"
                 ></slide-toc>
             </div>
-            <slide-editor
-                ref="slide"
-                :configFileStructure="configFileStructure"
-                :currentSlide="currentSlide"
-                :lang="configLang"
-                :slideIndex="slideIndex"
-                :isLast="slideIndex === slides.length - 1"
-                :uid="uuid"
-                @slide-change="selectSlide"
-                @slide-edit="onSlidesEdited"
-                @custom-slide-updated="updateCustomSlide"
-                :sourceCounts="sourceCounts"
-            ></slide-editor>
+            <div class="flex flex-col space-between w-full">
+                <slide-editor
+                    class="flex-1 w-full"
+                    ref="slide"
+                    :configFileStructure="configFileStructure"
+                    :currentSlide="currentSlide"
+                    :lang="bothLanguageSlides.find((slides) => slides.fr === currentSlide) ? 'fr' : 'en'"
+                    :slideIndex="slideIndex"
+                    :isLast="slideIndex === bothLanguageSlides.length - 1"
+                    :uid="uuid"
+                    @slide-change="selectSlide"
+                    @slide-edit="onSlidesEdited"
+                    @custom-slide-updated="updateCustomSlide"
+                    :sourceCounts="sourceCounts"
+                ></slide-editor>
+                <div class="footer text-right pr-5 editor-button h-fit">
+                    <a
+                        :href="`mailto:applicationsdecartographieweb-webmappingapplications@ec.gc.ca?subject=${$t(
+                            'editor.feedback.subject'
+                        )}`"
+                    >
+                        {{ $t('editor.feedback') }}
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="footer text-right pr-5 editor-button">
-            <a
-                :href="`mailto:applicationsdecartographieweb-webmappingapplications@ec.gc.ca?subject=${$t(
-                    'editor.feedback.subject'
-                )}`"
-            >
-                {{ $t('editor.feedback') }}
-            </a>
-        </div>
+
         <slot name="metadataModal"></slot>
         <help-panel :helpSections="helpSections" :originalTextArray="originalTextArray"></help-panel>
         <confirmation-modal
@@ -162,7 +193,15 @@
 
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
-import { ConfigFileStructure, HelpSection, MetadataContent, Slide, SourceCounts, StoryRampConfig } from '@/definitions';
+import {
+    ConfigFileStructure,
+    HelpSection,
+    MetadataContent,
+    Slide,
+    SlideForBothLanguages,
+    SourceCounts,
+    StoryRampConfig
+} from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import axios from 'axios';
 import { marked } from 'marked';
@@ -192,6 +231,8 @@ export default class EditorV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure | undefined;
     @Prop() sourceCounts!: SourceCounts;
     @Prop() metadata!: MetadataContent;
+
+    @Prop() bothLanguageSlides!: SlideForBothLanguages[];
     @Prop() slides!: Slide[];
     @Prop() configLang!: string;
     @Prop() saving!: boolean;
@@ -200,14 +241,14 @@ export default class EditorV extends Vue {
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
-    loadSlides: undefined | Slide[] = undefined;
+    loadSlides: undefined | SlideForBothLanguages[] = undefined;
     currentSlide: Slide | string = '';
     slideIndex = -1;
     helpSections: HelpSection[] = [];
     helpMd = '';
     originalTextArray: string[] = [];
 
-    @Watch('slides', { deep: true })
+    @Watch('bothLanguageSlides', { deep: true })
     onSlidesEdited(): void {
         this.$emit('save-status', true);
     }
@@ -218,7 +259,7 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
-        this.loadSlides = this.slides;
+        this.loadSlides = this.bothLanguageSlides;
         this.uuid = this.$route.params.uid as string;
 
         window.addEventListener('beforeunload', this.beforeWindowUnload);
@@ -242,7 +283,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number): void {
+    selectSlide(index: number, lang?: string): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();
@@ -255,7 +296,22 @@ export default class EditorV extends Vue {
         };
 
         setTimeout(() => {
-            this.currentSlide = index === -1 ? '' : (this.loadSlides as Slide[])[index];
+            if (
+                index === -1 ||
+                !this.loadSlides ||
+                !this.loadSlides?.[index] ||
+                !this.loadSlides?.[index][
+                    (lang as keyof SlideForBothLanguages) ?? (this.configLang as keyof SlideForBothLanguages)
+                ]
+            ) {
+                this.currentSlide = '';
+            } else {
+                this.currentSlide =
+                    this.loadSlides[index][
+                        (lang as keyof SlideForBothLanguages) ?? (this.configLang as keyof SlideForBothLanguages)
+                    ]!;
+            }
+
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
@@ -268,7 +324,7 @@ export default class EditorV extends Vue {
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean): void {
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex] = slideConfig;
+        this.bothLanguageSlides[this.slideIndex][this.configLang as keyof SlideForBothLanguages] = slideConfig;
         // save changes emitted from advanced editor
         if (save) {
             this.$emit('save-changes');
@@ -278,9 +334,14 @@ export default class EditorV extends Vue {
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(slides: Slide[]): void {
+    updateSlides(slides: SlideForBothLanguages[]): void {
         this.loadSlides = slides;
-        this.slideIndex = this.loadSlides.indexOf(this.currentSlide as Slide);
+        this.slideIndex = this.loadSlides.findIndex(
+            (bothSlides) =>
+                (this.currentSlide as Slide) === bothSlides['en'] || (this.currentSlide as Slide) === bothSlides['fr']
+        );
+        this.configs.en!.slides = this.bothLanguageSlides.filter((slides) => slides.en).map((slides) => slides.en!);
+        this.configs.fr!.slides = this.bothLanguageSlides.filter((slides) => slides.fr).map((slides) => slides.fr!);
     }
 
     /**
@@ -317,8 +378,9 @@ export default class EditorV extends Vue {
 
     /**
      * Open current editor config as a new Storylines product in new tab.
+     * @param language The config language to preview (either 'en' or 'fr')
      */
-    preview(): void {
+    preview(language: string): void {
         // save current slide final changes before previewing product
         if (this.$refs.slide != null && this.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
@@ -327,7 +389,7 @@ export default class EditorV extends Vue {
         setTimeout(() => {
             const routeData = this.$router.resolve({
                 name: 'preview',
-                params: { lang: this.configLang, uid: this.uuid }
+                params: { lang: language, uid: this.uuid }
             });
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
@@ -427,5 +489,80 @@ export default class EditorV extends Vue {
 .question-mark-button {
     font-size: 24px;
     line-height: 1.8rem;
+}
+
+.toc-popup-button {
+    border: 1px solid rgb(135, 135, 135);
+    background-color: rgb(243, 243, 243);
+    border-radius: 3px;
+    padding: 3px 12px;
+}
+.toc-popup-button:hover {
+    background-color: rgb(234, 234, 234);
+}
+.toc-popup-button:active {
+    background-color: rgb(221, 221, 221);
+}
+
+/* 
+ * Preview language selection dropdown styling
+ * Base (pre-styling) code graciously provided by 
+ * https://www.w3schools.com/howto/howto_css_dropdown.asp 
+ */
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: white;
+    color: black;
+    padding: 5px 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid black;
+    transition: background-color 0.2s;
+}
+
+/* Main dropdown icon - required for positioning */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+/* The dropdown box with the links */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 110px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border: 1px solid lightgray;
+}
+
+/* Links inside the dropdown */
+.dropdown-content button {
+    color: black;
+    padding: 7px 10px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    font-weight: 500;
+    width: 100%;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content button:hover {
+    background-color: #e6e5e5;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: #dbdbdb;
 }
 </style>
