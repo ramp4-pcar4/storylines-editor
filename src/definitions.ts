@@ -143,6 +143,11 @@ export interface Slide {
     includeInToc?: boolean;
 }
 
+export interface SlideForBothLanguages {
+    en: Slide | undefined;
+    fr: Slide | undefined;
+}
+
 export enum PanelType {
     Text = 'text',
     Image = 'image',
