@@ -72,7 +72,7 @@ export default class TextEditorV extends Vue {
                             const content = selected || ``;
 
                             return {
-                                text: `[${content}](http://)`,
+                                text: `<a href='http://' target='_blank'>${content}</a>`,
                                 selected: selected
                             };
                         });
@@ -123,5 +123,8 @@ export default class TextEditorV extends Vue {
 <style lang="scss" scoped>
 label {
     text-align: left !important;
+}
+:deep(.v-md-icon-link::before) {
+    content: '\1F517';
 }
 </style>
