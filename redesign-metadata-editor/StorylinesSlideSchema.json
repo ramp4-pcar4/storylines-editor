@@ -504,7 +504,23 @@
             "type": "boolean",
             "description": "Optional attribute that indicates whether or not to include slide in table of contents. Defaults to true.",
             "default": true
+        },
+        "rightOnly": {
+            "type": "boolean",
+            "description": "Optional attribute that indicates whether or not the right panel should take up all of the space in the slide. Defaults to false.",
+            "default": false
+        },
+        "centerSlide": {
+            "type": "boolean",
+            "description": "Optional attribute that indicates whether or not to center the content of the slide. Defaults to false. Must be false if centerPanel (below) is true",
+            "default": false
+        },
+        "centerPanel": {
+            "type": "boolean",
+            "description": "Optional attribute that indicates whether or not to center the content of each panel. Defaults to false. Must be false if centerSlide (above) is true",
+            "default": false
         }
+        
     },
 
     "required": ["title", "panel"]
