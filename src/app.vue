@@ -29,7 +29,7 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-$font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-serif;
 
 .ovwContainer .layerTile {
     max-width: initial;
