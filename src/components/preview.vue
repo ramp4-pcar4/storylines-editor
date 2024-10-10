@@ -220,8 +220,9 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     .h5,
     .h6 {
         font-family: $font-list;
-        line-height: 1.5;
+        line-height: 1.3;
         border-bottom: 0px;
+        margin-bottom: 3px;
     }
 
     .story-header {
