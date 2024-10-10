@@ -382,6 +382,7 @@ export default class EditorV extends Vue {
 
 .editor-container .input-error {
     border: 1px solid red;
+    outline-color: red;
 }
 
 .editor-button {
@@ -399,6 +400,12 @@ export default class EditorV extends Vue {
 .editor-button:hover:enabled {
     background-color: #dbdbdb;
     color: black;
+}
+
+.editor-button:focus {
+    outline: 2px solid royalblue;
+    outline-offset: 2px;
+    transition-duration: 0.075s;
 }
 
 .editor-button:disabled {
