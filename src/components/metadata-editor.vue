@@ -6,11 +6,11 @@
                 <header
                     class="flex flex-col md:flex-row justify-between border-b-2 border-black px-10 md:px-20 pt-10 pb-5 mb-5"
                 >
-                    <div class="flex flex-1 my-2 mx-auto md:mx-0 text-2xl md:text-3xl font-bold">
+                    <div class="flex flex-1 my-2 mx-0 text-2xl md:text-3xl font-bold">
                         {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
                     </div>
                     <div
-                        class="flex flex-row md:flex-col gap-3 items-center md:items-stretch justify-around text-right"
+                        class="flex flex-row md:flex-col gap-3 items-center md:items-stretch justify-between md:justify-around text-right"
                     >
                         <router-link
                             v-if="
@@ -82,7 +82,8 @@
                                     v-tippy="{
                                         content: $t('editor.editMetadata.input.tooltip'),
                                         trigger: 'focusin',
-                                        placement: 'top-end'
+                                        placement: 'top-end',
+                                        touch: false
                                     }"
                                 />
                                 <button
@@ -132,7 +133,8 @@
                                             v-tippy="{
                                                 content: $t('editor.editMetadata.input.tooltip'),
                                                 trigger: 'focusin',
-                                                placement: 'top-end'
+                                                placement: 'top-end',
+                                                touch: false
                                             }"
                                         />
                                         <div
@@ -342,25 +344,74 @@
                             </div>
                         </section>
 
-                        <div class="mb-4">
-                            <h1 class="text-2xl font-semibold">{{ $t('editor.productDetails') }}</h1>
-                            <p>
-                                {{ $t('editor.metadata.instructions') }}
-                            </p>
+                        <div class="mb-4 flex gap-2 items-start md:items-center flex-col md:flex-row">
+                            <div class="flex-1">
+                                <h1 class="text-2xl font-semibold">{{ $t('editor.productDetails') }}</h1>
+                                <p>
+                                    {{
+                                        editExisting
+                                            ? $t('editor.metadata.instructions.existing')
+                                            : $t('editor.metadata.instructions.new')
+                                    }}
+                                </p>
+                            </div>
+                            <button
+                                v-if="editExisting"
+                                @click="preview"
+                                class="editor-button editor-forms-button m-0 border border-black"
+                            >
+                                {{ $t('editor.editMetadata.previewProject') }}
+                            </button>
                         </div>
-                        <metadata-content
-                            :metadata="metadata"
-                            @metadata-changed="updateMetadata"
-                            @logo-changed="onFileChange"
-                            @logo-source-changed="onLogoSourceInput"
-                        ></metadata-content>
-                        <button
-                            v-if="editExisting"
-                            @click="saveMetadata(true)"
-                            class="editor-button editor-forms-button"
-                        >
-                            {{ $t('editor.saveChanges') }}
-                        </button>
+                        <div class="px-5 md:px-8 py-5 border rounded-md">
+                            <button
+                                v-if="!editingMetadata"
+                                @click="editingMetadata = !editingMetadata"
+                                class="editor-button editor-forms-button md:float-right flex items-center gap-2 text-md ml-0 mb-3 font-semibold px-3 py-2 border border-gray-300"
+                            >
+                                <svg
+                                    clip-rule="evenodd"
+                                    fill-rule="evenodd"
+                                    width="16"
+                                    height="16"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="mx-1"
+                                >
+                                    <path
+                                        d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
+                                        fill-rule="nonzero"
+                                    />
+                                </svg>
+
+                                <p class="text-left">{{ $t('editor.editMetadata') }}</p>
+                            </button>
+                            <div class="overflow-visible">
+                                <metadata-content
+                                    :metadata="metadata"
+                                    :editing="editingMetadata"
+                                    @metadata-changed="updateMetadata"
+                                    @logo-changed="onFileChange"
+                                    @logo-source-changed="onLogoSourceInput"
+                                ></metadata-content>
+                                <div v-if="editingMetadata && editExisting" class="flex gap-1 mt-2">
+                                    <button
+                                        @click="saveMetadata(true)"
+                                        class="editor-button editor-forms-button leading-snug ml-0 bg-black border border-black text-white hover:bg-gray-800"
+                                    >
+                                        {{ $t('editor.saveChanges') }}
+                                    </button>
+                                    <button
+                                        @click="discardMetadataUpdates()"
+                                        class="editor-button editor-forms-button leading-snug"
+                                    >
+                                        {{ $t('editor.discardChanges') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </section>
             </div>
@@ -424,24 +475,27 @@
 
                 <template v-slot:metadataModal>
                     <vue-final-modal
+                        @click="discardMetadataUpdates"
                         modalId="metadata-edit-modal"
-                        content-class="flex flex-col max-h-full overflow-y-auto max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+                        content-class="max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
                         class="flex justify-center items-center"
                     >
-                        <h2 slot="header" class="text-lg font-bold">{{ $t('editor.editMetadata') }}</h2>
-                        <metadata-content
-                            :metadata="metadata"
-                            @metadata-changed="updateMetadata"
-                            @logo-changed="onFileChange"
-                            @logo-source-changed="onLogoSourceInput"
-                        ></metadata-content>
-                        <div class="w-full flex justify-end">
-                            <button
-                                class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
-                                @click="saveMetadata(false)"
-                            >
-                                {{ $t('editor.done') }}
-                            </button>
+                        <div @click.stop class="flex flex-col space-y-2">
+                            <h2 slot="header" class="text-2xl font-bold mb-3">{{ $t('editor.editMetadata') }}</h2>
+                            <metadata-content
+                                :metadata="metadata"
+                                @metadata-changed="updateMetadata"
+                                @logo-changed="onFileChange"
+                                @logo-source-changed="onLogoSourceInput"
+                            ></metadata-content>
+                            <div class="w-full flex justify-end">
+                                <button
+                                    class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
+                                    @click="saveMetadata(false)"
+                                >
+                                    {{ $t('editor.done') }}
+                                </button>
+                            </div>
                         </div>
                     </vue-final-modal>
                 </template>
@@ -574,6 +628,21 @@ export default class MetadataEditorV extends Vue {
         returnTop: true,
         dateModified: ''
     };
+    editingMetadata = false;
+    temporaryMetadataCopy: MetadataContent = {
+        // A copy to save changes before edit, so they can be reverted
+        title: '',
+        introTitle: '',
+        introSubtitle: '',
+        logoPreview: '',
+        logoName: '',
+        logoAltText: '',
+        contextLink: '',
+        contextLabel: '',
+        tocOrientation: '',
+        returnTop: true,
+        dateModified: ''
+    };
     // add more required metadata fields to here as needed
     reqFields: { uuid: boolean } = {
         uuid: true
@@ -583,6 +652,7 @@ export default class MetadataEditorV extends Vue {
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
+        this.editingMetadata = !this.editExisting;
     }
 
     created(): void {
@@ -664,6 +734,28 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Open current editor config as a new Storylines product in new tab.
+     * Note: Preview button on metadata editor will only show when editing an existing product, not cwhen creating a new one
+     * This is a design decision, can change if we decide that people would want to preview new products for some reason
+     */
+    preview(): void {
+        // save current metadata final changes before previewing product
+        this.saveMetadata(false);
+
+        setTimeout(() => {
+            const routeData = this.$router.resolve({
+                name: 'preview',
+                params: { lang: this.configLang, uid: this.uuid }
+            });
+            const previewTab = window.open(routeData.href, '_blank');
+            (previewTab as Window).props = {
+                configs: this.configs,
+                configFileStructure: this.configFileStructure
+            };
+        }, 5);
     }
 
     /**
@@ -1127,6 +1219,9 @@ export default class MetadataEditorV extends Vue {
             // If there's no logo, mark the product as loaded.
             this.loadStatus = 'loaded';
         }
+
+        // Load the temp copy of the metadata
+        this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
     }
 
     /**
@@ -1238,6 +1333,12 @@ export default class MetadataEditorV extends Vue {
         this.unsavedChanges = true;
     }
 
+    discardMetadataUpdates(): void {
+        this.metadata = JSON.parse(JSON.stringify(this.temporaryMetadataCopy));
+        this.editingMetadata = false;
+        this.unsavedChanges = false; // TODO: Does this cause false negatives? (maybe not if we don't have discarding for vfm)
+    }
+
     /**
      * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
      * to config file. If `publish` is set to true, publish to server as well.
@@ -1277,6 +1378,8 @@ export default class MetadataEditorV extends Vue {
 
             if (publish) {
                 this.generateConfig();
+                this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
+                this.editingMetadata = false;
             }
 
             const userStore = useUserStore();
@@ -1303,6 +1406,7 @@ export default class MetadataEditorV extends Vue {
             tocOrientation: '',
             returnTop: true
         };
+        this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
         this.configs = { en: undefined, fr: undefined };
         this.slides = [];
     }
@@ -1549,7 +1653,7 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     h5,
     h6 {
         font-family: $font-list;
-        line-height: 1.5;
+        line-height: 1.3;
         border-bottom: 0px;
     }
 
@@ -1561,47 +1665,19 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
         max-width: 80%;
         min-width: 70%;
         max-height: 90%;
-        padding: 12px;
+        padding: 20px;
     }
 
     .vfm__content label {
-        width: 10vw;
-        text-align: right;
-        margin-right: 15px;
-        display: inline-block;
+        display: block;
     }
 
     .editor-container h3 {
-        font-size: larger;
-    }
-
-    .vfm__content input {
-        padding: 5px 10px;
-        margin-top: 5px;
-        border: 1px solid black;
-        display: inline;
+        font-size: x-large;
     }
 
     .editor-container .input-error {
         border: 1px solid red;
-    }
-
-    .vfm__content button {
-        padding: 5px 12px;
-        margin: 0px 10px;
-        font-weight: 600;
-        transition-duration: 0.2s;
-    }
-
-    .vfm__content button:hover:enabled {
-        background-color: #dbdbdb;
-        color: black;
-    }
-
-    .vfm__content button:disabled {
-        border: 1px solid gray;
-        color: gray;
-        cursor: not-allowed;
     }
 
     .image-preview {

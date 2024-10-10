@@ -57,10 +57,23 @@ editor.editMetadata.versionHistory.noResults,There are no previous versions of t
 editor.editMetadata.versionHistory.load,Load this version,1,Charger cette version,0
 editor.editMetadata.versionHistory.actions,Actions,1,Actes,0
 editor.editMetadata.versionHistory.saveDate,Save Date,1,Enregistrer la date,0
+editor.editMetadata.previewProject,Preview project,1,Projet d'aperçu,0
 editor.editMetadata.retrievalAborted,Product retrieval manually aborted.,1,Récupération du produit interrompue manuellement.,0
+editor.metadataForm.caption.title,The title field appears in the top bar of the storyline product. The top bar is visible to users at all times.,1,Le champ de titre apparaît dans la barre supérieure du produit de scénario. La barre supérieure est visible à tout moment pour les utilisateurs.,0
+editor.metadataForm.caption.tocOrientation,"Determines the direction of the storyline's table of contents: horizontal (above the storyline) or vertical (beside the storyline, on the left).",1,"Détermine la direction de la table des matières du scénario : horizontale (au-dessus du scénario) ou verticale (à côté du scénario, à gauche).",0
+editor.metadataForm.caption.introTitle,"The intro title is the title displayed in large text on the first slide, right underneath the logo (if given).",1,"Le titre d'introduction est le titre affiché en gros texte sur la première diapositive, juste en dessous du logo (s'il est fourni).",0
+editor.metadataForm.caption.introSubtitle,"The intro subtitle displays underneath the intro title, in small text.",1,"Le sous-titre d'introduction s'affiche sous le titre d'introduction, en petit texte.",0
+editor.metadataForm.caption.logoAltText,"For accessibility purposes, provide description text for the logo.",1,"À des fins d’accessibilité, veuillez fournir un texte de description pour le logo.",0
+editor.metadataForm.caption.contextLink,"Context link shows up at the bottom of the page to provide additional resources for interested users.",1,"Le lien contextuel apparaît au bas de la page pour fournir des ressources supplémentaires aux utilisateurs intéressés.",0
+editor.metadataForm.caption.contextLabel,"Context label shows up as text. When users click the context link, the linked site appears in a new tab for the user.",1,"L'étiquette de contexte s'affiche sous forme de texte. Lorsque les utilisateurs cliquent sur le lien contextuel, le site lié apparaît dans un nouvel onglet pour l'utilisateur.",0
+editor.metadataForm.introPage.heading,Introduction page details,1,Détails de la page d'introduction,0
+editor.metadataForm.introPage.explanation,"The introduction page of the storylines product is displayed to users at the beginning of the storyline product, before any content slides.",1,"La page d'introduction du produit Storylines est affichée aux utilisateurs au début du produit Storylines, avant toute diapositive de contenu.",0
+editor.metadataForm.endOfPage.heading,End of page information,1,Informations de fin de page,0
+editor.metadataForm.endOfPage.explanation,"This information is displayed at the end of the storyline product, after all content slides.",1,"Ces informations sont affichées à la fin du scénario du produit, après toutes les diapositives de contenu.",0
 editor.done,Done,1,Fini,0
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
-editor.metadata.instructions,Fill in metadata details about your new Storylines product. Use the "Preview" button to see what your slides will look like.,1,Inscrivez les métadonnées de votre nouveau produit de scénario. Utilisez la fonction « Afficher l’aperçu » pour voir à quoi ressemblent vos diapositives.,1
+editor.metadata.instructions.new,Fill in metadata details about your new Storylines product.,1,Inscrivez les métadonnées de votre nouveau produit de scénario.,1
+editor.metadata.instructions.existing,View or edit metadata details about your Storylines product. Use the "Preview" button to see what your slides will look like.,1,Affichez ou modifiez les détails des métadonnées de votre produit Storylines. Utilisez le bouton « Aperçu » pour voir à quoi ressembleront vos diapositives.,0
 editor.uuid,UUID,1,UUID,0
 editor.uuid.required,(required),1,(obligatoire),0
 editor.uuid.new,New UUID,1,New UUID,0
@@ -96,7 +109,8 @@ editor.preview,Preview,1,Afficher l’aperçu,1
 editor.confirm,Confirm,1,Confirmer,1
 editor.cancel,Cancel,1,Annuler,1
 editor.unsavedChanges,Unsaved changes,1,Modifications non enregistrées,1
-editor.saveChanges,Save Changes,1,Enregistrer les modifications,1
+editor.saveChanges,Save changes,1,Enregistrer les modifications,1
+editor.discardChanges,Discard changes,1,Annuler les modifications,0
 editor.label.or,or,1,ou,1
 editor.label.browse,browse,1,parcourir,1
 editor.label.upload,to upload,1,téléverser,1
