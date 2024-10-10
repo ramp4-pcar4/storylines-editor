@@ -382,6 +382,7 @@ export default class EditorV extends Vue {
 
 .editor-container .input-error {
     border: 1px solid red;
+    outline-color: red;
 }
 
 .editor-button {

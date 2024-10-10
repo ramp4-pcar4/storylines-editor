@@ -22,7 +22,7 @@ module.exports = {
             flex: {
                 2: '2 2 0%'
             },
-            maxHeight:{
+            maxHeight: {
                 '60vh': '60vh'
             },
             maxWidth: {
@@ -32,7 +32,8 @@ module.exports = {
             colors: {
                 'accent-blue': '#001A49',
                 'accent-turquoise': '#00D2D3',
-                'accent-orange': '#FF9F43'
+                'accent-orange': '#FF9F43',
+                'accent-dark-orange': '#cc3901'
             },
             typography: {
                 // remove default margin from images to allow for better customization through the story config
