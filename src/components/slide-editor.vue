@@ -295,7 +295,7 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save)"
+                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save, lang)"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
