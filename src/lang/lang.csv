@@ -128,6 +128,7 @@ editor.slides.addSlide,"New blank slide",1,Nouvelle diapositive,0
 editor.slides.currentLangLabel,({lang} slide),1,(Diapositive en {lang}),0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
 editor.slides.deleteSlide.confirm,"Are you sure you want to delete the slide {title}?",1,"Voulez-vous vraiment supprimer la diapositive {titre}?",1
+editor.slides.deleteConfig.confirm,"Are you sure you want to delete this config {title}?",1,Êtes-vous sûr de vouloir supprimer cette configuration {title} ?,0
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
 editor.slides.makeFull,Make the right panel the full slide,1,Mettre la diapositive complète dans le panneau de droite,1
 editor.slides.centerPanel,Center panel content,1,Contenu de la diapositive centrale,0

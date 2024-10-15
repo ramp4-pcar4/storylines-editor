@@ -248,7 +248,7 @@
                 :configFileStructure="configFileStructure"
                 :sourceCounts="sourceCounts"
                 :metadata="metadata"
-                :bothLanguageSlides="bothLanguageSlides"
+                :slides="slides"
                 :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
@@ -408,8 +408,7 @@ export default class MetadataEditorV extends Vue {
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: Slide[] = [];
-    bothLanguageSlides: SlideForBothLanguages[] = [];
+    slides: SlideForBothLanguages[] = [];
 
     sourceCounts: SourceCounts = {};
 
@@ -448,7 +447,7 @@ export default class MetadataEditorV extends Vue {
                 this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
-                this.slides = props.slides;
+                // this.slides = props.slides;
                 this.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
                 this.unsavedChanges = props.unsavedChanges;
@@ -456,21 +455,7 @@ export default class MetadataEditorV extends Vue {
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
 
-                const frSlides = props.configs.en?.slides.map((engSlide) => {
-                    return {
-                        en: engSlide
-                    };
-                });
-                const engSlides = props.configs.fr?.slides.map((frSlide) => {
-                    return {
-                        fr: frSlide
-                    };
-                });
-
-                const maxLength = Math.max(frSlides!.length ?? 0, engSlides!.length ?? 0);
-                this.bothLanguageSlides = Array.from({ length: maxLength }, (_, index) =>
-                    Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
-                );
+                this.loadSlides(props.configs);
 
                 if (logo) {
                     const logoFile = this.configFileStructure?.zip.file(logoSrc);
@@ -508,6 +493,30 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Loads the slide variable with both EN and FR language configs.
+     * @param configs The config object with separate EN and FR StoryRamp configs.
+     */
+    loadSlides(configs: { [p: string]: StoryRampConfig | undefined }): void {
+        const engSlides =
+            configs.en?.slides.map((engSlide) => {
+                return {
+                    en: engSlide
+                };
+            }) ?? [];
+        const frSlides =
+            configs.fr?.slides.map((frSlide) => {
+                return {
+                    fr: frSlide
+                };
+            }) ?? [];
+
+        const maxLength = frSlides.length > engSlides.length ? frSlides.length : engSlides.length;
+        this.slides = Array.from({ length: maxLength }, (_, index) =>
+            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+        );
     }
 
     /**
@@ -921,23 +930,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.dateModified = config.dateModified;
 
-        this.slides = config.slides;
-
-        const frSlides = this.configs.fr?.slides.map((frSlide) => {
-            return {
-                fr: frSlide
-            };
-        });
-        const engSlides = this.configs.en?.slides.map((enSlide) => {
-            return {
-                en: enSlide
-            };
-        });
-
-        const maxLength = Math.max(frSlides!.length ?? 0, engSlides!.length ?? 0);
-        this.bothLanguageSlides = Array.from({ length: maxLength }, (_, index) =>
-            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
-        );
+        this.loadSlides(this.configs);
 
         const logo = config.introSlide.logo?.src;
         if (logo) {
@@ -1156,7 +1149,7 @@ export default class MetadataEditorV extends Vue {
             returnTop: true
         };
         this.configs = { en: undefined, fr: undefined };
-        this.bothLanguageSlides = [];
+        this.slides = [];
     }
 
     /**
@@ -1170,7 +1163,7 @@ export default class MetadataEditorV extends Vue {
         this.loadConfig(this.configs[this.configLang]);
 
         if (this.loadEditor) {
-            (this.$refs.mainEditor as EditorV).updateSlides(this.bothLanguageSlides);
+            (this.$refs.mainEditor as EditorV).updateSlides(this.slides);
             (this.$refs.mainEditor as EditorV).selectSlide(-1);
         }
     }
