@@ -248,11 +248,11 @@
                 :configFileStructure="configFileStructure"
                 :sourceCounts="sourceCounts"
                 :metadata="metadata"
-                :bothLanguageSlides="bothLanguageSlides"
+                :slides="slides"
                 :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
-                @save-changes="generateConfig"
+                @save-changes="onSave"
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
                 ref="mainEditor"
@@ -283,9 +283,17 @@
             </editor>
         </template>
     </div>
+    <!--Modal shows when undefined configs may be overwritten-->
+    <action-modal
+        name="overwrite-undefined-config"
+        :title="$t('editor.slides.overwrite.title')"
+        :message="$t('editor.slides.overwrite.text')"
+        @ok="generateConfig"
+    />
 </template>
 
 <script lang="ts">
+import ActionModal from '@/components/helpers/action-modal.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
@@ -348,6 +356,7 @@ interface History {
 
 @Options({
     components: {
+        ActionModal,
         Editor: EditorV,
         'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
@@ -404,12 +413,26 @@ export default class MetadataEditorV extends Vue {
         returnTop: true,
         dateModified: ''
     };
+    defaultBlankSlide: Slide = {
+        title: '',
+        panel: [
+            {
+                type: 'text',
+                title: '',
+                content: ''
+            } as TextPanel,
+            {
+                type: 'text',
+                title: '',
+                content: ''
+            } as TextPanel
+        ]
+    };
     // add more required metadata fields to here as needed
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: Slide[] = [];
-    bothLanguageSlides: SlideForBothLanguages[] = [];
+    slides: SlideForBothLanguages[] = [];
 
     sourceCounts: SourceCounts = {};
 
@@ -448,7 +471,7 @@ export default class MetadataEditorV extends Vue {
                 this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
-                this.slides = props.slides;
+                // this.slides = props.slides;
                 this.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
                 this.unsavedChanges = props.unsavedChanges;
@@ -456,21 +479,7 @@ export default class MetadataEditorV extends Vue {
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
 
-                const frSlides = props.configs.en?.slides.map((engSlide) => {
-                    return {
-                        en: engSlide
-                    };
-                });
-                const engSlides = props.configs.fr?.slides.map((frSlide) => {
-                    return {
-                        fr: frSlide
-                    };
-                });
-
-                const maxLength = Math.max(frSlides!.length ?? 0, engSlides!.length ?? 0);
-                this.bothLanguageSlides = Array.from({ length: maxLength }, (_, index) =>
-                    Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
-                );
+                this.loadSlides(props.configs);
 
                 if (logo) {
                     const logoFile = this.configFileStructure?.zip.file(logoSrc);
@@ -508,6 +517,30 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Loads the slide variable with both EN and FR language configs.
+     * @param configs The config object with separate EN and FR StoryRamp configs.
+     */
+    loadSlides(configs: { [p: string]: StoryRampConfig | undefined }): void {
+        const engSlides =
+            configs.en?.slides.map((engSlide) => {
+                return {
+                    en: engSlide
+                };
+            }) ?? [];
+        const frSlides =
+            configs.fr?.slides.map((frSlide) => {
+                return {
+                    fr: frSlide
+                };
+            }) ?? [];
+
+        const maxLength = frSlides.length > engSlides.length ? frSlides.length : engSlides.length;
+        this.slides = Array.from({ length: maxLength }, (_, index) =>
+            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+        );
     }
 
     /**
@@ -921,23 +954,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.dateModified = config.dateModified;
 
-        this.slides = config.slides;
-
-        const frSlides = this.configs.fr?.slides.map((frSlide) => {
-            return {
-                fr: frSlide
-            };
-        });
-        const engSlides = this.configs.en?.slides.map((enSlide) => {
-            return {
-                en: enSlide
-            };
-        });
-
-        const maxLength = Math.max(frSlides!.length ?? 0, engSlides!.length ?? 0);
-        this.bothLanguageSlides = Array.from({ length: maxLength }, (_, index) =>
-            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
-        );
+        this.loadSlides(this.configs);
 
         const logo = config.introSlide.logo?.src;
         if (logo) {
@@ -978,6 +995,21 @@ export default class MetadataEditorV extends Vue {
     }
 
     /**
+     * Conducts various checks before saving.
+     */
+    onSave(): void {
+        // Detect if there are any undefined configs
+        const engConfigHasUndefined = this.configs.en?.slides.some((slide) => !slide) as boolean;
+        const frConfigHasUndefined = this.configs.fr?.slides.some((slide) => !slide) as boolean;
+
+        if (engConfigHasUndefined || frConfigHasUndefined) {
+            this.$vfm.open('overwrite-undefined-config');
+        } else {
+            this.generateConfig();
+        }
+    }
+
+    /**
      * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
      * with the new changes, then generates and submits the product file to the server.
      */
@@ -987,6 +1019,15 @@ export default class MetadataEditorV extends Vue {
         // Update the configuration files, for both languages.
         const engFileName = `${this.uuid}_en.json`;
         const frFileName = `${this.uuid}_fr.json`;
+
+        // Replace undefined slides with empty slides
+        this.configs.en!.slides = this.configs.en!.slides.map((slide) => {
+            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+        });
+        this.configs.fr!.slides = this.configs.fr!.slides.map((slide) => {
+            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+        });
+        this.loadSlides(this.configs);
 
         const engFormattedConfigFile = JSON.stringify(this.configs.en, null, 4);
         const frFormattedConfigFile = JSON.stringify(this.configs.fr, null, 4);
@@ -1156,7 +1197,7 @@ export default class MetadataEditorV extends Vue {
             returnTop: true
         };
         this.configs = { en: undefined, fr: undefined };
-        this.bothLanguageSlides = [];
+        this.slides = [];
     }
 
     /**
@@ -1170,7 +1211,7 @@ export default class MetadataEditorV extends Vue {
         this.loadConfig(this.configs[this.configLang]);
 
         if (this.loadEditor) {
-            (this.$refs.mainEditor as EditorV).updateSlides(this.bothLanguageSlides);
+            (this.$refs.mainEditor as EditorV).updateSlides(this.slides);
             (this.$refs.mainEditor as EditorV).selectSlide(-1);
         }
     }
@@ -1401,7 +1442,7 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     h5,
     h6 {
         font-family: $font-list;
-        line-height: 1.5;
+        line-height: 1.3;
         border-bottom: 0px;
     }
 
@@ -1439,6 +1480,7 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     }
 
     .vfm__content button {
+        border-radius: 3px;
         padding: 5px 12px;
         margin: 0px 10px;
         font-weight: 600;

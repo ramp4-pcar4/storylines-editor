@@ -123,11 +123,17 @@ editor.slideshow.label.edit,Edit existing item,1,Modifier un élément existant,
 editor.slideshow.label.type,Type,1,Type,0
 editor.slideshow.label.add,Add,1,Ajouter,1
 editor.slideshow.label.slideNumber,Slide Number,1,Numéro de diapositive,0
+editor.slides.overwrite.title,Save will overwrite undefined configs,1,L'enregistrement écrasera les configurations non définies,0
+editor.slides.overwrite.text,Saving will replace all undefined configs with blank configs. Are you sure you want to continue?,1,L'enregistrement remplacera toutes les configurations non définies par des diapositives vides. Êtes-vous sûr de vouloir continuer ?,0
+editor.slides.continue,Continue,1,Continuer,0
 editor.slides.title,Intro title,1,Titre de l’introduction,1
 editor.slides.addSlide,"New blank slide",1,Nouvelle diapositive,0
 editor.slides.currentLangLabel,({lang} slide),1,(Diapositive en {lang}),0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
-editor.slides.deleteSlide.confirm,"Are you sure you want to delete the slide {title}?",1,"Voulez-vous vraiment supprimer la diapositive {titre}?",1
+editor.slides.deleteSlide.title,Delete slide {num}?,1,Supprimer la diapositive {num} ?,0
+editor.slides.deleteSlide.confirm,"Both English and French configurations will be deleted{title}.",1,"Les configurations anglaise et française seront supprimées{title}.",0
+editor.slides.deleteConfig.title,Delete {lang} config?,1,Supprimer la configuration {lang} ?,0
+editor.slides.deleteConfig.confirm,"Are you sure you want to delete this config {title}?",1,Êtes-vous sûr de vouloir supprimer cette configuration {title} ?,0
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
 editor.slides.makeFull,Make the right panel the full slide,1,Mettre la diapositive complète dans le panneau de droite,1
 editor.slides.centerPanel,Center panel content,1,Contenu de la diapositive centrale,0
@@ -142,6 +148,8 @@ editor.slides.toc.newENGSlideText,New ENG Slide *,1,Nouvelle diapositive ANG *,0
 editor.slides.toc.newFRSlideText,New FR Slide *,1,Novelle diapositive FR *,0
 editor.slides.toc.noENGslide,(No English Config),1,(Pas de configuration Anglais),0
 editor.slide.toc.noFRSlide,(No French Config),1,(Pas de configuration française),0
+editor.slide.toc.untitledENG,(Untitled English slide),1,(Diapositive anglaise sans titre),0
+editor.slide.toc.untitledFR,(Untitled French slide),1,(Diapositive française sans titre),0
 editor.slides.toc.prevEngDNE,Cannot create this config if previous slide EN config does not exist.,1,Impossible de créer cette configuration si la configuration EN de la diapositive précédente n'existe pas.,0
 editor.slide.toc.prevFrDNE,Cannot create this config if previous slide FR config does not exist.,1,Impossible de créer cette configuration si la configuration FR de la diapositive précédente n'existe pas.,0
 editor.slides.toc.newBlankConfig,Create new blank config,1,Créer une nouvelle configuration vierge,0
