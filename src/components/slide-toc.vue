@@ -1,9 +1,13 @@
 <template>
     <div>
+        <!-- Sidebar header -->
         <div class="flex toc-header px-3 pt-2 mt-5 pb-2 border-b align-bottom items-end">
+            <!-- Header title ("SLIDES" or equivalent) -->
             <p class="flex items-center justify-center font-bold">{{ $t('editor.slides.slideHeader') }}</p>
             <p class="flex-1"></p>
             <p class="ml-auto"></p>
+            <!-- Add new slide button -->
+            <!-- New slide will have a blank ENG and FR config, with some exceptions -->
             <button class="mx-auto toc-popup-button py-0 px-2" @click="addNewSlide">
                 <span class="inline-block pr-1"
                     ><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
@@ -15,8 +19,12 @@
             <br />
         </div>
 
-        <ul class="toc-list">
+        <!-- Slide list -->
+        <ul :class="[isMobileSidebar ? 'toc-list-mobile' : 'toc-list']">
+            <!-- Slide -->
+            <!-- Dragging is turned off on mobile version as you can't scroll otherwise (component would think a scroll === a drag) -->
             <draggable
+                :disabled="isMobileSidebar"
                 :list="bothLanguageSlides"
                 @update="$emit('slides-updated', bothLanguageSlides)"
                 :item-key="getSlideId"
@@ -24,26 +32,33 @@
             >
                 <template #item="{ element, index }">
                     <li
-                        class="toc-slide border-t flex px-3 py-2 cursor-pointer hover:bg-gray-50"
+                        class="toc-slide select-none border-t flex px-3 py-2 cursor-pointer hover:bg-gray-50"
                         :class="slideIndex === index ? 'bg-gray-100 border-gray-300' : ''"
-                        :id="'slide' + index"
+                        :id="(isMobileSidebar ? 'mobile' : '') + 'slide' + index"
                         :key="'slide' + index"
                         v-focus-item
                     >
                         <div class="flex space-between w-full align-center text-base">
                             <div class="flex flex-col flex-1">
                                 <section class="flex space-between mb-1">
-                                    <p class="font-semibold overflow-ellipsis whitespace-nowrap overflow-hidden flex-1">
+                                    <!-- Slide number -->
+                                    <p
+                                        class="font-semibold select-none overflow-ellipsis whitespace-nowrap self-center overflow-hidden flex-1"
+                                    >
                                         {{ $t('editor.slides.slide') }} {{ index + 1 }}
                                     </p>
-                                    <div class="flex align-center mr-4">
+                                    <!-- Whole-slide options -->
+                                    <div class="flex align-center mr-4 space-x-1">
+                                        <!-- Copy slide button -->
                                         <button
-                                            class="slide-toc-button px-5"
+                                            class="slide-toc-button"
+                                            :class="{ 'toc-popup-button': isMobileSidebar }"
                                             @click.stop="copySlide(index)"
                                             v-tippy="{
                                                 delay: '200',
                                                 placement: 'top-start',
-                                                content: $t('editor.slides.toc.copySlide')
+                                                content: $t('editor.slides.toc.copySlide'),
+                                                touch: ['hold', 500]
                                             }"
                                         >
                                             <svg
@@ -51,20 +66,23 @@
                                                 height="17"
                                                 width="17"
                                                 viewBox="0 0 24 24"
-                                                class="mx-1"
+                                                :class="[isMobileSidebar ? 'mx-2 my-1' : 'mx-1']"
                                             >
                                                 <path
                                                     d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z"
                                                 />
                                             </svg>
                                         </button>
+                                        <!-- Delete slide button -->
                                         <button
                                             class="slide-toc-button"
+                                            :class="{ 'toc-popup-button': isMobileSidebar }"
                                             @click.stop="$vfm.open(`delete-slide-${index}`)"
                                             v-tippy="{
                                                 delay: '200',
                                                 placement: 'top-start',
-                                                content: $t('editor.slides.toc.deleteSlide')
+                                                content: $t('editor.slides.toc.deleteSlide'),
+                                                touch: ['hold', 500]
                                             }"
                                         >
                                             <svg
@@ -72,7 +90,7 @@
                                                 viewBox="0 0 110.61 122.88"
                                                 width="15"
                                                 height="15"
-                                                class="mx-1"
+                                                :class="[isMobileSidebar ? 'mx-2 my-1' : 'mx-1']"
                                             >
                                                 <path
                                                     d="M39.27,58.64a4.74,4.74,0,1,1,9.47,0V93.72a4.74,4.74,0,1,1-9.47,0V58.64Zm63.6-19.86L98,103a22.29,22.29,0,0,1-6.33,14.1,19.41,19.41,0,0,1-13.88,5.78h-45a19.4,19.4,0,0,1-13.86-5.78l0,0A22.31,22.31,0,0,1,12.59,103L7.74,38.78H0V25c0-3.32,1.63-4.58,4.84-4.58H27.58V10.79A10.82,10.82,0,0,1,38.37,0H72.24A10.82,10.82,0,0,1,83,10.79v9.62h23.35a6.19,6.19,0,0,1,1,.06A3.86,3.86,0,0,1,110.59,24c0,.2,0,.38,0,.57V38.78Zm-9.5.17H17.24L22,102.3a12.82,12.82,0,0,0,3.57,8.1l0,0a10,10,0,0,0,7.19,3h45a10.06,10.06,0,0,0,7.19-3,12.8,12.8,0,0,0,3.59-8.1L93.37,39ZM71,20.41V12.05H39.64v8.36ZM61.87,58.64a4.74,4.74,0,1,1,9.47,0V93.72a4.74,4.74,0,1,1-9.47,0V58.64Z"
@@ -81,36 +99,46 @@
                                         </button>
                                     </div>
                                 </section>
-
+                                <!-- ENG and FR configs for slide -->
                                 <section class="flex flex-col gap-0.5 text-sm">
                                     <!-- ENG config for slide -->
                                     <button
-                                        class="flex gap-2 px-2 py-1 rounded-md bg-transparent hover:bg-gray-200"
+                                        class="flex gap-2 px-2 rounded-md bg-transparent hover:bg-gray-200"
+                                        :disabled="!element.en"
                                         :class="{
                                             'selected-toc-config-item': element.en === currentSlide,
+                                            'py-1': !isMobileSidebar,
+                                            'py-2': isMobileSidebar,
+                                            'border-2 border-blue-500': isMobileSidebar && element.en === currentSlide,
                                             'cursor-not-allowed border-2 border-red-400': !element.en
                                         }"
                                         v-tippy="{
                                             delay: '200',
-                                            placement: 'right',
+                                            placement: isMobileSidebar ? 'top' : 'right',
                                             content:
                                                 element.en?.title ||
                                                 (element.en?.title === ''
                                                     ? $t('editor.slides.toc.newENGSlideText')
                                                     : $t('editor.slides.toc.noENGslide')),
                                             animateFill: true,
-                                            offset: [0, 50]
+                                            offset: [0, isMobileSidebar ? 0 : 50],
+                                            touch: ['hold', 500]
                                         }"
-                                        @click.stop="selectSlide(index, 'en')"
+                                        @click.stop="
+                                            selectSlide(index, 'en');
+                                            onButtonClick();
+                                        "
                                     >
+                                        <!-- "EN" text -->
                                         <p
-                                            class="font-bold italic text-gray-500"
+                                            class="font-bold italic text-gray-500 select-none"
                                             :class="{ 'text-gray-700': slideIndex === index }"
                                         >
                                             EN
                                         </p>
+                                        <!-- Config title -->
                                         <p
-                                            class="text-left line-clamp-2"
+                                            class="text-left line-clamp-2 select-none"
                                             :class="{
                                                 italic: !element.en?.title
                                             }"
@@ -138,7 +166,8 @@
                                                         index - 1 !== -1 && !bothLanguageSlides[index - 1]?.en
                                                             ? $t('editor.slides.toc.prevEngDNE')
                                                             : $t('editor.slides.toc.newBlankConfig'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                                 @click="
                                                     index - 1 !== -1 && !bothLanguageSlides[index - 1]?.en
@@ -164,7 +193,8 @@
                                                     />
                                                 </svg>
                                             </button>
-                                            <!-- Copy FR config over here -->
+                                            <!-- Button: Copy the FR config in the same slide, if it exists -->
+                                            <!-- Only available if the slide's ENG config is undefined -->
                                             <button
                                                 v-if="element.fr"
                                                 class="slide-toc-button"
@@ -179,7 +209,8 @@
                                                         index - 1 !== -1 && !bothLanguageSlides[index - 1]?.en
                                                             ? $t('editor.slides.toc.prevEngDNE')
                                                             : $t('editor.slides.toc.newConfigFromFR'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                                 @click="
                                                     index - 1 !== -1 && !bothLanguageSlides[index - 1]?.en
@@ -210,7 +241,8 @@
                                                     delay: '200',
                                                     placement: 'top-start',
                                                     content: $t('editor.slides.toc.isolatedUndefinedENGconfig'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                             >
                                                 <svg
@@ -233,6 +265,7 @@
                                         </div>
                                         <div v-else class="ml-auto flex my-auto">
                                             <!-- Allow deleting the final slide -->
+                                            <!-- TODO: Do we want a warning for deleting individual configs in a slide? -->
                                             <button
                                                 class="slide-toc-button"
                                                 v-if="!bothLanguageSlides.slice(index + 1).some((slide) => slide.en)"
@@ -240,7 +273,8 @@
                                                     delay: '200',
                                                     placement: 'top-start',
                                                     content: $t('editor.slides.toc.deleteConfig'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                                 @click="deleteConfig(element, 'en')"
                                             >
@@ -258,34 +292,45 @@
                                             </button>
                                         </div>
                                     </button>
+                                    <hr v-if="isMobileSidebar" />
                                     <!-- FR config for slide -->
                                     <button
                                         class="flex gap-2 px-2 py-1 rounded-md bg-transparent hover:bg-gray-200"
+                                        :disabled="!element.fr"
                                         :class="{
                                             'selected-toc-config-item': element.fr === currentSlide,
+                                            'py-1': !isMobileSidebar,
+                                            'py-2': isMobileSidebar,
+                                            'border-2 border-blue-500': isMobileSidebar && element.fr === currentSlide,
                                             'cursor-not-allowed border-2 border-red-400': !element.fr
                                         }"
                                         v-tippy="{
                                             delay: '200',
-                                            placement: 'right',
+                                            placement: isMobileSidebar ? 'bottom' : 'right',
                                             content:
                                                 element.fr?.title ||
                                                 (element.fr?.title === ''
                                                     ? $t('editor.slides.toc.newFRSlideText')
                                                     : $t('editor.slide.toc.noFRSlide')),
                                             animateFill: true,
-                                            offset: [0, 50]
+                                            offset: [0, isMobileSidebar ? 0 : 50],
+                                            touch: ['hold', 500]
                                         }"
-                                        @click.stop="element.fr ? selectSlide(index, 'fr') : ''"
+                                        @click.stop="
+                                            selectSlide(index, 'fr');
+                                            onButtonClick();
+                                        "
                                     >
+                                        <!-- "FR" text -->
                                         <p
-                                            class="font-bold italic text-gray-500"
+                                            class="font-bold italic text-gray-500 select-none"
                                             :class="{ 'text-gray-700': slideIndex === index }"
                                         >
                                             FR
                                         </p>
+                                        <!-- Config title -->
                                         <p
-                                            class="text-left line-clamp-2"
+                                            class="text-left line-clamp-2 select-none"
                                             :class="{
                                                 italic: !element.fr?.title
                                             }"
@@ -313,7 +358,8 @@
                                                         index - 1 !== -1 && !bothLanguageSlides[index - 1]?.fr
                                                             ? $t('editor.slide.toc.prevFrDNE')
                                                             : $t('editor.slides.toc.newBlankConfig'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                                 @click="
                                                     index - 1 !== -1 && !bothLanguageSlides[index - 1]?.fr
@@ -339,7 +385,8 @@
                                                     />
                                                 </svg>
                                             </button>
-                                            <!-- Copy ENG config over here -->
+                                            <!-- Button: Copy the ENG config in the same slide, if it exists -->
+                                            <!-- Only available if the slide's FR config is undefined -->
                                             <button
                                                 v-if="element.en"
                                                 class="slide-toc-button"
@@ -354,7 +401,8 @@
                                                         index - 1 !== -1 && !bothLanguageSlides[index - 1]?.fr
                                                             ? $t('editor.slide.toc.prevFrDNE')
                                                             : $t('editor.slides.toc.newConfigFromEng'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                                 @click="
                                                     index - 1 !== -1 && !bothLanguageSlides[index - 1]?.fr
@@ -385,7 +433,8 @@
                                                     delay: '200',
                                                     placement: 'bottom-start',
                                                     content: $t('editor.slides.toc.isolatedUndefinedFRconfig'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                             >
                                                 <svg
@@ -415,7 +464,8 @@
                                                     delay: '200',
                                                     placement: 'bottom-start',
                                                     content: $t('editor.slides.toc.deleteConfig'),
-                                                    animateFill: false
+                                                    animateFill: false,
+                                                    touch: ['hold', 500]
                                                 }"
                                                 @click="deleteConfig(element, 'fr')"
                                             >
@@ -436,16 +486,22 @@
                                 </section>
                             </div>
 
+                            <!-- Move slide buttons -->
                             <div class="flex ml-0.5 flex-col space-between">
+                                <!-- Move slide up button -->
                                 <button
                                     class="slide-toc-button h-auto grow-0"
-                                    :class="index == 0 ? 'text-gray-400 cursor-not-allowed' : ''"
+                                    :class="{
+                                        'toc-popup-button border-none bg-transparent': isMobileSidebar,
+                                        'text-gray-400 cursor-not-allowed': index === 0
+                                    }"
                                     @click.stop="moveUp(index)"
                                     :disabled="index == 0"
                                     v-tippy="{
                                         delay: '200',
                                         placement: 'right',
-                                        content: $t('editor.slides.toc.moveSlideUp')
+                                        content: $t('editor.slides.toc.moveSlideUp'),
+                                        touch: ['hold', 500]
                                     }"
                                 >
                                     <svg
@@ -458,7 +514,8 @@
                                         xml:space="preserve"
                                         height="14"
                                         width="14"
-                                        class="m-1 fill-current"
+                                        class="fill-current"
+                                        :class="[isMobileSidebar ? 'm-2' : 'm-1']"
                                     >
                                         <g>
                                             <path
@@ -467,17 +524,20 @@
                                         </g>
                                     </svg>
                                 </button>
+                                <!-- Move slide down button -->
                                 <button
                                     class="slide-toc-button rotate-180 transform h-auto grow-0 mt-auto"
-                                    :class="
-                                        index == bothLanguageSlides.length - 1 ? 'text-gray-400 cursor-not-allowed' : ''
-                                    "
+                                    :class="{
+                                        'toc-popup-button border-none bg-transparent': isMobileSidebar,
+                                        'text-gray-400 cursor-not-allowed': index == bothLanguageSlides.length - 1
+                                    }"
                                     @click.stop="moveDown(index)"
                                     :disabled="index == bothLanguageSlides.length - 1"
                                     v-tippy="{
                                         delay: '200',
                                         placement: 'right',
-                                        content: $t('editor.slides.toc.moveSlideDown')
+                                        content: $t('editor.slides.toc.moveSlideDown'),
+                                        touch: ['hold', 500]
                                     }"
                                 >
                                     <svg
@@ -490,7 +550,8 @@
                                         xml:space="preserve"
                                         height="14"
                                         width="14"
-                                        class="m-1 fill-current"
+                                        class="fill-current"
+                                        :class="[isMobileSidebar ? 'm-2' : 'm-1']"
                                     >
                                         <g>
                                             <path
@@ -501,6 +562,7 @@
                                 </button>
                             </div>
                         </div>
+                        <!-- Delete slide confirmation modal -->
                         <confirmation-modal
                             :name="`delete-slide-${index}`"
                             :message="
@@ -558,14 +620,23 @@ export default class SlideTocV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop() onButtonClick!: Function;
+    @Prop({ default: false }) isMobileSidebar!: boolean;
 
     selectedForCopying = 0;
 
+    /**
+     * Selects a config (english or french) of a particular slide, and opens its editor.
+     * @param index Index of slide to select (usually slide number [in UI] - 1)
+     * @param lang Specific config in slide to select ('en' or 'fr')
+     */
     selectSlide(index: number, lang: string): void {
         this.$emit('slide-change', index, lang);
     }
 
-    // Assumes you're adding slide at end
+    /**
+     * Adds a new slide at the end of the current list.
+     */
     addNewSlide(): void {
         const lastSlide = this.bothLanguageSlides[this.bothLanguageSlides.length - 1];
         this.bothLanguageSlides.push({
@@ -627,7 +698,9 @@ export default class SlideTocV extends Vue {
      */
     scrollToElement(index: number): void {
         setTimeout(() => {
-            document.getElementById('slide' + index)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document
+                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 10);
     }
 
@@ -779,6 +852,18 @@ export default class SlideTocV extends Vue {
         return 'slide' + this.bothLanguageSlides.indexOf(slide);
     }
 }
+
+// More accurate page height for mobile
+// Counts the URL bar for mobile browsers (e.g. iOS Safari) so the content doesn't vertically overshoot
+// and get covered by the URL bar when it's opened
+
+let vh = window.innerHeight * 0.01;
+document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+window.addEventListener('resize', () => {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -820,10 +905,20 @@ export default class SlideTocV extends Vue {
     -webkit-line-clamp: 2;
 }
 
-// Hard coded height :(
-// TODO: Change positioning of app components so we don't need to hardcode
+/* Hard coded height :(
+   TODO: Change positioning of app components so we don't need to hardcode
+   TODO: Change height here when any new changes cause overshoot
+ */
 .toc-list {
     height: calc(100vh - 177px);
+    height: calc(calc(var(--vh, 1vh) * 100) - 177px);
+    overflow-y: auto;
+}
+
+/* TODO: Change height here when any new changes cause overshoot */
+.toc-list-mobile {
+    height: calc(100vh - 123px);
+    height: calc(calc(var(--vh, 1vh) * 100) - 123px);
     overflow-y: auto;
 }
 
