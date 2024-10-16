@@ -137,6 +137,7 @@
                 :uid="uuid"
                 @slide-change="selectSlide"
                 @slide-edit="onSlidesEdited"
+                @shared-asset="onSharedAsset"
                 @custom-slide-updated="updateCustomSlide"
                 :sourceCounts="sourceCounts"
             ></slide-editor>
@@ -209,7 +210,69 @@ export default class EditorV extends Vue {
 
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
+        console.log('editor - slide edit event emitted');
         this.$emit('save-status', true);
+    }
+
+    // move asset from opposite lang's assets folder to shared assets folder
+    onSharedAsset(assetName: string): void {
+        console.log('editor - asset to be moved to shared asset folder');
+        console.log(assetName);
+        // access config of opposite lang
+        const oppositeLang = this.configLang === 'en' ? 'fr' : 'en';
+        const oppositeConfig = this.configs[oppositeLang];
+        console.log('opposite langs config (before)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig)));
+        console.log('opposite langs slides (before)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig.slides)));
+
+        for (let i = 0; i < oppositeConfig.slides.length; i++) {
+            const currSlide = oppositeConfig.slides[i];
+            console.log('current slide');
+            console.log(JSON.parse(JSON.stringify(currSlide)));
+
+            for (let j = 0; j < currSlide.panel.length; j++) {
+                const currPanel = currSlide.panel[j];
+                console.log('current panel');
+                console.log(JSON.parse(JSON.stringify(currPanel)));
+
+                // if panel is slideshow, image or video then proceed
+                if (currPanel.type === 'slideshow') {
+                    for (let k = 0; k < currPanel.items.length; k++) {
+                        const currItem = currPanel.items[k];
+                        console.log('current slideshow item');
+                        console.log(JSON.parse(JSON.stringify(currItem)));
+                        if (currItem.src) {
+                            let assetSrc = currItem.src.split('/');
+                            const assetFolder = assetSrc[2];
+                            if (currItem.src.includes(assetName) && assetFolder === oppositeLang) {
+                                console.log('need to change to shared');
+                                assetSrc[2] = 'shared';
+                                currItem.src = assetSrc.join('/');
+                            }
+                        }
+                    }
+                } else if (['image', 'video'].includes(currPanel.type)) {
+                    if (currPanel.src) {
+                        let assetSrc = currPanel.src.split('/');
+                        const assetFolder = assetSrc[2];
+                        if (currPanel.src.includes(assetName) && assetFolder === oppositeLang) {
+                            console.log('need to change to shared');
+                            assetSrc[2] = 'shared';
+                            currPanel.src = assetSrc.join('/');
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log('opposite langs config (after)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig)));
+        console.log('opposite langs slides (after)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig.slides)));
+
+        this.$emit('save-status', true);
+        console.log(' ');
     }
 
     @Watch('metadata', { deep: true })

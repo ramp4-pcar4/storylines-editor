@@ -66,6 +66,7 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
             res.status(500).send({ status: 'Internal Server Error' });
             return;
         }
+        logger('INFO', file.data.originalFilename);
 
         const fileName = `${TARGET_PATH}/${file.data.originalFilename.split('.zip')[0]}`;
         const secureFilename = `${UPLOAD_PATH}/${file.data.newFilename}`;
