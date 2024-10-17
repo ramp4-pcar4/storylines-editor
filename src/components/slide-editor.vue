@@ -1,8 +1,9 @@
 <template>
-    <div class="sticky top-20 h-auto self-start flex-grow m-5">
+    <div class="overflow-y-auto top-20 h-auto self-start flex-grow p-5">
         <div v-if="!!currentSlide">
             <div class="flex">
                 <div class="flex flex-col w-full">
+                    <h2 class="font-bold mb-3">{{ $t('editor.slides.currentLangLabel', { lang: langTranslate }) }}</h2>
                     <label class="editor-label" for="slideTitle">{{ $t('editor.slides.slideTitle') }}:</label>
                     <div class="flex">
                         <input
@@ -417,6 +418,8 @@ export default class SlideEditorV extends Vue {
     includeInToc = true;
     dynamicSelected = false;
 
+    langTranslate = '';
+
     editors: Record<string, string> = {
         text: 'text-editor',
         image: 'image-editor',
@@ -428,8 +431,13 @@ export default class SlideEditorV extends Vue {
         dynamic: 'dynamic-editor'
     };
 
+    mounted() {
+        this.langTranslate = this.$t(`editor.lang.${this.lang}`);
+    }
+
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
+        this.langTranslate = this.$t(`editor.lang.${this.lang}`);
         this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
         this.centerPanel = this.currentSlide.centerPanel ?? false;
         this.centerSlide = this.currentSlide.centerSlide ?? false;
