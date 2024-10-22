@@ -257,20 +257,6 @@
                 @refresh-config="refreshConfig"
                 ref="mainEditor"
             >
-                <template v-slot:langModal="slotProps">
-                    <button
-                        class="editor-button"
-                        @click.stop="slotProps.unsavedChanges ? $vfm.open(`change-lang`) : swapLang()"
-                    >
-                        {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
-                    </button>
-                    <confirmation-modal
-                        :name="`change-lang`"
-                        :message="$t('editor.changeLang.modal')"
-                        @ok="swapLang()"
-                    />
-                </template>
-
                 <template v-slot:metadataModal>
                     <vue-final-modal
                         modalId="metadata-edit-modal"
@@ -316,6 +302,7 @@ import {
     MetadataContent,
     PanelType,
     Slide,
+    SlideForBothLanguages,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -421,7 +408,8 @@ export default class MetadataEditorV extends Vue {
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: Slide[] = [];
+    slides: SlideForBothLanguages[] = [];
+
     sourceCounts: SourceCounts = {};
 
     created(): void {
@@ -459,13 +447,15 @@ export default class MetadataEditorV extends Vue {
                 this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
-                this.slides = props.slides;
+                // this.slides = props.slides;
                 this.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
                 this.unsavedChanges = props.unsavedChanges;
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
+
+                this.loadSlides(props.configs);
 
                 if (logo) {
                     const logoFile = this.configFileStructure?.zip.file(logoSrc);
@@ -503,6 +493,30 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Loads the slide variable with both EN and FR language configs.
+     * @param configs The config object with separate EN and FR StoryRamp configs.
+     */
+    loadSlides(configs: { [p: string]: StoryRampConfig | undefined }): void {
+        const engSlides =
+            configs.en?.slides.map((engSlide) => {
+                return {
+                    en: engSlide
+                };
+            }) ?? [];
+        const frSlides =
+            configs.fr?.slides.map((frSlide) => {
+                return {
+                    fr: frSlide
+                };
+            }) ?? [];
+
+        const maxLength = frSlides.length > engSlides.length ? frSlides.length : engSlides.length;
+        this.slides = Array.from({ length: maxLength }, (_, index) =>
+            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+        );
     }
 
     /**
@@ -916,7 +930,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.dateModified = config.dateModified;
 
-        this.slides = config.slides;
+        this.loadSlides(this.configs);
 
         const logo = config.introSlide.logo?.src;
         if (logo) {
@@ -963,11 +977,15 @@ export default class MetadataEditorV extends Vue {
     generateConfig(): ConfigFileStructure {
         this.saving = true;
 
-        // Update the configuration file.
-        const fileName = `${this.uuid}_${this.configLang}.json`;
-        const formattedConfigFile = JSON.stringify(this.configs[this.configLang], null, 4);
+        // Update the configuration files, for both languages.
+        const engFileName = `${this.uuid}_en.json`;
+        const frFileName = `${this.uuid}_fr.json`;
 
-        this.configFileStructure?.zip.file(fileName, formattedConfigFile);
+        const engFormattedConfigFile = JSON.stringify(this.configs.en, null, 4);
+        const frFormattedConfigFile = JSON.stringify(this.configs.fr, null, 4);
+
+        this.configFileStructure?.zip.file(engFileName, engFormattedConfigFile);
+        this.configFileStructure?.zip.file(frFileName, frFormattedConfigFile);
 
         // Upload the ZIP file.
         this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
@@ -1365,7 +1383,7 @@ export default class MetadataEditorV extends Vue {
 </script>
 
 <style lang="scss">
-$font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-serif;
 
 .storyramp-app,
 .vfm {
