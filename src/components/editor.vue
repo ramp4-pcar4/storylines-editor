@@ -373,14 +373,16 @@ export default class EditorV extends Vue {
 }
 
 .editor-input {
-    padding: 5px 10px;
+    padding: 10px 10px;
     margin-top: 5px;
     border: 1px solid black;
     display: inline;
+    border-radius: 5px;
 }
 
 .editor-container .input-error {
     border: 1px solid red;
+    outline-color: red;
 }
 
 .editor-button {
@@ -388,6 +390,11 @@ export default class EditorV extends Vue {
     margin: 0px 10px;
     font-weight: 600;
     transition-duration: 0.2s;
+}
+
+.editor-forms-button {
+    padding: 11px 15px;
+    border-radius: 5px;
 }
 
 .editor-button:hover:enabled {

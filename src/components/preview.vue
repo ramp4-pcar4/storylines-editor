@@ -193,7 +193,7 @@ export default class StoryPreviewV extends Vue {
 </script>
 
 <style lang="scss">
-$font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-serif;
 
 .storyramp-app {
     h1,
@@ -209,8 +209,9 @@ $font-list: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     .h5,
     .h6 {
         font-family: $font-list;
-        line-height: 1.5;
+        line-height: 1.3;
         border-bottom: 0px;
+        margin-bottom: 3px;
     }
 
     .story-header {
