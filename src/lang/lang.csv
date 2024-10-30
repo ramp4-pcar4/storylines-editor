@@ -32,7 +32,7 @@ editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
 editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Êtes-vous sûr de vouloir remplacer le produit « {uuid} » ?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
-editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées,1
+editor.editMetadata,Edit Project Metadata,1,Mod. les métadonnées,1
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
 editor.metadata.instructions,Fill in metadata details about your new Storylines product. Use the "Preview" button to see what your slides will look like.,1,Inscrivez les métadonnées de votre nouveau produit de scénario. Utilisez la fonction « Afficher l’aperçu » pour voir à quoi ressemblent vos diapositives.,1
 editor.uuid,UUID,1,UUID,1
@@ -132,8 +132,8 @@ editor.slides.currentLangLabel,({lang} slide),1,(Diapositive en {lang}),0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
 editor.slides.deleteSlide.title,Delete slide {num}?,1,Supprimer la diapositive {num} ?,0
 editor.slides.deleteSlide.confirm,"Both English and French configurations will be deleted{title}.",1,"Les configurations anglaise et française seront supprimées{title}.",0
-editor.slides.deleteConfig.title,Delete {lang} config?,1,Supprimer la configuration {lang} ?,0
-editor.slides.deleteConfig.confirm,"Are you sure you want to delete this config {title}?",1,Êtes-vous sûr de vouloir supprimer cette configuration {title} ?,0
+editor.slides.deleteConfig.title,Slide {num} {lang} config will be cleared,1,La configuration de la diapositive {num} {lang} sera effacée,0
+editor.slides.deleteConfig.confirm,"This will replace the config '{title}' with a blank config.",1,Cela remplacera la configuration '{title}' par une configuration vide.,0
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
 editor.slides.makeFull,Make the right panel the full slide,1,Mettre la diapositive complète dans le panneau de droite,1
 editor.slides.centerPanel,Center panel content,1,Contenu de la diapositive centrale,0
@@ -142,10 +142,15 @@ editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
+editor.slides.toc.dropdownTooltip,Options,1,Options,0
+editor.slides.toc.dropdown.copy,Copy from other config,1,Copier à partir d'une autre config.,0
+editor.slides.toc.dropdown.clear,Clear content,1,Contenu clair,0
+editor.slides.toc.copySlide.warning.title,Copy will delete existing contents,1,La copie supprimera le contenu existant,0
+editor.slides.toc.copySlide.warning.message,Slide {num}'s {oldLang} config ('{oldTitle}') will be replaced with the {newLang} config ('{newTitle}'). All existing contents will be lost.,1,La configuration {oldLang} de la diapositive {num} ('{oldTitle}') sera remplacée par la configuration {newLang} ('{newTitle}'). Tout le contenu existant sera perdu.,0
 editor.slides.toc.copySlide,Copy Slide,1,Copier la diapositive,0
 editor.slides.toc.deleteSlide,Delete Slide,1,Supprimer la diapositive,0
-editor.slides.toc.newENGSlideText,New ENG Slide *,1,Nouvelle diapositive ANG *,0
-editor.slides.toc.newFRSlideText,New FR Slide *,1,Novelle diapositive FR *,0
+editor.slides.toc.newENGSlideText,New EN Slide*,1,Nouvelle diapositive AN*,0
+editor.slides.toc.newFRSlideText,New FR Slide*,1,Nouvelle diapositive FR*,0
 editor.slides.toc.noENGslide,(No English Config),1,(Pas de configuration Anglais),0
 editor.slide.toc.noFRSlide,(No French Config),1,(Pas de configuration française),0
 editor.slide.toc.untitledENG,(Untitled English slide),1,(Diapositive anglaise sans titre),0

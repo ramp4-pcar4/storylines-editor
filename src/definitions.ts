@@ -143,7 +143,7 @@ export interface Slide {
     includeInToc?: boolean;
 }
 
-export interface SlideForBothLanguages {
+export interface MultiLanguageSlide {
     en: Slide | undefined;
     fr: Slide | undefined;
 }

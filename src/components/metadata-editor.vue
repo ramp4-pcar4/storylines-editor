@@ -310,7 +310,7 @@ import {
     MetadataContent,
     PanelType,
     Slide,
-    SlideForBothLanguages,
+    MultiLanguageSlide,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -432,7 +432,7 @@ export default class MetadataEditorV extends Vue {
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: SlideForBothLanguages[] = [];
+    slides: MultiLanguageSlide[] = [];
 
     sourceCounts: SourceCounts = {};
 
