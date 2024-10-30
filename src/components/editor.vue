@@ -471,8 +471,7 @@ export default class EditorV extends Vue {
             if (index === -1 || !this.loadSlides) {
                 this.currentSlide = '';
             } else {
-                const selectedLang =
-                    (lang as keyof SlideForBothLanguages) ?? (this.configLang as keyof SlideForBothLanguages);
+                const selectedLang = (lang ?? this.configLang) as keyof SlideForBothLanguages;
                 const selectedSlide = this.loadSlides[index][selectedLang];
                 this.currentSlide = selectedSlide ?? '';
             }
@@ -489,9 +488,7 @@ export default class EditorV extends Vue {
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][
-            (lang as keyof SlideForBothLanguages) ?? (this.configLang as keyof SlideForBothLanguages)
-        ] = slideConfig;
+        this.slides[this.slideIndex][(lang ?? this.configLang) as keyof SlideForBothLanguages] = slideConfig;
         // save changes emitted from advanced editor
         if (save) {
             this.$emit('save-changes');

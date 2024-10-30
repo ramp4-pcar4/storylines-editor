@@ -230,77 +230,42 @@
                                                     />
                                                 </svg>
                                             </button>
-                                            <!-- Warning indicator for isolated undefined configs: Defined configs below it WILL be moved up! -->
-                                            <button
-                                                class="slide-toc-button cursor-default"
-                                                v-if="
-                                                    slides.slice(0, index).some((slide) => slide.en) &&
-                                                    slides.slice(index + 1).some((slide) => slide.en)
-                                                "
-                                                v-tippy="{
-                                                    delay: '200',
-                                                    placement: 'top-start',
-                                                    content: $t('editor.slides.toc.isolatedUndefinedENGconfig'),
-                                                    animateFill: false,
-                                                    touch: ['hold', 500]
-                                                }"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    shape-rendering="geometricPrecision"
-                                                    text-rendering="geometricPrecision"
-                                                    image-rendering="optimizeQuality"
-                                                    fill-rule="evenodd"
-                                                    clip-rule="evenodd"
-                                                    viewBox="0 0 512 463.43"
-                                                    height="16"
-                                                    width="16"
-                                                    style="fill: rgb(248, 113, 113)"
-                                                >
-                                                    <path
-                                                        d="M189.46 44.02c34.26-58.66 99.16-58.77 133.24.12l.97 1.81 175.27 304.4c33.71 56.4-1.2 113.76-66.17 112.96v.12H73.53c-.9 0-1.78-.04-2.66-.11-58.34-.79-86.64-54.22-61.9-106.84.39-.85.82-1.67 1.28-2.46l-.04-.03 179.3-309.94-.05-.03zm50.32 302.4c4.26-4.13 9.35-6.19 14.45-6.56 3.4-.24 6.8.29 9.94 1.48 3.13 1.19 6.01 3.03 8.39 5.41 6.92 6.91 8.72 17.38 4.64 26.16-2.69 5.8-7.08 9.7-12.11 11.78-3.03 1.27-6.3 1.84-9.56 1.76-3.27-.08-6.49-.82-9.41-2.18-5.02-2.33-9.3-6.43-11.7-12.2-2.65-6.36-2.27-12.96.63-19.15 1.15-2.46 2.75-4.81 4.73-6.5zm33.86-47.07c-.8 19.91-34.51 19.93-35.28-.01-3.41-34.1-12.13-110.53-11.85-142.58.28-9.87 8.47-15.72 18.94-17.95 3.23-.69 6.78-1.03 10.35-1.02 3.6.01 7.16.36 10.39 1.05 10.82 2.3 19.31 8.39 19.31 18.45l-.05 1-11.81 141.06z"
-                                                    />
-                                                </svg>
-                                            </button>
                                         </div>
                                         <div v-else class="ml-auto flex my-auto">
-                                            <!-- Allow deleting the final slide -->
-                                            <!-- TODO: Do we want a warning for deleting individual configs in a slide? -->
-                                            <button
-                                                class="slide-toc-button"
-                                                v-if="!slides.slice(index + 1).some((slide) => slide.en)"
-                                                v-tippy="{
-                                                    delay: '200',
-                                                    placement: 'top-start',
-                                                    content: $t('editor.slides.toc.deleteConfig'),
-                                                    animateFill: false,
-                                                    touch: ['hold', 500]
-                                                }"
-                                                @click.stop="$vfm.open(`delete-slide-${index}-en-config`)"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 110.61 122.88"
-                                                    width="14"
-                                                    height="14"
-                                                    class="mx-1 my-0.5"
-                                                >
-                                                    <path
-                                                        d="M39.27,58.64a4.74,4.74,0,1,1,9.47,0V93.72a4.74,4.74,0,1,1-9.47,0V58.64Zm63.6-19.86L98,103a22.29,22.29,0,0,1-6.33,14.1,19.41,19.41,0,0,1-13.88,5.78h-45a19.4,19.4,0,0,1-13.86-5.78l0,0A22.31,22.31,0,0,1,12.59,103L7.74,38.78H0V25c0-3.32,1.63-4.58,4.84-4.58H27.58V10.79A10.82,10.82,0,0,1,38.37,0H72.24A10.82,10.82,0,0,1,83,10.79v9.62h23.35a6.19,6.19,0,0,1,1,.06A3.86,3.86,0,0,1,110.59,24c0,.2,0,.38,0,.57V38.78Zm-9.5.17H17.24L22,102.3a12.82,12.82,0,0,0,3.57,8.1l0,0a10,10,0,0,0,7.19,3h45a10.06,10.06,0,0,0,7.19-3,12.8,12.8,0,0,0,3.59-8.1L93.37,39ZM71,20.41V12.05H39.64v8.36ZM61.87,58.64a4.74,4.74,0,1,1,9.47,0V93.72a4.74,4.74,0,1,1-9.47,0V58.64Z"
-                                                    />
-                                                </svg>
-                                            </button>
+                                            <!-- ENG options dropdown menu -->
+                                            <toc-options
+                                                :copy-allowed="!!element.fr"
+                                                @copy="
+                                                    configEmpty(element, 'en')
+                                                        ? copyConfigFromOtherLang(element, 'en')
+                                                        : $vfm.open(`copy-other-slide-${index}-en-config`)
+                                                "
+                                                @clear="$vfm.open(`delete-slide-${index}-en-config`)"
+                                            />
                                         </div>
                                     </button>
                                     <!-- Delete ENG confirmation modal -->
-                                    <confirmation-modal
+                                    <action-modal
                                         :name="`delete-slide-${index}-en-config`"
-                                        :message="
-                                            $t('editor.slides.deleteConfig.confirm', {
-                                                title: element['en']?.title
+                                        :title="
+                                            $t('editor.slides.deleteConfig.title', {
+                                                lang: $t('editor.lang.en'),
+                                                num: index + 1
                                             })
                                         "
-                                        @ok="deleteConfig(element, 'en')"
+                                        :message="
+                                            $t('editor.slides.deleteConfig.confirm', {
+                                                title: element['en']?.title || ''
+                                            })
+                                        "
+                                        @ok="createNewConfig(element, 'en')"
+                                    />
+                                    <!-- ENG copy other slide confirmation modal -->
+                                    <action-modal
+                                        :name="`copy-other-slide-${index}-en-config`"
+                                        :title="$t('editor.slides.toc.copySlide.warning.title')"
+                                        :message="$t('editor.slides.toc.copySlide.warning.message')"
+                                        @ok="copyConfigFromOtherLang(element, 'en')"
                                     />
                                     <hr v-if="isMobileSidebar" />
                                     <!-- FR config for slide -->
@@ -466,42 +431,40 @@
                                             </button>
                                         </div>
                                         <div v-else class="ml-auto flex my-auto">
-                                            <!-- Allow deleting the final slide -->
-                                            <button
-                                                class="slide-toc-button"
-                                                v-if="!slides.slice(index + 1).some((slide) => slide.fr)"
-                                                v-tippy="{
-                                                    delay: '200',
-                                                    placement: 'bottom-start',
-                                                    content: $t('editor.slides.toc.deleteConfig'),
-                                                    animateFill: false,
-                                                    touch: ['hold', 500]
-                                                }"
-                                                @click.stop="$vfm.open(`delete-slide-${index}-fr-config`)"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 110.61 122.88"
-                                                    width="14"
-                                                    height="14"
-                                                    class="mx-1 my-0.5"
-                                                >
-                                                    <path
-                                                        d="M39.27,58.64a4.74,4.74,0,1,1,9.47,0V93.72a4.74,4.74,0,1,1-9.47,0V58.64Zm63.6-19.86L98,103a22.29,22.29,0,0,1-6.33,14.1,19.41,19.41,0,0,1-13.88,5.78h-45a19.4,19.4,0,0,1-13.86-5.78l0,0A22.31,22.31,0,0,1,12.59,103L7.74,38.78H0V25c0-3.32,1.63-4.58,4.84-4.58H27.58V10.79A10.82,10.82,0,0,1,38.37,0H72.24A10.82,10.82,0,0,1,83,10.79v9.62h23.35a6.19,6.19,0,0,1,1,.06A3.86,3.86,0,0,1,110.59,24c0,.2,0,.38,0,.57V38.78Zm-9.5.17H17.24L22,102.3a12.82,12.82,0,0,0,3.57,8.1l0,0a10,10,0,0,0,7.19,3h45a10.06,10.06,0,0,0,7.19-3,12.8,12.8,0,0,0,3.59-8.1L93.37,39ZM71,20.41V12.05H39.64v8.36ZM61.87,58.64a4.74,4.74,0,1,1,9.47,0V93.72a4.74,4.74,0,1,1-9.47,0V58.64Z"
-                                                    />
-                                                </svg>
-                                            </button>
+                                            <!-- FR options dropdown menu -->
+                                            <toc-options
+                                                :copy-allowed="!!element.en"
+                                                @copy="
+                                                    configEmpty(element, 'fr')
+                                                        ? copyConfigFromOtherLang(element, 'fr')
+                                                        : $vfm.open(`copy-other-slide-${index}-fr-config`)
+                                                "
+                                                @clear="$vfm.open(`delete-slide-${index}-fr-config`)"
+                                            />
                                         </div>
                                     </button>
                                     <!-- Delete FR confirmation modal -->
-                                    <confirmation-modal
+                                    <action-modal
                                         :name="`delete-slide-${index}-fr-config`"
-                                        :message="
-                                            $t('editor.slides.deleteConfig.confirm', {
-                                                title: element['fr']?.title
+                                        :title="
+                                            $t('editor.slides.deleteConfig.title', {
+                                                lang: $t('editor.lang.fr'),
+                                                num: index + 1
                                             })
                                         "
-                                        @ok="deleteConfig(element, 'fr')"
+                                        :message="
+                                            $t('editor.slides.deleteConfig.confirm', {
+                                                title: element['fr']?.title || ''
+                                            })
+                                        "
+                                        @ok="createNewConfig(element, 'fr')"
+                                    />
+                                    <!-- FR copy other slide confirmation modal -->
+                                    <action-modal
+                                        :name="`copy-other-slide-${index}-fr-config`"
+                                        :title="$t('editor.slides.toc.copySlide.warning.title')"
+                                        :message="$t('editor.slides.toc.copySlide.warning.message')"
+                                        @ok="copyConfigFromOtherLang(element, 'fr')"
                                     />
                                 </section>
                             </div>
@@ -609,6 +572,7 @@
 
 <script lang="ts">
 import ActionModal from '@/components/helpers/action-modal.vue';
+import TocOptions from '@/components/helpers/toc-options.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -636,6 +600,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
+        TocOptions,
         ActionModal,
         'slide-editor': SlideEditorV,
         'confirmation-modal': ConfirmationModalV,
@@ -653,8 +618,6 @@ export default class SlideTocV extends Vue {
     @Prop() closeSidebar!: Function;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
-    selectedForCopying = 0;
-
     defaultBlankSlide: Slide = {
         title: '',
         panel: [
@@ -670,6 +633,15 @@ export default class SlideTocV extends Vue {
             } as TextPanel
         ]
     };
+
+    /**
+     * Determines if a particular config is empty.
+     * @param slide Slide object to check.
+     * @param lang Specific config in slide to check ('en' or 'fr')
+     */
+    configEmpty(slide: SlideForBothLanguages, lang: keyof SlideForBothLanguages): boolean {
+        return JSON.stringify(slide[lang]) === JSON.stringify(this.defaultBlankSlide);
+    }
 
     /**
      * Selects a config (english or french) of a particular slide, and opens its editor.
@@ -723,10 +695,8 @@ export default class SlideTocV extends Vue {
     }
 
     // Assumes that you've already checked that the other lang DOES have a config.
-    copyConfigFromOtherLang(slides: SlideForBothLanguages, currLang: string): void {
-        slides[currLang as keyof SlideForBothLanguages] = JSON.parse(
-            JSON.stringify(slides[currLang === 'en' ? 'fr' : 'en'])
-        );
+    copyConfigFromOtherLang(slides: SlideForBothLanguages, currLang: keyof SlideForBothLanguages): void {
+        slides[currLang] = JSON.parse(JSON.stringify(slides[currLang === 'en' ? 'fr' : 'en']));
         this.$emit('slides-updated', this.slides);
     }
 
