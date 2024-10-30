@@ -283,13 +283,6 @@
             </editor>
         </template>
     </div>
-    <!--Modal shows when undefined configs may be overwritten-->
-    <action-modal
-        name="overwrite-undefined-config"
-        :title="$t('editor.slides.overwrite.title')"
-        :message="$t('editor.slides.overwrite.text')"
-        @ok="generateConfig"
-    />
 </template>
 
 <script lang="ts">
@@ -310,7 +303,7 @@ import {
     MetadataContent,
     PanelType,
     Slide,
-    SlideForBothLanguages,
+    MultiLanguageSlide,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -432,7 +425,7 @@ export default class MetadataEditorV extends Vue {
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: SlideForBothLanguages[] = [];
+    slides: MultiLanguageSlide[] = [];
 
     sourceCounts: SourceCounts = {};
 
@@ -527,13 +520,15 @@ export default class MetadataEditorV extends Vue {
         const engSlides =
             configs.en?.slides.map((engSlide) => {
                 return {
-                    en: engSlide
+                    // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
+                    en: engSlide && Object.keys(engSlide).length ? (engSlide as Slide) : undefined
                 };
             }) ?? [];
         const frSlides =
             configs.fr?.slides.map((frSlide) => {
                 return {
-                    fr: frSlide
+                    // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
+                    fr: frSlide && Object.keys(frSlide).length ? (frSlide as Slide) : undefined
                 };
             }) ?? [];
 
@@ -998,15 +993,9 @@ export default class MetadataEditorV extends Vue {
      * Conducts various checks before saving.
      */
     onSave(): void {
-        // Detect if there are any undefined configs
-        const engConfigHasUndefined = this.configs.en?.slides.some((slide) => !slide) as boolean;
-        const frConfigHasUndefined = this.configs.fr?.slides.some((slide) => !slide) as boolean;
-
-        if (engConfigHasUndefined || frConfigHasUndefined) {
-            this.$vfm.open('overwrite-undefined-config');
-        } else {
-            this.generateConfig();
-        }
+        // Currently allowing undefined configs & handling them elsewhere
+        // If that changes in the future, can detect for undefined configs and warn user here
+        this.generateConfig();
     }
 
     /**
@@ -1020,12 +1009,12 @@ export default class MetadataEditorV extends Vue {
         const engFileName = `${this.uuid}_en.json`;
         const frFileName = `${this.uuid}_fr.json`;
 
-        // Replace undefined slides with empty slides
+        // Replace undefined slides with empty objects
         this.configs.en!.slides = this.configs.en!.slides.map((slide) => {
-            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+            return slide ?? {};
         });
         this.configs.fr!.slides = this.configs.fr!.slides.map((slide) => {
-            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+            return slide ?? {};
         });
         this.loadSlides(this.configs);
 

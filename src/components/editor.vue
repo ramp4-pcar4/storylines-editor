@@ -336,7 +336,7 @@ import {
     HelpSection,
     MetadataContent,
     Slide,
-    SlideForBothLanguages,
+    MultiLanguageSlide,
     SourceCounts,
     StoryRampConfig,
     TextPanel
@@ -371,7 +371,7 @@ export default class EditorV extends Vue {
     @Prop() sourceCounts!: SourceCounts;
     @Prop() metadata!: MetadataContent;
 
-    @Prop() slides!: SlideForBothLanguages[];
+    @Prop() slides!: MultiLanguageSlide[];
     @Prop() configLang!: string;
     @Prop() saving!: boolean;
     @Prop() unsavedChanges!: boolean;
@@ -379,7 +379,7 @@ export default class EditorV extends Vue {
     // Form properties.
     uuid = '';
     logoImage: undefined | File = undefined;
-    loadSlides: undefined | SlideForBothLanguages[] = undefined;
+    loadSlides: undefined | MultiLanguageSlide[] = undefined;
     currentSlide: Slide | string = '';
     slideIndex = -1;
     helpSections: HelpSection[] = [];
@@ -471,8 +471,7 @@ export default class EditorV extends Vue {
             if (index === -1 || !this.loadSlides) {
                 this.currentSlide = '';
             } else {
-                const selectedLang =
-                    (lang as keyof SlideForBothLanguages) ?? (this.configLang as keyof SlideForBothLanguages);
+                const selectedLang = (lang ?? this.configLang) as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
                 this.currentSlide = selectedSlide ?? '';
             }
@@ -489,9 +488,7 @@ export default class EditorV extends Vue {
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][
-            (lang as keyof SlideForBothLanguages) ?? (this.configLang as keyof SlideForBothLanguages)
-        ] = slideConfig;
+        this.slides[this.slideIndex][(lang ?? this.configLang) as keyof MultiLanguageSlide] = slideConfig;
         // save changes emitted from advanced editor
         if (save) {
             this.$emit('save-changes');
@@ -501,7 +498,7 @@ export default class EditorV extends Vue {
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(slides: SlideForBothLanguages[]): void {
+    updateSlides(slides: MultiLanguageSlide[]): void {
         this.loadSlides = slides;
         this.slideIndex = this.loadSlides.findIndex(
             (bothSlides) =>
