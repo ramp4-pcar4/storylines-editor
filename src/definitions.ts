@@ -4,7 +4,7 @@ export interface StoryRampConfig {
     title: string;
     lang: string;
     introSlide: Intro;
-    slides: Slide[];
+    slides: (Slide | {})[];
     contextLink: string;
     contextLabel: string;
     tocOrientation: string;
@@ -143,7 +143,7 @@ export interface Slide {
     includeInToc?: boolean;
 }
 
-export interface SlideForBothLanguages {
+export interface MultiLanguageSlide {
     en: Slide | undefined;
     fr: Slide | undefined;
 }

@@ -158,6 +158,17 @@ export default class StoryPreviewV extends Vue {
             });
         }
 
+        // Purge undefined slides from configs
+        if (this.config) {
+            this.config.slides = this.config.slides.filter((slide) => slide && Object.keys(slide).length);
+        }
+        if (this.configs['en']) {
+            this.configs['en'].slides = this.configs['en'].slides.filter((slide) => slide && Object.keys(slide).length);
+        }
+        if (this.configs['fr']) {
+            this.configs['fr'].slides = this.configs['fr'].slides.filter((slide) => slide && Object.keys(slide).length);
+        }
+
         // set page lang
         const html = document.documentElement;
         html.setAttribute('lang', this.lang);
