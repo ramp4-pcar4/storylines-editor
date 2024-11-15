@@ -111,10 +111,10 @@
                             <ul>
                                 <li
                                     v-for="history in storylineHistory"
-                                    :key="history.id"
+                                    :key="history.hash"
                                     @click="selectHistory(history)"
                                     class="p-2 cursor-pointer"
-                                    :class="{ 'bg-blue-200': selectedHistory && history.id === selectedHistory.id }"
+                                    :class="{ 'bg-blue-200': selectedHistory && history.hash === selectedHistory.hash }"
                                 >
                                     {{ formatDate(history.created) }}
                                 </li>
@@ -354,7 +354,7 @@ interface RouteParams {
 }
 
 interface History {
-    id: number;
+    hash: string;
     storylineUUID: string;
     created: string;
 }
@@ -561,26 +561,22 @@ export default class MetadataEditorV extends Vue {
         };
     }
 
-    /**
-     * Provided with a UID, retrieve the project contents from the file server.
-     */
-    generateRemoteConfig(): void {
+    loadVersion(version: string): void {
         this.loadStatus = 'loading';
-
-        // Reset fields
-        this.baseUuid = this.uuid;
-        this.renamed = '';
-        this.changeUuid = '';
-
-        // Attempt to fetch the project from the server.
-        fetch(this.apiUrl + `/retrieve/${this.uuid}`)
+        const user = useUserStore().userProfile.userName || 'Guest';
+        fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, { headers: { user } })
             .then((res: Response) => {
                 if (res.status === 404) {
-                    // Product not found.
-                    Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
-                    this.error = true;
-                    this.loadStatus = 'waiting';
-                    this.clearConfig();
+                    // Version not found.
+                    if (version === 'latest') {
+                        Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+                        this.error = true;
+                        this.loadStatus = 'waiting';
+                        this.clearConfig();
+                    } else {
+                        Message.error(`The requested version does not exist.`);
+                        this.loadStatus = 'loaded';
+                    }
                 } else {
                     const configZip = new JSZip();
                     // Files retrieved. Convert them into a JSZip object.
@@ -591,6 +587,8 @@ export default class MetadataEditorV extends Vue {
                     });
                 }
 
+                // TODO: Should this run only on product fetch or also on version fetch?
+                // Right now we run for both.
                 fetch(this.apiUrl + `/retrieveMessages`)
                     .then((res: any) => {
                         if (res.ok) return res.json();
@@ -607,14 +605,32 @@ export default class MetadataEditorV extends Vue {
                     .catch((error: any) => console.log(error.response || error));
             })
             .catch(() => {
-                Message.error(`Failed to load product, no response from server`);
+                Message.error(
+                    `Failed to load ${version === 'latest' ? 'product' : 'version'}, no response from the server.`
+                );
                 this.loadStatus = 'loaded';
             });
+    }
+
+    /**
+     * Provided with a UID, retrieve the project contents from the file server.
+     */
+    generateRemoteConfig(): void {
+        this.loadStatus = 'loading';
+
+        // Reset fields
+        this.baseUuid = this.uuid;
+        this.renamed = '';
+        this.changeUuid = '';
+
+        // Attempt to fetch the project from the server.
+        this.loadVersion('latest');
     }
 
     fetchHistory(): void {
         if (this.uuid === undefined) Message.error(`You must first enter a UUID`);
 
+        /*
         if (import.meta.env.VITE_APP_CURR_ENV) {
             axios
                 .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/fetch/${this.uuid}`)
@@ -623,6 +639,20 @@ export default class MetadataEditorV extends Vue {
                 })
                 .catch((error: any) => console.log(error.response || error));
         }
+        */
+        this.loadStatus = 'loading';
+        const user = useUserStore().userProfile.userName || 'Guest';
+        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user } }).then((res: Response) => {
+            if (res.status === 404) {
+                // Product not found.
+                Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+            } else {
+                res.json().then((json) => {
+                    this.storylineHistory = json;
+                });
+            }
+            this.loadStatus = 'loaded';
+        });
     }
 
     selectHistory(selected: any): void {
@@ -646,11 +676,11 @@ export default class MetadataEditorV extends Vue {
     }
 
     loadHistory(): void {
-        if (this.selectedHistory && import.meta.env.VITE_APP_CURR_ENV) {
-            this.loadStatus = 'loading';
-
+        if (this.selectedHistory) {
+            // && import.meta.env.VITE_APP_CURR_ENV
+            /*
             axios
-                .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.id}`, {
+                .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.hash}`, {
                     responseType: 'blob'
                 })
                 .then((response: any) => {
@@ -676,7 +706,8 @@ export default class MetadataEditorV extends Vue {
                         Message.error('Failed to load product, no response from server');
                     }
                     this.loadStatus = 'loaded';
-                });
+                });*/
+            this.loadVersion(this.selectedHistory.hash);
         }
     }
 
@@ -951,7 +982,9 @@ export default class MetadataEditorV extends Vue {
                 });
             }
         } else {
-            // If there's no logo, mark the product as loaded.
+            // If there's no logo, mark the product as loaded and remove any existing logos
+            this.metadata.logoName = '';
+            this.metadata.logoPreview = '';
             this.loadStatus = 'loaded';
         }
     }
@@ -973,7 +1006,8 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
-            const headers = { 'Content-Type': 'multipart/form-data' };
+            const userStore = useUserStore();
+            const headers = { 'Content-Type': 'multipart/form-data', user: userStore.userProfile.userName || 'Guest' };
             Message.warning('Please wait. This may take several minutes.');
 
             axios
@@ -1046,6 +1080,7 @@ export default class MetadataEditorV extends Vue {
                             })
                             .catch((error: any) => console.log(error.response || error));
                     } else {
+                        Message.success('Successfully saved changes!');
                         // padding to prevent save button from being clicked rapidly
                         setTimeout(() => {
                             this.saving = false;
@@ -1154,27 +1189,30 @@ export default class MetadataEditorV extends Vue {
         if (rename) this.checkingUuid = true;
 
         if (!this.loadExisting || rename) {
+            const user = useUserStore().userProfile.userName || 'Guest';
             // If renaming, show the loading spinner while we check whether the UUID is taken.
-            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
-                if (res.status !== 404) {
-                    this.warning = rename ? 'rename' : 'uuid';
+            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}/latest`, { headers: { user } }).then(
+                (res: Response) => {
+                    if (res.status !== 404) {
+                        this.warning = rename ? 'rename' : 'uuid';
+                    }
+
+                    if (rename) this.checkingUuid = false;
+
+                    fetch(this.apiUrl + `/retrieveMessages`)
+                        .then((res: any) => {
+                            if (res.ok) return res.json();
+                        })
+                        .then((data) => {
+                            axios
+                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                    messages: data.messages
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        })
+                        .catch((error: any) => console.log(error.response || error));
                 }
-
-                if (rename) this.checkingUuid = false;
-
-                fetch(this.apiUrl + `/retrieveMessages`)
-                    .then((res: any) => {
-                        if (res.ok) return res.json();
-                    })
-                    .then((data) => {
-                        axios
-                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                                messages: data.messages
-                            })
-                            .catch((error: any) => console.log(error.response || error));
-                    })
-                    .catch((error: any) => console.log(error.response || error));
-            });
+            );
         }
         this.warning = 'none';
         this.highlightedIndex = -1;
