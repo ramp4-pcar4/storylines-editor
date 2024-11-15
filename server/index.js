@@ -7,6 +7,7 @@ var cors = require('cors');
 var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
+const simpleGit = require('simple-git');
 const responseMessages = [];
 require('dotenv').config();
 
@@ -43,6 +44,19 @@ app.use(cors());
 
 // POST requests made to /upload will be handled here.
 app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
+    // TODO: Putting this on the header isn't great. The body has the zipped folder. And usernames in the URL doesn't look great either. Maybe improve this somehow.
+    const user = req.headers.user 
+    if (!user) {
+        // Send back error if the user uploading the storyline was not provided.
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Upload Aborted: the user uploading the form was not provided.'
+        });
+        logger('WARNING', 'Upload Aborted: the user uploading the form was not provided.');
+        res.status(400).send({ status: 'Bad Request' });
+        return;
+    }
+
     const options = {
         uploadDir: UPLOAD_PATH,
         keepExtensions: true,
@@ -56,7 +70,7 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     //const projectNameRegex = /[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}/g;
 
     // Upload the file to the server, into the /files/ folder.
-    form.parse(req, function (err, field, file) {
+    form.parse(req, async function (err, field, file) {
         if (err) {
             responseMessages.push({
                 type: 'WARNING',
@@ -97,7 +111,7 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
 
         // Unzip the contents of the uploaded zip file into the target directory. Will overwrite
         // old files in the folder.
-        decompress(secureFilename, fileName).then((files) => {
+        decompress(secureFilename, fileName).then(async () => {
             // SECURITY FEATURE: delete all files in the folder that don't have one of the following extensions:
             // .json, .jpg, .jpeg, .gif, .png, .csv
             // TODO: Disabled until I can find a better regex
@@ -106,26 +120,84 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
             // });
             responseMessages.push({ type: 'INFO', message: `Uploaded files to product ${fileName}` });
             logger('INFO', `Uploaded files to product ${fileName}`);
-
+            // Initialize a new git repo if this is a new storyline.
+            // Otherwise, simply create a new commit with the zipped folder.
+            if (!newStorylines) {
+                await commitToRepo(fileName, user, false)
+            }
+            else {
+                await initGitRepo(fileName, user)
+            }
             // Finally, delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
-
+            const git = simpleGit(fileName);
+            const commits = await git.log();
+            // Get the hash of the latest commit
+            const lastHash = commits.latest.hash;
             // Send a response back to the client.
-            res.json({ new: newStorylines });
+            res.json({ new: newStorylines, commitHash: lastHash });
         });
     });
 });
 
-// GET requests made to /retrieve/ID will be handled here.
-app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
+// GET requests made to /retrieve/ID/commitHash will be handled here.
+// Callimg this with commitHash as "latest" simply fetches the product as normal.
+app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
+    // This user is only needed for backwards compatibility. 
+    // If we have an existing storylines product that is not a git repo, we need to initialize a git repo
+    // and make an initial commit for it, but we need the user for the commit.
+    const user = req.headers.user 
+    if (!user) {
+        // Send back error if the user uploading the storyline was not provided.
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Upload Aborted: the user uploading the form was not provided.'
+        });
+        logger('WARNING', 'Upload Aborted: the user uploading the form was not provided.');
+        res.status(400).send({ status: 'Bad Request' });
+        return;
+    }
+
     var archive = archiver('zip');
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
     const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
+    const commitHash = req.params.hash
 
     // Check if the product exists.
     if (
-        fs.access(PRODUCT_PATH, (error) => {
+        fs.access(PRODUCT_PATH, async (error) => {
             if (!error) {
+                // Backwards compatibility. If the existing product is not a git repo i.e. it existed before git version control,
+                // we make a git repo for it before returning the version history. Otherwise, the code below will explode.
+                await initGitRepo(PRODUCT_PATH, user)
+                const git = simpleGit(PRODUCT_PATH);
+                // Get the current branch. We do it this way instead of assuming its "main" in case someone has it set to master.
+                const branches = await git.branchLocal()
+                const currBranch = branches.current
+                if (commitHash !== 'latest') {
+                    // If the user does not ask for the latest commit, we checkout a new branch at the point of the requested commit, 
+                    // and then proceed with getting the zipped folder below.
+                    try {
+                        // First, we check if the requested commit exists.
+                        // NOTE: When calling from frontend, the catch block should never run.
+                        const commitExists = await git.catFile(['-t', commitHash]);
+                        if (commitExists !== 'commit\n') {
+                            throw new Error()
+                        }
+                    } catch (error) {
+                        responseMessages.push({
+                            type: 'INFO',
+                            message: `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`
+                        });
+                        logger('INFO', `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`);
+                        res.status(404).send({ status: 'Not Found' });
+                        return;
+                    }
+                    // Checkout a new branch at the point of the requested commit
+                    // This will result in the code below returning the version's folder back to the client.
+                    await git.checkoutBranch(`version-${commitHash}`, commitHash);
+                }
+
                 const output = fs.createWriteStream(uploadLocation);
                 // This event listener is fired when the write stream has finished. This means that the
                 // ZIP file should be correctly populated. Now, we can set the correct headers and send the
@@ -139,10 +211,18 @@ app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
 
                     const result = fs.createReadStream(uploadLocation).pipe(res);
 
-                    // When the piping is finished, delete the stream.
-                    result.on('finish', () => {
+                    // When the piping is finished, delete the stream and perform any git cleanup.
+                    result.on('finish', async () => {
                         fs.rm(uploadLocation);
+
+                        if (commitHash !== 'latest') {
+                            // Since the user has not asked for the latest commit, we need to clean up.
+                            // Go back to the main branch and delete the newly created branch.
+                            await git.checkout(currBranch);
+                            await git.deleteLocalBranch(`version-${commitHash}`)
+                        }
                     });
+
                 });
 
                 // Write the product data to the ZIP file.
@@ -155,6 +235,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id').get(function (req, res, next) {
 
                 responseMessages.push({ type: 'INFO', message: `Successfully loaded product ${req.params.id}` });
                 logger('INFO', `Successfully loaded product ${req.params.id}`);
+
             } else {
                 responseMessages.push({
                     type: 'INFO',
@@ -209,11 +290,109 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
     );
 });
 
+app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
+    // This user is only needed for backwards compatibility. 
+    // If we have an existing storylines product that is not a git repo, we need to initialize a git repo
+    // and make an initial commit for it, but we need the user for the commit.
+    const user = req.headers.user 
+    if (!user) {
+        // Send back error if the user uploading the storyline was not provided.
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Upload Aborted: the user uploading the form was not provided.'
+        });
+        logger('WARNING', 'Upload Aborted: the user uploading the form was not provided.');
+        res.status(400).send({ status: 'Bad Request' });
+        return;
+    }
+
+    const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
+    // Check if the product exists.
+    fs.access(PRODUCT_PATH, async (error) => {
+        if (error) {
+            responseMessages.push({
+                type: 'INFO',
+                message: `Access attempt to versions of ${req.params.id} failed, does not exist.`
+            });
+            logger('INFO', `Access attempt to versions of ${req.params.id} failed, does not exist.`);
+            res.status(404).send({ status: 'Not Found' });
+        }
+        else {
+            // Backwards compatibility. If the existing product is not a git repo i.e. it existed before git version control,
+            // we make a git repo for it before returning the version history. Otherwise, the code below will explode.
+            await initGitRepo(PRODUCT_PATH, user)
+            // Get version history for this product via git log command
+            const git = simpleGit(PRODUCT_PATH);
+            const log = await git.log()
+            // TODO: Remove the 10 version limit once pagination is implemented
+            const history = log.all.slice(0, 10).map((commit) => ({hash: commit.hash, created: commit.date, storylineUUID: req.params.id}))
+            res.json(history)
+        }
+    })
+
+})
+
 // GET reuests made to /retrieveMessages will recieve all the responseMessages currently queued.
 app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
     res.json({ messages: responseMessages });
     responseMessages.length = 0;
 });
+
+/*
+ * Initializes a git repo at the requested path, if one does not already exist.
+ * Creates an initial commit with any currently existing files in the directory.
+ * 
+ * @param {string} path the path of the git repo
+ * @param {string} username the name of the user initializing the repo
+ */
+async function initGitRepo(path, username) {
+    const git = simpleGit(path);
+    let repoExists = true;
+    try {
+        // Check if the product directory is the top-level directory of a git repo.
+        // We need to do it this way because locally the storylines-editor is a git repo
+        // so simply checking for existence of a git repo is not sufficient.
+        const res = await git.raw('rev-parse', '--git-dir');
+        if (res !== '.git\n') {
+            // Product directory is in a git repo but not top-level, we are working locally.
+            repoExists = false;
+        }
+    } catch(error) {
+        // Product directory is not a git repo nor is it within a git repo.
+        repoExists = false;
+    }
+
+    if (!repoExists) {
+        // Repo does not exist for the storyline product. 
+        // Initialize a git repo and add an initial commit with all existing files.
+        await git.init()
+        await commitToRepo(path, username, true)
+    }
+}
+
+/**
+ * Commits any existing files in the repo at the specified directory.
+ * Precondition: assumes that the specified directory is already a git repo.
+ * @param {string} path the path of the git repo
+ * @param {string} username the name of the user making the commit
+ * @param {boolean} initial specifies whether this is the initial commit
+ */
+async function commitToRepo(path, username, initial) {
+    const date = moment().format('YYYY-MM-DD')
+    const time = moment().format('hh:mm:ss a')
+    // Initialize git
+    const git = simpleGit(path);
+    let versionNumber = 1
+    if (!initial) {
+        // Compute version number for storyline if this is not the initial commit.
+        const log = await git.log()
+        const lastMessage = log.latest.message
+        versionNumber = lastMessage.split(' ')[3]
+        versionNumber = Number(versionNumber) + 1;
+    }
+    // Commit the files for this storyline to its repo.
+    await git.add('./*').commit(`Add product version ${versionNumber} on ${date} at ${time}`, {'--author': `"${username} <>"`}) 
+}
 
 /*
  * Verifies that the file has a valid extension. If it's not valid, the file is removed.
