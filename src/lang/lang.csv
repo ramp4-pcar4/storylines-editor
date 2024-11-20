@@ -122,6 +122,7 @@ editor.next,Next,1,Suivant,1
 editor.preview,Preview,1,Afficher l’aperçu,1
 editor.confirm,Confirm,1,Confirmer,1
 editor.cancel,Cancel,1,Annuler,1
+editor.caption.placeholder,Add a caption,1,Ajouter une légende,0
 editor.unsavedChanges,Unsaved changes,1,Modifications non enregistrées,1
 editor.saveChanges,Save changes,1,Enregistrer les modifications,1
 editor.discardChanges,Discard changes,1,Annuler les modifications,0
