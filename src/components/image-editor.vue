@@ -74,6 +74,37 @@
                             @change="onImagesEdited"
                         />
                     </div>
+
+                    <div class="flex gap-2">
+                        <div class="flex mt-4 items-center w-full text-left">
+                            <label class="editor-label text-label" :for="'imgHeight' + index"
+                                >{{ $t('editor.image.label.height') }}:</label
+                            >
+                            <input
+                                :id="'imgHeight' + index"
+                                class="editor-input w-4/5"
+                                type="text"
+                                v-model="element.height"
+                                @change="onImagesEdited"
+                            />
+                        </div>
+
+                        <div class="flex mt-4 items-center w-full text-left">
+                            <label class="editor-label text-label" :for="'imgWidth' + index"
+                                >{{ $t('editor.image.label.width') }}:</label
+                            >
+                            <input
+                                :id="'imgWidth' + index"
+                                class="editor-input w-4/5"
+                                type="text"
+                                v-model="element.width"
+                                @change="onImagesEdited"
+                            />
+                        </div>
+                    </div>
+                    <p>
+                        {{ $t('editor.image.label.widthWarning') }}
+                    </p>
                 </ImagePreview>
             </template>
         </draggable>
