@@ -47,8 +47,10 @@
                         :configFileStructure="configFileStructure"
                         :sourceCounts="sourceCounts"
                         :lang="lang"
+                        :index="index"
                         @edit="editChart"
                         @delete="$vfm.open(`${element.name}-${index}`)"
+                        @captionEdit="onChartsEdited"
                     ></ChartPreview>
                 </template>
             </draggable>
