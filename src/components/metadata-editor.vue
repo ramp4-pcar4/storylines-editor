@@ -289,7 +289,7 @@
                                 class="editor-button bg-black text-white hover:bg-gray-800"
                                 @click="saveMetadata(false)"
                             >
-                                Done
+                                {{ $t('editor.modal.done') }}
                             </button>
                         </div>
                     </vue-final-modal>

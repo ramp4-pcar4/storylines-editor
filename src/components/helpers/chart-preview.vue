@@ -63,6 +63,18 @@
                 </div>
             </button>
         </div>
+        <div class="flex mt-4">
+            <label :for="'chartPreviewCaption' + index" class="font-bold"
+                >{{ $t('editor.image.label.caption') }}:
+            </label>
+            <input
+                :id="'chartPreviewCaption' + index"
+                class="editor-input w-2/5 ml-2"
+                type="text"
+                v-model="chart.caption"
+                @input="$emit('captionEdit')"
+            />
+        </div>
     </li>
 </template>
 
@@ -92,6 +104,7 @@ export default class ChartPreviewV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() sourceCounts!: SourceCounts;
     @Prop() lang!: string;
+    @Prop() index!: number;
 
     loading = true;
     chartIdx = 0;

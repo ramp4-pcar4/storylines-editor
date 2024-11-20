@@ -24,6 +24,13 @@
 
             <div class="mb-4" v-if="usingTimeSlider"></div>
 
+            <div class="flex items-center w-full text-left mt-2">
+                <label class="editor-label text-label" for="rampMapCaption">
+                    {{ $t('editor.image.label.caption') }}:</label
+                >
+                <input id="rampMapCaption" class="editor-input w-2/5" type="text" v-model="panel.caption" />
+            </div>
+
             <div class="ramp-editor mt-5" ref="editor" style="width: 70vw; height: 80vh"></div>
         </div>
         <vue-final-modal
@@ -44,7 +51,7 @@
                     :disabled="timeSliderError"
                     @click="saveTimeSlider"
                 >
-                    Done
+                    {{ $t('editor.modal.done') }}
                 </button>
             </div>
         </vue-final-modal>

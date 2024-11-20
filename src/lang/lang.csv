@@ -163,6 +163,7 @@ editor.tocOrientation.vertical,Vertical,1,Vertical,0
 editor.tocOrientation.horizontal,Horizontal,1,Horizontal,0
 editor.returnTop,Include return to top navigation,1,Inclure le retour en haut de la navigation,0
 editor.landing.greeting,Hello,1,Bonjour,1
+editor.modal.done,Done,1,Fait,0
 help.title,Help,1,Aide,1
 help.search,Search Help,1,Aide à la recherche,1
 help.section.expand,Expand section,1,Développer une section,1

@@ -178,6 +178,7 @@ export interface MapPanel extends BasePanel {
     title: string;
     scrollguard: boolean;
     customStyles?: string;
+    caption?: string;
 }
 export interface TimeSliderConfig {
     range: number[];
@@ -247,6 +248,7 @@ export interface ChartPanel extends BasePanel {
     name?: string;
     options?: DQVOptions;
     customStyles?: string;
+    caption?: string;
 }
 
 export interface ChartConfig {
@@ -255,6 +257,7 @@ export interface ChartConfig {
     config?: any;
     name?: string;
     options?: DQVOptions;
+    caption?: string;
 }
 
 export interface ImageFile {
