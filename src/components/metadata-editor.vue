@@ -403,25 +403,11 @@
                 :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
-                @save-changes="generateConfig"
+                @save-changes="onSave"
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
                 ref="mainEditor"
             >
-                <template v-slot:langModal="slotProps">
-                    <button
-                        class="editor-button editor-forms-button"
-                        @click.stop="slotProps.unsavedChanges ? $vfm.open(`change-lang`) : swapLang()"
-                    >
-                        {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
-                    </button>
-                    <confirmation-modal
-                        :name="`change-lang`"
-                        :message="$t('editor.changeLang.modal')"
-                        @ok="swapLang()"
-                    />
-                </template>
-
                 <template v-slot:metadataModal>
                     <vue-final-modal
                         modalId="metadata-edit-modal"
@@ -451,6 +437,7 @@
 </template>
 
 <script lang="ts">
+import ActionModal from '@/components/helpers/action-modal.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
@@ -467,6 +454,7 @@ import {
     MetadataContent,
     PanelType,
     Slide,
+    MultiLanguageSlide,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -512,6 +500,7 @@ interface History {
 
 @Options({
     components: {
+        ActionModal,
         Editor: EditorV,
         'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
@@ -574,11 +563,27 @@ export default class MetadataEditorV extends Vue {
         returnTop: true,
         dateModified: ''
     };
+    defaultBlankSlide: Slide = {
+        title: '',
+        panel: [
+            {
+                type: 'text',
+                title: '',
+                content: ''
+            } as TextPanel,
+            {
+                type: 'text',
+                title: '',
+                content: ''
+            } as TextPanel
+        ]
+    };
     // add more required metadata fields to here as needed
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: Slide[] = [];
+    slides: MultiLanguageSlide[] = [];
+
     sourceCounts: SourceCounts = {};
 
     mounted(): void {
@@ -620,13 +625,15 @@ export default class MetadataEditorV extends Vue {
                 this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
-                this.slides = props.slides;
+                // this.slides = props.slides;
                 this.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
                 this.unsavedChanges = props.unsavedChanges;
                 // Load product logo (if provided).
                 const logo = this.configs[this.configLang]?.introSlide.logo?.src;
                 const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
+
+                this.loadSlides(props.configs);
 
                 if (logo) {
                     const logoFile = this.configFileStructure?.zip.file(logoSrc);
@@ -664,6 +671,32 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Loads the slide variable with both EN and FR language configs.
+     * @param configs The config object with separate EN and FR StoryRamp configs.
+     */
+    loadSlides(configs: { [p: string]: StoryRampConfig | undefined }): void {
+        const engSlides =
+            configs.en?.slides.map((engSlide) => {
+                return {
+                    // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
+                    en: engSlide && Object.keys(engSlide).length ? (engSlide as Slide) : undefined
+                };
+            }) ?? [];
+        const frSlides =
+            configs.fr?.slides.map((frSlide) => {
+                return {
+                    // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
+                    fr: frSlide && Object.keys(frSlide).length ? (frSlide as Slide) : undefined
+                };
+            }) ?? [];
+
+        const maxLength = frSlides.length > engSlides.length ? frSlides.length : engSlides.length;
+        this.slides = Array.from({ length: maxLength }, (_, index) =>
+            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+        );
     }
 
     /**
@@ -1089,7 +1122,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.dateModified = config.dateModified;
 
-        this.slides = config.slides;
+        this.loadSlides(this.configs);
 
         const logo = config.introSlide.logo?.src;
         if (logo) {
@@ -1130,17 +1163,39 @@ export default class MetadataEditorV extends Vue {
     }
 
     /**
+     * Conducts various checks before saving.
+     */
+    onSave(): void {
+        // Currently allowing undefined configs & handling them elsewhere
+        // If that changes in the future, can detect for undefined configs and warn user here
+        this.generateConfig();
+    }
+
+    /**
      * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
      * with the new changes, then generates and submits the product file to the server.
      */
     generateConfig(): ConfigFileStructure {
         this.saving = true;
 
-        // Update the configuration file.
-        const fileName = `${this.uuid}_${this.configLang}.json`;
-        const formattedConfigFile = JSON.stringify(this.configs[this.configLang], null, 4);
+        // Update the configuration files, for both languages.
+        const engFileName = `${this.uuid}_en.json`;
+        const frFileName = `${this.uuid}_fr.json`;
 
-        this.configFileStructure?.zip.file(fileName, formattedConfigFile);
+        // Replace undefined slides with empty objects
+        this.configs.en!.slides = this.configs.en!.slides.map((slide) => {
+            return slide ?? {};
+        });
+        this.configs.fr!.slides = this.configs.fr!.slides.map((slide) => {
+            return slide ?? {};
+        });
+        this.loadSlides(this.configs);
+
+        const engFormattedConfigFile = JSON.stringify(this.configs.en, null, 4);
+        const frFormattedConfigFile = JSON.stringify(this.configs.fr, null, 4);
+
+        this.configFileStructure?.zip.file(engFileName, engFormattedConfigFile);
+        this.configFileStructure?.zip.file(frFileName, frFormattedConfigFile);
 
         // Upload the ZIP file.
         this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
@@ -1549,7 +1604,7 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     h5,
     h6 {
         font-family: $font-list;
-        line-height: 1.5;
+        line-height: 1.3;
         border-bottom: 0px;
     }
 
@@ -1587,6 +1642,7 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     }
 
     .vfm__content button {
+        border-radius: 3px;
         padding: 5px 12px;
         margin: 0px 10px;
         font-weight: 600;
