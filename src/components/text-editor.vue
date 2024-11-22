@@ -8,6 +8,8 @@
             height="400px"
             left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper | ul ol table hr | addLink image code | save"
             :toolbar="toolbar"
+            @change="escapeStyleTags"
+            ref="textEditor"
         ></v-md-editor>
     </div>
 </template>
@@ -115,6 +117,19 @@ export default class TextEditorV extends Vue {
             this.panel.customStyles += 'text-align: left !important;';
         } else if (!this.centerSlide && this.dynamicSelected) {
             this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
+        }
+    }
+
+    escapeStyleTags(text: string, html: string): void {
+        const styleRegex = /<\/?\s*style\s*\/?>/gi;
+        if (this.$refs.textEditor?.text){
+            const regexMatch = text.match(styleRegex);
+            if (regexMatch) {
+                const escapedText = text.replaceAll(styleRegex, (match) => {
+                    return match.split(' ').join('').replace('<', '‹').replace('>', '›').toLowerCase();
+                });
+                this.$refs.textEditor.text = escapedText;
+            }
         }
     }
 }
