@@ -5,7 +5,7 @@
             <div class="px-20 py-5">
                 <div class="flex">
                     <div class="flex flex-1 text-2xl font-bold mb-5">
-                        {{ editExisting ? $t('editor.editProduct') : $t('editor.createProduct') }}
+                        {{ editExisting ? $t('editor.loadProduct') : $t('editor.createProduct') }}
                     </div>
                     <button class="editor-button" @click="swapLang()">
                         {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
@@ -220,7 +220,7 @@
                     {{ $t('editor.saveChanges') }}
                 </button>
                 <div class="ml-auto">
-                    <router-link :to="{ name: 'home' }" target>
+                    <router-link :to="{ name: 'home' }" target tabindex="-1">
                         <button class="editor-button">{{ $t('editor.back') }}</button>
                     </router-link>
                     <button
@@ -1336,9 +1336,9 @@ export default class MetadataEditorV extends Vue {
 
     get getStorylines() {
         const userStore = useUserStore();
-        const userStorylines = userStore.userProfile.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
+        const userStorylines = userStore.userProfile?.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
         const allStorylines =
-            userStore.userProfile.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
+            userStore.userProfile?.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
         let combined = [...userStorylines, ...allStorylines];
 
         if (this.uuid) {

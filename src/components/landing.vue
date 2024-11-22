@@ -38,7 +38,7 @@ export default class LandingV extends Vue {
 
     get userName(): string {
         const userStore = useUserStore();
-        return userStore.userProfile.userName || 'Guest';
+        return userStore.userProfile?.userName || 'Guest';
     }
 }
 </script>
