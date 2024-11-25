@@ -351,7 +351,7 @@
                                                 idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
                                             "
                                         >
-                                            {{ historyItem.created }}
+                                            {{ formatDate(historyItem.created) }}
                                         </td>
                                         <td
                                             style="background-color: #f9f9f9"
@@ -466,7 +466,7 @@
             </div>
 
             <!-- Main section: page back/continue buttons -->
-            <div class="flex px-7 md:px-20 py-5 mt-8">
+            <div class="flex px-7 md:px-20 py-5 mt-8" :disabled="loadStatus === 'loading'">
                 <!-- Back button -->
                 <!-- Moves you to the dashboard again -->
                 <router-link :to="{ name: 'home' }" target tabindex="-1">
@@ -478,6 +478,7 @@
                 <!-- Moves you to the editor -->
                 <div class="ml-auto">
                     <button
+                        :disabled="loadStatus === 'loading'"
                         @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
                         class="editor-button editor-forms-button m-0 bg-black text-white"
                         :class="{ hidden: editExisting && loadStatus !== 'loaded' }"
@@ -603,7 +604,7 @@ interface RouteParams {
 }
 
 interface History {
-    id: number;
+    hash: string;
     storylineUUID: string;
     created: string;
 }
@@ -904,14 +905,70 @@ export default class MetadataEditorV extends Vue {
     }
 
     /**
+     * Provided with a UID and version, retrieve the project contents from the file server.
+     */
+    loadVersion(version: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.loadStatus = 'loading';
+            const user = useUserStore().userProfile.userName || 'Guest';
+            fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, { headers: { user } })
+                .then((res: Response) => {
+                    if (res.status === 404) {
+                        // Version not found.
+                        if (version === 'latest') {
+                            Message.error(this.$t('editor.warning.uuidNotFound', this.uuid));
+                        } else {
+                            Message.error(this.$t('editor.editMetadata.message.error.noRequestedVersion'));
+                            this.loadStatus = 'loaded';
+                        }
+                        this.error = true;
+                        this.loadStatus = 'waiting';
+                        this.clearConfig();
+                    } else {
+                        const configZip = new JSZip();
+                        // Files retrieved. Convert them into a JSZip object.
+                        res.blob().then((file: Blob) => {
+                            configZip.loadAsync(file).then(() => {
+                                this.configFileStructureHelper(configZip);
+                            });
+                        });
+                    }
+
+                    // TODO: Should this run only on product fetch or also on version fetch?
+                    // Right now we run for both.
+                    fetch(this.apiUrl + `/retrieveMessages`)
+                        .then((res: any) => {
+                            if (res.ok) return res.json();
+                        })
+                        .then((data) => {
+                            if (import.meta.env.VITE_APP_CURR_ENV) {
+                                axios
+                                    .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                        messages: data.messages
+                                    })
+                                    .catch((error: any) => console.log(error.response || error));
+                            }
+                        })
+                        .catch((error: any) => console.log(error.response || error));
+                    resolve();
+                })
+                .catch((err) => {
+                    if (err.name === 'AbortError' || err instanceof PointerEvent) {
+                        Message.info(this.$t('editor.editMetadata.retrievalAborted'));
+                    } else {
+                        Message.error(this.$t('editor.warning.retrievalFailed'));
+                    }
+                    this.loadStatus = 'waiting';
+                    reject();
+                });
+        });
+    }
+
+    /**
      * Provided with a UID, retrieve the project contents from the file server.
      */
-    async generateRemoteConfig(): Promise<void> {
+    generateRemoteConfig(): Promise<void> {
         this.loadStatus = 'loading';
-
-        // Create a new AbortController for each fetch attempt
-        // as they get 'used up' after each successful abort() call
-        this.controller = new AbortController();
 
         // Reset fields
         this.baseUuid = this.uuid;
@@ -919,48 +976,9 @@ export default class MetadataEditorV extends Vue {
         this.changeUuid = '';
 
         // Attempt to fetch the project from the server.
-        try {
-            const res = await fetch(this.apiUrl + `/retrieve/${this.uuid}`, { signal: this.controller.signal });
-
-            if (res.status === 404) {
-                // Product not found.
-                Message.error(this.$t('editor.warning.uuidNotFound', this.uuid));
-                this.error = true;
-                this.loadStatus = 'waiting';
-                this.clearConfig();
-                return; // Exit early if product is not found
-            }
-
-            const configZip = new JSZip();
-            const file = await res.blob();
-            await configZip.loadAsync(file);
-            this.configFileStructureHelper(configZip);
-
-            // Fetch messages after the product has been retrieved
-            const messageRes = await fetch(this.apiUrl + `/retrieveMessages`);
-            if (messageRes.ok) {
-                const data = await messageRes.json();
-
-                if (import.meta.env.VITE_APP_CURR_ENV) {
-                    try {
-                        await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                            messages: data.messages
-                        });
-                    } catch (axiosError: any) {
-                        console.error(axiosError.response || axiosError);
-                    }
-                }
-            }
-            return Promise.resolve();
-        } catch (err: any) {
-            if (err.name === 'AbortError' || err instanceof PointerEvent) {
-                Message.info(this.$t('editor.editMetadata.retrievalAborted'));
-            } else {
-                Message.error(this.$t('editor.warning.retrievalFailed'));
-            }
-            this.loadStatus = 'waiting';
-            return Promise.reject();
-        }
+        return new Promise((resolve, reject) => {
+            this.loadVersion('latest').then(resolve).catch(reject);
+        });
     }
 
     fetchHistory(): void {
@@ -968,15 +986,19 @@ export default class MetadataEditorV extends Vue {
         // as the history should be much smaller and quicker to fetch than the config
 
         if (this.uuid === undefined) Message.error(this.$t('editor.warning.mustEnterUuid'));
-
-        if (import.meta.env.VITE_APP_CURR_ENV) {
-            axios
-                .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/fetch/${this.uuid}`)
-                .then((response: any) => {
-                    this.storylineHistory = response.data;
-                })
-                .catch((error: any) => console.log(error.response || error));
-        }
+        this.loadStatus = 'loading';
+        const user = useUserStore().userProfile.userName || 'Guest';
+        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user } }).then((res: Response) => {
+            if (res.status === 404) {
+                // Product not found.
+                Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+            } else {
+                res.json().then((json) => {
+                    this.storylineHistory = json;
+                });
+            }
+            this.loadStatus = 'loaded';
+        });
     }
 
     selectHistory(selected: any): void {
@@ -1000,37 +1022,8 @@ export default class MetadataEditorV extends Vue {
     }
 
     loadHistory(): void {
-        if (this.selectedHistory && import.meta.env.VITE_APP_CURR_ENV) {
-            this.loadStatus = 'loading';
-
-            axios
-                .get(import.meta.env.VITE_APP_NET_API_URL + `/api/version/load/${this.selectedHistory.id}`, {
-                    responseType: 'blob'
-                })
-                .then((response: any) => {
-                    const blob = response.data;
-
-                    JSZip.loadAsync(blob)
-                        .then((zip: any) => {
-                            this.configFileStructureHelper(zip);
-                        })
-                        .catch((jsZipError: any) => {
-                            console.error('Error processing ZIP file:', jsZipError);
-                            Message.error(this.$t('editor.editMetadata.message.error.failedZipFile'));
-                        });
-                })
-                .catch((error: any) => {
-                    if (error.response && error.response.status === 404) {
-                        Message.error(this.$t('editor.editMetadata.message.error.noRequestedVersion'));
-                        this.error = true;
-                        this.loadStatus = 'waiting';
-                        this.clearConfig();
-                    } else {
-                        console.error('Failed to load version:', error);
-                        Message.error(this.$t('editor.editMetadata.message.error.noResponseFromServer'));
-                    }
-                    this.loadStatus = 'loaded';
-                });
+        if (this.selectedHistory) {
+            this.loadVersion(this.selectedHistory.hash);
         }
     }
 
@@ -1305,7 +1298,9 @@ export default class MetadataEditorV extends Vue {
                 });
             }
         } else {
-            // If there's no logo, mark the product as loaded.
+            // If there's no logo, mark the product as loaded and remove any existing logos
+            this.metadata.logoName = '';
+            this.metadata.logoPreview = '';
             this.loadStatus = 'loaded';
         }
 
@@ -1352,7 +1347,8 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
-            const headers = { 'Content-Type': 'multipart/form-data' };
+            const userStore = useUserStore();
+            const headers = { 'Content-Type': 'multipart/form-data', user: userStore.userProfile.userName || 'Guest' };
             Message.warning(this.$t('editor.editMetadata.message.wait'));
 
             axios
@@ -1361,6 +1357,7 @@ export default class MetadataEditorV extends Vue {
                     const responseData = res.data;
                     responseData.files; // binary representation of the file
                     responseData.status; // HTTP status
+                    const commitHash = responseData.commitHash; // commit hash of the git commit
                     this.unsavedChanges = false;
                     this.loadExisting = true; // if editExisting was false, we can now set it to true
 
@@ -1375,11 +1372,11 @@ export default class MetadataEditorV extends Vue {
                                 .then((response: any) => {
                                     const userStore = useUserStore();
                                     userStore.fetchUserProfile();
-                                    console.log(response);
-
                                     formData.append('uuid', this.uuid);
                                     formData.append('titleEn', this.configs['en']?.title ?? '');
                                     formData.append('titleFr', this.configs['fr']?.title ?? '');
+                                    formData.append('commitHash', commitHash);
+                                    formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
                                     axios
                                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
@@ -1398,6 +1395,8 @@ export default class MetadataEditorV extends Vue {
                             formData.append('uuid', this.uuid);
                             formData.append('titleEn', this.configs['en']?.title ?? '');
                             formData.append('titleFr', this.configs['fr']?.title ?? '');
+                            formData.append('commitHash', commitHash);
+                            formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
                             axios
                                 .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
@@ -1425,6 +1424,7 @@ export default class MetadataEditorV extends Vue {
                             })
                             .catch((error: any) => console.log(error.response || error));
                     } else {
+                        Message.success('Successfully saved changes!');
                         // padding to prevent save button from being clicked rapidly
                         setTimeout(() => {
                             this.saving = false;
@@ -1542,27 +1542,30 @@ export default class MetadataEditorV extends Vue {
         if (rename) this.checkingUuid = true;
 
         if (!this.loadExisting || rename) {
+            const user = useUserStore().userProfile.userName || 'Guest';
             // If renaming, show the loading spinner while we check whether the UUID is taken.
-            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
-                if (res.status !== 404) {
-                    this.warning = rename ? 'rename' : 'uuid';
+            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}/latest`, { headers: { user } }).then(
+                (res: Response) => {
+                    if (res.status !== 404) {
+                        this.warning = rename ? 'rename' : 'uuid';
+                    }
+
+                    if (rename) this.checkingUuid = false;
+
+                    fetch(this.apiUrl + `/retrieveMessages`)
+                        .then((res: any) => {
+                            if (res.ok) return res.json();
+                        })
+                        .then((data) => {
+                            axios
+                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                    messages: data.messages
+                                })
+                                .catch((error: any) => console.log(error.response || error));
+                        })
+                        .catch((error: any) => console.log(error.response || error));
                 }
-
-                if (rename) this.checkingUuid = false;
-
-                fetch(this.apiUrl + `/retrieveMessages`)
-                    .then((res: any) => {
-                        if (res.ok) return res.json();
-                    })
-                    .then((data) => {
-                        axios
-                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                                messages: data.messages
-                            })
-                            .catch((error: any) => console.log(error.response || error));
-                    })
-                    .catch((error: any) => console.log(error.response || error));
-            });
+            );
         }
         this.warning = 'none';
         this.highlightedIndex = -1;

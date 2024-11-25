@@ -64,6 +64,7 @@ import { AxiosError } from 'axios';
 
 import JSZip from 'jszip';
 import axios from 'axios';
+import { useUserStore } from '@/stores/userStore';
 
 @Options({
     components: {
@@ -84,7 +85,7 @@ export default class StoryPreviewV extends Vue {
         [key: string]: StoryRampConfig | undefined;
     } = { en: undefined, fr: undefined };
 
-    created(): void {
+    async created() {
         this.uid = this.$route.params.uid as string;
         this.lang = this.$route.params.lang as string;
 
@@ -96,8 +97,11 @@ export default class StoryPreviewV extends Vue {
             this.loadStatus = 'loaded';
         } else {
             this.savedProduct = true;
+            const userStore = useUserStore();
+            await userStore.fetchUserProfile();
+            const user = userStore.userProfile.userName;
             // attempt to fetch saved config file from the server (TODO: setup as express route?)
-            fetch(this.apiUrl + `/retrieve/${this.uid}`).then((res: Response) => {
+            fetch(this.apiUrl + `/retrieve/${this.uid}/latest`, { headers: { user } }).then((res: Response) => {
                 if (res.status === 404) {
                     console.error(`There does not exist a saved product with UID ${this.uid}.`);
                     // redirect to canada.ca 404 page on invalid URL params
