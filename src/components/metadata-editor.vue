@@ -3,15 +3,19 @@
     <div class="editor-container">
         <template v-if="!loadEditor">
             <div>
+                <!-- Main section: Page header -->
                 <header
-                    class="flex flex-col md:flex-row justify-between border-b-2 border-black px-10 md:px-20 pt-10 pb-5 mb-5"
+                    class="flex flex-col md:flex-row justify-between border-b-2 border-black px-7 md:px-20 pt-10 pb-5 mb-5"
                 >
-                    <div class="flex flex-1 my-2 mx-auto md:mx-0 text-2xl md:text-3xl font-bold">
+                    <!-- Page title -->
+                    <div class="flex flex-1 my-2 mx-0 text-2xl md:text-3xl font-bold">
                         {{ editExisting ? $t('editor.loadProduct') : $t('editor.createProduct') }}
                     </div>
+                    <!-- Header links -->
                     <div
-                        class="flex flex-row md:flex-col gap-3 items-center md:items-stretch justify-around text-right"
+                        class="flex flex-row md:flex-col gap-3 items-center md:items-stretch justify-between md:justify-around text-right"
                     >
+                        <!-- ENG/FR page toggle -->
                         <router-link
                             v-if="
                                 !currentRoute.includes('index-ca-en.html') && !currentRoute.includes('index-ca-fr.html')
@@ -20,17 +24,22 @@
                                 name: editExisting ? 'metadataExisting' : 'metadataNew',
                                 params: { lang: currLang === 'en' ? 'fr' : 'en' }
                             }"
+                            class="sub-link"
                         >
-                            <a class="sub-link">
+                            <a>
                                 {{ currLang === 'en' ? 'Français' : 'English' }}
                             </a>
                         </router-link>
+                        <!-- ENG/FR config toggle -->
                         <a class="sub-link" @click="swapLang()" tabindex="0">
                             {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
                         </a>
                     </div>
                 </header>
-                <section class="px-10 md:px-20 py-5">
+                <!-- Main section: Page body content -->
+                <section class="px-7 md:px-20 py-5">
+                    <!-- Body heading and instructions -->
+
                     <h1 v-if="editExisting" class="text-2xl font-semibold">
                         {{ $t('editor.editMetadata.editExistingHeader') }}
                     </h1>
@@ -39,6 +48,7 @@
                         {{ $t('editor.metadata.uuidInstructions') }}
                     </p>
 
+                    <!-- Body section: UUID input and rename -->
                     <section>
                         <label for="uuid-input" class="font-bold mb-0"
                             >{{ $t('editor.uuid') }}
@@ -62,7 +72,10 @@
                             {{ $t('editor.metadata.newUuidInstructions') }}
                         </p>
 
+                        <!-- Subsection: UUID inputs -->
                         <div class="pb-5 pt-1">
+                            <!-- UUID rename inputs -->
+                            <!-- Shows up after you load a UUID and click the 'rename uuid' button (not exact text) -->
                             <div v-if="renaming" class="flex flex-row items-center w-full md:w-3/4">
                                 <label for="rename-input" class="mr-6 ml-3"> {{ $t('editor.uuid.new') }}: </label>
                                 <input
@@ -74,20 +87,20 @@
                                         checkUuid(true);
                                     "
                                     v-model="changeUuid"
-                                    v-on:keyup.enter="renameProduct"
+                                    @keyup.enter="!error && warning === 'none' && renameProduct()"
                                     :class="{
-                                        'input-error': error || !reqFields.uuid,
-                                        'input-warning': warning === 'rename'
+                                        'input-error': warning === 'rename' || error || !reqFields.uuid
                                     }"
                                     v-tippy="{
                                         content: $t('editor.editMetadata.input.tooltip'),
                                         trigger: 'focusin',
-                                        placement: 'top-end'
+                                        placement: 'top-end',
+                                        touch: false
                                     }"
                                 />
                                 <button
                                     @click="renameProduct"
-                                    class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
+                                    class="editor-button editor-forms-button bg-black text-white mr-0"
                                     :class="{ 'input-error': error }"
                                     :disabled="changeUuid.length === 0 || checkingUuid || warning === 'rename'"
                                 >
@@ -99,6 +112,8 @@
                                     <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
                                 </div>
                             </div>
+                            <!-- UUID entry (default) -->
+                            <!-- Loads a new UUID -->
                             <div v-else class="flex flex-row items-center">
                                 <div class="flex flex-row items-center w-full">
                                     <div class="relative w-full md:w-3/5 inline-block">
@@ -127,14 +142,16 @@
                                             :class="{
                                                 'input-error': error || !reqFields.uuid,
                                                 'input-success': loadStatus === 'loaded',
-                                                'input-warning': !renaming && renamed
+                                                'input-warning': warning !== 'none' || (!renaming && renamed)
                                             }"
                                             v-tippy="{
                                                 content: $t('editor.editMetadata.input.tooltip'),
                                                 trigger: 'focusin',
-                                                placement: 'top-end'
+                                                placement: 'top-end',
+                                                touch: false
                                             }"
                                         />
+                                        <!-- Previous storylines (?) dropdown -->
                                         <div
                                             class="absolute z-10 w-full bg-white border border-gray-200 mt-1 max-h-60vh overflow-y-auto"
                                             v-show="showDropdown"
@@ -157,13 +174,16 @@
                                             </ul>
                                         </div>
                                     </div>
+                                    <!-- Load UUID button -->
+                                    <!-- Load storyline with the given UUID, if it exists on the server, and also
+                                         any history associated with the product that can be found -->
                                     <button
                                         @click="
                                             () => {
                                                 generateRemoteConfig().then(fetchHistory);
                                             }
                                         "
-                                        class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
+                                        class="editor-button editor-forms-button bg-black text-white mr-0"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
                                         v-if="editExisting"
@@ -172,14 +192,20 @@
                                     </button>
                                 </div>
                             </div>
+                            <!-- Subsection: Loading icon -->
+                            <!-- Shows up after the load UUID button is pressed.
+                                 Displays a large spinner to indicate that config is loading.
+                                 Also provides a button to cancel the loading, if desired. -->
                             <section class="flex flex-col gap-5 mt-10" v-if="loadStatus === 'loading'">
-                                <!-- If config is loading, display a small spinner. -->
+                                <!-- Loading text -->
                                 <p>
                                     {{ $t('editor.editMetadata.loading') }}
                                 </p>
+                                <!-- Spinner -->
                                 <div class="align-middle mb-1">
                                     <spinner size="65px" thickness="20" color="#009cd1" class="mx-2 my-auto"></spinner>
                                 </div>
+                                <!-- Cancel load button -->
                                 <div class="flex">
                                     <a class="sub-link text-left" @click="controller.abort">{{
                                         $t('editor.editMetadata.load.cancel')
@@ -191,9 +217,12 @@
                                 <!-- Display a warning if there is one. -->
                                 <span
                                     v-if="warning !== 'none'"
-                                    class="flex flex-row items-center text-yellow-500 rounded p-1"
+                                    class="flex flex-row items-center text-accent-dark-orange rounded p-1"
                                 >
-                                    <span class="sm:ml-28 align-middle inline-block mr-1 fill-current">
+                                    <span
+                                        class="align-middle inline-block mr-1 fill-current"
+                                        :class="{ 'sm:ml-28': warning === 'rename' }"
+                                    >
                                         <svg
                                             clip-rule="evenodd"
                                             fill-rule="evenodd"
@@ -221,7 +250,7 @@
                                 <!-- Warning displayed if product is being renamed. -->
                                 <span
                                     v-if="!renaming && renamed"
-                                    class="flex flex-row items-center text-yellow-500 rounded p-1"
+                                    class="flex flex-row items-center text-accent-dark-orange rounded p-1"
                                 >
                                     <!-- <div class="editor-label"></div> -->
                                     <span class="align-middle inline-block mr-1 fill-current">
@@ -258,11 +287,16 @@
 
                     <br />
 
+                    <!-- Body section: Main page contents. -->
+                    <!--Shows up either: once a UUID is entered and the storyline is loaded (existing), or immediately (new)-->
                     <section v-if="!editExisting || loadStatus === 'loaded'">
+                        <!-- Subsection: Version history (existing only) -->
                         <section v-if="editExisting" class="pb-10">
+                            <!-- Header -->
                             <h1 class="text-2xl font-semibold">
                                 {{ $t('editor.editMetadata.versionHistory.header') }}
                             </h1>
+                            <!-- Text indicating the amount of history results found -->
                             <p>
                                 {{
                                     storylineHistory.length === 0
@@ -270,6 +304,7 @@
                                         : $t('editor.editMetadata.versionHistory.resultsFound')
                                 }}
                             </p>
+                            <!-- History results, if there are any -->
                             <div class="flex flex-col gap-5 pt-5" v-if="storylineHistory.length !== 0">
                                 <div class="flex">
                                     <button
@@ -341,37 +376,106 @@
                                 </table>
                             </div>
                         </section>
-
-                        <div class="mb-4">
-                            <h1 class="text-2xl font-semibold">{{ $t('editor.productDetails') }}</h1>
-                            <p>
-                                {{ $t('editor.metadata.instructions') }}
-                            </p>
-                        </div>
-                        <metadata-content
-                            :metadata="metadata"
-                            @metadata-changed="updateMetadata"
-                            @logo-changed="onFileChange"
-                            @logo-source-changed="onLogoSourceInput"
-                        ></metadata-content>
-                        <button
-                            v-if="editExisting"
-                            @click="saveMetadata(true)"
-                            class="editor-button editor-forms-button"
-                        >
-                            {{ $t('editor.saveChanges') }}
-                        </button>
+                        <!-- Subsection: Metadata details form -->
+                        <section>
+                            <!-- Headings (pre-form) -->
+                            <section class="mb-4 flex gap-2 items-start md:items-center flex-col md:flex-row">
+                                <!-- Heading/subheading text -->
+                                <div class="flex-1">
+                                    <h1 class="text-2xl font-semibold">{{ $t('editor.productDetails') }}</h1>
+                                    <p>
+                                        {{
+                                            editExisting
+                                                ? $t('editor.metadata.instructions.existing')
+                                                : $t('editor.metadata.instructions.new')
+                                        }}
+                                    </p>
+                                </div>
+                                <!-- Preview project button (existing only) -->
+                                <button
+                                    v-if="editExisting"
+                                    @click="preview"
+                                    class="editor-button editor-forms-button m-0 border border-black"
+                                >
+                                    {{ $t('editor.editMetadata.previewProject') }}
+                                </button>
+                            </section>
+                            <!-- Metadata form -->
+                            <div class="px-4 md:px-8 py-5 border rounded-md">
+                                <!-- Edit form button (existing only) -->
+                                <!-- Form defaults to view-only for existing projects, can edit only if this button pressed -->
+                                <button
+                                    v-if="!editingMetadata"
+                                    @click="editingMetadata = !editingMetadata"
+                                    class="editor-button editor-forms-button md:float-right flex items-center gap-2 text-md ml-0 mb-3 font-semibold px-3 py-2 border border-gray-300"
+                                >
+                                    <svg
+                                        clip-rule="evenodd"
+                                        fill-rule="evenodd"
+                                        width="16"
+                                        height="16"
+                                        stroke-linejoin="round"
+                                        stroke-miterlimit="2"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="mx-1"
+                                    >
+                                        <path
+                                            d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
+                                            fill-rule="nonzero"
+                                        />
+                                    </svg>
+                                    <p class="text-left">{{ $t('editor.editMetadata') }}</p>
+                                </button>
+                                <div class="overflow-visible">
+                                    <!-- The form -->
+                                    <!-- If editingMetadata === false, form is read-only; if true, it can be edited -->
+                                    <!-- New projects can only be in edit mode; existing projects can be in both -->
+                                    <metadata-content
+                                        :metadata="metadata"
+                                        :editing="editingMetadata"
+                                        @metadata-changed="updateMetadata"
+                                        @logo-changed="onFileChange"
+                                        @logo-source-changed="onLogoSourceInput"
+                                    ></metadata-content>
+                                    <!-- Save/discard changes buttons (existing only) -->
+                                    <div v-if="editingMetadata && editExisting" class="flex gap-1 mt-2">
+                                        <!-- Save changes -->
+                                        <!-- Saves to remote copy on server -->
+                                        <!-- NOTE: Changes are saved to local copy automatically as you fill the form. To delete these changes, press the discard button -->
+                                        <button
+                                            @click="saveMetadata(true)"
+                                            class="editor-button editor-forms-button leading-snug ml-0 bg-black border border-black text-white hover:bg-gray-800"
+                                        >
+                                            {{ $t('editor.saveChanges') }}
+                                        </button>
+                                        <!-- Discard changes -->
+                                        <!-- Reverts to state before you enabled edit mode -->
+                                        <button
+                                            @click="discardMetadataUpdates()"
+                                            class="editor-button editor-forms-button leading-snug"
+                                        >
+                                            {{ $t('editor.discardChanges') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </section>
                 </section>
             </div>
 
-            <div class="flex px-10 md:px-20 py-5 mt-8">
-                <router-link :to="{ name: 'home' }" target>
-                    <button class="editor-button editor-forms-button m-0 border border-black">
+            <!-- Main section: page back/continue buttons -->
+            <div class="flex px-7 md:px-20 py-5 mt-8">
+                <!-- Back button -->
+                <!-- Moves you to the dashboard again -->
+                <router-link :to="{ name: 'home' }" target tabindex="-1">
+                    <button class="editor-button editor-forms-button m-0 border border-black" tabindex="0">
                         {{ $t('editor.back') }}
                     </button>
                 </router-link>
-
+                <!-- Continue button -->
+                <!-- Moves you to the editor -->
                 <div class="ml-auto">
                     <button
                         @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
@@ -393,6 +497,7 @@
             </div>
         </template>
 
+        <!-- The editor -->
         <template v-if="loadEditor && loadStatus === 'loaded'">
             <editor
                 :configs="configs"
@@ -408,26 +513,31 @@
                 @refresh-config="refreshConfig"
                 ref="mainEditor"
             >
+                <!-- Metadata editing modal inside the editor -->
+                <!-- Click Done or outside the modal to save changes LOCALLY. -->
                 <template v-slot:metadataModal>
                     <vue-final-modal
+                        @click="saveMetadata(false)"
                         modalId="metadata-edit-modal"
-                        content-class="flex flex-col max-h-full overflow-y-auto max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
+                        content-class="max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
                         class="flex justify-center items-center"
                     >
-                        <h2 slot="header" class="text-lg font-bold">{{ $t('editor.editMetadata') }}</h2>
-                        <metadata-content
-                            :metadata="metadata"
-                            @metadata-changed="updateMetadata"
-                            @logo-changed="onFileChange"
-                            @logo-source-changed="onLogoSourceInput"
-                        ></metadata-content>
-                        <div class="w-full flex justify-end">
-                            <button
-                                class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
-                                @click="saveMetadata(false)"
-                            >
-                                {{ $t('editor.done') }}
-                            </button>
+                        <div @click.stop class="flex flex-col space-y-2">
+                            <h2 slot="header" class="text-2xl font-bold mb-3">{{ $t('editor.editMetadata') }}</h2>
+                            <metadata-content
+                                :metadata="metadata"
+                                @metadata-changed="updateMetadata"
+                                @logo-changed="onFileChange"
+                                @logo-source-changed="onLogoSourceInput"
+                            ></metadata-content>
+                            <div class="w-full flex justify-end">
+                                <button
+                                    class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
+                                    @click="saveMetadata(false)"
+                                >
+                                    {{ $t('editor.done') }}
+                                </button>
+                            </div>
                         </div>
                     </vue-final-modal>
                 </template>
@@ -563,6 +673,21 @@ export default class MetadataEditorV extends Vue {
         returnTop: true,
         dateModified: ''
     };
+    editingMetadata = false;
+    temporaryMetadataCopy: MetadataContent = {
+        // A copy to save changes before edit, so they can be reverted
+        title: '',
+        introTitle: '',
+        introSubtitle: '',
+        logoPreview: '',
+        logoName: '',
+        logoAltText: '',
+        contextLink: '',
+        contextLabel: '',
+        tocOrientation: '',
+        returnTop: true,
+        dateModified: ''
+    };
     defaultBlankSlide: Slide = {
         title: '',
         panel: [
@@ -588,6 +713,7 @@ export default class MetadataEditorV extends Vue {
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
+        this.editingMetadata = !this.editExisting;
     }
 
     created(): void {
@@ -671,6 +797,28 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    /**
+     * Open current editor config as a new Storylines product in new tab.
+     * Note: Preview button on metadata editor will only show when editing an existing product, not cwhen creating a new one
+     * This is a design decision, can change if we decide that people would want to preview new products for some reason
+     */
+    preview(): void {
+        // save current metadata final changes before previewing product
+        this.saveMetadata(false);
+
+        setTimeout(() => {
+            const routeData = this.$router.resolve({
+                name: 'preview',
+                params: { lang: this.configLang, uid: this.uuid }
+            });
+            const previewTab = window.open(routeData.href, '_blank');
+            (previewTab as Window).props = {
+                configs: this.configs,
+                configFileStructure: this.configFileStructure
+            };
+        }, 5);
     }
 
     /**
@@ -1160,6 +1308,9 @@ export default class MetadataEditorV extends Vue {
             // If there's no logo, mark the product as loaded.
             this.loadStatus = 'loaded';
         }
+
+        // Load the temp copy of the metadata
+        this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
     }
 
     /**
@@ -1293,6 +1444,12 @@ export default class MetadataEditorV extends Vue {
         this.unsavedChanges = true;
     }
 
+    discardMetadataUpdates(): void {
+        this.metadata = JSON.parse(JSON.stringify(this.temporaryMetadataCopy));
+        this.editingMetadata = false;
+        this.unsavedChanges = false; // TODO: Does this cause false negatives? (maybe not if we don't have discarding for vfm)
+    }
+
     /**
      * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
      * to config file. If `publish` is set to true, publish to server as well.
@@ -1332,6 +1489,8 @@ export default class MetadataEditorV extends Vue {
 
             if (publish) {
                 this.generateConfig();
+                this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
+                this.editingMetadata = false;
             }
 
             const userStore = useUserStore();
@@ -1358,6 +1517,7 @@ export default class MetadataEditorV extends Vue {
             tocOrientation: '',
             returnTop: true
         };
+        this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
         this.configs = { en: undefined, fr: undefined };
         this.slides = [];
     }
@@ -1616,29 +1776,20 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
         max-width: 80%;
         min-width: 70%;
         max-height: 90%;
-        padding: 12px;
+        padding: 20px;
     }
 
     .vfm__content label {
-        width: 10vw;
-        text-align: right;
-        margin-right: 15px;
-        display: inline-block;
+        display: block;
     }
 
     .editor-container h3 {
-        font-size: larger;
-    }
-
-    .vfm__content input {
-        padding: 5px 10px;
-        margin-top: 5px;
-        border: 1px solid black;
-        display: inline;
+        font-size: x-large;
     }
 
     .editor-container .input-error {
         border: 1px solid red;
+        outline-color: red;
     }
 
     .vfm__content button {

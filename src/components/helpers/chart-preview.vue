@@ -136,7 +136,7 @@ export default class ChartPreviewV extends Vue {
                         })
                     );
 
-                    // Re-open the editor the the issue can be fixed.
+                    // Re-open the editor so the issue can be fixed.
                     setTimeout(() => this.modalEditor.show(), 100);
                 } else {
                     const chartConfig = {
