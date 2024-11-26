@@ -298,6 +298,7 @@
                     :slideIndex="slideIndex"
                     :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
+                    @shared-asset="onSharedAsset"
                     @slide-change="selectSlide"
                     @slide-edit="onSlidesEdited"
                     @custom-slide-updated="updateCustomSlide"
@@ -335,8 +336,8 @@ import {
     ConfigFileStructure,
     HelpSection,
     MetadataContent,
-    Slide,
     MultiLanguageSlide,
+    Slide,
     SourceCounts,
     StoryRampConfig,
     TextPanel
@@ -404,7 +405,64 @@ export default class EditorV extends Vue {
 
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
+        console.log('editor - slide edit event emitted');
         this.$emit('save-status', true);
+    }
+
+    // move asset from opposite lang's assets folder to shared assets folder
+    onSharedAsset(assetName: string): void {
+        console.log('editor - asset to be moved to shared asset folder');
+        console.log(assetName);
+        // access config of opposite lang
+        const oppositeLang = this.configLang === 'en' ? 'fr' : 'en';
+        const oppositeConfig = this.configs[oppositeLang];
+        console.log('opposite langs config (before)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig)));
+        console.log('opposite langs slides (before)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig?.slides)));
+
+        const sharedAssetHelper = (panel) => {
+            switch (panel.type) {
+                case 'slideshow':
+                    panel.items.forEach((item) => sharedAssetHelper(item));
+                    break;
+
+                case 'dynamic':
+                    panel.children.forEach((child) => sharedAssetHelper(child.panel));
+                    break;
+                case 'image':
+                case 'video':
+                    if (panel.src) {
+                        let assetSrc = panel.src.split('/');
+                        const assetFolder = assetSrc[2];
+                        if (panel.src.includes(assetName) && assetFolder === oppositeLang) {
+                            console.log('need to change to shared');
+                            assetSrc[2] = 'shared';
+                            panel.src = assetSrc.join('/');
+                        }
+                    }
+                    break;
+            }
+        };
+
+        oppositeConfig?.slides.forEach((slide) => {
+            console.log('current slide');
+            console.log(JSON.parse(JSON.stringify(slide)));
+
+            slide.panel.forEach((panel) => {
+                console.log('current panel');
+                console.log(JSON.parse(JSON.stringify(panel)));
+                sharedAssetHelper(panel);
+            });
+        });
+
+        console.log('opposite langs config (after)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig)));
+        console.log('opposite langs slides (after)');
+        console.log(JSON.parse(JSON.stringify(oppositeConfig?.slides)));
+
+        this.$emit('save-status', true);
+        console.log(' ');
     }
 
     @Watch('metadata', { deep: true })
@@ -467,15 +525,17 @@ export default class EditorV extends Vue {
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
+        const newLang = lang ? lang : this.configLang ? this.configLang : 'en';
+        this.$emit('lang-change', newLang);
+
         setTimeout(() => {
             if (index === -1 || !this.loadSlides) {
                 this.currentSlide = '';
             } else {
-                const selectedLang = (lang ?? this.configLang) as keyof MultiLanguageSlide;
+                const selectedLang = newLang as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
                 this.currentSlide = selectedSlide ?? '';
             }
-
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
