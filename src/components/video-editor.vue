@@ -128,6 +128,7 @@ import { ConfigFileStructure, SourceCounts, VideoFile, VideoPanel } from '@/defi
 import Message from 'vue-m-message';
 import draggable from 'vuedraggable';
 import VideoPreviewV from './helpers/video-preview.vue';
+import JSZip from 'jszip';
 
 @Options({
     components: {
@@ -171,7 +172,7 @@ export default class VideoEditorV extends Vue {
                     this.videoPreviewPromise = assetFile.async('blob').then((res: Blob) => {
                         return {
                             ...this.panel,
-                            id: filename ? filename : this.panel.src,
+                            id: this.panel.src,
                             src: URL.createObjectURL(res)
                         } as VideoFile;
                     });
@@ -200,26 +201,214 @@ export default class VideoEditorV extends Vue {
         }
     }
 
+    // TODO: move method into a plugin. That way it isn't repeated in the metadata/image editors
+    // Converts a file into a promise that resolves to an ArrayBuffer containing the files data
+    readBinaryData(file: File): Promise<ArrayBuffer> {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = () => {
+                reject(new Error('Could not load file reader'));
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the metadata/image editors
+    // Converts a file into a promise that resolves to its has, as an array of 8-bit integers
+    obtainHashData(file: File): Promise<Uint8Array> {
+        return this.readBinaryData(file)
+            .then((res) => {
+                res = new Uint8Array(res);
+                return window.crypto.subtle.digest('SHA-256', res);
+            })
+            .then((res) => {
+                res = new Uint8Array(res);
+                return res;
+            });
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the metadata/image editors
+    /**
+     * Helper used to find all instances of the specified file in the specified asset folder
+     * @param file File that was uploaded
+     * @param folder The asset folder withinn which we should be searching
+     * @param checkNested Flag that indicates whether we should consider assets with nested subfolders
+     */
+    filesInAssetFolder(file: File, folder: string, checkNested = true): Array<Promise<string>> {
+        console.log(' ');
+        console.log('fileInAssetFolder');
+        console.log('file');
+        console.log(file);
+
+        // Here, if a file in the specified folder has the same name and hash as the file uploaded, then we consider the
+        // two to be the same. Otherwise, we consider them to be different. We even consider if the asset is within a
+        // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
+        // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
+        // an array of duplicate asset promises
+        const sharedAssetPromises = [];
+        this.configFileStructure.assets[folder].forEach(async (relativePath, compressedBinary) => {
+            const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
+            if (assetName === file.name) {
+                console.log('current image has same name as uploaded image');
+                sharedAssetPromises.push(
+                    this.compareFiles(file, compressedBinary, assetName).then((fileSame) =>
+                        fileSame ? relativePath : 'N/A'
+                    )
+                );
+            }
+        });
+
+        return sharedAssetPromises;
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the metadata/image editors
+    /**
+     * Compares the hashes of two files
+     * @param file File that was uploaded
+     * @param compressedBinary Compressed binary file from configFileStructure
+     * @param compressedName The name of the compressed binary file
+     */
+    async compareFiles(file: File, compressedBinary: JSZip.JSZipObject, compressedName: string): Promise<boolean> {
+        const fileHash = await this.obtainHashData(file);
+        const compressedType = compressedName.split('.').at(-1);
+
+        return compressedBinary
+            .async(compressedType !== 'svg' ? 'blob' : 'text')
+            .then((assetFile) => {
+                if (compressedType === 'svg') {
+                    assetFile = new File([assetFile], compressedName, {
+                        type: 'image/svg+xml'
+                    });
+                }
+                return this.obtainHashData(assetFile);
+            })
+            .then((hash) => {
+                return hash.join() === fileHash.join();
+            });
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the metadata/image editors
     // adds an uploaded file that is either a: video, transcript or captions
-    addUploadedFile(file: File, type: string): void {
-        const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
-        this.configFileStructure.assets[this.lang].file(file.name, file);
+    async addUploadedFile(file: File, type: string): Promise<void> {
+        console.log(' ');
+        console.log('addUploadedFile (video)');
+        console.log('uploaded image');
+        console.log(file);
+        const oppositeLang = this.lang === 'en' ? 'fr' : 'en';
+        const sharedAssetPaths = await Promise.all(this.filesInAssetFolder(file, 'shared', false));
+        let inSharedAsset = false;
+        let oppositeSourceCount = 0;
+        let newAssetName = file.name;
+        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${file.name}`;
+
+        // Should contain either 0 or 1 promise.
+        sharedAssetPaths.forEach((sharedAssetPath) => {
+            if (sharedAssetPath !== 'N/A') {
+                console.log('asset is in shared asset folder, do nothing but increase source count');
+                inSharedAsset = true;
+            }
+        });
+
+        if (!inSharedAsset) {
+            const oppositeAssetPaths = await Promise.all(this.filesInAssetFolder(file, oppositeLang));
+            // If the current promise is empty, then the current path refers to an asset in the opposite asset folder that
+            // has the same name, but different contents, as the asset uploaded. In this case we do nothing, as this asset
+            // is not a valid duplicate.
+            for (const oppositeAssetPath of oppositeAssetPaths) {
+                if (oppositeAssetPath !== 'N/A') {
+                    console.log('asset in opposite lang asset folder, moving to shared');
+                    const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${oppositeAssetPath}`;
+                    oppositeSourceCount += this.sourceCounts[oppositeFileSource] ?? 0;
+                    this.sourceCounts[oppositeFileSource] = 0;
+                    this.configFileStructure.assets[oppositeLang].remove(oppositeAssetPath);
+
+                    // Add asset to shared folder if asset is yet to be moved to the shared folder. If an asset with the
+                    // same name, but different content, is already in the shared folder, we must give the asset we are
+                    // uploading a unique name. Otherwise the existing asset will be overwritten
+                    if (!inSharedAsset) {
+                        let i = 2;
+                        while (this.configFileStructure.assets['shared'].file(newAssetName)) {
+                            // If the updated name is the same as a file that already exists in the shared asset folder,
+                            // we must compare that file with the uploaded file, since they wouldnt have been compared
+                            // on the first run due to having different names
+                            if (i > 2) {
+                                const filesEqual = await this.compareFiles(
+                                    file,
+                                    this.configFileStructure.assets['shared'].file(newAssetName),
+                                    newAssetName
+                                );
+                                if (filesEqual) break;
+                            }
+                            newAssetName = `${file.name.split('.').at(0)}(${i}).${file.name.split('.').at(-1)}`;
+                            console.log('new unique shared lang asset name');
+                            console.log(newAssetName);
+                            i++;
+                        }
+                        uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
+                        this.configFileStructure.assets['shared'].file(newAssetName, file);
+                        inSharedAsset = true;
+                    }
+                    this.$emit('shared-asset', oppositeFileSource, uploadSource, oppositeLang); // must be emitted for each duplicate asset
+                }
+            }
+        }
+
+        // If the asset uploaded is in the shared asset folder, then no need to upload to the current langs assets folder
+        if (!inSharedAsset) {
+            console.log('asset neither in shared nor opposite');
+            const currAssetPaths = await Promise.all(this.filesInAssetFolder(file, this.lang, false));
+            console.log('currAssetPaths');
+            console.log(currAssetPaths);
+            // Should contain either 0 or 1 promise.
+            for (const currAssetPath of currAssetPaths) {
+                // If asset w/ same name but different contents is in curr lang asset folder, set name in curr lang
+                // asset folder to a unique name, to avoid overwriting an existing file.
+                if (currAssetPath === 'N/A') {
+                    console.log('asset w/ same name but different contents in curr asset folder');
+                    let i = 2;
+                    while (this.configFileStructure.assets[this.lang].file(newAssetName)) {
+                        // If the updated name is the same as a file that already exists in the current langs asset folder,
+                        // we must compare that file with the uploaded file, since they wouldnt have been compared
+                        // on the first run due to having different names
+                        if (i > 2) {
+                            const filesEqual = await this.compareFiles(
+                                file,
+                                this.configFileStructure.assets[this.lang].file(newAssetName),
+                                newAssetName
+                            );
+                            if (filesEqual) break;
+                        }
+                        newAssetName = `${file.name.split('.').at(0)}(${i}).${file.name.split('.').at(-1)}`;
+                        console.log('new unique curr lang asset name');
+                        console.log(newAssetName);
+                        i++;
+                    }
+                }
+            }
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${newAssetName}`;
+            this.configFileStructure.assets[this.lang].file(newAssetName, file);
+        }
+
         if (this.sourceCounts[uploadSource]) {
-            this.sourceCounts[uploadSource] += 1;
+            this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
         } else {
-            this.sourceCounts[uploadSource] = 1;
+            this.sourceCounts[uploadSource] = 1 + oppositeSourceCount;
         }
 
         // check if source file is creating a new video or uploading captions/transcript for current video
         const fileSrc = URL.createObjectURL(file);
         if (type === 'src') {
+            const assetName = inSharedAsset ? newAssetName : file.name;
             this.videoPreview = {
-                id: file.name,
-                title: this.videoPreview.title || file.name,
+                id: uploadSource,
+                title: assetName,
                 videoType: 'local',
                 src: fileSrc
             };
-            this.findFileType(file.name);
+            this.findFileType(assetName);
         } else {
             this.videoPreview[type as 'caption' | 'transcript'] = fileSrc;
         }
@@ -301,13 +490,25 @@ export default class VideoEditorV extends Vue {
     dropVideo(e: DragEvent): void {
         if (e.dataTransfer !== null) {
             const file = [...e.dataTransfer.files][0];
-            this.addUploadedFile(file, 'src');
-            this.dragging = false;
+            this.addUploadedFile(file, 'src').then(() => {
+                this.dragging = false;
+            });
         }
         this.onVideoEdited();
     }
 
     deleteVideo(): void {
+        if (this.videoPreview.videoType === 'local') {
+            const videoSource = this.videoPreview.id;
+            const videoFolder = this.videoPreview.id.split('/')[2];
+            const videoRelativePath = this.videoPreview.id.split('/').slice(3).join('/');
+
+            this.sourceCounts[videoSource] -= 1;
+            if (this.sourceCounts[videoSource] === 0) {
+                this.configFileStructure.assets[videoFolder].remove(videoRelativePath);
+                URL.revokeObjectURL(this.videoPreview.src);
+            }
+        }
         (this.$refs.videoFileInput as HTMLInputElement).value = '';
         this.videoPreview = {};
         this.onVideoEdited();
@@ -318,10 +519,8 @@ export default class VideoEditorV extends Vue {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
-            this.panel.src =
-                this.videoPreview.videoType === 'local'
-                    ? `${this.configFileStructure.uuid}/assets/${this.lang}/${this.videoPreview.id}`
-                    : this.videoPreview.src;
+
+            this.panel.src = this.videoPreview.videoType === 'local' ? this.videoPreview.id : this.videoPreview.src;
             this.panel.caption = this.videoPreview.caption ? this.videoPreview.caption : '';
             this.panel.transcript = this.videoPreview.transcript ? this.videoPreview.transcript : '';
         }
