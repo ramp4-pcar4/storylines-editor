@@ -171,7 +171,7 @@ export default class VideoEditorV extends Vue {
                     this.videoPreviewPromise = assetFile.async('blob').then((res: Blob) => {
                         return {
                             ...this.panel,
-                            id: filename ? filename : this.panel.src,
+                            id: this.panel.src,
                             src: URL.createObjectURL(res)
                         } as VideoFile;
                     });
@@ -200,26 +200,174 @@ export default class VideoEditorV extends Vue {
         }
     }
 
+    // Converts a file into a promise that resolves to an ArrayBuffer containing the files data
+    readBinaryData(file: File): Promise<ArrayBuffer> {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = () => {
+                reject(new Error('Could not load file reader'));
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+    }
+
+    // Converts a file into a promise that resolves to its has, as an array of 8-bit integers
+    obtainHashData(file: File): Promise<Uint8Array> {
+        return this.readBinaryData(file)
+            .then((res) => {
+                res = new Uint8Array(res);
+                return window.crypto.subtle.digest('SHA-256', res);
+            })
+            .then((res) => {
+                res = new Uint8Array(res);
+                return res;
+            });
+    }
+
+    // Helper used to find all instances of the specified file in the specified asset folder
+    async filesInAssetFolder(file: File, folder: string, checkNested = true): Promise<Array<Promise<string>>> {
+        const uploadedFileHash = await this.obtainHashData(file);
+
+        // Here, if a file in the specified folder has the same name and hash as the file uploaded, then we consider the
+        // two to be the same. Otherwise, we consider them to be different. We even consider if the asset is within a
+        // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
+        // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
+        // an array of duplicate asset promises
+        //TODO: consider using await somewhere here. This way, the array returned wont be an array of promises
+        const sharedAssetPromises = [];
+        this.configFileStructure.assets[folder].forEach((relativePath, zippedFile) => {
+            const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
+            if (assetName === file.name) {
+                const assetType = assetName.split('.').at(-1);
+                if (assetType !== 'svg') {
+                    sharedAssetPromises.push(
+                        zippedFile
+                            .async('blob')
+                            .then((img: Blob) => {
+                                const currentFile = new File([img], assetName);
+                                return this.obtainHashData(currentFile);
+                            })
+                            .then((hash) => {
+                                return hash.join() === uploadedFileHash.join() ? relativePath : '';
+                            })
+                    );
+                } else {
+                    sharedAssetPromises.push(
+                        zippedFile
+                            .async('text')
+                            .then((img) => {
+                                const currentFile = new File([img], assetName, {
+                                    type: 'image/svg+xml'
+                                });
+                                return this.obtainHashData(currentFile);
+                            })
+                            .then((hash) => {
+                                return hash.join() === uploadedFileHash.join() ? relativePath : '';
+                            })
+                    );
+                }
+            }
+        });
+
+        return sharedAssetPromises;
+    }
+
     // adds an uploaded file that is either a: video, transcript or captions
-    addUploadedFile(file: File, type: string): void {
-        const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
-        this.configFileStructure.assets[this.lang].file(file.name, file);
+    async addUploadedFile(file: File, type: string): Promise<void> {
+        console.log(' ');
+        console.log('addUploadedFile (video)');
+        const oppositeLang = this.lang === 'en' ? 'fr' : 'en';
+        // This array will contain either 0 or 1 promise, since we don't care for nested assets here
+        const duplicatesInShared = await this.filesInAssetFolder(file, 'shared', false);
+        let inSharedAsset = false;
+        let oppositeSourceCount = 0;
+        let newAssetName = file.name;
+        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${file.name}`;
+
+        // Should contain either 0 or 1 promise. If the promise inside is a valid asset path, then the shared asset
+        // folder contains an asset with the same name and contents, so we do nothing. If, however, the promise inside
+        // is empty, then the shared asset folder contains an asset with the same name but different content. In the
+        // latter case, we should upload the asset into the shared asset folder, but with a unique name
+        const sharedAssetPaths = await Promise.all(duplicatesInShared);
+        sharedAssetPaths.forEach((sharedAssetPath) => {
+            // If an asset with the same name, but different content, is already in the shared folder, we must give the
+            // asset we are uploading a unique name. Otherwise the existing asset will be overwritten
+            if (!sharedAssetPath) {
+                let i = 2;
+                while (this.configFileStructure.assets['shared'].file(newAssetName)) {
+                    newAssetName = `${file.name.split('.').at(0)}(${i}).${file.name.split('.').at(-1)}`;
+                    i++;
+                }
+                uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
+            } else {
+                inSharedAsset = true;
+            }
+        });
+
+        if (!inSharedAsset) {
+            const duplicatesInOpposite = await this.filesInAssetFolder(file, oppositeLang);
+            const oppositeAssetPaths = await Promise.all(duplicatesInOpposite);
+            // If the current promise is empty, then the current path refers to an asset in the opposite asset folder that
+            // has the same name, but different contents, as the asset uploaded. In this case we do nothing, as this asset
+            // is not a valid duplicate.
+            oppositeAssetPaths.forEach((oppositeAssetPath) => {
+                if (oppositeAssetPath) {
+                    const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${oppositeAssetPath}`;
+                    oppositeSourceCount = this.sourceCounts[oppositeFileSource] ?? 0;
+                    this.sourceCounts[oppositeFileSource] = 0;
+                    this.configFileStructure.assets[oppositeLang].remove(oppositeAssetPath);
+
+                    this.configFileStructure.assets['shared'].file(newAssetName, file);
+                    this.$emit('shared-asset', oppositeFileSource, uploadSource, oppositeLang);
+                    inSharedAsset = true;
+                }
+            });
+        }
+
+        // If the asset uploaded is in the shared asset folder, then no need to upload to the current langs assets folder
+        if (!inSharedAsset) {
+            newAssetName = file.name;
+            console.log('asset neither in shared nor opposite');
+            // This array will contain either 0 or 1 promise, since we don't care for nested assets here
+            const duplicatesInCurrent = await this.filesInAssetFolder(file, this.lang, false);
+            const currAssetPaths = await Promise.all(duplicatesInCurrent);
+            currAssetPaths.forEach((currAssetPath) => {
+                // An asset w/ same name but different content is in current asset folder, need to rename
+                if (!currAssetPath) {
+                    console.log('asset w/ same name but different contents in curr asset folder');
+                    let i = 2;
+                    while (this.configFileStructure.assets[this.lang].file(newAssetName)) {
+                        newAssetName = `${file.name.split('.').at(0)}(${i}).${file.name.split('.').at(-1)}`;
+                        console.log('new unique curr lang asset name');
+                        console.log(newAssetName);
+                        i++;
+                    }
+                }
+            });
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${newAssetName}`;
+            this.configFileStructure.assets[this.lang].file(newAssetName, file);
+        }
+
         if (this.sourceCounts[uploadSource]) {
-            this.sourceCounts[uploadSource] += 1;
+            this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
         } else {
-            this.sourceCounts[uploadSource] = 1;
+            this.sourceCounts[uploadSource] = 1 + oppositeSourceCount;
         }
 
         // check if source file is creating a new video or uploading captions/transcript for current video
         const fileSrc = URL.createObjectURL(file);
         if (type === 'src') {
+            const assetName = inSharedAsset ? newAssetName : file.name;
             this.videoPreview = {
-                id: file.name,
-                title: this.videoPreview.title || file.name,
+                id: uploadSource,
+                title: assetName,
                 videoType: 'local',
                 src: fileSrc
             };
-            this.findFileType(file.name);
+            this.findFileType(assetName);
         } else {
             this.videoPreview[type as 'caption' | 'transcript'] = fileSrc;
         }
@@ -301,13 +449,25 @@ export default class VideoEditorV extends Vue {
     dropVideo(e: DragEvent): void {
         if (e.dataTransfer !== null) {
             const file = [...e.dataTransfer.files][0];
-            this.addUploadedFile(file, 'src');
-            this.dragging = false;
+            this.addUploadedFile(file, 'src').then(() => {
+                this.dragging = false;
+            });
         }
         this.onVideoEdited();
     }
 
     deleteVideo(): void {
+        if (this.videoPreview.videoType === 'local') {
+            const videoSource = this.videoPreview.id;
+            const videoFolder = this.videoPreview.id.split('/')[2];
+            const videoRelativePath = this.videoPreview.id.split('/').slice(3).join('/');
+
+            this.sourceCounts[videoSource] -= 1;
+            if (this.sourceCounts[videoSource] === 0) {
+                this.configFileStructure.assets[videoFolder].remove(videoRelativePath);
+                URL.revokeObjectURL(this.videoPreview.src);
+            }
+        }
         (this.$refs.videoFileInput as HTMLInputElement).value = '';
         this.videoPreview = {};
         this.onVideoEdited();
@@ -318,10 +478,8 @@ export default class VideoEditorV extends Vue {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
-            this.panel.src =
-                this.videoPreview.videoType === 'local'
-                    ? `${this.configFileStructure.uuid}/assets/${this.lang}/${this.videoPreview.id}`
-                    : this.videoPreview.src;
+
+            this.panel.src = this.videoPreview.videoType === 'local' ? this.videoPreview.id : this.videoPreview.src;
             this.panel.caption = this.videoPreview.caption ? this.videoPreview.caption : '';
             this.panel.transcript = this.videoPreview.transcript ? this.videoPreview.transcript : '';
         }
