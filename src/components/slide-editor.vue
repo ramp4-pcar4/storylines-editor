@@ -333,7 +333,13 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save, lang)"
+                    @config-edited="(slideConfig: Slide, save?: boolean = false) => {
+                        $emit('custom-slide-updated', slideConfig, save, lang)
+                    }"
+                    @shared-asset="(assetName: string, oppositeLang: string) => {
+                        console.log('emitting shared-asset event from slide editor');
+                        $emit('shared-asset', assetName, oppositeLang);
+                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -347,6 +353,10 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
+                    @shared-asset="(assetName: string, oppositeLang: string) => {
+                        console.log('emitting shared-asset event from slide editor');
+                        $emit('shared-asset', assetName, oppositeLang);
+                    }"
                     @slide-edit="(changedFromDefault: boolean = true) => {
                         $emit('slide-edit');
 
@@ -564,6 +574,7 @@ export default class SlideEditorV extends Vue {
                 children: []
             }
         };
+        console.log(this.configFileStructure);
 
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
@@ -582,12 +593,20 @@ export default class SlideEditorV extends Vue {
     }
 
     removeSourceCounts(panel: BasePanel): void {
+        console.log('');
+        console.log('removeSourceCounts()');
+        console.log('configFileStructure before');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
         // The provided panel is being removed. Update source counts accordingly.
         switch (panel.type) {
             case 'map': {
                 const mapPanel = panel as MapPanel;
+                console.log('mapPanel being removed');
+                console.log(mapPanel);
                 this.sourceCounts[mapPanel.config] -= 1;
                 if (this.sourceCounts[mapPanel.config] === 0) {
+                    console.log('map being removed from configFileStructure');
+                    console.log(`${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`);
                     this.configFileStructure.zip.remove(
                         `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
                     );
@@ -596,9 +615,15 @@ export default class SlideEditorV extends Vue {
             }
 
             case 'image': {
+                // as long as assets are uploaded/removed from the appropriate folders (either shared or current lang),
+                // then this should work fine as is
                 const imagePanel = panel as ImagePanel;
+                console.log('image panel being removed');
+                console.log(imagePanel);
                 this.sourceCounts[imagePanel.src] -= 1;
                 if (this.sourceCounts[imagePanel.src] === 0) {
+                    console.log('image being removed from configFileStructure (source count has hit 0)');
+                    console.log(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
                     this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
                 }
 
@@ -607,8 +632,12 @@ export default class SlideEditorV extends Vue {
 
             case 'chart': {
                 const chartPanel = panel as ChartPanel;
+                console.log('chart panel being removed');
+                console.log(chartPanel);
                 this.sourceCounts[chartPanel.src] -= 1;
                 if (this.sourceCounts[chartPanel.src] === 0) {
+                    console.log('chart being removed from configFileStructure (source count has hit 0)');
+                    console.log(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
                     this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
                 }
 
@@ -617,6 +646,8 @@ export default class SlideEditorV extends Vue {
 
             case 'slideshow': {
                 const slideshowPanel = panel as SlideshowPanel;
+                console.log('slideshow panel being removed (source count has hit 0)');
+                console.log(slideshowPanel);
                 slideshowPanel.items.forEach((item: TextPanel | ImagePanel | MapPanel | ChartPanel) => {
                     this.removeSourceCounts(item);
                 });
@@ -625,9 +656,13 @@ export default class SlideEditorV extends Vue {
 
             case 'video': {
                 const videoPanel = panel as VideoPanel;
+                console.log('video panel being removed');
+                console.log(videoPanel);
                 if (videoPanel.videoType === 'local') {
                     this.sourceCounts[videoPanel.src] -= 1;
                     if (this.sourceCounts[videoPanel.src] === 0) {
+                        console.log('local video being removed from configFileStructure');
+                        console.log(`${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`);
                         this.configFileStructure.zip.remove(
                             `${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`
                         );
@@ -638,6 +673,8 @@ export default class SlideEditorV extends Vue {
 
             case 'dynamic': {
                 const dynamicPanel = panel as DynamicPanel;
+                console.log('dynamic panel being removed');
+                console.log(dynamicPanel);
                 dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
                     this.removeSourceCounts(subPanel.panel);
                 });
@@ -648,6 +685,9 @@ export default class SlideEditorV extends Vue {
                 break;
             }
         }
+
+        console.log('configFileStructure after');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
     }
 
     saveChanges(): void {
@@ -656,7 +696,14 @@ export default class SlideEditorV extends Vue {
             typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV).saveChanges ===
                 'function'
         ) {
+            // console.log('slideeditor.vue - saving changes after opening advanced editor ');
+            // console.log('editor for whcih we also save changes for');
+            // console.log(this.$refs.editor);
+            // console.log('slide config before saving image panel slide');
+            // console.log(JSON.parse(JSON.stringify(this.currentSlide)));
             (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV).saveChanges();
+            // console.log('slide config after saving image panel slide');
+            // console.log(JSON.parse(JSON.stringify(this.currentSlide)));
         }
     }
 
