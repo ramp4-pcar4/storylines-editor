@@ -150,6 +150,8 @@ export default class VideoEditorV extends Vue {
     }
 
     mounted(): void {
+        console.log(' ');
+        console.log('video panel being mounted');
         if (this.panel.src) {
             if (this.panel.videoType === 'local') {
                 this.videoPreviewLoading = true;
@@ -158,9 +160,16 @@ export default class VideoEditorV extends Vue {
                 const assetSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
                 const filename = this.panel.src.replace(/^.*[\\/]/, '');
 
+                console.log('video src');
+                console.log(assetSrc);
+                console.log('video file name');
+                console.log(filename);
+
                 const assetFile = this.configFileStructure.zip.file(assetSrc);
                 if (assetFile) {
                     this.videoPreviewPromise = assetFile.async('blob').then((res: Blob) => {
+                        console.log('asset file found, will be inserted into videoPreview');
+                        console.log(assetFile);
                         return {
                             ...this.panel,
                             id: filename ? filename : this.panel.src,
@@ -172,6 +181,8 @@ export default class VideoEditorV extends Vue {
                 this.videoPreviewPromise?.then((res) => {
                     this.videoPreview = res;
                     this.videoPreviewLoading = false;
+                    console.log('videoPreview after mounting video panel');
+                    console.log(this.imagePreviews);
                 });
 
                 this.slideshowCaption = this.panel.caption as string;
@@ -194,16 +205,54 @@ export default class VideoEditorV extends Vue {
 
     // adds an uploaded file that is either a: video, transcript or captions
     addUploadedFile(file: File, type: string): void {
-        const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
-        this.configFileStructure.assets[this.lang].file(file.name, file);
+        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${file.name}`;
+        const oppositeLang = this.lang === 'en' ? 'fr' : 'en';
+        let oppositeSourceCount = 0;
+        const inCurrAssets = !!this.configFileStructure.assets[this.lang].file(file.name);
+        const inOppositeAssets = !!this.configFileStructure.assets[oppositeLang].file(file.name);
+        const inSharedAssets = !!this.configFileStructure.assets['shared'].file(file.name);
+
+        console.log(' ');
+        console.log('addUploadedFile()');
+        console.log('this.videoPreview before');
+        console.log(JSON.parse(JSON.stringify(this.videoPreview)));
+        console.log('this.configFileStructure before');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
+        console.log('file name of dropped image');
+        console.log(file.name);
+        console.log('file in opposite langs assets folder?');
+        console.log(inOppositeAssets);
+        console.log('file in current langs assets folder?');
+        console.log(inCurrAssets);
+
+        // If the file is already in the opposite langs assets folder, we should move it to the shared
+        // assets folder, rather than duplicating it within the current lang's assets folder. Otherwise,
+        // if the file is already in the shared assets folder, then nothing needs to be done, since the
+        // panel's config will simply access the file from the shared assets folder. If the asset is neither
+        // in the shared nor the opposite langs assets folder, the file should be uploaded to the current
+        // langs assets folder
+        if (inOppositeAssets) {
+            const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${file.name}`;
+            oppositeSourceCount = this.sourceCounts[oppositeFileSource] ?? 0;
+            this.sourceCounts[oppositeFileSource] = 0;
+            this.configFileStructure.assets[oppositeLang].remove(file.name);
+            this.configFileStructure.assets['shared'].file(file.name, file);
+            this.$emit('shared-asset', file.name, oppositeLang);
+        } else if (!inSharedAssets) {
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
+            this.configFileStructure.assets[this.lang].file(file.name, file);
+        }
+
         if (this.sourceCounts[uploadSource]) {
-            this.sourceCounts[uploadSource] += 1;
+            this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
         } else {
-            this.sourceCounts[uploadSource] = 1;
+            this.sourceCounts[uploadSource] = 1 + oppositeSourceCount;
         }
 
         // check if source file is creating a new video or uploading captions/transcript for current video
         const fileSrc = URL.createObjectURL(file);
+        console.log('fileSrc');
+        console.log(fileSrc);
         if (type === 'src') {
             this.videoPreview = {
                 id: file.name,
@@ -217,6 +266,10 @@ export default class VideoEditorV extends Vue {
         }
         this.edited = true;
         this.$emit('slide-edit');
+        console.log('this.videoPreview after');
+        console.log(JSON.parse(JSON.stringify(this.videoPreview)));
+        console.log('this.configFileStructure after');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
     }
 
     onFileChange(e: Event): void {
@@ -300,29 +353,88 @@ export default class VideoEditorV extends Vue {
     }
 
     deleteVideo(): void {
+        console.log(' ');
+        console.log('deleteVideo()');
+        console.log('configFileStructure before');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
+        console.log('videoPreview before');
+        console.log(JSON.parse(JSON.stringify(this.videoPreview)));
+        const assetLocation = this.srcFolder(this.videoPreview.id);
+
+        if (this.videoPreview.videoType === 'local') {
+            const videoSource = `${this.configFileStructure.uuid}/assets/${assetLocation}/${this.videoPreview.id}`;
+            console.log('source of video being deleted');
+            console.log(videoSource);
+            console.log('name of video file being deleted');
+            console.log(this.videoPreview.id);
+
+            this.sourceCounts[videoSource] -= 1;
+            if (this.sourceCounts[videoSource] === 0) {
+                console.log('video being deleted from configFileStructure (source count hit 0)');
+                if (assetLocation === 'shared') {
+                    console.log('file being deleted exists in the shared folder, delete from there');
+                } else {
+                    console.log('file being deleted should be deleted from current langs folder');
+                }
+                this.configFileStructure.assets[assetLocation].remove(this.videoPreview.id);
+                URL.revokeObjectURL(this.videoPreview.src);
+            } else {
+                console.log(`source count of video is still: ${this.sourceCounts[videoSource]} `);
+            }
+        }
         (this.$refs.videoFileInput as HTMLInputElement).value = '';
         this.videoPreview = {};
         this.onVideoEdited();
+        console.log('configFileStructure after');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
+        console.log('videoPreview after');
+        console.log(JSON.parse(JSON.stringify(this.videoPreview)));
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('saveChanges()');
+        console.log('video panel being saved');
+        console.log('video panel before');
+        console.log(JSON.parse(JSON.stringify(this.panel)));
+        console.log('videoPreview');
+        console.log(this.videoPreview);
         if (this.edited && this.videoPreview) {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
+            const assetLocation = this.srcFolder(this.videoPreview.id);
+
+            if (assetLocation === 'shared') {
+                console.log('video preview will be put into shared folder');
+            } else {
+                console.log('video preview will be put into current langs folde');
+            }
+            if (this.panel.videoType === 'local') {
+                console.log('video preview src');
+                console.log(`${this.configFileStructure.uuid}/assets/${assetLocation}/${this.videoPreview.id}`);
+            }
+
             this.panel.src =
                 this.videoPreview.videoType === 'local'
-                    ? `${this.configFileStructure.uuid}/assets/${this.lang}/${this.videoPreview.id}`
+                    ? `${this.configFileStructure.uuid}/assets/${assetLocation}/${this.videoPreview.id}`
                     : this.videoPreview.src;
             this.panel.caption = this.videoPreview.caption ? this.videoPreview.caption : '';
             this.panel.transcript = this.videoPreview.transcript ? this.videoPreview.transcript : '';
         }
         this.edited = false;
+        console.log('video panel after');
+        console.log(JSON.parse(JSON.stringify(this.panel)));
     }
 
     onVideoEdited(): void {
         this.edited = true;
         this.$emit('slide-edit', this.videoPreview?.videoType || this.videoPreview?.title?.length ? true : false);
+    }
+
+    // checks whether an image belongs to current lang's assets folder or the shared assets folder
+    srcFolder(imageId: string): string {
+        return this.configFileStructure.assets['shared'].file(imageId) ? 'shared' : this.lang;
     }
 }
 </script>

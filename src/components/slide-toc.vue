@@ -614,6 +614,7 @@ export default class SlideTocV extends Vue {
      * @param currLang The config to delete, either 'en' for English of 'fr' for French.
      */
     deleteConfig(slides: MultiLanguageSlide, currLang: 'en' | 'fr'): void {
+        slides[currLang].panels.forEach((panel: BasePanel) => this.removeSourceHelper(panel));
         slides[currLang] = undefined;
         this.$emit('slides-updated', this.slides);
     }
@@ -632,7 +633,47 @@ export default class SlideTocV extends Vue {
 
     // Assumes that you've already checked that the other lang DOES have a config.
     copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
-        this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][currLang === 'en' ? 'fr' : 'en']));
+        console.log(' ');
+        console.log('copyConfigFromOtherLang()');
+        const oppositeLang = currLang === 'en' ? 'fr' : 'en';
+        console.log(this.slides[index][oppositeLang]);
+
+        // Called on each image/video panel in the opposite lang's config (at the provided index)
+        const oppositeToSharedFolder = (panel: ImagePanel | VideoPanel, oppositeLang: string) => {
+            if (panel.src) {
+                const assetSrc = panel.src.split('/');
+                console.log(assetSrc);
+                const fileName = assetSrc.at(-1);
+                const assetType = fileName.split('.').at(-1);
+                const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${fileName}`;
+                const sharedFileSource = `${this.configFileStructure.uuid}/assets/shared/${fileName}`;
+                const file = this.configFileStructure.assets[oppositeLang].file(fileName);
+
+                file.async(assetType !== 'svg' ? 'blob' : 'text').then((assetFile) => {
+                    if (assetType === 'svg') {
+                        assetFile = new File([assetFile], fileName, {
+                            type: 'image/svg+xml'
+                        });
+                    }
+                    if (!this.configFileStructure.assets['shared'].file(fileName)) {
+                        console.log('need to change to shared');
+                        this.configFileStructure.assets[oppositeLang].remove(fileName);
+                        this.configFileStructure.assets['shared'].file(fileName, assetFile);
+                        this.sourceCounts[sharedFileSource] = this.sourceCounts[oppositeFileSource];
+                        this.sourceCounts[oppositeFileSource] = 0;
+                        this.$emit('shared-asset', fileName, oppositeLang);
+                    }
+
+                    this.sourceCounts[sharedFileSource] += 1;
+                });
+            }
+        };
+
+        this.slides[index][oppositeLang].panel.forEach((panel) =>
+            this.$emit('process-panel', panel, oppositeToSharedFolder, oppositeLang)
+        );
+        this.slides[index][currLang].panel.forEach((panel) => this.removeSourceHelper(panel));
+        this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][oppositeLang]));
         this.$emit('slides-updated', this.slides);
         this.$emit('slide-change', index, currLang);
     }
@@ -654,6 +695,18 @@ export default class SlideTocV extends Vue {
      */
     copySlide(index: number): void {
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
+
+        // increment source count of each asset in this slide
+        const incrementSourceCounts = (panel: ImagePanel | VideoPanel, lang) => {
+            if (panel.src) {
+                const assetSrc = panel.src.split('/');
+                const fileSrc = `${this.configFileStructure.uuid}/assets/${lang}/${assetSrc.at(-1)}`;
+                this.sourceCounts[fileSrc] += 1;
+            }
+        };
+        this.slides[index].en.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts, 'en'));
+        this.slides[index].fr.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts, 'fr'));
+
         this.$emit('slides-updated', this.slides);
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
