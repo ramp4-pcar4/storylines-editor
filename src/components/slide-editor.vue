@@ -336,9 +336,16 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save, lang)"
+                    @config-edited="(slideConfig: Slide, save?: boolean = false) => {
+                        $emit('custom-slide-updated', slideConfig, save, lang)
+                    }"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
+                <!-- TODO: upon calling saveChanges() for an image panel, determineEditorType below gets called 
+                 This results in issues if the saveChanges() method is async, and the panel array is not yet defined -->
                 <component
                     ref="editor"
                     :is="editors[determineEditorType(currentSlide.panel[panelIndex])]"
@@ -350,6 +357,9 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
                     @slide-edit="(changedFromDefault: boolean = true) => {
                         $emit('slide-edit');
 
@@ -495,7 +505,7 @@ export default class SlideEditorV extends Vue {
         this.centerPanel = this.currentSlide.centerPanel ?? false;
         this.centerSlide = this.currentSlide.centerSlide ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel.length === 1;
+        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel?.length === 1;
     }
 
     /**
@@ -598,6 +608,8 @@ export default class SlideEditorV extends Vue {
             }
 
             case 'image': {
+                // as long as assets are uploaded/removed from the appropriate folders (either shared or current lang),
+                // then this should work fine as is
                 const imagePanel = panel as ImagePanel;
                 this.sourceCounts[imagePanel.src] -= 1;
                 if (this.sourceCounts[imagePanel.src] === 0) {
