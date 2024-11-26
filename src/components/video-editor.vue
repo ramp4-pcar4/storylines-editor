@@ -202,12 +202,34 @@ export default class VideoEditorV extends Vue {
 
     // adds an uploaded file that is either a: video, transcript or captions
     addUploadedFile(file: File, type: string): void {
-        const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
-        this.configFileStructure.assets[this.lang].file(file.name, file);
+        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${file.name}`;
+        const oppositeLang = this.lang === 'en' ? 'fr' : 'en';
+        let oppositeSourceCount = 0;
+        const inOppositeAssets = !!this.configFileStructure.assets[oppositeLang].file(file.name);
+        const inSharedAssets = !!this.configFileStructure.assets['shared'].file(file.name);
+
+        // If the file is already in the opposite langs assets folder, we should move it to the shared
+        // assets folder, rather than duplicating it within the current lang's assets folder. Otherwise,
+        // if the file is already in the shared assets folder, then nothing needs to be done, since the
+        // panel's config will simply access the file from the shared assets folder. If the asset is neither
+        // in the shared nor the opposite langs assets folder, the file should be uploaded to the current
+        // langs assets folder
+        if (inOppositeAssets) {
+            const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${file.name}`;
+            oppositeSourceCount = this.sourceCounts[oppositeFileSource] ?? 0;
+            this.sourceCounts[oppositeFileSource] = 0;
+            this.configFileStructure.assets[oppositeLang].remove(file.name);
+            this.configFileStructure.assets['shared'].file(file.name, file);
+            this.$emit('shared-asset', file.name, oppositeLang);
+        } else if (!inSharedAssets) {
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
+            this.configFileStructure.assets[this.lang].file(file.name, file);
+        }
+
         if (this.sourceCounts[uploadSource]) {
-            this.sourceCounts[uploadSource] += 1;
+            this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
         } else {
-            this.sourceCounts[uploadSource] = 1;
+            this.sourceCounts[uploadSource] = 1 + oppositeSourceCount;
         }
 
         // check if source file is creating a new video or uploading captions/transcript for current video
@@ -308,6 +330,17 @@ export default class VideoEditorV extends Vue {
     }
 
     deleteVideo(): void {
+        const assetLocation = this.srcFolder(this.videoPreview.id);
+
+        if (this.videoPreview.videoType === 'local') {
+            const videoSource = `${this.configFileStructure.uuid}/assets/${assetLocation}/${this.videoPreview.id}`;
+
+            this.sourceCounts[videoSource] -= 1;
+            if (this.sourceCounts[videoSource] === 0) {
+                this.configFileStructure.assets[assetLocation].remove(this.videoPreview.id);
+                URL.revokeObjectURL(this.videoPreview.src);
+            }
+        }
         (this.$refs.videoFileInput as HTMLInputElement).value = '';
         this.videoPreview = {};
         this.onVideoEdited();
@@ -318,9 +351,11 @@ export default class VideoEditorV extends Vue {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
+            const assetLocation = this.srcFolder(this.videoPreview.id);
+
             this.panel.src =
                 this.videoPreview.videoType === 'local'
-                    ? `${this.configFileStructure.uuid}/assets/${this.lang}/${this.videoPreview.id}`
+                    ? `${this.configFileStructure.uuid}/assets/${assetLocation}/${this.videoPreview.id}`
                     : this.videoPreview.src;
             this.panel.caption = this.videoPreview.caption ? this.videoPreview.caption : '';
             this.panel.transcript = this.videoPreview.transcript ? this.videoPreview.transcript : '';
@@ -331,6 +366,11 @@ export default class VideoEditorV extends Vue {
     onVideoEdited(): void {
         this.edited = true;
         this.$emit('slide-edit', this.videoPreview?.videoType || this.videoPreview?.title?.length ? true : false);
+    }
+
+    // checks whether an image belongs to current lang's assets folder or the shared assets folder
+    srcFolder(imageId: string): string {
+        return this.configFileStructure.assets['shared'].file(imageId) ? 'shared' : this.lang;
     }
 }
 </script>

@@ -485,6 +485,7 @@
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
                 @export-product="exportProduct"
+                @lang-change="changeLang"
                 ref="mainEditor"
             >
                 <!-- Metadata editing modal inside the editor -->
@@ -724,7 +725,6 @@ export default class MetadataEditorV extends Vue {
             this.metadata.tocOrientation = 'vertical';
             this.metadata.returnTop = true;
         }
-
         // Find which view to render based on route
         if (this.$route.name === 'editor') {
             this.loadEditor = true;
@@ -794,6 +794,10 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    changeLang(lang: string): void {
+        this.configLang = lang;
     }
 
     /**
@@ -1279,7 +1283,8 @@ export default class MetadataEditorV extends Vue {
             configs: this.configs as unknown as { [key: string]: StoryRampConfig },
             assets: {
                 en: (assetsFolder as JSZip).folder('en') as JSZip,
-                fr: (assetsFolder as JSZip).folder('fr') as JSZip
+                fr: (assetsFolder as JSZip).folder('fr') as JSZip,
+                shared: (assetsFolder as JSZip).folder('shared') as JSZip
             },
             charts: {
                 en: (chartsFolder as JSZip).folder('en') as JSZip,
@@ -1289,6 +1294,8 @@ export default class MetadataEditorV extends Vue {
         };
 
         // If uploadLogo is set, upload the logo to the directory.
+        // Q: if we create a shared assets folder, should the logo just go there, since both langs
+        // should have the same logo?
         if (uploadLogo !== undefined) {
             this.configFileStructure.assets[this.configLang].file(uploadLogo?.name, uploadLogo);
         }
@@ -1447,10 +1454,10 @@ export default class MetadataEditorV extends Vue {
         const frFileName = `${this.uuid}_fr.json`;
 
         // Replace undefined slides with empty objects
-        this.configs.en!.slides = this.configs.en!.slides.map((slide) => {
+        this.configs.en.slides = this.configs.en?.slides.map((slide) => {
             return slide ?? {};
         });
-        this.configs.fr!.slides = this.configs.fr!.slides.map((slide) => {
+        this.configs.fr.slides = this.configs.fr?.slides.map((slide) => {
             return slide ?? {};
         });
         this.loadSlides(this.configs);

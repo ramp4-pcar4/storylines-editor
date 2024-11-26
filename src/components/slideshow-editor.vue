@@ -95,6 +95,9 @@
                         :lang="lang"
                         :sourceCounts="sourceCounts"
                         :allowMany="false"
+                        @shared-asset="(assetName: string, oppositeLang: string) => {
+                            $emit('shared-asset', assetName, oppositeLang);
+                        }"
                     ></component>
                     <div class="mt-3 w-full flex justify-end">
                         <button
@@ -117,6 +120,9 @@
                         :sourceCounts="sourceCounts"
                         :key="editingIdx + panel.items[editingIdx].type"
                         :allowMany="false"
+                        @shared-asset="(assetName: string, oppositeLang: string) => {
+                            $emit('shared-asset', assetName, oppositeLang);
+                        }"
                     ></component>
                     <div class="mt-3 w-full flex justify-end">
                         <button class="editor-button bg-black text-white hover:bg-gray-800" @click="saveItem()">

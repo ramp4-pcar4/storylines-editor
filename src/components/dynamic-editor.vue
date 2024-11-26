@@ -92,6 +92,9 @@
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit')"
+                    @shared-asset="(assetName: string, oppositeLang: string) => {
+                        $emit('shared-asset', assetName, oppositeLang);
+                    }"
                 ></component>
             </div>
         </div>

@@ -333,7 +333,12 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save, lang)"
+                    @config-edited="(slideConfig: Slide, save?: boolean = false) => {
+                        $emit('custom-slide-updated', slideConfig, save, lang)
+                    }"
+                    @shared-asset="(assetName: string, oppositeLang: string) => {
+                        $emit('shared-asset', assetName, oppositeLang);
+                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -347,6 +352,9 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
+                    @shared-asset="(assetName: string, oppositeLang: string) => {
+                        $emit('shared-asset', assetName, oppositeLang);
+                    }"
                     @slide-edit="(changedFromDefault: boolean = true) => {
                         $emit('slide-edit');
 
@@ -596,6 +604,8 @@ export default class SlideEditorV extends Vue {
             }
 
             case 'image': {
+                // as long as assets are uploaded/removed from the appropriate folders (either shared or current lang),
+                // then this should work fine as is
                 const imagePanel = panel as ImagePanel;
                 this.sourceCounts[imagePanel.src] -= 1;
                 if (this.sourceCounts[imagePanel.src] === 0) {

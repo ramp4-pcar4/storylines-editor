@@ -244,9 +244,49 @@ export default class ImageEditorV extends Vue {
                 this.imagePreviews = res;
                 this.imagePreviewsLoading = false;
             });
-
             this.slideshowCaption = this.panel.caption as string;
         }
+    }
+
+    // Helper for onFileChange and dropImages. Maps a File object to an ImageFile object
+    addUploadedFile(file: File) {
+        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${file.name}`;
+        const oppositeLang = this.lang === 'en' ? 'fr' : 'en';
+        let oppositeSourceCount = 0;
+        const inOppositeAssets = !!this.configFileStructure.assets[oppositeLang].file(file.name);
+        const inSharedAssets = !!this.configFileStructure.assets['shared'].file(file.name);
+
+        // If the file is already in the opposite langs assets folder, we should move it to the shared
+        // assets folder, rather than duplicating it within the current lang's assets folder. Otherwise,
+        // if the file is already in the shared assets folder, then nothing needs to be done, since the
+        // panel config will simply access the file from the shared assets folder. If the asset is neither
+        // in the shared nor the opposite langs assets folder, the file should be uploaded to the current
+        // langs assets folder
+        if (inOppositeAssets) {
+            const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${file.name}`;
+            oppositeSourceCount = this.sourceCounts[oppositeFileSource] ?? 0;
+            this.sourceCounts[oppositeFileSource] = 0;
+            this.configFileStructure.assets[oppositeLang].remove(file.name);
+            this.configFileStructure.assets['shared'].file(file.name, file);
+            this.$emit('shared-asset', file.name, oppositeLang);
+        } else if (!inSharedAssets) {
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
+            this.configFileStructure.assets[this.lang].file(file.name, file);
+        }
+
+        if (this.sourceCounts[uploadSource]) {
+            this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
+        } else {
+            this.sourceCounts[uploadSource] = 1 + oppositeSourceCount;
+        }
+
+        let imageSrc = URL.createObjectURL(file);
+        return {
+            id: file.name,
+            altText: '',
+            caption: '',
+            src: imageSrc
+        };
     }
 
     onFileChange(e: Event): void {
@@ -254,25 +294,10 @@ export default class ImageEditorV extends Vue {
         const filelist = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>);
         this.imagePreviews.push(
             ...filelist.map((file: File) => {
-                // Add the uploaded images to the product ZIP file.
-                const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
-                this.configFileStructure.assets[this.lang].file(file.name, file);
-
-                if (this.sourceCounts[uploadSource]) {
-                    this.sourceCounts[uploadSource] += 1;
-                } else {
-                    this.sourceCounts[uploadSource] = 1;
-                }
-
-                let imageSrc = URL.createObjectURL(file);
-                return {
-                    id: file.name,
-                    altText: '',
-                    caption: '',
-                    src: imageSrc
-                };
+                return this.addUploadedFile(file);
             })
         );
+
         this.onImagesEdited();
     }
 
@@ -287,23 +312,7 @@ export default class ImageEditorV extends Vue {
 
             this.imagePreviews.push(
                 ...files.map((file: File) => {
-                    // Add the uploaded images to the product ZIP file.
-                    const uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${file.name}`;
-                    this.configFileStructure.assets[this.lang].file(file.name, file);
-
-                    if (this.sourceCounts[uploadSource]) {
-                        this.sourceCounts[uploadSource] += 1;
-                    } else {
-                        this.sourceCounts[uploadSource] = 1;
-                    }
-
-                    let imageSrc = URL.createObjectURL(file);
-                    return {
-                        id: file.name,
-                        altText: '',
-                        caption: '',
-                        src: imageSrc
-                    };
+                    return this.addUploadedFile(file);
                 })
             );
             this.dragging = false;
@@ -314,12 +323,15 @@ export default class ImageEditorV extends Vue {
     deleteImage(img: ImageFile): void {
         const idx = this.imagePreviews.findIndex((file: ImageFile) => file.id === img.id);
         if (idx !== -1) {
-            const fileSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${this.imagePreviews[idx].id}`;
+            const assetLocation = this.srcFolder(this.imagePreviews[idx].id);
+
+            // Set file source based on whether it exists in the shared assets folder or not
+            const fileSource = `${this.configFileStructure.uuid}/assets/${assetLocation}/${this.imagePreviews[idx].id}`;
 
             // Remove the image from the product ZIP file.
             this.sourceCounts[fileSource] -= 1;
             if (this.sourceCounts[fileSource] === 0) {
-                this.configFileStructure.assets[this.lang].remove(this.imagePreviews[idx].id);
+                this.configFileStructure.assets[assetLocation].remove(this.imagePreviews[idx].id);
                 URL.revokeObjectURL(this.imagePreviews[idx].src);
             }
             this.imagePreviews.splice(idx, 1);
@@ -355,18 +367,24 @@ export default class ImageEditorV extends Vue {
                     // @ts-ignore
                     (this.panel as ImagePanel)[key] = imageFile[key];
                 });
-
-                (this.panel as ImagePanel).src = `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`;
+                // Set the image source based on whether the image is in the shared assets folder or not
+                (this.panel as ImagePanel).src = `${this.configFileStructure.uuid}/assets/${this.srcFolder(
+                    imageFile.id
+                )}/${imageFile.id}`;
             } else {
                 // Otherwise, convert this to a slideshow panel.
                 this.panel.type = PanelType.Slideshow;
                 this.panel.caption = this.slideshowCaption ?? undefined;
 
-                // Turn each of the image configs into an image panel and add them to the slidesow.
+                // Turn each of the image configs into an image panel and add them to the slideshow.
                 (this.panel as SlideshowPanel).items = this.imagePreviews.map((imageFile: ImageFile) => {
+                    // Set the image source based on whether the image is in the shared assets folder or not
+                    const imageSource = `${this.configFileStructure.uuid}/assets/${this.srcFolder(imageFile.id)}/${
+                        imageFile.id
+                    }`;
                     return {
                         ...imageFile,
-                        src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`,
+                        src: imageSource,
                         type: PanelType.Image
                     } as ImagePanel;
                 });
@@ -378,6 +396,11 @@ export default class ImageEditorV extends Vue {
     onImagesEdited(): void {
         this.edited = true;
         this.$emit('slide-edit', this.imagePreviews.length !== 0);
+    }
+
+    // checks whether an image belongs to current lang's assets folder or the shared assets folder
+    srcFolder(imageId: string): string {
+        return this.configFileStructure.assets['shared'].file(imageId) ? 'shared' : this.lang;
     }
 }
 </script>
