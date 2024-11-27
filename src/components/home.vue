@@ -137,6 +137,7 @@
                                 min-width: 0;
                                 max-width: 100%;
                             "
+                            @click="editProduct(storyline.uuid)"
                         >
                             <span class="pr-1">
                                 <svg
@@ -174,23 +175,55 @@ export default class HomeV extends Vue {
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
         this.sourceFile = window.location.href.split('/').find((s) => s.includes('#'));
-        this.userStore
-            .fetchUserProfile()
-            .then(() => {
-                if (this.userStore.userProfile) {
-                    this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
+        // this.userStore
+        //     .fetchUserProfile()
+        //     .then(() => {
+        //         if (this.userStore.userProfile) {
+        //             this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         console.error(error);
+        //     });
+
+        this.profile = {
+            userName: 'A User',
+            role: 'Editor',
+            storylines: [
+                {
+                    uuid: '00000000-0000-0000-0000-000000000000',
+                    titleEN: '',
+                    titleFR: '',
+                    lastModified: '2024-11-12T15:59:59.4366667'
+                },
+                {
+                    uuid: '02980a8b-c041-49f9-9820-40bf05a75002',
+                    titleEN: 'NPRI Sector Overview: Electricity',
+                    titleFR: "Aperçu des secteurs de l'INRP : électricité",
+                    lastModified: '2024-11-12T14:59:59.4366667'
+                },
+                {
+                    uuid: '02980a8b-c041-49f9-9820-40bf05a75004',
+                    titleEN: 'NPRI Sector Overview: Electricity',
+                    titleFR: "Aperçu des secteurs de l'INRP : électricité",
+                    lastModified: '2021-12-12T15:59:59.4366667'
+                },
+                {
+                    uuid: '02aef6e7-b848-4512-8054-e1f3ccd58ce8',
+                    titleEN: 'NPRI Data Integration : Water Quality',
+                    titleFR: "Intégration des données de l'INRP : la qualité de l'eau",
+                    lastModified: '2024-10-12T15:59:59.4366667'
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            ]
+        };
     }
+
     get userName(): string {
         return this.profile?.userName || 'Guest';
     }
 
     get userStorylines(): Array<Storyline> {
-        return this.profile?.storylines || {};
+        return this.profile?.storylines?.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified)) || {};
     }
 
     dateFormatter(date: string | null): string {
@@ -216,6 +249,10 @@ export default class HomeV extends Vue {
                 return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
             }
         }
+    }
+
+    editProduct(uuid: number): void {
+        this.$router.push({ name: 'editor', params: { uid: uuid } });
     }
 }
 </script>
