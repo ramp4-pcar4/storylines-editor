@@ -137,6 +137,7 @@
                                 min-width: 0;
                                 max-width: 100%;
                             "
+                            @click="editProduct(storyline.uuid)"
                         >
                             <span class="pr-1">
                                 <svg
@@ -174,17 +175,31 @@ export default class HomeV extends Vue {
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
         this.sourceFile = window.location.href.split('/').find((s) => s.includes('#'));
-        this.userStore
-            .fetchUserProfile()
-            .then(() => {
-                if (this.userStore.userProfile) {
-                    this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
+        // this.userStore
+        //     .fetchUserProfile()
+        //     .then(() => {
+        //         if (this.userStore.userProfile) {
+        //             this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         console.error(error);
+        //     });
+
+        this.profile = {
+            userName: 'A User',
+            role: 'Editor',
+            storylines: [
+                {
+                    uuid: '00000000-0000-0000-0000-000000000000',
+                    titleEN: '',
+                    titleFR: '',
+                    lastModified: '2024-11-12T15:59:59.4366667'
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            ]
+        };
     }
+
     get userName(): string {
         return this.profile?.userName || 'Guest';
     }
@@ -216,6 +231,10 @@ export default class HomeV extends Vue {
                 return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
             }
         }
+    }
+
+    editProduct(uuid: number): void {
+        this.$router.push({ name: 'editor', params: { uid: uuid } });
     }
 }
 </script>
