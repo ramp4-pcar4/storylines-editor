@@ -544,6 +544,16 @@
                 </template>
             </editor>
         </template>
+        <confirmation-modal
+            :name="`confirm-extend-session`"
+            :message="
+                $t('editor.extendSession', {
+                    secs: lockStore.timeRemaining
+                })
+            "
+            :messageClass="'text-lg'"
+            @ok="extendSession()"
+        />
     </div>
 </template>
 
@@ -588,6 +598,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import EditorV from './editor.vue';
 
 import cloneDeep from 'clone-deep';
+import { useLockStore } from '@/stores/lockStore';
 
 interface RouteParams {
     uid: string;
@@ -641,6 +652,7 @@ export default class MetadataEditorV extends Vue {
     currLang = 'en'; // page language
     showDropdown = false;
     highlightedIndex = -1;
+    lockStore = useLockStore();
 
     storylineHistory: History[] = [];
     selectedHistory: History | null = null;
@@ -709,7 +721,8 @@ export default class MetadataEditorV extends Vue {
         uuid: true
     };
     slides: MultiLanguageSlide[] = [];
-
+    confirmationTimeout: NodeJS.Timeout | undefined = undefined; // the timer to show the session extension confirmation modal
+    endTimeout: NodeJS.Timeout | undefined = undefined; // the timer to kill the session due to timeout
     sourceCounts: SourceCounts = {};
 
     mounted(): void {
@@ -748,6 +761,8 @@ export default class MetadataEditorV extends Vue {
 
             // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
             if (props && props.configs && props.configFileStructure) {
+                // New product has UUID locked in, need to start timing sessions
+                this.extendSession();
                 this.configs = props.configs;
                 this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
@@ -798,6 +813,28 @@ export default class MetadataEditorV extends Vue {
         if (this.$route.params.uid) {
             this.generateRemoteConfig();
         }
+    }
+
+    handleSessionTimeout(): void {
+        // Clear any lingering timers
+        clearTimeout(this.endTimeout);
+        clearTimeout(this.confirmationTimeout);
+        // We prompt the user to extend the session when there are 30 seconds left (i.e. 29.5 minutes have passed).
+        this.confirmationTimeout = setTimeout(() => {
+            this.$vfm.open(`confirm-extend-session`);
+        }, this.lockStore.timeRemaining * 1000 - 30000);
+        // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
+        this.endTimeout = setTimeout(() => {
+            this.$vfm.close('confirm-extend-session');
+            this.$router.push({ name: 'home' });
+        }, this.lockStore.timeRemaining * 1000 + 1000);
+    }
+
+    extendSession(): void {
+        // If the user wants to extend the timer, this method will reset the time remaining.
+        this.lockStore.resetSession();
+        // We need to call this method again because we need to keep checking that the time has not run out.
+        this.handleSessionTimeout();
     }
 
     /**
@@ -911,7 +948,8 @@ export default class MetadataEditorV extends Vue {
         return new Promise((resolve, reject) => {
             this.loadStatus = 'loading';
             const user = useUserStore().userProfile.userName || 'Guest';
-            fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, { headers: { user } })
+            const secret = this.lockStore.secret;
+            fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, { headers: { user, secret: secret } })
                 .then((res: Response) => {
                     if (res.status === 404) {
                         // Version not found.
@@ -930,6 +968,8 @@ export default class MetadataEditorV extends Vue {
                         res.blob().then((file: Blob) => {
                             configZip.loadAsync(file).then(() => {
                                 this.configFileStructureHelper(configZip);
+                                // Extend the session on load
+                                this.extendSession();
                             });
                         });
                     }
@@ -968,16 +1008,34 @@ export default class MetadataEditorV extends Vue {
      * Provided with a UID, retrieve the project contents from the file server.
      */
     generateRemoteConfig(): Promise<void> {
-        this.loadStatus = 'loading';
-
-        // Reset fields
-        this.baseUuid = this.uuid;
-        this.renamed = '';
-        this.changeUuid = '';
-
-        // Attempt to fetch the project from the server.
         return new Promise((resolve, reject) => {
-            this.loadVersion('latest').then(resolve).catch(reject);
+            // Clear any lingering timeouts, don't want to exit while stuff is loading.
+            clearInterval(this.confirmationTimeout);
+            clearInterval(this.endTimeout);
+
+            // Before loading the product, we need to try and get its "lock".
+            // If successful i.e. the product is free to use, we load the product.
+            // If not i.e. another user is using it right now, we show an error message.
+            this.lockStore
+                .lockStoryline(this.uuid)
+                .then(() => {
+                    this.loadStatus = 'loading';
+                    this.error = false;
+
+                    // Reset fields
+                    this.baseUuid = this.uuid;
+                    this.renamed = '';
+                    this.changeUuid = '';
+
+                    // Attempt to fetch the project from the server.
+                    this.loadVersion('latest').then(resolve).catch(reject);
+                })
+                .catch(() => {
+                    this.error = true;
+                    this.loadStatus = 'waiting';
+                    this.clearConfig();
+                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                });
         });
     }
 
@@ -986,9 +1044,9 @@ export default class MetadataEditorV extends Vue {
         // as the history should be much smaller and quicker to fetch than the config
 
         if (this.uuid === undefined) Message.error(this.$t('editor.warning.mustEnterUuid'));
-        this.loadStatus = 'loading';
         const user = useUserStore().userProfile.userName || 'Guest';
-        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user } }).then((res: Response) => {
+        const secret = this.lockStore.secret;
+        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user, secret } }).then((res: Response) => {
             if (res.status === 404) {
                 // Product not found.
                 Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
@@ -997,7 +1055,6 @@ export default class MetadataEditorV extends Vue {
                     this.storylineHistory = json;
                 });
             }
-            this.loadStatus = 'loaded';
         });
     }
 
@@ -1324,6 +1381,10 @@ export default class MetadataEditorV extends Vue {
     generateConfig(): ConfigFileStructure {
         this.saving = true;
 
+        // Clear any session timeouts, don't want the app to exit while saving, duh
+        clearTimeout(this.confirmationTimeout);
+        clearTimeout(this.endTimeout);
+
         // Update the configuration files, for both languages.
         const engFileName = `${this.uuid}_en.json`;
         const frFileName = `${this.uuid}_fr.json`;
@@ -1348,11 +1409,15 @@ export default class MetadataEditorV extends Vue {
             const formData = new FormData();
             formData.append('data', content, `${this.uuid}.zip`);
             const userStore = useUserStore();
-            const headers = { 'Content-Type': 'multipart/form-data', user: userStore.userProfile.userName || 'Guest' };
+            const headers = {
+                'Content-Type': 'multipart/form-data',
+                user: userStore.userProfile.userName || 'Guest',
+                secret: this.lockStore.secret
+            };
             Message.warning(this.$t('editor.editMetadata.message.wait'));
 
             axios
-                .post(this.apiUrl + '/upload', formData, { headers })
+                .post(this.apiUrl + `/upload/${this.uuid}`, formData, { headers })
                 .then((res: AxiosResponse) => {
                     const responseData = res.data;
                     responseData.files; // binary representation of the file
@@ -1380,6 +1445,8 @@ export default class MetadataEditorV extends Vue {
                                     axios
                                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
+                                            // Extend the session on save
+                                            this.extendSession();
                                             Message.success(this.$t('editor.editMetadata.message.successfulSave'));
                                         })
                                         .catch((error: any) => console.log(error.response || error))
@@ -1401,6 +1468,8 @@ export default class MetadataEditorV extends Vue {
                                 .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
                                     Message.success(this.$t('editor.editMetadata.message.successfulSave'));
+                                    // Extend the session on save
+                                    this.extendSession();
                                 })
                                 .catch((error: any) => console.log(error.response || error))
                                 .finally(() => {
@@ -1542,30 +1611,27 @@ export default class MetadataEditorV extends Vue {
         if (rename) this.checkingUuid = true;
 
         if (!this.loadExisting || rename) {
-            const user = useUserStore().userProfile.userName || 'Guest';
             // If renaming, show the loading spinner while we check whether the UUID is taken.
-            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}/latest`, { headers: { user } }).then(
-                (res: Response) => {
-                    if (res.status !== 404) {
-                        this.warning = rename ? 'rename' : 'uuid';
-                    }
-
-                    if (rename) this.checkingUuid = false;
-
-                    fetch(this.apiUrl + `/retrieveMessages`)
-                        .then((res: any) => {
-                            if (res.ok) return res.json();
-                        })
-                        .then((data) => {
-                            axios
-                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                                    messages: data.messages
-                                })
-                                .catch((error: any) => console.log(error.response || error));
-                        })
-                        .catch((error: any) => console.log(error.response || error));
+            fetch(this.apiUrl + `/exists/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
+                if (res.status !== 404) {
+                    this.warning = rename ? 'rename' : 'uuid';
                 }
-            );
+
+                if (rename) this.checkingUuid = false;
+
+                fetch(this.apiUrl + `/retrieveMessages`)
+                    .then((res: any) => {
+                        if (res.ok) return res.json();
+                    })
+                    .then((data) => {
+                        axios
+                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                messages: data.messages
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    })
+                    .catch((error: any) => console.log(error.response || error));
+            });
         }
         this.warning = 'none';
         this.highlightedIndex = -1;
@@ -1656,6 +1722,9 @@ export default class MetadataEditorV extends Vue {
             if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
                 this.saveMetadata(false);
+                // We have loaded an existing product and are now going to the main editor tab.
+                // We extend the session so that the user has a full 30 minutes to make their edits.
+                this.extendSession();
                 this.updateEditorPath();
             } else {
                 Message.error(this.$t('editor.editMetadata.message.error.noConfig'));
@@ -1664,7 +1733,16 @@ export default class MetadataEditorV extends Vue {
             Message.error(this.$t('editor.warning.mustEnterUuid'));
             this.error = true;
         } else {
-            this.generateNewConfig();
+            // We have a new product that is going to the main editor route, so its UUID is now locked.
+            // Therefore, we also lock it in the server so that another user does not create a new product
+            // with the same UUID until the user's session is in progress.
+            this.lockStore
+                .lockStoryline(this.uuid)
+                .then(() => this.generateNewConfig())
+                .catch(() => {
+                    this.error = true;
+                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                });
         }
     }
 
@@ -1689,7 +1767,15 @@ export default class MetadataEditorV extends Vue {
     beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
         const curEditor = this.$route.name === 'editor';
         const confirmationMessage = 'Leave the page? Changes made may not be saved.';
-        if (this.unsavedChanges && curEditor && !window.confirm(confirmationMessage)) {
+        const stay = this.unsavedChanges && curEditor && !window.confirm(confirmationMessage);
+        const exitingProduct = to.name !== 'editor' && !stay;
+        if (exitingProduct) {
+            // Unlock the storyline for other users if we are exiting the product e.g. by navigating to a different route.
+            this.lockStore.unlockStoryline();
+            clearTimeout(this.confirmationTimeout);
+            clearTimeout(this.endTimeout);
+        }
+        if (stay) {
             next(false);
         } else {
             next();

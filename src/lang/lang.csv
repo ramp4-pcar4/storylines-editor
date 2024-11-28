@@ -51,6 +51,7 @@ editor.editMetadata.message.error.noRequestedVersion,The requested version does 
 editor.editMetadata.message.error.noResponseFromServer,"Failed to load product, no response from server",1,"Échec du chargement du produit, aucune réponse du serveur",0
 editor.editMetadata.message.error.malformedProduct,The requested product {uuid} is malformed.,1,Le produit demandé {uuid} est mal formé.,0
 editor.editMetadata.message.error.failedSave,Failed to save changes.,1,Échec de l'enregistrement des modifications.,0
+editor.editMetadata.message.error.unauthorized,The product is being accessed by another user. Please try again later.,1,[FR] The product is being accessed by another user. Please try again later.,0
 editor.editMetadata.message.error.logoFailedLoad,Failed to load logo image.,1,Échec du chargement de l'image du logo.,0
 editor.editMetadata.message.error.requiredFieldsNotFilled,Please fill out the required fields before proceeding.,1,Veuillez remplir les champs obligatoires avant de continuer.,0
 editor.editMetadata.message.logoSuccessfulLoad,Successfully loaded logo image.,1,Image du logo chargée avec succès.,0
@@ -81,6 +82,7 @@ editor.metadataForm.endOfPage.explanation,"This information is displayed at the 
 editor.metadataForm.enabled,Enabled,1,Activé,0
 editor.metadataForm.disabled,Disabled,1,Désactivé,0
 editor.metadataForm.na,N/A,1,N / A,0
+editor.extendSession,We noticed that you have been working on this product for a while. Your session is going to expire in {secs} seconds. Please confirm that you are still working on it to extend your session time by another 30 minutes.,1,[FR] We noticed that you have been working on this product for a while. Your session is going to expire in {secs} seconds. Please confirm that you are still working on it to extend your session time by another 30 minutes.,0
 editor.done,Done,1,Fini,0
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
 editor.editMetadata,Edit Project Metadata,1,Mod. les métadonnées,1

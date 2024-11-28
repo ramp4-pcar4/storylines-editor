@@ -8,7 +8,10 @@ var moment = require('moment'); // require
 const decompress = require('decompress');
 const archiver = require('archiver');
 const simpleGit = require('simple-git');
+const uuid = require('uuid');
+const generateKey = uuid.v4;
 const responseMessages = [];
+let lockedUuids = {}; // the uuids of the storylines currently in use, along with the secret key to access them
 require('dotenv').config();
 
 // CONFIGURATION
@@ -32,6 +35,7 @@ ROUTE_PREFIX =
 
 // Create express app.
 var app = express();
+var expressWs = require('express-ws')(app);
 
 // Open the logfile in append mode.
 var logFile = fs.createWriteStream(LOG_PATH, { flags: 'a' });
@@ -43,9 +47,26 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // POST requests made to /upload will be handled here.
-app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
+app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
+    // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
+    if (!lockedUuids[req.params.id]) {
+        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        return;
+    }
+
+    const secret = req.headers.secret;
+    if (!secret || secret !== lockedUuids[req.params.id]) {
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Aborted: Secret key corresponding to storyline lock not provided.'
+        });
+        logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
+        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        return;
+    }
+
     // TODO: Putting this on the header isn't great. The body has the zipped folder. And usernames in the URL doesn't look great either. Maybe improve this somehow.
-    const user = req.headers.user 
+    const user = req.headers.user;
     if (!user) {
         // Send back error if the user uploading the storyline was not provided.
         responseMessages.push({
@@ -123,10 +144,9 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
             // Initialize a new git repo if this is a new storyline.
             // Otherwise, simply create a new commit with the zipped folder.
             if (!newStorylines) {
-                await commitToRepo(fileName, user, false)
-            }
-            else {
-                await initGitRepo(fileName, user)
+                await commitToRepo(fileName, user, false);
+            } else {
+                await initGitRepo(fileName, user);
             }
             // Finally, delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
@@ -140,13 +160,45 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     });
 });
 
+// GET requests made to /exists/ID will be handled here.
+app.route(ROUTE_PREFIX + '/exists/:id').get(function (req, res, next) {
+    // A simple boolean check for if a product exists or not.
+    // The reason for separating this from /upload is that we want to allow
+    // checking for an existing product even if the user doesn't hold the lock
+    // for that product.
+    const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
+    const uuid = req.params.id;
+    if (lockedUuids[uuid] || fs.existsSync(PRODUCT_PATH)) {
+        res.status(200).send({ status: 'Storyline exists.' });
+    } else {
+        res.status(404).send({ status: 'Storyline does not exist.' });
+    }
+});
+
 // GET requests made to /retrieve/ID/commitHash will be handled here.
 // Calling this with commitHash as "latest" simply fetches the product as normal.
 app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
-    // This user is only needed for backwards compatibility. 
+    // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
+    if (!lockedUuids[req.params.id]) {
+        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        return;
+    }
+
+    const secret = req.headers.secret;
+    if (!secret || secret !== lockedUuids[req.params.id]) {
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Aborted: Secret key corresponding to storyline lock not provided.'
+        });
+        logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
+        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        return;
+    }
+
+    // This user is only needed for backwards compatibility.
     // If we have an existing storylines product that is not a git repo, we need to initialize a git repo
     // and make an initial commit for it, but we need the user for the commit.
-    const user = req.headers.user 
+    const user = req.headers.user;
     if (!user) {
         // Send back error if the user uploading the storyline was not provided.
         responseMessages.push({
@@ -161,7 +213,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
     var archive = archiver('zip');
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
     const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
-    const commitHash = req.params.hash
+    const commitHash = req.params.hash;
 
     // Check if the product exists.
     if (
@@ -169,27 +221,30 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
             if (!error) {
                 // Backwards compatibility. If the existing product is not a git repo i.e. it existed before git version control,
                 // we make a git repo for it before returning the version history. Otherwise, the code below will explode.
-                await initGitRepo(PRODUCT_PATH, user)
+                await initGitRepo(PRODUCT_PATH, user);
                 const git = simpleGit(PRODUCT_PATH);
                 // Get the current branch. We do it this way instead of assuming its "main" in case someone has it set to master.
-                const branches = await git.branchLocal()
-                const currBranch = branches.current
+                const branches = await git.branchLocal();
+                const currBranch = branches.current;
                 if (commitHash !== 'latest') {
-                    // If the user does not ask for the latest commit, we checkout a new branch at the point of the requested commit, 
+                    // If the user does not ask for the latest commit, we checkout a new branch at the point of the requested commit,
                     // and then proceed with getting the zipped folder below.
                     try {
                         // First, we check if the requested commit exists.
                         // NOTE: When calling from frontend, the catch block should never run.
                         const commitExists = await git.catFile(['-t', commitHash]);
                         if (commitExists !== 'commit\n') {
-                            throw new Error()
+                            throw new Error();
                         }
                     } catch (error) {
                         responseMessages.push({
                             type: 'INFO',
                             message: `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`
                         });
-                        logger('INFO', `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`);
+                        logger(
+                            'INFO',
+                            `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`
+                        );
                         res.status(404).send({ status: 'Not Found' });
                         return;
                     }
@@ -219,10 +274,9 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
                             // Since the user has not asked for the latest commit, we need to clean up.
                             // Go back to the main branch and delete the newly created branch.
                             await git.checkout(currBranch);
-                            await git.deleteLocalBranch(`version-${commitHash}`)
+                            await git.deleteLocalBranch(`version-${commitHash}`);
                         }
                     });
-
                 });
 
                 // Write the product data to the ZIP file.
@@ -235,7 +289,6 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
 
                 responseMessages.push({ type: 'INFO', message: `Successfully loaded product ${req.params.id}` });
                 logger('INFO', `Successfully loaded product ${req.params.id}`);
-
             } else {
                 responseMessages.push({
                     type: 'INFO',
@@ -250,6 +303,23 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
 
 // GET requests made to /retrieve/ID/LANG will be handled here.
 app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
+    // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
+    if (!lockedUuids[req.params.id]) {
+        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        return;
+    }
+
+    const secret = req.headers.secret;
+    if (!secret || secret !== lockedUuids[req.params.id]) {
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Aborted: Secret key corresponding to storyline lock not provided.'
+        });
+        logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
+        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        return;
+    }
+
     const CONFIG_PATH = `${TARGET_PATH}/${req.params.id}/${req.params.id}_${req.params.lang}.json`;
 
     // obtain requested config file if it exists
@@ -290,18 +360,37 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
     );
 });
 
+// GET requests made to /retrieve/ID/LANG will be handled here.
+// Returns the version history ({commitHash, createdDate}) for the requested storyline.
 app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
-    // This user is only needed for backwards compatibility. 
+    // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
+    if (!lockedUuids[req.params.id]) {
+        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        return;
+    }
+
+    const secret = req.headers.secret;
+    if (!secret || secret !== lockedUuids[req.params.id]) {
+        responseMessages.push({
+            type: 'WARNING',
+            message: 'Aborted: Secret key corresponding to storyline lock not provided.'
+        });
+        logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
+        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        return;
+    }
+
+    // This user is only needed for backwards compatibility.
     // If we have an existing storylines product that is not a git repo, we need to initialize a git repo
     // and make an initial commit for it, but we need the user for the commit.
-    const user = req.headers.user 
+    const user = req.headers.user;
     if (!user) {
         // Send back error if the user uploading the storyline was not provided.
         responseMessages.push({
             type: 'WARNING',
-            message: 'Upload Aborted: the user uploading the form was not provided.'
+            message: 'Aborted: the user uploading the form was not provided.'
         });
-        logger('WARNING', 'Upload Aborted: the user uploading the form was not provided.');
+        logger('WARNING', 'Aborted: the user uploading the form was not provided.');
         res.status(400).send({ status: 'Bad Request' });
         return;
     }
@@ -316,21 +405,21 @@ app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
             });
             logger('INFO', `Access attempt to versions of ${req.params.id} failed, does not exist.`);
             res.status(404).send({ status: 'Not Found' });
-        }
-        else {
+        } else {
             // Backwards compatibility. If the existing product is not a git repo i.e. it existed before git version control,
             // we make a git repo for it before returning the version history. Otherwise, the code below will explode.
-            await initGitRepo(PRODUCT_PATH, user)
+            await initGitRepo(PRODUCT_PATH, user);
             // Get version history for this product via git log command
             const git = simpleGit(PRODUCT_PATH);
-            const log = await git.log()
+            const log = await git.log();
             // TODO: Remove the 10 version limit once pagination is implemented
-            const history = log.all.slice(0, 10).map((commit) => ({hash: commit.hash, created: commit.date, storylineUUID: req.params.id}))
-            res.json(history)
+            const history = log.all
+                .slice(0, 10)
+                .map((commit) => ({ hash: commit.hash, created: commit.date, storylineUUID: req.params.id }));
+            res.json(history);
         }
-    })
-
-})
+    });
+});
 
 // GET reuests made to /retrieveMessages will recieve all the responseMessages currently queued.
 app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
@@ -338,10 +427,70 @@ app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
     responseMessages.length = 0;
 });
 
+// Simple web socket server to manage concurrency
+// We use a web socket server because it can detect whether the browser
+// has closed the window or dropped the connection in any way, unlocking their
+// storylines.
+app.ws('/', function (ws, req) {
+    // The following messages can be received in stringified JSON format:
+    // { uuid: <uuid>, lock: true }
+    // { uuid: <uuid>, lock: false }
+    // TODO: Do we need this stuff in the logs?
+    ws.on('message', function (msg) {
+        const message = JSON.parse(msg);
+        const uuid = message.uuid;
+        if (!uuid) {
+            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
+        }
+        // User wants to lock storyline since they are about to load/edit it.
+        if (message.lock) {
+            // Someone else is currently accessing this storyline, do not allow the user to lock!
+            if (!!lockedUuids[uuid] && ws.uuid !== uuid) {
+                ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
+            }
+            // Lock the storyline for this user. No-one else can access it until the user is done with it.
+            // Unlock any storyline that the user was previously locking.
+            // Send the secret key back to the client so that they can now get/save the storyline by passing in the
+            // secret key to the server routes.
+            else {
+                delete lockedUuids[ws.uuid];
+                const secret = generateKey();
+                lockedUuids[uuid] = secret;
+                ws.uuid = uuid;
+                ws.send(JSON.stringify({ status: 'success', secret }));
+            }
+        } else {
+            // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
+            if (uuid !== ws.uuid) {
+                ws.send(
+                    JSON.stringify({
+                        status: 'fail',
+                        message: 'You have not locked this storyline, so you may not unlock it.'
+                    })
+                );
+            }
+            // Unlock the storyline for any other user/connection to use.
+            else {
+                delete ws.uuid;
+                delete lockedUuids[uuid];
+                ws.send(JSON.stringify({ status: 'success' }));
+            }
+        }
+    });
+
+    ws.on('close', () => {
+        // Connection was closed, unlock this user's locked storyline
+        if (ws.uuid) {
+            delete lockedUuids[ws.uuid];
+            delete ws.uuid;
+        }
+    });
+});
+
 /*
  * Initializes a git repo at the requested path, if one does not already exist.
  * Creates an initial commit with any currently existing files in the directory.
- * 
+ *
  * @param {string} path the path of the git repo
  * @param {string} username the name of the user initializing the repo
  */
@@ -357,16 +506,16 @@ async function initGitRepo(path, username) {
             // Product directory is in a git repo but not top-level, we are working locally.
             repoExists = false;
         }
-    } catch(error) {
+    } catch (error) {
         // Product directory is not a git repo nor is it within a git repo.
         repoExists = false;
     }
 
     if (!repoExists) {
-        // Repo does not exist for the storyline product. 
+        // Repo does not exist for the storyline product.
         // Initialize a git repo and add an initial commit with all existing files.
-        await git.init()
-        await commitToRepo(path, username, true)
+        await git.init();
+        await commitToRepo(path, username, true);
     }
 }
 
@@ -378,20 +527,22 @@ async function initGitRepo(path, username) {
  * @param {boolean} initial specifies whether this is the initial commit
  */
 async function commitToRepo(path, username, initial) {
-    const date = moment().format('YYYY-MM-DD')
-    const time = moment().format('hh:mm:ss a')
+    const date = moment().format('YYYY-MM-DD');
+    const time = moment().format('hh:mm:ss a');
     // Initialize git
     const git = simpleGit(path);
-    let versionNumber = 1
+    let versionNumber = 1;
     if (!initial) {
         // Compute version number for storyline if this is not the initial commit.
-        const log = await git.log()
-        const lastMessage = log.latest.message
-        versionNumber = lastMessage.split(' ')[3]
+        const log = await git.log();
+        const lastMessage = log.latest.message;
+        versionNumber = lastMessage.split(' ')[3];
         versionNumber = Number(versionNumber) + 1;
     }
     // Commit the files for this storyline to its repo.
-    await git.add('./*').commit(`Add product version ${versionNumber} on ${date} at ${time}`, {'--author': `"${username} <>"`}) 
+    await git
+        .add('./*')
+        .commit(`Add product version ${versionNumber} on ${date} at ${time}`, { '--author': `"${username} <>"` });
 }
 
 /*

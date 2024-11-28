@@ -4,7 +4,7 @@ interface Storyline {
     uuid: string;
     titleEN: string;
     titleFR: string;
-    lastModified: Date;
+    lastModified: string;
     isUserStoryline?: boolean;
 }
 
