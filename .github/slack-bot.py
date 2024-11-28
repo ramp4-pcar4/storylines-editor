@@ -9,7 +9,8 @@ pr_labels = json.loads(pr_labels_json)
 
 # Summarization (example model, could be adjusted)
 summarizer = pipeline('summarization', model='tuner007/pegasus_summarizer')
-neutral_summary = summarizer(pr_body, max_length=200, min_length=25, do_sample=False)[0]['summary_text']
+# Escape double quotes and literal backslashes
+neutral_summary = summarizer(pr_body, max_length=200, min_length=25, do_sample=False)[0]['summary_text'].replace('"', '\\"')
 
 # PR label types with associated metadata
 pr_label_types = {
