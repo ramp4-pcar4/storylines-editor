@@ -24,23 +24,18 @@ pr_label_str = ", ".join(
     f"<{pr_label_types[label['name']][1]}|{pr_label_types[label['name']][0]}>"
     for label in pr_labels if pr_label_types.get(label['name'])
 )
-if len(pr_label_str) == 0:
+if (len(pr_label_str) == 0):
     pr_label_str = "None"
 
 # Handle regular labels (not in pr_label_types)
 reg_label_str = ", ".join(
     label['name'] for label in pr_labels if pr_label_types.get(label['name']) is None
 )
-if len(reg_label_str) == 0:
+if (len(reg_label_str) == 0):
     reg_label_str = "None"
 
-# Escape using json.dumps for JSON compatibility
-escaped_summary = json.dumps(neutral_summary)[1:-1]  # Removes surrounding quotes added by json.dumps
-pr_label_str = json.dumps(pr_label_str)[1:-1]
-reg_label_str = json.dumps(reg_label_str)[1:-1]
-
-# Write all results to environment
+# Write all results to environment 
 with open(os.environ['GITHUB_ENV'], 'a') as env_file:
-    env_file.write(f'NEUTRAL_SUMMARY="{escaped_summary}"\n')
-    env_file.write(f'PR_LABEL_STR="{pr_label_str}"\n')
-    env_file.write(f'REG_LABEL_STR="{reg_label_str}"\n')
+    env_file.write(f'NEUTRAL_SUMMARY={neutral_summary}\n')
+    env_file.write(f'PR_LABEL_STR={pr_label_str}\n')
+    env_file.write(f'REG_LABEL_STR={reg_label_str}\n')
