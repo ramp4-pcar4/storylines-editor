@@ -30,23 +30,25 @@
                         </button>
                     </div>
                     <div class="flex mt-3">
-                        <label class="ml-0" for="fullSlide">
-                            <span class="mr-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
-                        </label>
-                        <input
-                            type="checkbox"
-                            id="fullSlide"
-                            class="editor-input rounded-none cursor-pointer w-4 h-4"
-                            v-model="rightOnly"
-                            :disabled="rightOnly && determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
-                            @change.stop="
-                                if (currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])) {
-                                    $vfm.open(`right-only-${slideIndex}`);
-                                } else {
-                                    toggleRightOnly();
-                                }
-                            "
-                        />
+                        <div v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'">
+                            <label class="ml-0" for="fullSlide">
+                                <span class="mr-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
+                            </label>
+                            <input
+                                type="checkbox"
+                                id="fullSlide"
+                                class="editor-input rounded-none cursor-pointer w-4 h-4"
+                                v-model="rightOnly"
+                                :disabled="rightOnly && determineEditorType(currentSlide.panel[0]) === 'dynamic'"
+                                @change.stop="
+                                    if (currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])) {
+                                        $vfm.open(`right-only-${slideIndex}`);
+                                    } else {
+                                        toggleRightOnly();
+                                    }
+                                "
+                            />
+                        </div>
                         <label class="ml-0" for="centerSlide">
                             <span class="mr-2 font-bold">{{ $t('editor.slides.centerSlide') }}</span>
                         </label>
@@ -438,11 +440,10 @@ export default class SlideEditorV extends Vue {
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-        this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
         this.centerPanel = this.currentSlide.centerPanel ?? false;
         this.centerSlide = this.currentSlide.centerSlide ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.rightOnly = this.currentSlide.rightOnly ?? false;
+        this.rightOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel.length === 1;
     }
 
     /**
@@ -526,6 +527,8 @@ export default class SlideEditorV extends Vue {
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }
+
+        this.currentSlide.rightOnly = this.currentSlide.panel.length === 1;
     }
 
     removeSourceCounts(panel: BasePanel): void {
@@ -661,24 +664,24 @@ export default class SlideEditorV extends Vue {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].customStyles = 'text-align: right;';
             } else {
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0]?.customStyles || '').replace(
                     'text-align: right;',
                     ''
                 );
             }
-        } else if (this.rightOnly) {
+        } else if (this.rightOnly || this.currentSlide.panel.length === 1) {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].customStyles = 'text-align: center;';
             } else {
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0]?.customStyles || '').replace(
                     'text-align: right;',
                     ''
                 );
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0]?.customStyles || '').replace(
                     'text-align: left;',
                     ''
                 );
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0]?.customStyles || '').replace(
                     'text-align: center;',
                     ''
                 );
@@ -688,11 +691,11 @@ export default class SlideEditorV extends Vue {
                 this.currentSlide.panel[0].customStyles = 'text-align: right;';
                 this.currentSlide.panel[1].customStyles = 'text-align: left;';
             } else {
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
+                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0]?.customStyles || '').replace(
                     'text-align: right;',
                     ''
                 );
-                this.currentSlide.panel[1].customStyles = (this.currentSlide.panel[1].customStyles || '').replace(
+                this.currentSlide.panel[1].customStyles = (this.currentSlide.panel[1]?.customStyles || '').replace(
                     'text-align: left;',
                     ''
                 );
@@ -708,7 +711,7 @@ export default class SlideEditorV extends Vue {
             }
         } else {
             for (const p in this.currentSlide.panel) {
-                this.currentSlide.panel[p].customStyles = (this.currentSlide.panel[p].customStyles || '').replace(
+                this.currentSlide.panel[p].customStyles = (this.currentSlide.panel[p]?.customStyles || '').replace(
                     'text-align: center;',
                     ''
                 );
