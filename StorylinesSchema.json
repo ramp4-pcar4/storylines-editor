@@ -103,6 +103,10 @@
                 "type": {
                     "type": "string",
                     "enum": ["dynamic"]
+                }, 
+                "modified": {
+                    "type": "boolean",
+                    "description": "An optional tag that specifies whether the panel has been modified from its default configuration"
                 }
             },
             "required": ["content", "type", "children", "title"]
