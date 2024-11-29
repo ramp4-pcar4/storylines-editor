@@ -48,6 +48,32 @@
             <label class="editor-label text-label" for="videoURL"
                 >{{ $t('editor.label.or') + ' ' + $t('editor.video.pasteUrl') }}:</label
             >
+            <span
+                class="mr-3"
+                :content="$t('editor.video.label.linkSupport')"
+                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
+            >
+                <svg
+                    class="fill-current"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    x="0px"
+                    y="0px"
+                    viewBox="0 0 122.88 122.88"
+                    height="20"
+                    width="20"
+                    xml:space="preserve"
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                >
+                    <g>
+                        <path
+                            class="st0"
+                            d="M122.88,61.44C122.88,27.51,95.37,0,61.44,0C27.51,0,0,27.51,0,61.44c0,33.93,27.51,61.44,61.44,61.44 C95.37,122.88,122.88,95.37,122.88,61.44L122.88,61.44z M68.79,74.58H51.3v-1.75c0-2.97,0.32-5.39,1-7.25 c0.68-1.87,1.68-3.55,3.01-5.1c1.34-1.54,4.35-4.23,9.01-8.11c2.48-2.03,3.73-3.88,3.73-5.56c0-1.71-0.51-3.01-1.5-3.95 c-1-0.93-2.51-1.4-4.54-1.4c-2.19,0-3.98,0.73-5.4,2.16c-1.43,1.44-2.34,3.97-2.74,7.56l-17.88-2.22c0.61-6.57,3-11.86,7.15-15.85 c4.17-4.02,10.55-6.01,19.14-6.01c6.7,0,12.1,1.4,16.21,4.19c5.6,3.78,8.38,8.82,8.38,15.1c0,2.62-0.73,5.14-2.16,7.56 c-1.44,2.44-4.39,5.39-8.85,8.88c-3.09,2.48-5.05,4.44-5.86,5.93C69.19,70.24,68.79,72.19,68.79,74.58L68.79,74.58z M50.68,79.25 h18.76v16.53H50.68V79.25L50.68,79.25z"
+                        />
+                    </g>
+                </svg>
+            </span>
             <input
                 ref="videoUrl"
                 id="videoURL"
@@ -218,6 +244,12 @@ export default class VideoEditorV extends Vue {
     uploadVideoUrl(): void {
         // TODO: might need to improve upon detecting YT link depending on cases
         let url = (this.$refs.videoUrl as HTMLInputElement).value as string;
+
+        // handle shortened URL case
+        if (url.toLowerCase().includes('youtu.be')) {
+            url = url.replace('youtu.be/', 'www.youtube.com/watch?v=');
+        }
+
         const isYoutube = url.toLowerCase().includes('youtube');
 
         // change YT link to embed format
