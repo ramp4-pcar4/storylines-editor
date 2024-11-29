@@ -563,9 +563,9 @@ import {
     ImagePanel,
     MapPanel,
     MetadataContent,
+    MultiLanguageSlide,
     PanelType,
     Slide,
-    MultiLanguageSlide,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -764,12 +764,24 @@ export default class MetadataEditorV extends Vue {
 
                 if (logo) {
                     const logoFile = this.configFileStructure?.zip.file(logoSrc);
+                    const logoType = logoSrc.split('.').at(-1);
                     if (logoFile) {
-                        logoFile.async('blob').then((img: Blob) => {
-                            this.logoImage = new File([img], this.metadata.logoName);
-                            this.metadata.logoPreview = URL.createObjectURL(img);
-                            this.loadStatus = 'loaded';
-                        });
+                        if (logoType !== 'svg') {
+                            logoFile.async('blob').then((img: Blob) => {
+                                this.logoImage = new File([img], this.metadata.logoName);
+                                this.metadata.logoPreview = URL.createObjectURL(img);
+                                this.loadStatus = 'loaded';
+                            });
+                        } else {
+                            logoFile.async('text').then((img) => {
+                                const logoImageFile = new File([img], this.metadata.logoName, {
+                                    type: 'image/svg+xml'
+                                });
+                                this.logoImage = logoImageFile;
+                                this.metadata.logoPreview = URL.createObjectURL(logoImageFile);
+                                this.loadStatus = 'loaded';
+                            });
+                        }
                     } else {
                         // Fill in the field with this value whether it exists or not.
                         this.metadata.logoName = logo;
@@ -1269,19 +1281,30 @@ export default class MetadataEditorV extends Vue {
         if (logo) {
             // Set the alt text for the logo.
             this.metadata.logoAltText = config.introSlide.logo?.altText ? config.introSlide.logo.altText : '';
+            this.metadata.logoName = logo.split('/').at(-1);
 
             // Fetch the logo from the folder (if it exists).
             const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
             const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
             const logoFile = this.configFileStructure?.zip.file(logoSrc);
-
+            const logoType = logoSrc.split('.').at(-1);
             if (logoFile) {
-                logoFile.async('blob').then((img: Blob) => {
-                    this.logoImage = new File([img], logoName);
-                    this.metadata.logoPreview = URL.createObjectURL(img);
-                    this.metadata.logoName = logoName;
-                    this.loadStatus = 'loaded';
-                });
+                if (logoType !== 'svg') {
+                    logoFile.async('blob').then((img: Blob) => {
+                        this.logoImage = new File([img], this.metadata.logoName);
+                        this.metadata.logoPreview = URL.createObjectURL(img);
+                        this.loadStatus = 'loaded';
+                    });
+                } else {
+                    logoFile.async('text').then((img) => {
+                        const logoImageFile = new File([img], this.metadata.logoName, {
+                            type: 'image/svg+xml'
+                        });
+                        this.logoImage = logoImageFile;
+                        this.metadata.logoPreview = URL.createObjectURL(logoImageFile);
+                        this.loadStatus = 'loaded';
+                    });
+                }
             } else {
                 // Fill in the field with this value whether it exists or not.
                 this.metadata.logoName = logo;
