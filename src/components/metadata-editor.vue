@@ -97,6 +97,7 @@
                                         placement: 'top-end',
                                         touch: false
                                     }"
+                                    spellcheck="false"
                                 />
                                 <button
                                     @click="renameProduct"
@@ -150,6 +151,7 @@
                                                 placement: 'top-end',
                                                 touch: false
                                             }"
+                                            spellcheck="false"
                                         />
                                         <!-- Previous storylines (?) dropdown -->
                                         <div
