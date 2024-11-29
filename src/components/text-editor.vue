@@ -6,7 +6,7 @@
         <v-md-editor
             v-model="panel.content"
             height="400px"
-            left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper | ul ol table hr | addLink image code | save"
+            left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
             :toolbar="toolbar"
         ></v-md-editor>
     </div>
@@ -25,7 +25,55 @@ export default class TextEditorV extends Vue {
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
 
+    // Default font size is 16, so it's skipped here
+    fontSizes = [5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 18, 20, 22, 24, 26, 28, 36, 48, 72];
+
+    // Minor issue when selecting content after clicking a toolbar item: it will always select the first instance of the content string.
+    // For example, if your text is "span", changing font size while selecting it won't select <span style...>SPAN</span> afterward, but <SPAN style...>span</span>.
+    // The default (module-provided) toolbar items have the same issue (try the content "*" for Bold).
     toolbar = {
+        fontSize: {
+            title: 'Font Size',
+            text: 'Aa',
+            menus: {
+                itemWidth: '42px',
+                rowNum: 10,
+                items: this.fontSizes.map((fontSize) => {
+                    return {
+                        name: `${fontSize}`,
+                        text: `${fontSize}`,
+                        action(editor: MDEditor): void {
+                            editor.insert((selected: string) => {
+                                const content = selected || `resize`;
+
+                                const finalText = content
+                                    .split('\n')
+                                    .map((paragraph) => {
+                                        if (!paragraph) {
+                                            return '';
+                                        } else if (
+                                            paragraph.charAt(0) === '|' || // table
+                                            paragraph.charAt(0) === '!' || // image
+                                            paragraph.charAt(0) === '`' || // code block
+                                            paragraph === '------------------------------------'
+                                        ) {
+                                            return paragraph;
+                                        } else {
+                                            return `<span style="font-size:${fontSize}px;">${paragraph}</span>`;
+                                        }
+                                    })
+                                    .join('\n');
+
+                                return {
+                                    text: finalText,
+                                    selected: content
+                                };
+                            });
+                        }
+                    };
+                })
+            }
+        },
         subsuper: {
             title: 'Superscript/Subscript',
             text: 'T',
@@ -35,11 +83,11 @@ export default class TextEditorV extends Vue {
                     text: 'Superscript',
                     action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
-                            const content = selected || ``;
+                            const content = selected || `superscript`;
 
                             return {
                                 text: `<sup>${content}</sup>`,
-                                selected: selected
+                                selected: content
                             };
                         });
                     }
@@ -49,11 +97,11 @@ export default class TextEditorV extends Vue {
                     text: 'Subscript',
                     action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
-                            const content = selected || ``;
+                            const content = selected || `subscript`;
 
                             return {
                                 text: `<sub>${content}</sub>`,
-                                selected: selected
+                                selected: content
                             };
                         });
                     }
@@ -69,11 +117,11 @@ export default class TextEditorV extends Vue {
                     text: 'Add External Link (New Tab)',
                     action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
-                            const content = selected || ``;
+                            const content = selected || `link text`;
 
                             return {
                                 text: `<a href='http://' target='_blank'>${content}</a>`,
-                                selected: selected
+                                selected: content
                             };
                         });
                     }
@@ -83,11 +131,11 @@ export default class TextEditorV extends Vue {
                     text: 'Add External Link (Same Tab)',
                     action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
-                            const content = selected || ``;
+                            const content = selected || `link text`;
 
                             return {
                                 text: `<a href='http://' target='_self'>${content}</a>`,
-                                selected: selected
+                                selected: content
                             };
                         });
                     }
@@ -97,11 +145,11 @@ export default class TextEditorV extends Vue {
                     text: 'Add Dynamic Link',
                     action(editor: MDEditor): void {
                         editor.insert((selected: string) => {
-                            const content = selected || ``;
+                            const content = selected || `link text`;
 
                             return {
                                 text: `<a panel='panel-id-here'>${content}</a>`,
-                                selected: selected
+                                selected: content
                             };
                         });
                     }
