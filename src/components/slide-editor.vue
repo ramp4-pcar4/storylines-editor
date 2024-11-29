@@ -44,13 +44,16 @@
                     <!-- Slide options -->
                     <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
                         <!-- Make the current panel the full slide -->
-                        <div class="flex flex-row items-center">
+                        <div
+                            class="flex flex-row items-center"
+                            v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'"
+                        >
                             <input
                                 type="checkbox"
                                 id="fullSlide"
                                 class="rounded-none cursor-pointer w-4 h-4"
                                 v-model="onePanelOnly"
-                                :disabled="determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
+                                :disabled="onePanelOnly && determineEditorType(currentSlide.panel[0]) === 'dynamic'"
                                 @change.stop="
                                     () => {
                                         // if statement doesn't work properly (?), so had to use ternary
@@ -489,13 +492,10 @@ export default class SlideEditorV extends Vue {
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-        this.currentSlide ? (this.onePanelOnly = this.currentSlide.panel.length === 1) : false;
         this.centerPanel = this.currentSlide.centerPanel ?? false;
         this.centerSlide = this.currentSlide.centerSlide ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.onePanelOnly =
-            this.currentSlide.rightOnly ??
-            this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic';
+        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel.length === 1;
     }
 
     /**
@@ -579,6 +579,8 @@ export default class SlideEditorV extends Vue {
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }
+
+        this.currentSlide.rightOnly = this.currentSlide.panel.length === 1;
     }
 
     removeSourceCounts(panel: BasePanel): void {
@@ -721,7 +723,7 @@ export default class SlideEditorV extends Vue {
                     ''
                 );
             }
-        } else if (this.onePanelOnly) {
+        } else if (this.onePanelOnly || this.currentSlide.panel.length === 1) {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].customStyles = 'text-align: center;';
             } else {
