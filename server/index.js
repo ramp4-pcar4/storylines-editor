@@ -46,6 +46,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
+// CORS headers to allow connections
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 // POST requests made to /upload will be handled here.
 app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
     // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
