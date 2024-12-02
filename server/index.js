@@ -50,7 +50,7 @@ app.use(cors());
 app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
     // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
     if (!lockedUuids[req.params.id]) {
-        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        res.status(400).send({ status: 'Need to lock storyline from other users first.' });
         return;
     }
 
@@ -61,7 +61,7 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
             message: 'Aborted: Secret key corresponding to storyline lock not provided.'
         });
         logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
-        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        res.status(400).send({ status: 'Secret key corresponding to storyline lock not provided.' });
         return;
     }
 
@@ -178,9 +178,14 @@ app.route(ROUTE_PREFIX + '/exists/:id').get(function (req, res, next) {
 // GET requests made to /retrieve/ID/commitHash will be handled here.
 // Calling this with commitHash as "latest" simply fetches the product as normal.
 app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
+    responseMessages.push({
+        type: 'INFO',
+        message: `Secret: ${req.headers.secret}, All secrets: ${JSON.stringify(lockedUuids)}`
+    });
+    logger('INFO', `Secret: ${req.headers.secret}, All secrets: ${JSON.stringify(lockedUuids)}`);
     // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
     if (!lockedUuids[req.params.id]) {
-        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        res.status(400).send({ status: 'Need to lock storyline from other users first.' });
         return;
     }
 
@@ -191,7 +196,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
             message: 'Aborted: Secret key corresponding to storyline lock not provided.'
         });
         logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
-        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        res.status(400).send({ status: 'Secret key corresponding to storyline lock not provided.' });
         return;
     }
 
@@ -305,7 +310,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
 app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
     // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
     if (!lockedUuids[req.params.id]) {
-        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        res.status(400).send({ status: 'Need to lock storyline from other users first.' });
         return;
     }
 
@@ -316,7 +321,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
             message: 'Aborted: Secret key corresponding to storyline lock not provided.'
         });
         logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
-        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        res.status(400).send({ status: 'Secret key corresponding to storyline lock not provided.' });
         return;
     }
 
@@ -365,7 +370,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
 app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
     // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
     if (!lockedUuids[req.params.id]) {
-        res.status(401).send({ status: 'Need to lock storyline from other users first.' });
+        res.status(400).send({ status: 'Need to lock storyline from other users first.' });
         return;
     }
 
@@ -376,7 +381,7 @@ app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
             message: 'Aborted: Secret key corresponding to storyline lock not provided.'
         });
         logger('WARNING', 'Aborted: Secret key corresponding to storyline lock not provided.');
-        res.status(401).send({ status: 'Secret key corresponding to storyline lock not provided.' });
+        res.status(400).send({ status: 'Secret key corresponding to storyline lock not provided.' });
         return;
     }
 

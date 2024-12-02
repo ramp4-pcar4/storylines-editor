@@ -16,12 +16,13 @@ export const useLockStore = defineStore('lock', {
         initConnection() {
             const socketUrl = import.meta.env.VITE_APP_CURR_ENV
                 ? import.meta.env.VITE_APP_SOCKET_URL
-                : 'ws://localhost:6040';
+                : 'http://localhost:6040';
             this.socket = new WebSocket(socketUrl);
 
             // Connection opened
             this.socket.addEventListener('open', (event) => {
                 this.connected = true;
+                console.log('Successfully connected to web socket server!');
             });
 
             // Listen for messages
@@ -55,6 +56,7 @@ export const useLockStore = defineStore('lock', {
                                 } else {
                                     this.uuid = uuid;
                                     this.secret = this.result.secret;
+                                    console.log('Locked storyline!', this.uuid);
                                     resolve();
                                 }
                             }

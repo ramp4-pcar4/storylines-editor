@@ -949,6 +949,7 @@ export default class MetadataEditorV extends Vue {
             this.loadStatus = 'loading';
             const user = useUserStore().userProfile.userName || 'Guest';
             const secret = this.lockStore.secret;
+            console.log('Sending secret', secret);
             fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, { headers: { user, secret: secret } })
                 .then((res: Response) => {
                     if (res.status === 404) {
