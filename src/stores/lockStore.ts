@@ -31,6 +31,14 @@ export const useLockStore = defineStore('lock', {
                 this.received = true;
                 this.result = res;
             });
+
+            this.socket.addEventListener('error', () => {
+                console.log('Connection with web socket server has a problem!');
+            });
+
+            this.socket.addEventListener('close', () => {
+                console.log('Connection with web socket server has closed!');
+            });
         },
         // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.

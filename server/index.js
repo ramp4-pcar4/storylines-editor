@@ -437,6 +437,13 @@ app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
 // has closed the window or dropped the connection in any way, unlocking their
 // storylines.
 app.ws('/', function (ws, req) {
+    ws.on('connect', () => {
+        responseMessages.push({
+            type: 'INFO',
+            message: `A client connected to the web socket server.`
+        });
+        logger('INFO', `A client connected to the web socket server.`);
+    });
     // The following messages can be received in stringified JSON format:
     // { uuid: <uuid>, lock: true }
     // { uuid: <uuid>, lock: false }
@@ -484,6 +491,11 @@ app.ws('/', function (ws, req) {
     });
 
     ws.on('close', () => {
+        responseMessages.push({
+            type: 'INFO',
+            message: `Client connection with web socket server has closed.`
+        });
+        logger('INFO', `Client connection with web socket server has closed.`);
         // Connection was closed, unlock this user's locked storyline
         if (ws.uuid) {
             delete lockedUuids[ws.uuid];
