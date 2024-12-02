@@ -436,7 +436,7 @@ app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
 // We use a web socket server because it can detect whether the browser
 // has closed the window or dropped the connection in any way, unlocking their
 // storylines.
-app.ws('/', function (ws, req) {
+app.ws('/ws', function (ws, req) {
     ws.on('connect', () => {
         responseMessages.push({
             type: 'INFO',
