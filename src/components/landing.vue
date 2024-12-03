@@ -36,6 +36,40 @@ import { useUserStore } from '../stores/userStore';
 export default class LandingV extends Vue {
     title = document.title;
 
+    mounted(): void {
+        const socketUrl = import.meta.env.VITE_APP_CURR_ENV
+            ? import.meta.env.VITE_APP_TEST_SOCKET_URL
+            : 'http://localhost:6040/ws-simple-test';
+        const socket = new WebSocket(socketUrl);
+
+        // Connection opened
+        socket.addEventListener('open', (event) => {
+            console.log(socket);
+            console.log(socket.readyState);
+            console.log('Sending hello server to client!');
+            socket.send('Hello Server!');
+        });
+
+        // Listen for messages
+        socket.addEventListener('message', (event) => {
+            console.log(socket);
+            console.log(socket.readyState);
+            console.log('Message from server: ', event.data);
+        });
+
+        socket.addEventListener('error', () => {
+            console.log(socket);
+            console.log(socket.readyState);
+            console.log('Connection with web socket server has a problem!');
+        });
+
+        socket.addEventListener('close', () => {
+            console.log(socket);
+            console.log(socket.readyState);
+            console.log('Connection with web socket server has closed!');
+        });
+    }
+
     get userName(): string {
         const userStore = useUserStore();
         return userStore.userProfile?.userName || 'Guest';

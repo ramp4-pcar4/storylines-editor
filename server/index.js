@@ -440,18 +440,34 @@ app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
     responseMessages.length = 0;
 });
 
+app.ws('/ws-simple-test', function (ws, req) {
+    responseMessages.push({
+        type: 'INFO',
+        message: `A client connected to the web socket server.`
+    });
+    logger('INFO', `A client connected to the web socket server.`);
+
+    ws.on('message', function (msg) {
+        responseMessages.push({
+            type: 'INFO',
+            message: `Received message from client: ${msg}`
+        });
+        logger('INFO', `Received message from client: ${msg}`);
+        ws.send(`Hello client. I received your message: ${msg}`);
+    });
+});
+
 // Simple web socket server to manage concurrency
 // We use a web socket server because it can detect whether the browser
 // has closed the window or dropped the connection in any way, unlocking their
 // storylines.
 app.ws('/ws', function (ws, req) {
-    ws.on('connect', () => {
-        responseMessages.push({
-            type: 'INFO',
-            message: `A client connected to the web socket server.`
-        });
-        logger('INFO', `A client connected to the web socket server.`);
+    responseMessages.push({
+        type: 'INFO',
+        message: `A client connected to the web socket server.`
     });
+    logger('INFO', `A client connected to the web socket server.`);
+
     // The following messages can be received in stringified JSON format:
     // { uuid: <uuid>, lock: true }
     // { uuid: <uuid>, lock: false }
