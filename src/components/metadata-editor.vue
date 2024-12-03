@@ -1424,7 +1424,7 @@ export default class MetadataEditorV extends Vue {
                             })
                             .catch((error: any) => console.log(error.response || error));
                     } else {
-                        Message.success('Successfully saved changes!');
+                        Message.success(this.$t('editor.editMetadata.message.saveSuccess'));
                         // padding to prevent save button from being clicked rapidly
                         setTimeout(() => {
                             this.saving = false;

@@ -56,7 +56,8 @@ editor.editMetadata.message.error.requiredFieldsNotFilled,Please fill out the re
 editor.editMetadata.message.logoSuccessfulLoad,Successfully loaded logo image.,1,Image du logo chargée avec succès.,0
 editor.editMetadata.message.successfulLoad,Successfully loaded storyline!,1,Scénario chargé avec succès!,0
 editor.editMetadata.message.successfulSave,Successfully saved changes!,1,Modifications enregistrées avec succès!,0
-editor.editMetadata.message.wait,Please wait. This may take several minutes.,1,"S'il vous plaît, attendez. Cela peut prendre plusieurs minutes.",0
+editor.editMetadata.message.wait,Please wait. Saving may take a few moments.,1,"Veuillez patienter. L'enregistrement peut prendre quelques instants.",0
+editor.editMetadata.message.saveSuccess,Successfully saved changes!,1,Modifications enregistrées avec succès!,0
 editor.editMetadata.versionHistory.buttonShow,Show previous versions of product,1,Afficher les versions précédentes du produit,0
 editor.editMetadata.versionHistory.buttonHide,Hide previous versions,1,Masquer les versions précédentes,0
 editor.editMetadata.versionHistory.header,Version History,1,Historique des versions,0
