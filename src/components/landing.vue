@@ -37,9 +37,9 @@ export default class LandingV extends Vue {
     title = document.title;
 
     mounted(): void {
-        const socketUrl = import.meta.env.VITE_APP_CURR_ENV
-            ? import.meta.env.VITE_APP_TEST_SOCKET_URL
-            : 'http://localhost:6040/ws-simple-test';
+        const socketUrl = `${
+            import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
+        }/ws-test-simple`;
         const socket = new WebSocket(socketUrl);
 
         // Connection opened
