@@ -30,8 +30,14 @@
 </template>
 
 <script lang="ts">
+import { ref } from 'vue';
 import { Vue } from 'vue-property-decorator';
+<<<<<<< HEAD
 import { useUserStore } from '../stores/userStore';
+=======
+
+// import { useUserStore } from '../stores/userStore';
+>>>>>>> 0ec84c8 (Changes the web socket server after local IIS debugging)
 
 export default class LandingV extends Vue {
     title = document.title;
@@ -39,35 +45,43 @@ export default class LandingV extends Vue {
     mounted(): void {
         const socketUrl = `${
             import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
-        }/ws-test-simple`;
-        const socket = new WebSocket(socketUrl);
+        }`;
 
-        // Connection opened
-        socket.addEventListener('open', (event) => {
-            console.log(socket);
-            console.log(socket.readyState);
-            console.log('Sending hello server to client!');
-            socket.send('Hello Server!');
-        });
+        const socket = ref(null);
 
-        // Listen for messages
-        socket.addEventListener('message', (event) => {
-            console.log(socket);
-            console.log(socket.readyState);
-            console.log('Message from server: ', event.data);
-        });
+        socket.value = new WebSocket(socketUrl);
 
-        socket.addEventListener('error', () => {
-            console.log(socket);
-            console.log(socket.readyState);
-            console.log('Connection with web socket server has a problem!');
-        });
+        socket.value.onopen = () => {
+            console.log('Web socket connected');
+        }
 
-        socket.addEventListener('close', () => {
-            console.log(socket);
-            console.log(socket.readyState);
-            console.log('Connection with web socket server has closed!');
-        });
+        socket.value.onmessage = (event) => {
+            console.log(event.data);
+            socket.value.send('Hello from the client!');
+        }
+
+        socket.value.onclose = () => {
+            console.log('Web socket disconnected');
+        }
+    
+        // // When the WebSocket connection is established
+        // socket.onopen = function() {
+        //     console.log("WebSocket connected.");
+        //     // Send a message to the server
+        //     socket.send("Hello from the client!");
+        // };
+        // // When a message is received from the server
+        // socket.onmessage = function(event) {
+        //     console.log("Received from server:", event.data);
+        // };
+        // // When the WebSocket connection is closed
+        // socket.onclose = function() {
+        //     console.log("WebSocket connection closed.");
+        // };
+        // // If there's an error with the WebSocket
+        // socket.onerror = function(error) {
+        //     console.log("WebSocket error:", error);
+        // };
     }
 
     get userName(): string {
