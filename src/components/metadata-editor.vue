@@ -100,7 +100,7 @@
                                 />
                                 <button
                                     @click="renameProduct"
-                                    class="editor-button editor-forms-button bg-black text-white mr-0"
+                                    class="editor-button editor-forms-button bg-black text-white mr-0 ml-2"
                                     :class="{ 'input-error': error }"
                                     :disabled="changeUuid.length === 0 || checkingUuid || warning === 'rename'"
                                 >
@@ -185,7 +185,7 @@
                                                 generateRemoteConfig().then(fetchHistory);
                                             }
                                         "
-                                        class="editor-button editor-forms-button bg-black text-white mr-0"
+                                        class="editor-button editor-forms-button bg-black text-white mr-0 ml-2"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
                                         v-if="editExisting"
@@ -526,7 +526,17 @@
                         class="flex justify-center items-center"
                     >
                         <div @click.stop class="flex flex-col space-y-2">
-                            <h2 slot="header" class="text-2xl font-bold mb-3">{{ $t('editor.editMetadata') }}</h2>
+                            <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
+                            <!-- ENG/FR config toggle -->
+                            <div class="mb-3">
+                                <button
+                                    class="editor-button editor-forms-button border border-gray-300"
+                                    @click="swapLang()"
+                                    tabindex="0"
+                                >
+                                    {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                                </button>
+                            </div>
                             <metadata-content
                                 :metadata="metadata"
                                 @metadata-changed="updateMetadata"
@@ -1814,9 +1824,12 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     .vfm__content button {
         border-radius: 3px;
         padding: 5px 12px;
-        margin: 0px 10px;
         font-weight: 600;
         transition-duration: 0.2s;
+    }
+
+    .vfm__content button:focus {
+        transition-duration: 0.075s;
     }
 
     .vfm__content button:hover:enabled {
