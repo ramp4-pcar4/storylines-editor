@@ -820,10 +820,11 @@ export default class MetadataEditorV extends Vue {
         // Clear any lingering timers
         clearTimeout(this.endTimeout);
         clearTimeout(this.confirmationTimeout);
-        // We prompt the user to extend the session when there are 30 seconds left (i.e. 29.5 minutes have passed).
+        // We prompt the user to extend the session when session warn minutes have passed.
+        const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 29.5;
         this.confirmationTimeout = setTimeout(() => {
             this.$vfm.open(`confirm-extend-session`);
-        }, this.lockStore.timeRemaining * 1000 - 300000);
+        }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000);
         // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
         this.endTimeout = setTimeout(() => {
             this.$vfm.close('confirm-extend-session');
