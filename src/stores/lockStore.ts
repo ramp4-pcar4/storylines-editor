@@ -14,33 +14,33 @@ export const useLockStore = defineStore('lock', {
     actions: {
         // Opens a connection with the web socket
         initConnection() {
-            const socketUrl = import.meta.env.VITE_APP_CURR_ENV
-                ? import.meta.env.VITE_APP_SOCKET_URL
-                : 'http://localhost:6040/ws';
+            const socketUrl = `${
+                import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
+            }`;
             this.socket = new WebSocket(socketUrl);
 
             // Connection opened
-            this.socket.addEventListener('open', (event) => {
+            this.socket.onopen = () => {
                 this.connected = true;
                 console.log(this.socket);
                 console.log('Successfully connected to web socket server!');
                 return false;
-            });
+            };
 
             // Listen for messages
-            this.socket.addEventListener('message', (event) => {
+            this.socket.onmessage = (event) => {
                 const res = JSON.parse(event.data);
                 this.received = true;
                 this.result = res;
-            });
+            };
 
-            this.socket.addEventListener('error', () => {
+            this.socket.onerror = () => {
                 console.log('Connection with web socket server has a problem!');
-            });
+            };
 
-            this.socket.addEventListener('close', () => {
+            this.socket.onclose = () => {
                 console.log('Connection with web socket server has closed!');
-            });
+            };
         },
         // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.

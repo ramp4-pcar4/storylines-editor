@@ -955,7 +955,7 @@ export default class MetadataEditorV extends Vue {
                     if (res.status === 404) {
                         // Version not found.
                         if (version === 'latest') {
-                            Message.error(this.$t('editor.warning.uuidNotFound', this.uuid));
+                            Message.error(this.$t('editor.warning.uuidNotFound', { uuid: this.uuid }));
                         } else {
                             Message.error(this.$t('editor.editMetadata.message.error.noRequestedVersion'));
                             this.loadStatus = 'loaded';
@@ -963,6 +963,8 @@ export default class MetadataEditorV extends Vue {
                         this.error = true;
                         this.loadStatus = 'waiting';
                         this.clearConfig();
+                        // Product was not found, unlock the UUID
+                        this.lockStore.unlockStoryline();
                     } else {
                         const configZip = new JSZip();
                         // Files retrieved. Convert them into a JSZip object.
@@ -1000,6 +1002,8 @@ export default class MetadataEditorV extends Vue {
                         Message.error(this.$t('editor.warning.retrievalFailed'));
                     }
                     this.loadStatus = 'waiting';
+                    // Unlock the UUID if loading failed
+                    this.lockStore.unlockStoryline();
                     reject();
                 });
         });
@@ -1050,7 +1054,7 @@ export default class MetadataEditorV extends Vue {
         fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user, secret } }).then((res: Response) => {
             if (res.status === 404) {
                 // Product not found.
-                Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+                // Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
             } else {
                 res.json().then((json) => {
                     this.storylineHistory = json;
@@ -1446,14 +1450,14 @@ export default class MetadataEditorV extends Vue {
                                     axios
                                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                         .then((response: any) => {
-                                            // Extend the session on save
-                                            this.extendSession();
                                             Message.success(this.$t('editor.editMetadata.message.successfulSave'));
                                         })
                                         .catch((error: any) => console.log(error.response || error))
                                         .finally(() => {
                                             // padding to prevent save button from being clicked rapidly
                                             setTimeout(() => {
+                                                // Extend the session on save
+                                                this.extendSession();
                                                 this.saving = false;
                                             }, 500);
                                         });
@@ -1469,14 +1473,14 @@ export default class MetadataEditorV extends Vue {
                                 .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
                                 .then((response: any) => {
                                     Message.success(this.$t('editor.editMetadata.message.successfulSave'));
-                                    // Extend the session on save
-                                    this.extendSession();
                                 })
                                 .catch((error: any) => console.log(error.response || error))
                                 .finally(() => {
                                     // padding to prevent save button from being clicked rapidly
                                     setTimeout(() => {
                                         this.saving = false;
+                                        // Extend the session on save
+                                        this.extendSession();
                                     }, 500);
                                 });
                         }
@@ -1494,15 +1498,18 @@ export default class MetadataEditorV extends Vue {
                             })
                             .catch((error: any) => console.log(error.response || error));
                     } else {
-                        Message.success('Successfully saved changes!');
+                        Message.success(this.$t('editor.editMetadata.message.successfulSave'));
                         // padding to prevent save button from being clicked rapidly
                         setTimeout(() => {
                             this.saving = false;
+                            // Extend the session on save
+                            this.extendSession();
                         }, 500);
                     }
                 })
                 .catch(() => {
                     Message.error(this.$t('editor.editMetadata.message.error.failedSave'));
+                    this.handleSessionTimeout();
                 });
         });
 

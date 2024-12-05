@@ -54,9 +54,11 @@
             </div>
         </div>
     </div>
+    <div v-else></div>
 </template>
 
 <script lang="ts">
+import Message from 'vue-m-message';
 import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
@@ -65,6 +67,7 @@ import { AxiosError } from 'axios';
 import JSZip from 'jszip';
 import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
+import { useLockStore } from '@/stores/lockStore';
 
 @Options({
     components: {
@@ -88,6 +91,7 @@ export default class StoryPreviewV extends Vue {
     async created() {
         this.uid = this.$route.params.uid as string;
         this.lang = this.$route.params.lang as string;
+        const lockStore = useLockStore();
 
         // if config file structure passed from session (from main editor page)
         if (window.props) {
@@ -100,66 +104,80 @@ export default class StoryPreviewV extends Vue {
             const userStore = useUserStore();
             await userStore.fetchUserProfile();
             const user = userStore.userProfile.userName;
-            // attempt to fetch saved config file from the server (TODO: setup as express route?)
-            fetch(this.apiUrl + `/retrieve/${this.uid}/latest`, { headers: { user } }).then((res: Response) => {
-                if (res.status === 404) {
-                    console.error(`There does not exist a saved product with UID ${this.uid}.`);
-                    // redirect to canada.ca 404 page on invalid URL params
-                    // window.location.href = 'https://www.canada.ca/errors/404.html';
-                } else {
-                    const configZip = new JSZip();
-                    // Files retrieved. Convert them into a JSZip object.
-                    res.blob().then((file: Blob) => {
-                        configZip.loadAsync(file).then(() => {
-                            const assetsFolder = configZip.folder('assets');
-                            const chartsFolder = configZip.folder('charts');
-                            const rampConfigFolder = configZip.folder('ramp-config');
+            lockStore
+                .lockStoryline(this.uid)
+                .then(() => {
+                    // attempt to fetch saved config file from the server (TODO: setup as express route?)
+                    fetch(this.apiUrl + `/retrieve/${this.uid}/latest`, {
+                        headers: { user, secret: lockStore.secret }
+                    }).then((res: Response) => {
+                        if (res.status === 404) {
+                            Message.error(this.$t('editor.warning.uuidNotFound', { uuid: this.uid }));
+                            console.error(`There does not exist a saved product with UID ${this.uid}.`);
+                            // redirect to canada.ca 404 page on invalid URL params
+                            // window.location.href = 'https://www.canada.ca/errors/404.html';
+                            this.loadStatus = 'error';
+                            // Unlock the storyline if load fails.
+                            lockStore.unlockStoryline();
+                        } else {
+                            const configZip = new JSZip();
+                            // Files retrieved. Convert them into a JSZip object.
+                            res.blob().then((file: Blob) => {
+                                configZip.loadAsync(file).then(() => {
+                                    const assetsFolder = configZip.folder('assets');
+                                    const chartsFolder = configZip.folder('charts');
+                                    const rampConfigFolder = configZip.folder('ramp-config');
 
-                            // save EN and FR storylines configurations (for lang switching)
-                            const enFile = configZip.file(`${this.uid}_en.json`);
-                            const frFile = configZip.file(`${this.uid}_fr.json`);
-                            enFile?.async('string').then((res: string) => {
-                                this.configs['en'] = JSON.parse(res);
-                            });
-                            frFile?.async('string').then((res: string) => {
-                                this.configs['fr'] = JSON.parse(res);
-                            });
+                                    // save EN and FR storylines configurations (for lang switching)
+                                    const enFile = configZip.file(`${this.uid}_en.json`);
+                                    const frFile = configZip.file(`${this.uid}_fr.json`);
+                                    enFile?.async('string').then((res: string) => {
+                                        this.configs['en'] = JSON.parse(res);
+                                    });
+                                    frFile?.async('string').then((res: string) => {
+                                        this.configs['fr'] = JSON.parse(res);
+                                    });
 
-                            this.configFileStructure = {
-                                uuid: this.uid,
-                                zip: configZip,
-                                configs: this.configs as unknown as { [key: string]: StoryRampConfig },
-                                assets: {
-                                    en: (assetsFolder as JSZip).folder('en') as JSZip,
-                                    fr: (assetsFolder as JSZip).folder('fr') as JSZip
-                                },
-                                charts: {
-                                    en: (chartsFolder as JSZip).folder('en') as JSZip,
-                                    fr: (chartsFolder as JSZip).folder('fr') as JSZip
-                                },
-                                rampConfig: rampConfigFolder as JSZip
-                            };
+                                    this.configFileStructure = {
+                                        uuid: this.uid,
+                                        zip: configZip,
+                                        configs: this.configs as unknown as { [key: string]: StoryRampConfig },
+                                        assets: {
+                                            en: (assetsFolder as JSZip).folder('en') as JSZip,
+                                            fr: (assetsFolder as JSZip).folder('fr') as JSZip
+                                        },
+                                        charts: {
+                                            en: (chartsFolder as JSZip).folder('en') as JSZip,
+                                            fr: (chartsFolder as JSZip).folder('fr') as JSZip
+                                        },
+                                        rampConfig: rampConfigFolder as JSZip
+                                    };
 
-                            const configFile = configZip.file(`${this.uid}_${this.lang}.json`);
-                            configFile?.async('string').then((configContent: string) => {
-                                const config = JSON.parse(configContent) as StoryRampConfig;
-                                this.config = config;
-                                this.loadStatus = 'loaded';
-                                document.title = this.config.title + ' - Canada.ca';
+                                    const configFile = configZip.file(`${this.uid}_${this.lang}.json`);
+                                    configFile?.async('string').then((configContent: string) => {
+                                        const config = JSON.parse(configContent) as StoryRampConfig;
+                                        this.config = config;
+                                        this.loadStatus = 'loaded';
+                                        document.title = this.config.title + ' - Canada.ca';
+                                    });
+                                });
                             });
+                        }
+
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
+                            axios
+                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                    messages: res.data.messages
+                                })
+                                .catch((error: AxiosError) => console.log(error.response || error));
                         });
                     });
-                }
-
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
-                    axios
-                        .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                            messages: res.data.messages
-                        })
-                        .catch((error: AxiosError) => console.log(error.response || error));
+                })
+                .catch(() => {
+                    this.loadStatus = 'error';
+                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
                 });
-            });
         }
 
         // Purge undefined slides from configs

@@ -39,7 +39,7 @@ ROUTE_PREFIX =
 // Create express app.
 var app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server, perMessageDeflate: false }); 
+const wss = new WebSocketServer({ server, perMessageDeflate: false });
 
 // Open the logfile in append mode.
 var logFile = fs.createWriteStream(LOG_PATH, { flags: 'a' });
@@ -444,7 +444,6 @@ app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
     responseMessages.length = 0;
 });
 
-
 /*
  * Initializes a git repo at the requested path, if one does not already exist.
  * Creates an initial commit with any currently existing files in the directory.
@@ -636,12 +635,79 @@ function logger(type, message) {
 //     });
 // });
 
-app.get('/test', (req, res) => {
+/* app.get('/test', (req, res) => {
     logger('INFO', 'Running on ' + PORT);
     res.send('Running on ' + PORT);
-});
+}); */
 
 wss.on('connection', (ws) => {
+    responseMessages.push({
+        type: 'INFO',
+        message: `A client connected to the web socket server.`
+    });
+    logger('INFO', `A client connected to the web socket server.`);
+
+    // The following messages can be received in stringified JSON format:
+    // { uuid: <uuid>, lock: true }
+    // { uuid: <uuid>, lock: false }
+    // TODO: Do we need this stuff in the logs?
+    ws.on('message', function (msg) {
+        const message = JSON.parse(msg);
+        const uuid = message.uuid;
+        if (!uuid) {
+            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
+        }
+        // User wants to lock storyline since they are about to load/edit it.
+        if (message.lock) {
+            // Someone else is currently accessing this storyline, do not allow the user to lock!
+            if (!!lockedUuids[uuid] && ws.uuid !== uuid) {
+                ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
+            }
+            // Lock the storyline for this user. No-one else can access it until the user is done with it.
+            // Unlock any storyline that the user was previously locking.
+            // Send the secret key back to the client so that they can now get/save the storyline by passing in the
+            // secret key to the server routes.
+            else {
+                delete lockedUuids[ws.uuid];
+                const secret = generateKey();
+                lockedUuids[uuid] = secret;
+                ws.uuid = uuid;
+                ws.send(JSON.stringify({ status: 'success', secret }));
+            }
+        } else {
+            // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
+            if (uuid !== ws.uuid) {
+                ws.send(
+                    JSON.stringify({
+                        status: 'fail',
+                        message: 'You have not locked this storyline, so you may not unlock it.'
+                    })
+                );
+            }
+            // Unlock the storyline for any other user/connection to use.
+            else {
+                delete ws.uuid;
+                delete lockedUuids[uuid];
+                ws.send(JSON.stringify({ status: 'success' }));
+            }
+        }
+    });
+
+    ws.on('close', () => {
+        responseMessages.push({
+            type: 'INFO',
+            message: `Client connection with web socket server has closed.`
+        });
+        logger('INFO', `Client connection with web socket server has closed.`);
+        // Connection was closed, unlock this user's locked storyline
+        if (ws.uuid) {
+            delete lockedUuids[ws.uuid];
+            delete ws.uuid;
+        }
+    });
+});
+
+/* wss.on('connection', (ws) => {
     logger('INFO', `Client has connected via Web Socket.`);
     
     ws.send('Hello from the server!');
@@ -653,7 +719,7 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         logger('INFO', `Client has disconnected.`);
     });
-});
+}); */
 
 // Run the express app on the IIS Port.
 server.listen(PORT, () => {

@@ -32,18 +32,13 @@
 <script lang="ts">
 import { ref } from 'vue';
 import { Vue } from 'vue-property-decorator';
-<<<<<<< HEAD
 import { useUserStore } from '../stores/userStore';
-=======
-
-// import { useUserStore } from '../stores/userStore';
->>>>>>> 0ec84c8 (Changes the web socket server after local IIS debugging)
 
 export default class LandingV extends Vue {
     title = document.title;
 
     mounted(): void {
-        const socketUrl = `${
+        /* const socketUrl = `${
             import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
         }`;
 
@@ -53,17 +48,16 @@ export default class LandingV extends Vue {
 
         socket.value.onopen = () => {
             console.log('Web socket connected');
-        }
+        };
 
         socket.value.onmessage = (event) => {
             console.log(event.data);
             socket.value.send('Hello from the client!');
-        }
+        };
 
         socket.value.onclose = () => {
             console.log('Web socket disconnected');
-        }
-    
+        }; */
         // // When the WebSocket connection is established
         // socket.onopen = function() {
         //     console.log("WebSocket connected.");
