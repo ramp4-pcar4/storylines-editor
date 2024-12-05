@@ -323,7 +323,7 @@
                                 <table v-show="showHistory" class="shadow-lg bg-white w-full md:w-3/4 lg:w-1/2">
                                     <colgroup>
                                         <col class="w-3/5" />
-                                        <col span="2" />
+                                        <col span="1" />
                                     </colgroup>
                                     <tr>
                                         <td
@@ -1424,7 +1424,7 @@ export default class MetadataEditorV extends Vue {
                             })
                             .catch((error: any) => console.log(error.response || error));
                     } else {
-                        Message.success('Successfully saved changes!');
+                        Message.success(this.$t('editor.editMetadata.message.saveSuccess'));
                         // padding to prevent save button from being clicked rapidly
                         setTimeout(() => {
                             this.saving = false;
