@@ -635,10 +635,10 @@ function logger(type, message) {
 //     });
 // });
 
-/* app.get('/test', (req, res) => {
+app.get('/test', (req, res) => {
     logger('INFO', 'Running on ' + PORT);
     res.send('Running on ' + PORT);
-}); */
+});
 
 wss.on('connection', (ws) => {
     responseMessages.push({
