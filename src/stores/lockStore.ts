@@ -86,7 +86,7 @@ export const useLockStore = defineStore('lock', {
         },
         // Resets the current session back to a full 30 minutes.
         resetSession() {
-            this.timeRemaining = 40; // TODO: Change to 1800 (30 minutes) when testing is done.
+            this.timeRemaining = 1800; //  This value is in seconds!!! Don't mix up the units!!!
             if (this.timeInterval) {
                 clearInterval(this.timeInterval);
             }
