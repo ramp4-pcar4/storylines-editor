@@ -548,7 +548,8 @@
             :name="`confirm-extend-session`"
             :message="
                 $t('editor.extendSession', {
-                    secs: lockStore.timeRemaining
+                    mins: Math.floor(lockStore.timeRemaining / 60),
+                    secs: lockStore.timeRemaining - Math.floor(lockStore.timeRemaining / 60) * 60
                 })
             "
             :messageClass="'text-lg'"
