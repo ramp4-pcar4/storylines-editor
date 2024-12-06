@@ -175,4 +175,9 @@ label {
 :deep(.v-md-icon-link::before) {
     content: '\1F517';
 }
+:deep(.v-md-editor__tooltip) {
+    max-width: 90px;
+    text-wrap: wrap;
+    overflow-wrap: break-word;
+}
 </style>
