@@ -131,7 +131,9 @@
                                             v-model.trim="uuid"
                                             v-on:keyup.enter="
                                                 () => {
-                                                    generateRemoteConfig().then(fetchHistory);
+                                                    generateRemoteConfig()
+                                                        .then(fetchHistory)
+                                                        .catch(() => {}); // Prevent grousing in console
                                                 }
                                             "
                                             @focus="showDropdown = true"
@@ -909,9 +911,16 @@ export default class MetadataEditorV extends Vue {
      */
     loadVersion(version: string): Promise<void> {
         return new Promise((resolve, reject) => {
+            // Create a new AbortController for each fetch attempt
+            // as they get 'used up' after each successful abort() call
+            this.controller = new AbortController();
+
             this.loadStatus = 'loading';
             const user = useUserStore().userProfile.userName || 'Guest';
-            fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, { headers: { user } })
+            fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, {
+                headers: { user },
+                signal: this.controller.signal
+            })
                 .then((res: Response) => {
                     if (res.status === 404) {
                         // Version not found.
