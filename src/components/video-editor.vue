@@ -31,11 +31,12 @@
                 </span>
                 <span class="align-middle inline-block">
                     <span>
-                        <div>{{ $t('editor.video.label.drag') }}</div>
+                        <div class="text-center">{{ $t('editor.video.label.drag') }}</div>
                         <div>
                             {{ $t('editor.label.or') }}
                             <span class="text-blue-700 font-bold">{{ $t('editor.label.browse') }}</span>
                             {{ $t('editor.label.upload') }}
+                            {{ ' ' + $t('editor.video.label.sizeLimit', { size: fileSizeLimit }) }}
                         </div>
                     </span>
                     <input ref="videoFileInput" type="file" class="cursor-pointer" @change="onFileChange" />
@@ -94,6 +95,7 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, SourceCounts, VideoFile, VideoPanel } from '@/definitions';
 
+import Message from 'vue-m-message';
 import draggable from 'vuedraggable';
 import VideoPreviewV from './helpers/video-preview.vue';
 
@@ -115,6 +117,7 @@ export default class VideoEditorV extends Vue {
     edited = false;
 
     fileType = '';
+    fileSizeLimit = 75; // File size limit in MB
     videoPreviewLoading = false;
     videoPreviewPromise = undefined as Promise<VideoFile> | undefined;
     videoPreview = {} as VideoFile | Record<string, never>;
@@ -196,6 +199,17 @@ export default class VideoEditorV extends Vue {
 
     onFileChange(e: Event): void {
         const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+
+        // Block files which are too big
+        if (file.size > this.fileSizeLimit * 1024 * 1024) {
+            Message.error(
+                this.$t('editor.video.sizeExceeded') +
+                    ' ' +
+                    this.$t('editor.video.label.sizeLimit', { size: this.fileSizeLimit })
+            );
+            return;
+        }
+
         this.addUploadedFile(file, 'src');
         this.onVideoEdited();
     }
