@@ -137,6 +137,7 @@
                                 min-width: 0;
                                 max-width: 100%;
                             "
+                            @click="editProduct(storyline.uuid)"
                         >
                             <span class="pr-1">
                                 <svg
@@ -185,12 +186,13 @@ export default class HomeV extends Vue {
                 console.error(error);
             });
     }
+
     get userName(): string {
         return this.profile?.userName || 'Guest';
     }
 
     get userStorylines(): Array<Storyline> {
-        return this.profile?.storylines || {};
+        return this.profile?.storylines?.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified)) || {};
     }
 
     dateFormatter(date: string | null): string {
@@ -216,6 +218,10 @@ export default class HomeV extends Vue {
                 return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
             }
         }
+    }
+
+    editProduct(uuid: number): void {
+        this.$router.push({ name: 'editor', params: { uid: uuid } });
     }
 }
 </script>
