@@ -148,6 +148,7 @@ editor.video.label.drag,Drag your video file here,1,Glissez votre fichier vidéo
 editor.video.label.captions,Video Captions,1,Sous-titres,1
 editor.video.label.transcript,Video Transcript,1,Transcription,1
 editor.video.label.upload,Upload,1,Télécharger,1
+editor.video.label.linkSupport,Supports YouTube links (regular and shortened) as well as direct links to mp4 videos.,1,Prend en charge les liens YouTube (réguliers et raccourcis) ainsi que les liens directs vers des vidéos mp4.,0
 editor.video.delete,Delete Video,1,Supprimer la vidéo,1
 editor.video.pasteUrl,Paste the URL to a video,1,Collez l'url d'une vidéo,0
 editor.chart.delete,Delete Chart,1,Supprimer le graphique,1
