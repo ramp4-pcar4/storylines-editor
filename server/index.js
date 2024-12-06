@@ -35,35 +35,109 @@ ROUTE_PREFIX =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? '/Storylines-Editor-STB-Server'
         : '';
-        LOG_PATH =
-        process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
-            ? process.env.SERVER_LOG_PATH
-            : './logfile.txt'; // the path to the logfile
 CERT_PATH =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? process.env.SERVER_CERT_PATH
         : './cert.pem'; // the path to the self signed cert (use openssl to generate)
 KEY_PATH =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
-        ? process.env.SERVER_CERT_PATH
+        ? process.env.SERVER_KEY_PATH
         : './key.pem'; // the path to the self signed key (use openssl to generate)
 
 
 // Create express app.
 var app = express();
 
-const keyPath = fs.readFileSync(CERT_PATH, 'utf8');
-const certPath = fs.readFileSync(KEY_PATH, 'utf8');
-const credentials = { key: keyPath, cert: certPath };
-
-// Create HTTPS server
-const server = https.createServer(credentials, app);
-
-// Attach WebSocket server to the HTTPS server
-const wss = new WebSocketServer({ server, perMessageDeflate: false });
-
 // Open the logfile in append mode.
 var logFile = fs.createWriteStream(LOG_PATH, { flags: 'a' });
+
+try{
+    const keyPath = fs.readFileSync(CERT_PATH, 'utf8');
+    const certPath = fs.readFileSync(KEY_PATH, 'utf8');
+    const credentials = { key: keyPath, cert: certPath };
+    
+    // Create HTTPS server
+    const server = https.createServer(credentials, app);
+
+    // Attach WebSocket server to the HTTPS server
+    const wss = new WebSocketServer({ server, perMessageDeflate: false });
+
+    // Run the express app on the IIS Port.
+    server.listen(PORT, () => {
+        logger('INFO', `Storylines Express Server Started, PORT: ${PORT}`);
+    });
+
+    wss.on('connection', (ws) => {
+        responseMessages.push({
+            type: 'INFO',
+            message: `A client connected to the web socket server.`
+        });
+        logger('INFO', `A client connected to the web socket server.`);
+    
+        // The following messages can be received in stringified JSON format:
+        // { uuid: <uuid>, lock: true }
+        // { uuid: <uuid>, lock: false }
+        // TODO: Do we need this stuff in the logs?
+        ws.on('message', function (msg) {
+            const message = JSON.parse(msg);
+            const uuid = message.uuid;
+            if (!uuid) {
+                ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
+            }
+            // User wants to lock storyline since they are about to load/edit it.
+            if (message.lock) {
+                // Someone else is currently accessing this storyline, do not allow the user to lock!
+                if (!!lockedUuids[uuid] && ws.uuid !== uuid) {
+                    ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
+                }
+                // Lock the storyline for this user. No-one else can access it until the user is done with it.
+                // Unlock any storyline that the user was previously locking.
+                // Send the secret key back to the client so that they can now get/save the storyline by passing in the
+                // secret key to the server routes.
+                else {
+                    delete lockedUuids[ws.uuid];
+                    const secret = generateKey();
+                    lockedUuids[uuid] = secret;
+                    ws.uuid = uuid;
+                    ws.send(JSON.stringify({ status: 'success', secret }));
+                }
+            } else {
+                // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
+                if (uuid !== ws.uuid) {
+                    ws.send(
+                        JSON.stringify({
+                            status: 'fail',
+                            message: 'You have not locked this storyline, so you may not unlock it.'
+                        })
+                    );
+                }
+                // Unlock the storyline for any other user/connection to use.
+                else {
+                    delete ws.uuid;
+                    delete lockedUuids[uuid];
+                    ws.send(JSON.stringify({ status: 'success' }));
+                }
+            }
+        });
+    
+        ws.on('close', () => {
+            responseMessages.push({
+                type: 'INFO',
+                message: `Client connection with web socket server has closed.`
+            });
+            logger('INFO', `Client connection with web socket server has closed.`);
+            // Connection was closed, unlock this user's locked storyline
+            if (ws.uuid) {
+                delete lockedUuids[ws.uuid];
+                delete ws.uuid;
+            }
+        });
+    });
+} catch (error) {
+    logger('INFO', `Cert Path: ` + CERT_PATH);
+    logger('INFO', `Key Path: ` + KEY_PATH);
+    logger('INFO', `Error: ${error}`);
+}
 
 // Express middleware.
 app.use(express.static(path.join(__dirname, 'public')));
@@ -661,72 +735,7 @@ app.get('/test', (req, res) => {
     res.send('Running on ' + PORT);
 });
 
-wss.on('connection', (ws) => {
-    responseMessages.push({
-        type: 'INFO',
-        message: `A client connected to the web socket server.`
-    });
-    logger('INFO', `A client connected to the web socket server.`);
 
-    // The following messages can be received in stringified JSON format:
-    // { uuid: <uuid>, lock: true }
-    // { uuid: <uuid>, lock: false }
-    // TODO: Do we need this stuff in the logs?
-    ws.on('message', function (msg) {
-        const message = JSON.parse(msg);
-        const uuid = message.uuid;
-        if (!uuid) {
-            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
-        }
-        // User wants to lock storyline since they are about to load/edit it.
-        if (message.lock) {
-            // Someone else is currently accessing this storyline, do not allow the user to lock!
-            if (!!lockedUuids[uuid] && ws.uuid !== uuid) {
-                ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
-            }
-            // Lock the storyline for this user. No-one else can access it until the user is done with it.
-            // Unlock any storyline that the user was previously locking.
-            // Send the secret key back to the client so that they can now get/save the storyline by passing in the
-            // secret key to the server routes.
-            else {
-                delete lockedUuids[ws.uuid];
-                const secret = generateKey();
-                lockedUuids[uuid] = secret;
-                ws.uuid = uuid;
-                ws.send(JSON.stringify({ status: 'success', secret }));
-            }
-        } else {
-            // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
-            if (uuid !== ws.uuid) {
-                ws.send(
-                    JSON.stringify({
-                        status: 'fail',
-                        message: 'You have not locked this storyline, so you may not unlock it.'
-                    })
-                );
-            }
-            // Unlock the storyline for any other user/connection to use.
-            else {
-                delete ws.uuid;
-                delete lockedUuids[uuid];
-                ws.send(JSON.stringify({ status: 'success' }));
-            }
-        }
-    });
-
-    ws.on('close', () => {
-        responseMessages.push({
-            type: 'INFO',
-            message: `Client connection with web socket server has closed.`
-        });
-        logger('INFO', `Client connection with web socket server has closed.`);
-        // Connection was closed, unlock this user's locked storyline
-        if (ws.uuid) {
-            delete lockedUuids[ws.uuid];
-            delete ws.uuid;
-        }
-    });
-});
 
 /* wss.on('connection', (ws) => {
     logger('INFO', `Client has connected via Web Socket.`);
@@ -742,7 +751,4 @@ wss.on('connection', (ws) => {
     });
 }); */
 
-// Run the express app on the IIS Port.
-server.listen(PORT, () => {
-    logger('INFO', `Storylines Express Server Started, PORT: ${PORT}`);
-});
+
