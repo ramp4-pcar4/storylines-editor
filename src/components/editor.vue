@@ -189,7 +189,7 @@
                 <div class="flex items-center justify-center border-b p-2">
                     <!-- Edit metadata button -->
                     <!-- Opens the edit metadata modal -->
-                    <button class="toc-popup-button" @click.stop="$vfm.open('metadata-edit-modal')">
+                    <button class="toc-popup-button border-gray-400" @click.stop="$vfm.open('metadata-edit-modal')">
                         <span class="align-middle inline-block pr-1"
                             ><svg
                                 clip-rule="evenodd"
@@ -637,7 +637,6 @@ window.addEventListener('resize', () => {
 
 .editor-button {
     padding: 5px 12px;
-    margin: 0px 10px;
     font-weight: 600;
     transition-duration: 0.2s;
 }
