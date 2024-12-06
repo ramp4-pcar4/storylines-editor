@@ -286,7 +286,7 @@
                                 :key="thing"
                                 :value="thing"
                             >
-                                {{ thing }}
+                                {{ $t(`editor.slide.panel.type.${thing}`) }}
                             </option>
                         </select>
                     </div>
