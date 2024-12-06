@@ -11,7 +11,7 @@ const simpleGit = require('simple-git');
 const uuid = require('uuid');
 const generateKey = uuid.v4;
 const responseMessages = [];
-const http = require('http');
+const https = require('https');
 const { WebSocketServer } = require('ws');
 
 let lockedUuids = {}; // the uuids of the storylines currently in use, along with the secret key to access them
@@ -35,10 +35,31 @@ ROUTE_PREFIX =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? '/Storylines-Editor-STB-Server'
         : '';
+        LOG_PATH =
+        process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+            ? process.env.SERVER_LOG_PATH
+            : './logfile.txt'; // the path to the logfile
+CERT_PATH =
+    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? process.env.SERVER_CERT_PATH
+        : './cert.pem'; // the path to the self signed cert (use openssl to generate)
+KEY_PATH =
+    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? process.env.SERVER_CERT_PATH
+        : './key.pem'; // the path to the self signed key (use openssl to generate)
+
 
 // Create express app.
 var app = express();
-const server = http.createServer(app);
+
+const keyPath = fs.readFileSync(CERT_PATH, 'utf8');
+const certPath = fs.readFileSync(KEY_PATH, 'utf8');
+const credentials = { key: keyPath, cert: certPath };
+
+// Create HTTPS server
+const server = https.createServer(credentials, app);
+
+// Attach WebSocket server to the HTTPS server
 const wss = new WebSocketServer({ server, perMessageDeflate: false });
 
 // Open the logfile in append mode.
