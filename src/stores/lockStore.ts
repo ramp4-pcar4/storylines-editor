@@ -15,7 +15,7 @@ export const useLockStore = defineStore('lock', {
         // Opens a connection with the web socket
         initConnection() {
             const socketUrl = `${
-                import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
+                import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'https://localhost:6040'
             }`;
             this.socket = new WebSocket(socketUrl);
 
@@ -34,8 +34,8 @@ export const useLockStore = defineStore('lock', {
                 this.result = res;
             };
 
-            this.socket.onerror = () => {
-                console.log('Connection with web socket server has a problem!');
+            this.socket.onerror = (event) => {
+                console.error('Connection with web socket server has a problem!: ', event);
             };
 
             this.socket.onclose = () => {
