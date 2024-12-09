@@ -1,36 +1,33 @@
 <template>
-    <div class="flex flex-col">
-        <label class="editor-label text-left" for="mapTitle">{{ $t('editor.map.title') }}:</label>
+    <div class="flex flex-col mt-4">
+        <label class="editor-label text-left" for="mapTitle">{{ $t('editor.map.title') }}</label>
         <input class="editor-input" type="text" id="mapTitle" v-model="panel.title" />
 
         <div>
-            <label class="editor-label mt-6" for="timeSliderToggle">{{ $t('editor.map.timeslider.enable') }}</label>
-            <input
-                class="editor-input"
-                type="checkbox"
-                id="timeSliderToggle"
-                @change="saveTimeSlider"
-                v-model="usingTimeSlider"
-            />
-            <span class="mx-4"></span>
-            <button
-                v-if="usingTimeSlider"
-                @click="$vfm.open('time-slider-edit-modal')"
-                class="editor-button bg-black text-white hover:bg-gray-800 mt-3"
-            >
-                {{ $t('editor.map.timeslider.edit') }}
-            </button>
-            <br />
-
-            <div class="mb-4" v-if="usingTimeSlider"></div>
-
-            <div class="flex items-center w-full text-left mt-2">
-                <label class="editor-label text-label" for="rampMapCaption">
-                    {{ $t('editor.image.label.caption') }}:</label
+            <div class="flex items-center gap-2 mt-2">
+                <input
+                    class="rounded-none cursor-pointer w-4 h-4"
+                    type="checkbox"
+                    id="timeSliderToggle"
+                    @change="saveTimeSlider"
+                    v-model="usingTimeSlider"
+                />
+                <label class="editor-label" for="timeSliderToggle">{{ $t('editor.map.timeslider.enable') }}</label>
+                <!-- Use invisible instead of v-if to reserve space for button (so checkbox doesn't move around) -->
+                <button
+                    :class="{ 'hidden md:invisible': !usingTimeSlider }"
+                    @click="$vfm.open('time-slider-edit-modal')"
+                    class="editor-button block md:inline-block ml-0 text-sm py-1 bg-black text-white hover:bg-gray-800"
                 >
+                    {{ $t('editor.map.timeslider.edit') }}
+                </button>
+            </div>
+
+            <div class="flex flex-col w-full text-left mt-5 mb-1">
+                <label class="editor-label" for="rampMapCaption"> {{ $t('editor.image.label.caption') }}</label>
                 <input
                     id="rampMapCaption"
-                    class="editor-input w-2/5"
+                    class="editor-input w-full lg:w-2/5"
                     type="text"
                     v-model="panel.caption"
                     :placeholder="$t('editor.caption.placeholder')"
