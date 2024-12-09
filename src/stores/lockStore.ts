@@ -9,7 +9,8 @@ export const useLockStore = defineStore('lock', {
         received: false,
         timeInterval: undefined as NodeJS.Timeout | undefined,
         timeRemaining: 100000000000000, // in seconds
-        result: {} as any
+        result: {} as any,
+        broadcast: undefined as BroadcastChannel | undefined
     }),
     actions: {
         // Opens a connection with the web socket
@@ -66,6 +67,11 @@ export const useLockStore = defineStore('lock', {
                                 } else {
                                     this.uuid = uuid;
                                     this.secret = this.result.secret;
+                                    this.broadcast = new BroadcastChannel(this.result.secret);
+                                    console.log(this.broadcast);
+                                    this.broadcast.onmessage = (e) => {
+                                        console.log(e.data);
+                                    };
                                     console.log('Locked storyline!', this.uuid);
                                     resolve();
                                 }
@@ -77,18 +83,22 @@ export const useLockStore = defineStore('lock', {
         },
         // Unlocks the curent storyline for this user.
         unlockStoryline() {
+            clearInterval(this.timeInterval);
             if (this.connected) {
                 this.socket!.send(JSON.stringify({ uuid: this.uuid, lock: false }));
                 this.uuid = '';
                 this.secret = '';
-                clearInterval(this.timeInterval);
+                this.broadcast?.postMessage({ action: 'end' });
             }
         },
         // Resets the current session back to a full 30 minutes.
-        resetSession() {
-            this.timeRemaining = import.meta.env.VITE_APP_CURR_ENV
-                ? Number(import.meta.env.VITE_SESSION_END) * 60
-                : 1800; //  This value is in seconds!!! Don't mix up the units!!!
+        resetSession(overrideTime?: number) {
+            this.timeRemaining =
+                overrideTime !== undefined
+                    ? overrideTime
+                    : import.meta.env.VITE_APP_CURR_ENV
+                    ? Number(import.meta.env.VITE_SESSION_END) * 60
+                    : 1800; //  This value is in seconds!!! Don't mix up the units!!!
             if (this.timeInterval) {
                 clearInterval(this.timeInterval);
             }

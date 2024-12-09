@@ -545,7 +545,7 @@
             </editor>
         </template>
         <confirmation-modal
-            :name="`confirm-extend-session`"
+            :name="`confirm-extend-session-editor`"
             :message="
                 $t('editor.extendSession', {
                     mins: Math.floor(lockStore.timeRemaining / 60),
@@ -760,10 +760,13 @@ export default class MetadataEditorV extends Vue {
             this.loadEditor = true;
             const props = this.$route.meta.data as RouteParams;
 
-            // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
-            if (props && props.configs && props.configFileStructure) {
+            if (!this.loadExisting) {
                 // New product has UUID locked in, need to start timing sessions
                 this.extendSession();
+            }
+
+            // Properties already passed in props, load editor view (could use a refactor to clean up this workflow process)
+            if (props && props.configs && props.configFileStructure) {
                 this.configs = props.configs;
                 this.configLang = props.configLang;
                 this.configFileStructure = props.configFileStructure;
@@ -817,22 +820,29 @@ export default class MetadataEditorV extends Vue {
     }
 
     handleSessionTimeout(): void {
+        console.log('Clearing timers');
         // Clear any lingering timers
         clearTimeout(this.endTimeout);
         clearTimeout(this.confirmationTimeout);
         // We prompt the user to extend the session when session warn minutes have passed.
-        const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 29.5;
+        const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
         this.confirmationTimeout = setTimeout(() => {
-            this.$vfm.open(`confirm-extend-session`);
+            this.$vfm.open(`confirm-extend-session-editor`);
+            this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
         }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000);
         // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
         this.endTimeout = setTimeout(() => {
-            this.$vfm.close('confirm-extend-session');
-            this.$router.push({ name: 'home' });
+            this.$vfm.close('confirm-extend-session-editor');
+            this.$router.push({ name: 'homeExpired' });
         }, this.lockStore.timeRemaining * 1000 + 1000);
+        console.log('Starting timers');
     }
 
-    extendSession(): void {
+    extendSession(firstLoad?: boolean): void {
+        if (!firstLoad) {
+            Message.success(this.$t('editor.session.extended'));
+            this.lockStore.broadcast?.postMessage({ action: 'extend' });
+        }
         // If the user wants to extend the timer, this method will reset the time remaining.
         this.lockStore.resetSession();
         // We need to call this method again because we need to keep checking that the time has not run out.
@@ -847,7 +857,7 @@ export default class MetadataEditorV extends Vue {
     preview(): void {
         // save current metadata final changes before previewing product
         this.saveMetadata(false);
-
+        const lockStore = useLockStore();
         setTimeout(() => {
             const routeData = this.$router.resolve({
                 name: 'preview',
@@ -856,7 +866,9 @@ export default class MetadataEditorV extends Vue {
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
                 configs: this.configs,
-                configFileStructure: this.configFileStructure
+                configFileStructure: this.configFileStructure,
+                secret: lockStore.secret,
+                timeRemaining: lockStore.timeRemaining
             };
         }, 5);
     }
@@ -974,7 +986,7 @@ export default class MetadataEditorV extends Vue {
                             configZip.loadAsync(file).then(() => {
                                 this.configFileStructureHelper(configZip);
                                 // Extend the session on load
-                                this.extendSession();
+                                this.extendSession(true);
                             });
                         });
                     }
@@ -1026,6 +1038,14 @@ export default class MetadataEditorV extends Vue {
             this.lockStore
                 .lockStoryline(this.uuid)
                 .then(() => {
+                    this.lockStore.broadcast!.onmessage = (e) => {
+                        // session was extended from the preview tab, need to handle in editor tab
+                        const msg = e.data;
+                        if (msg.action === 'extend') {
+                            this.$vfm.close('confirm-extend-session-editor');
+                            this.extendSession();
+                        }
+                    };
                     this.loadStatus = 'loading';
                     this.error = false;
 
@@ -1732,8 +1752,6 @@ export default class MetadataEditorV extends Vue {
             if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                 this.loadEditor = true;
                 this.saveMetadata(false);
-                // We have loaded an existing product and are now going to the main editor tab.
-                // We extend the session so that the user has a full 30 minutes to make their edits.
                 this.extendSession();
                 this.updateEditorPath();
             } else {
@@ -1748,7 +1766,16 @@ export default class MetadataEditorV extends Vue {
             // with the same UUID until the user's session is in progress.
             this.lockStore
                 .lockStoryline(this.uuid)
-                .then(() => this.generateNewConfig())
+                .then(() => {
+                    this.lockStore.broadcast!.onmessage = (e) => {
+                        // session was extended from the preview tab, need to handle in editor tab
+                        const msg = e.data;
+                        if (msg.action === 'extend') {
+                            this.extendSession();
+                        }
+                    };
+                    this.generateNewConfig();
+                })
                 .catch(() => {
                     this.error = true;
                     Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
