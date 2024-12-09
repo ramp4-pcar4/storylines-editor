@@ -143,7 +143,7 @@ editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,1
 editor.image.label.caption,Caption,1,Légende,1
 editor.image.reorder,Click and drag to reorder images,1,Cliquez sur les images et faites-les glisser pour changer l’ordre.,1
 editor.image.altTag,Alt tag,1,Texte de remplacement,1
-editor.image.slideshowCaption,Slideshow Caption,1,Légende du diaporama,1
+editor.image.slideshowCaption,Slideshow caption,1,Légende du diaporama,1
 editor.image.loadingError,An error occurred when trying to load image,1,Une erreur est survenue lors du chargement de l’image.,1
 editor.video.title,Video Title,1,Titre de la vidéo,1
 editor.video.label.drag,Drag your video file here,1,Glissez votre fichier vidéo ici,1
@@ -171,7 +171,7 @@ editor.map.label.name,Map config name,1,Nom de la configuration de la carte,1
 editor.map.label.create,Create New Configuration File,1,Créer un nouveau fichier de configuration,1
 editor.map.label.edit,Edit Map Configuration,1,Modifier la configuration de la carte,1
 editor.map.scrollguard.enable,Enable scrollguard,1,Activer le contrôle du défilement,1
-editor.map.timeslider.enable,Enable Time Slider:,1,Activer le curseur temporel:,1
+editor.map.timeslider.enable,Enable time slider,1,Activer le curseur temporel,1
 editor.map.timeslider.edit,Edit Time Slider Config,1,Modifier la configuration du curseur temporel,1
 editor.map.timeslider.range,Range:,1,Tranche:,1
 editor.map.timeslider.start,Start:,1,Début:,1
@@ -191,14 +191,22 @@ editor.slideshow.label.slideNumber,Slide Number,1,Numéro de diapositive,0
 editor.slides.continue,Continue,1,Continuer,0
 editor.slides.title,Intro title,1,Titre de l’introduction,1
 editor.slides.addSlide,"New blank slide",1,Nouvelle diapositive,0
-editor.slides.currentLangLabel,({lang} slide),1,(Diapositive en {lang}),0
+editor.slides.currentLangLabel,Slide {num} ({lang}),1,Diapositive {num} ({lang}),0
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
 editor.slides.deleteSlide.title,Delete slide {num}?,1,Supprimer la diapositive {num} ?,0
 editor.slides.deleteSlide.confirm,"Both English and French configurations will be deleted{title}.",1,"Les configurations anglaise et française seront supprimées{title}.",0
 editor.slides.deleteConfig.title,Slide {num} {lang} config will be cleared,1,La configuration de la diapositive {num} {lang} sera effacée,0
 editor.slides.deleteConfig.confirm,"This will replace the config '{title}' with a blank config.",1,Cela remplacera la configuration '{title}' par une configuration vide.,0
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
-editor.slides.makeFull,Make the right panel the full slide,1,Mettre la diapositive complète dans le panneau de droite,1
+editor.slides.changePanelType.title,Panel type will be changed to {type},1,Le type de panneau sera modifié en {type},0
+editor.slides.changePanelType.message,Existing contents will be deleted.,1,Le contenu existant sera supprimé.,0
+editor.slides.changeToOnePanel.title,Current panel will become a fullscreen panel,1,Le panneau actuel deviendra un panneau plein écran,0
+editor.slides.changeToOnePanel.message,The other panel(s) will be deleted.,1,Les autres panneaux seront supprimés.,0
+editor.slides.addBlankPanel.title,Which side should the new panel be added to?,1,De quel côté le nouveau panneau doit-il être ajouté?,0
+editor.slides.addBlankPanel.message,The existing panel will be on the opposite side.,1,Le panneau existant actuel sera du côté opposé.,0
+editor.slides.addBlankPanel.left,Left,1,Gauche,0
+editor.slides.addBlankPanel.right,Right,1,Droit,0
+editor.slides.makeFull,Make this panel the full slide,1,Faites de ce panneau la diapositive complète,0
 editor.slides.centerPanel,Center panel content,1,Contenu de la diapositive centrale,0
 editor.slides.centerSlide,Center slide content,1,Contenu du panneau central,0
 editor.slides.copyAll,Copy all,1,Copier tout,1
@@ -233,7 +241,7 @@ editor.slides.nextSlide,Next slide,1,Diapositive suivante,1
 editor.slides.leftPanel,Left panel,1,Panneau de gauche,1
 editor.slides.rightPanel,Right panel,1,Panneau de droite,1
 editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
-editor.slides.slideTitle,Slide Title,1,Titre de la diapositive,0
+editor.slides.slideTitle,Slide title,1,Titre de la diapositive,0
 editor.slides.addSlideTitle,Add a title,1,Ajoutez un titre,0
 editor.slides.advanced,Advanced,1,Avancé,0
 editor.slides.advanced.good,Configuration adheres to Storylines schema.,1,La configuration adhère au schéma Storylines.,0

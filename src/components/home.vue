@@ -18,7 +18,7 @@
             <div class="flex justify-center">
                 <div class="home-btn-container border border-gray-400 border-solid mr-5 flex-1 home-buttons">
                     <router-link :to="{ name: 'metadataNew' }" class="flex justify-center h-full" target>
-                        <button class="flex items-center text-xl font-bold px-2" tabindex="-1">
+                        <button class="dashboard-option-button flex items-center text-xl font-bold px-2" tabindex="-1">
                             <svg
                                 height="50"
                                 width="50"
@@ -37,7 +37,7 @@
                 </div>
                 <div class="home-btn-container border border-gray-400 border-solid flex-1 home-buttons">
                     <router-link :to="{ name: 'metadataExisting' }" class="flex justify-center h-full" target>
-                        <button class="flex items-center text-xl font-bold" tabindex="-1">
+                        <button class="dashboard-option-button flex items-center text-xl font-bold" tabindex="-1">
                             <span class="pr-3">
                                 <svg
                                     width="55"
@@ -227,6 +227,10 @@ export default class HomeV extends Vue {
 </script>
 
 <style lang="scss">
+.dashboard-option-button {
+    outline: none !important;
+}
+
 .home-btn-container {
     height: 12vh;
     width: 45vh;
