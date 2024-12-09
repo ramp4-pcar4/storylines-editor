@@ -59,12 +59,12 @@
                             <button
                                 class="ml-10 sub-link inline-block select-none text-sm"
                                 @click="
-                                    renaming = !renaming;
+                                    renameMode = !renameMode;
                                     changeUuid = '';
                                     warning = warning === 'rename' ? 'none' : warning;
                                 "
                             >
-                                {{ renaming ? $t('editor.cancel') : $t('editor.changeUuid') }}
+                                {{ renameMode ? $t('editor.cancel') : $t('editor.changeUuid') }}
                             </button>
                         </span>
 
@@ -76,8 +76,8 @@
                         <div class="pb-5 pt-1">
                             <!-- UUID rename inputs -->
                             <!-- Shows up after you load a UUID and click the 'rename uuid' button (not exact text) -->
-                            <div v-if="renaming" class="flex flex-row items-center w-full md:w-3/4">
-                                <label for="rename-input" class="mr-6 ml-3"> {{ $t('editor.uuid.new') }}: </label>
+                            <div v-if="renameMode" class="flex flex-row items-center w-full md:w-3/4">
+                                <label for="rename-input" class="mr-6"> {{ $t('editor.uuid.new') }}: </label>
                                 <input
                                     id="rename-input"
                                     class="editor-input mt-0 flex-2"
@@ -102,13 +102,18 @@
                                     @click="renameProduct"
                                     class="editor-button editor-forms-button bg-black text-white mr-0"
                                     :class="{ 'input-error': error }"
-                                    :disabled="changeUuid.length === 0 || checkingUuid || warning === 'rename'"
+                                    :disabled="
+                                        changeUuid.length === 0 ||
+                                        checkingUuid ||
+                                        processingRename ||
+                                        warning === 'rename'
+                                    "
                                 >
                                     {{ $t('editor.rename') }}
                                 </button>
 
                                 <!-- If config is loading, display a small spinner. -->
-                                <div class="inline-flex align-middle mb-1" v-if="checkingUuid">
+                                <div class="inline-flex align-middle mb-1" v-if="checkingUuid || processingRename">
                                     <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
                                 </div>
                             </div>
@@ -144,7 +149,7 @@
                                             :class="{
                                                 'input-error': error || !reqFields.uuid,
                                                 'input-success': loadStatus === 'loaded',
-                                                'input-warning': warning !== 'none' || (!renaming && renamed)
+                                                'input-warning': warning !== 'none'
                                             }"
                                             v-tippy="{
                                                 content: $t('editor.editMetadata.input.tooltip'),
@@ -245,41 +250,6 @@
                                         <span class="inline-block select-none text-sm">{{
                                             $t(`editor.warning.${warning}`)
                                         }}</span>
-                                    </div>
-                                    <br />
-                                </span>
-
-                                <!-- Warning displayed if product is being renamed. -->
-                                <span
-                                    v-if="!renaming && renamed"
-                                    class="flex flex-row items-center text-accent-dark-orange rounded p-1"
-                                >
-                                    <!-- <div class="editor-label"></div> -->
-                                    <span class="align-middle inline-block mr-1 fill-current">
-                                        <svg
-                                            clip-rule="evenodd"
-                                            fill-rule="evenodd"
-                                            stroke-linejoin="round"
-                                            stroke-miterlimit="2"
-                                            viewBox="0 0 24 24"
-                                            width="18"
-                                            height="18"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="m2.095 19.886 9.248-16.5c.133-.237.384-.384.657-.384.272 0 .524.147.656.384l9.248 16.5c.064.115.096.241.096.367 0 .385-.309.749-.752.749h-18.496c-.44 0-.752-.36-.752-.749 0-.126.031-.252.095-.367zm9.907-6.881c-.414 0-.75.336-.75.75v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5c0-.414-.336-.75-.75-.75zm-.002-3c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1z"
-                                                fill-rule="nonzero"
-                                            />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <span class="inline-block select-none text-sm"
-                                            >{{
-                                                $t('editor.changingUuid', {
-                                                    changeUuid: renamed
-                                                })
-                                            }}
-                                        </span>
                                     </div>
                                     <br />
                                 </span>
@@ -659,9 +629,9 @@ export default class MetadataEditorV extends Vue {
     // Form properties.
     uuid = '';
     baseUuid = ''; // to save the original UUID
-    changeUuid = '';
-    renaming = false;
-    renamed = '';
+    changeUuid = ''; // the model for the rename input
+    renameMode = false; // if currently in rename mode
+    processingRename = false; // only true while we're waiting for the server to process a rename
     logoImage: undefined | File = undefined;
     metadata: MetadataContent = {
         title: '',
@@ -981,7 +951,6 @@ export default class MetadataEditorV extends Vue {
 
         // Reset fields
         this.baseUuid = this.uuid;
-        this.renamed = '';
         this.changeUuid = '';
 
         // Attempt to fetch the project from the server.
@@ -1041,46 +1010,64 @@ export default class MetadataEditorV extends Vue {
             return;
         }
 
+        const prevUuid = this.uuid;
+        const userStore = useUserStore();
+
         // Fetch the two existing configuration files.
         const enFile = this.configFileStructure?.zip.file(`${this.uuid}_en.json`);
         const frFile = this.configFileStructure?.zip.file(`${this.uuid}_fr.json`);
 
         if (enFile && frFile) {
-            axios
-                .post(process.env.VUE_APP_NET_API_URL + '/api/version/update', {
-                    uuid: this.uuid,
-                    changeUuid: this.changeUuid
+            this.processingRename = true;
+            // Remove the current configuration files from the ZIP folder.
+            this.configFileStructure?.zip.remove(enFile.name);
+            this.configFileStructure?.zip.remove(frFile.name);
+
+            // Fetch the contents of the two configuration files, and perform a find/replace on the UUID for each source.
+            const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
+            const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
+            [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
+
+            // Convert the two configuration files into string format.
+            const convertedEnglish = JSON.stringify(englishConfig, null, 4);
+            const convertedFrench = JSON.stringify(frenchConfig, null, 4);
+
+            // Re-add the configuration files to the ZIP with the new UUID.
+            this.configFileStructure?.zip.file(`${this.changeUuid}_en.json`, convertedEnglish);
+            this.configFileStructure?.zip.file(`${this.changeUuid}_fr.json`, convertedFrench);
+
+            this.uuid = this.changeUuid;
+
+            // Reset source counts.
+            this.sourceCounts = {};
+
+            // First, hit the Express server `rename` endpoint to perform the `rename` syscall on the file system.
+            await axios
+                .post(this.apiUrl + `/rename`, {
+                    user: userStore.userProfile.userName || 'Guest',
+                    previousUuid: prevUuid,
+                    newUuid: this.changeUuid,
+                    configs: { en: convertedEnglish, fr: convertedFrench }
                 })
-                .then(async (response: any) => {
-                    // Remove the files from the ZIP folder.
-                    this.configFileStructure?.zip.remove(enFile.name);
-                    this.configFileStructure?.zip.remove(frFile.name);
+                .then(async (res: AxiosResponse) => {
+                    // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
+                    if (process.env.VUE_APP_NET_API_URL !== undefined) {
+                        await axios.post(process.env.VUE_APP_NET_API_URL + '/api/version/update', {
+                            uuid: this.uuid,
+                            changeUuid: this.changeUuid
+                        });
+                    }
 
-                    // Fetch the contents of the two files, and perform a find/replace on the UUID for each source.
-                    const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
-                    const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
-                    [englishConfig, frenchConfig].forEach((config) => this.renameSources(config));
-
-                    // Convert the configs back into a string and re-add them to the ZIP with the new UUID.
-                    this.configFileStructure?.zip.file(
-                        `${this.changeUuid}_en.json`,
-                        JSON.stringify(englishConfig, null, 4)
-                    );
-                    this.configFileStructure?.zip.file(
-                        `${this.changeUuid}_fr.json`,
-                        JSON.stringify(frenchConfig, null, 4)
-                    );
-
-                    this.uuid = this.changeUuid;
-
-                    // Reset source counts and re-generate the config file structure.
-                    this.sourceCounts = {};
-
-                    if (this.configFileStructure?.zip) this.configFileStructureHelper(this.configFileStructure.zip);
+                    // After the server and database have been updated, re-build configFileStructure,
+                    // save the new config files to the server and fetch the new Git history.
+                    if (this.configFileStructure?.zip) {
+                        this.configFileStructureHelper(this.configFileStructure.zip).then(() => {
+                            this.fetchHistory();
+                            this.renameMode = this.processingRename = false;
+                        });
+                    }
                 });
         }
-        this.renaming = false;
-        this.renamed = this.uuid;
     }
 
     // Given a Storylines config, replace instances of the current UUID with a new UUID.
@@ -1109,6 +1096,7 @@ export default class MetadataEditorV extends Vue {
             }
         };
 
+        // Rename logo and introduction slide background image, if applicable.
         if (config?.introSlide.logo?.src) {
             config.introSlide.logo.src = config.introSlide.logo.src.replace(
                 `${this.uuid}/assets/`,
@@ -1116,10 +1104,26 @@ export default class MetadataEditorV extends Vue {
             );
         }
 
+        if (config?.introSlide.backgroundImage) {
+            config.introSlide.backgroundImage = config.introSlide.backgroundImage.replace(
+                `${this.uuid}/assets/`,
+                `${this.changeUuid}/assets/`
+            );
+        }
+
         config.slides.forEach((slide) => {
-            slide.panel.forEach((panel) => {
-                _renameHelper(panel);
-            });
+            if (Object.keys(slide).length !== 0) {
+                if ((slide as Slide).backgroundImage) {
+                    (slide as Slide).backgroundImage = (slide as Slide).backgroundImage.replace(
+                        `${this.uuid}/assets/`,
+                        `${this.changeUuid}/assets/`
+                    );
+                }
+
+                (slide as Slide).panel.forEach((panel) => {
+                    _renameHelper(panel);
+                });
+            }
         });
     }
 
@@ -1130,9 +1134,11 @@ export default class MetadataEditorV extends Vue {
             }
 
             configs[lang]?.slides.forEach((slide) => {
-                slide.panel.forEach((panel) => {
-                    this.panelSourceHelper(panel);
-                });
+                if (Object.keys(slide).length !== 0) {
+                    (slide as Slide).panel.forEach((panel) => {
+                        this.panelSourceHelper(panel);
+                    });
+                }
             });
         });
     }
@@ -1185,7 +1191,7 @@ export default class MetadataEditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: typeof JSZip, uploadLogo?: File | undefined): void {
+    configFileStructureHelper(configZip: typeof JSZip, uploadLogo?: File | undefined): Promise<void> {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -1210,12 +1216,13 @@ export default class MetadataEditorV extends Vue {
             this.configFileStructure.assets[this.configLang].file(uploadLogo?.name, uploadLogo);
         }
 
-        this.loadConfig();
+        return this.loadConfig();
     }
 
     /**
      * Loads a configuration file from the product folder, and sets application data
      * as needed.
+     * @param config the configuration object to load.
      */
     async loadConfig(config?: StoryRampConfig): Promise<void> {
         if (config) {
@@ -1239,7 +1246,7 @@ export default class MetadataEditorV extends Vue {
             return;
         }
 
-        if (this.loadExisting && !this.renamed) {
+        if (this.loadExisting) {
             this.loadStatus = 'waiting';
             Message.success(this.$t('editor.editMetadata.message.successfulLoad'));
         } else {
@@ -1553,28 +1560,26 @@ export default class MetadataEditorV extends Vue {
         if (!this.loadExisting || rename) {
             const user = useUserStore().userProfile.userName || 'Guest';
             // If renaming, show the loading spinner while we check whether the UUID is taken.
-            fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}/latest`, { headers: { user } }).then(
-                (res: Response) => {
-                    if (res.status !== 404) {
-                        this.warning = rename ? 'rename' : 'uuid';
-                    }
-
-                    if (rename) this.checkingUuid = false;
-
-                    fetch(this.apiUrl + `/retrieveMessages`)
-                        .then((res: any) => {
-                            if (res.ok) return res.json();
-                        })
-                        .then((data) => {
-                            axios
-                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                                    messages: data.messages
-                                })
-                                .catch((error: any) => console.log(error.response || error));
-                        })
-                        .catch((error: any) => console.log(error.response || error));
+            fetch(this.apiUrl + `/check/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
+                if (res.status !== 404) {
+                    this.warning = rename ? 'rename' : 'uuid';
                 }
-            );
+
+                if (rename) this.checkingUuid = false;
+
+                fetch(this.apiUrl + `/retrieveMessages`)
+                    .then((res: any) => {
+                        if (res.ok) return res.json();
+                    })
+                    .then((data) => {
+                        axios
+                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                messages: data.messages
+                            })
+                            .catch((error: any) => console.log(error.response || error));
+                    })
+                    .catch((error: any) => console.log(error.response || error));
+            });
         }
         this.warning = 'none';
         this.highlightedIndex = -1;
