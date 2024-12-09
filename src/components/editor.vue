@@ -335,8 +335,8 @@ import {
     ConfigFileStructure,
     HelpSection,
     MetadataContent,
-    Slide,
     MultiLanguageSlide,
+    Slide,
     SourceCounts,
     StoryRampConfig,
     TextPanel
