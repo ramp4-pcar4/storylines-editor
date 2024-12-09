@@ -52,8 +52,8 @@ var app = express();
 var logFile = fs.createWriteStream(LOG_PATH, { flags: 'a' });
 
 try{
-    const keyPath = fs.readFileSync(CERT_PATH, 'utf8');
-    const certPath = fs.readFileSync(KEY_PATH, 'utf8');
+    const keyPath = fs.readFileSync(KEY_PATH, 'utf8');
+    const certPath = fs.readFileSync(CERT_PATH, 'utf8');
     const credentials = { key: keyPath, cert: certPath };
     
     // Create HTTPS server
@@ -730,11 +730,15 @@ function logger(type, message) {
 //     });
 // });
 
-app.get('/test', (req, res) => {
-    logger('INFO', 'Running on ' + PORT);
-    res.send('Running on ' + PORT);
-});
-
+try{
+    app.get('/test', (req, res) => {
+        logger('INFO', 'Running on ' + PORT);
+        res.send('Running on ' + PORT);
+    });
+}
+catch (error) {
+    logger('INFO', 'Error: ' + error);
+}
 
 
 /* wss.on('connection', (ws) => {
