@@ -49,30 +49,30 @@
         >
             <template #item="{ element, index }">
                 <ImagePreview :key="`${element.id}-${index}`" :imageFile="element" @delete="deleteImage">
-                    <div class="flex mt-4 items-center w-full text-left">
-                        <label class="editor-label text-label" :for="'altTag' + index"
-                            >{{ $t('editor.image.altTag') }}:</label
-                        >
-                        <input
-                            :id="'altTag' + index"
-                            class="editor-input w-4/5"
-                            type="text"
-                            v-model="element.altText"
-                            @change="onImagesEdited"
-                        />
-                    </div>
+                    <div class="px-2 pb-2">
+                        <div class="flex flex-col mt-4 w-full text-left self-center">
+                            <label class="editor-label" :for="'altTag' + index">{{ $t('editor.image.altTag') }}</label>
+                            <input
+                                :id="'altTag' + index"
+                                class="editor-input"
+                                type="text"
+                                v-model="element.altText"
+                                @change="onImagesEdited"
+                            />
+                        </div>
 
-                    <div class="flex mt-4 items-center w-full text-left">
-                        <label class="editor-label text-label" :for="'imgCaption' + index"
-                            >{{ $t('editor.image.label.caption') }}:</label
-                        >
-                        <input
-                            :id="'imgCaption' + index"
-                            class="editor-input w-4/5"
-                            type="text"
-                            v-model="element.caption"
-                            @change="onImagesEdited"
-                        />
+                        <div class="flex flex-col mt-4 w-full text-left self-center">
+                            <label class="editor-label" :for="'imgCaption' + index">{{
+                                $t('editor.image.label.caption')
+                            }}</label>
+                            <input
+                                :id="'imgCaption' + index"
+                                class="editor-input"
+                                type="text"
+                                v-model="element.caption"
+                                @change="onImagesEdited"
+                            />
+                        </div>
                     </div>
                 </ImagePreview>
             </template>
