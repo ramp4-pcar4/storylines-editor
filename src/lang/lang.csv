@@ -136,6 +136,9 @@ editor.changeLang.modal,"Are you sure you want to switch languages? Unsaved chan
 editor.frenchConfig,View French Config,1,Afficher la configuration en français,1
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,1
 editor.returnToLanding,Return to Landing,1,Retour à la page d’accueil,1
+editor.image.label.height,Height,1,Hauteur,0
+editor.image.label.width,Width,1,Largeur,0
+editor.image.label.widthWarning,Maximum width is 2/3 (66%) of screen on desktop and 100% on mobile. Larger widths will be ignored.,1,La largeur maximale est de 2/3 (66%) de l'écran sur un ordinateur de bureau et de 100% sur un appareil mobile. Les largeurs supérieures seront ignorées.,0
 editor.image.delete,Delete Image,1,Supprimer l'image,1
 editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,1
 editor.image.label.caption,Caption,1,Légende,1
