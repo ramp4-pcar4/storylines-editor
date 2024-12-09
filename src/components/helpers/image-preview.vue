@@ -61,4 +61,16 @@ export default class ImagePreviewV extends Vue {
         padding: 0 !important;
     }
 }
+
+@media only screen and (max-width: 1500px) {
+    .image-item {
+        width: 41%;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .image-item {
+        width: 90%;
+    }
+}
 </style>
