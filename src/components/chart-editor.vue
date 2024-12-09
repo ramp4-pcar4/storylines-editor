@@ -1,5 +1,5 @@
 <template>
-    <div class="block">
+    <div class="block mt-3">
         <!-- Menu with option to add a new chart -->
         <div class="flex items-center">
             <span class="font-bold px-4">{{

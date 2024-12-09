@@ -1,18 +1,18 @@
 <template>
-    <div class="block">
+    <div class="block mt-2">
         <!-- left and right panel buttons for dynamic panels -->
         <div class="flex">
             <button
                 @click="() => changePanel('text')"
-                class="editor-button border hover:bg-gray-100"
-                :class="editingStatus === 'text' ? 'border-black' : 'border-gray-300'"
+                class="editor-button rounded-none rounded-l border hover:bg-gray-100"
+                :class="editingStatus === 'text' ? 'border-black font-bold' : 'border-gray-300'"
             >
                 {{ $t('dynamic.textSection') }}
             </button>
             <button
                 @click="() => changePanel('panels')"
-                class="editor-button border hover:bg-gray-100"
-                :class="editingStatus !== 'text' ? 'border-black' : 'border-gray-300'"
+                class="editor-button rounded-none rounded-r border hover:bg-gray-100"
+                :class="editingStatus !== 'text' ? 'border-black font-bold' : 'border-gray-300'"
             >
                 {{ $t('dynamic.panel.collection') }}
             </button>
@@ -61,7 +61,7 @@
                         <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
                     </td>
                     <td>
-                        <select v-model="newSlideType">
+                        <select v-model="newSlideType" class="editor-input rounded shadow">
                             <option v-for="thing in Object.keys(editors)" :key="thing">
                                 {{ thing }}
                             </option>
@@ -311,7 +311,7 @@ export default class DynamicEditorV extends Vue {
     width: 150px !important;
     text-align: center;
     font-weight: normal;
-    border: 1px solid black;
+    //border: 1px solid black;
     padding: 2px !important;
     margin-top: 0 !important;
 }
