@@ -1,17 +1,20 @@
 <template>
-    <div class="flex flex-col">
-        <label class="editor-label text-left" for="mapTitle">{{ $t('editor.map.title') }}:</label>
+    <div class="flex flex-col mt-4">
+        <label class="editor-label text-left" for="mapTitle">{{ $t('editor.map.title') }}</label>
         <input class="editor-input" type="text" id="mapTitle" v-model="panel.title" />
 
         <div>
-            <label class="editor-label mt-6" for="timeSliderToggle">{{ $t('editor.map.timeslider.enable') }}</label>
-            <input
-                class="editor-input"
-                type="checkbox"
-                id="timeSliderToggle"
-                @change="saveTimeSlider"
-                v-model="usingTimeSlider"
-            />
+            <div class="flex items-center gap-2 mt-2">
+                <input
+                    class="rounded-none cursor-pointer w-4 h-4"
+                    type="checkbox"
+                    id="timeSliderToggle"
+                    @change="saveTimeSlider"
+                    v-model="usingTimeSlider"
+                />
+                <label class="editor-label" for="timeSliderToggle">{{ $t('editor.map.timeslider.enable') }}</label>
+            </div>
+
             <span class="mx-4"></span>
             <button
                 v-if="usingTimeSlider"

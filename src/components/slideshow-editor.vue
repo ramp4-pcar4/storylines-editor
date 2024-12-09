@@ -1,8 +1,8 @@
 <template>
-    <div class="block">
+    <div class="block mt-3">
         <!-- Menu with option to add a new chart -->
         <div class="flex items-center">
-            <span class="font-bold px-4">{{
+            <span class="font-bold pr-4">{{
                 $t('editor.slideshow.label.info', {
                     num: panel.items.length
                 })
@@ -40,12 +40,11 @@
         </div>
         <hr class="border-solid border-t-2 border-gray-300 my-2" />
         <!-- Metadata Editor -->
-        <div class="flex items-center w-full text-left">
-            <label class="editor-label text-label" for="slideshowCaption"
-                >{{ $t('editor.image.slideshowCaption') }}:</label
-            >
-            <input id="slideshowCaption" class="editor-input w-1/3" type="text" v-model="panel.caption" /><br />
+        <div class="mt-5 mb-8">
+            <label class="editor-label" for="slideshowCaption">{{ $t('editor.image.slideshowCaption') }}</label>
+            <input id="slideshowCaption" class="editor-input block w-1/3" type="text" v-model="panel.caption" />
         </div>
+
         <table class="w-2/3 mt-5">
             <thead>
                 <tr class="table-header">
