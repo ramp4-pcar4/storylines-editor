@@ -8,7 +8,7 @@
             <p class="ml-auto"></p>
             <!-- Add new slide button -->
             <!-- New slide will have a blank ENG and FR config, with some exceptions -->
-            <button class="mx-auto toc-popup-button py-0 px-2" @click="addNewSlide">
+            <button class="mx-auto toc-popup-button py-0 px-2 border-gray-300 font-semibold" @click="addNewSlide">
                 <span class="inline-block pr-1"
                     ><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
                         <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
