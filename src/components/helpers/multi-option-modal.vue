@@ -6,15 +6,30 @@
         class="flex justify-center items-center"
     >
         <div class="mx-5 my-2">
-            <h2 slot="header" class="text-2xl font-bold mb-1">{{ title }}</h2>
-            <p>{{ message }}</p>
+            <h2 v-if="title" slot="header" class="text-2xl font-bold mb-1">{{ title }}</h2>
+            <p v-if="message">{{ message }}</p>
             <div class="w-full flex justify-end mt-3">
-                <button class="editor-button bg-black text-white hover:bg-gray-800" @click="onOk">
-                    {{ $t('editor.slides.continue') }}
+                <button
+                    v-for="option in options"
+                    class="editor-button bg-black text-white hover:bg-gray-800"
+                    @click="
+                        () => {
+                            option.action();
+                            this.$vfm.close(this.name);
+                        }
+                    "
+                >
+                    {{ option.label }}
                 </button>
-                <button class="editor-button hover:bg-gray-800" @click="onCancel">
+                <button v-if="cancelAllowed" class="editor-button hover:bg-gray-800" @click="onCancel">
                     {{ $t('editor.cancel') }}
                 </button>
+                <!--                <button class="editor-button bg-black text-white hover:bg-gray-800" @click="onOk">-->
+                <!--                    {{ $t('editor.slides.continue') }}-->
+                <!--                </button>-->
+                <!--                <button class="editor-button hover:bg-gray-800" @click="onCancel">-->
+                <!--                    {{ $t('editor.cancel') }}-->
+                <!--                </button>-->
             </div>
         </div>
     </vue-final-modal>
@@ -25,6 +40,11 @@ import { Options, Prop, Vue } from 'vue-property-decorator';
 import { VueFinalModal } from 'vue-final-modal';
 // import { Options } from 'vue-property-decorator';
 
+interface modalOption {
+    label: string;
+    action: () => void;
+}
+
 @Options({
     components: {
         'vue-final-modal': VueFinalModal
@@ -33,12 +53,9 @@ import { VueFinalModal } from 'vue-final-modal';
 export default class MetadataEditorV extends Vue {
     @Prop() name!: string;
     @Prop() title!: string;
-    @Prop() message!: string;
-
-    onOk(): void {
-        this.$emit('ok');
-        this.$vfm.close(this.name);
-    }
+    @Prop() message!: string | undefined;
+    @Prop() options!: modalOption[];
+    @Prop({ default: false }) cancelAllowed!: boolean;
 
     onCancel(): void {
         this.$emit('Cancel');

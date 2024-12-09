@@ -12,7 +12,7 @@
                     id="metaTitle"
                     :value="metadata.title"
                     @change="metadataChanged"
-                    class="metadata-input"
+                    class="metadata-input editor-input"
                 />
                 <p class="metadata-subcaption">
                     {{ $t('editor.metadataForm.caption.title') }}
@@ -79,7 +79,7 @@
                         :value="metadata.introTitle"
                         @change="metadataChanged"
                         id="introTitle"
-                        class="metadata-input"
+                        class="metadata-input editor-input"
                     />
                     <p class="metadata-subcaption">
                         {{ $t('editor.metadataForm.caption.introTitle') }}
@@ -97,7 +97,7 @@
                         id="introSubtitle"
                         :value="metadata.introSubtitle"
                         @change="metadataChanged"
-                        class="metadata-input"
+                        class="metadata-input editor-input"
                     />
                     <p class="metadata-subcaption">
                         {{ $t('editor.metadataForm.caption.introSubtitle') }}
@@ -117,12 +117,12 @@
                         id="metaLogo"
                         @change="$emit('logo-source-changed', $event)"
                         :value="metadata.logoName"
-                        class="metadata-input w-full lg:w-1/2"
+                        class="metadata-input editor-input w-full lg:w-1/2"
                     />
                     <!-- Upload button -->
                     <button
                         @click.stop="openFileSelector"
-                        class="metadata-button mb-0.5 bg-black border border-black text-white hover:bg-gray-800"
+                        class="editor-button py-1.5 bg-black border border-black text-white hover:bg-gray-800"
                     >
                         {{ $t('editor.browse') }}
                     </button>
@@ -130,7 +130,7 @@
                     <button
                         v-if="metadata.logoName || metadata.logoPreview"
                         @click.stop="removeLogo"
-                        class="metadata-button border mb-0.5 border-black"
+                        class="editor-button py-1.5 border border-black"
                     >
                         {{ $t('editor.remove') }}
                     </button>
@@ -169,7 +169,7 @@
                         id="logoAltText"
                         :value="metadata.logoAltText"
                         @change="metadataChanged"
-                        class="metadata-input"
+                        class="metadata-input editor-input"
                     />
                     <p class="metadata-subcaption">
                         {{ $t('editor.metadataForm.caption.logoAltText') }}
@@ -193,7 +193,7 @@
                     id="contextLink"
                     :value="metadata.contextLink"
                     @change="metadataChanged"
-                    class="metadata-input"
+                    class="metadata-input editor-input"
                 />
                 <p class="metadata-subcaption">
                     {{ $t('editor.metadataForm.caption.contextLink') }}
@@ -211,7 +211,7 @@
                     id="contextLabel"
                     :value="metadata.contextLabel"
                     @change="metadataChanged"
-                    class="metadata-input"
+                    class="metadata-input editor-input"
                 />
                 <p class="metadata-subcaption">
                     {{ $t('editor.metadataForm.caption.contextLabel') }}
@@ -224,7 +224,7 @@
             <label class="metadata-label" for="dateModified">{{ $t('editor.dateModified') }}</label>
             <div v-show="editing">
                 <input
-                    class="metadata-input w-full md:w-1/3"
+                    class="metadata-input editor-input w-full md:w-1/3"
                     type="date"
                     name="dateModified"
                     id="dateModified"
@@ -279,8 +279,8 @@ h2 {
 }
 
 .metadata-input {
-    padding: 8px 10px;
-    border: 1px solid lightgray;
+    //padding: 8px 10px;
+    border: 1px solid lightgray !important;
     // outline: 1px solid lightgray;
     display: block;
     border-radius: 5px;
@@ -288,6 +288,8 @@ h2 {
     margin-bottom: 0.25rem;
     max-width: 100%;
     width: 1200px;
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 
 .metadata-subcaption {
@@ -298,36 +300,14 @@ h2 {
 .metadata-select {
     padding: 8px 10px;
     border: 1px solid lightgray;
+    background-color: white;
     display: block;
     border-radius: 5px;
     margin-top: 0.15rem;
     margin-bottom: 0.25rem;
     max-width: 100%;
     width: 300px;
-}
-
-.metadata-button {
-    padding: 8px 15px;
-    margin: 0;
-    border-radius: 5px;
-    font-weight: 600;
-    transition-duration: 0.2s;
-}
-
-.metadata-button:hover:enabled {
-    background-color: #dbdbdb;
-    color: black;
-}
-
-.metadata-button:focus {
-    outline: 2px solid royalblue;
-    outline-offset: 2px;
-    transition-duration: 0.075s;
-}
-
-.metadata-button:disabled {
-    border: 1px solid gray;
-    color: gray;
-    cursor: not-allowed;
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 </style>

@@ -1,89 +1,113 @@
 <template>
-    <div class="overflow-y-auto top-20 h-auto self-start flex-grow p-5">
+    <div class="p-5">
         <div v-if="!!currentSlide">
             <div class="flex">
                 <div class="flex flex-col w-full">
-                    <h2 class="font-bold mb-3">{{ $t('editor.slides.currentLangLabel', { lang: langTranslate }) }}</h2>
-                    <label class="editor-label" for="slideTitle">{{ $t('editor.slides.slideTitle') }}:</label>
+                    <div class="flex justify-between flex-wrap gap-3 gap-y-1 items-center">
+                        <h2 class="text-2xl font-bold">
+                            {{ $t('editor.slides.currentLangLabel', { lang: langTranslate, num: slideIndex + 1 }) }}
+                        </h2>
+                        <div class="space-x-2">
+                            <button
+                                @click.stop="selectSlide(slideIndex - 1)"
+                                :disabled="slideIndex === 0"
+                                class="editor-button border border-black"
+                            >
+                                {{ $t('editor.slides.previousSlide') }}
+                            </button>
+                            <button
+                                @click.stop="selectSlide(slideIndex + 1)"
+                                :disabled="isLast"
+                                class="editor-button border border-black"
+                            >
+                                {{ $t('editor.slides.nextSlide') }}
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Slide title -->
+                    <label style="margin-left: 0" class="editor-label mt-4" for="slideTitle">{{
+                        $t('editor.slides.slideTitle')
+                    }}</label>
                     <div class="flex">
                         <input
                             type="text"
                             id="slideTitle"
                             v-model="currentSlide.title"
                             :placeholder="$t('editor.slides.addSlideTitle')"
-                            class="editor-input w-2/3"
+                            class="editor-input w-full lg:w-2/3"
                         />
                         <span class="ml-auto"></span>
-                        <button
-                            @click.stop="selectSlide(slideIndex - 1)"
-                            :disabled="slideIndex === 0"
-                            class="editor-button border border-black"
-                        >
-                            {{ $t('editor.slides.previousSlide') }}
-                        </button>
-                        <button
-                            @click.stop="selectSlide(slideIndex + 1)"
-                            :disabled="isLast"
-                            class="editor-button border border-black"
-                        >
-                            {{ $t('editor.slides.nextSlide') }}
-                        </button>
                     </div>
-                    <div class="flex mt-3">
-                        <label class="ml-0" for="fullSlide">
-                            <span class="mr-2 font-bold">{{ $t('editor.slides.makeFull') }}</span>
-                        </label>
-                        <input
-                            type="checkbox"
-                            id="fullSlide"
-                            class="editor-input rounded-none cursor-pointer w-4 h-4"
-                            v-model="rightOnly"
-                            :disabled="rightOnly && determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
-                            @change.stop="
-                                if (currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])) {
-                                    $vfm.open(`right-only-${slideIndex}`);
-                                } else {
-                                    toggleRightOnly();
-                                }
-                            "
-                        />
-                        <label class="ml-0" for="centerSlide">
-                            <span class="mr-2 font-bold">{{ $t('editor.slides.centerSlide') }}</span>
-                        </label>
-                        <input
-                            type="checkbox"
-                            id="centerSlide"
-                            class="editor-input rounded-none cursor-pointer w-4 h-4"
-                            v-model="centerSlide"
-                            :disabled="centerPanel"
-                            @change.stop="toggleCenterSlide()"
-                        />
-                        <label class="ml-0" for="centerPanel">
-                            <span class="mr-2 font-bold">{{ $t('editor.slides.centerPanel') }}</span>
-                        </label>
-                        <input
-                            type="checkbox"
-                            id="centerPanel"
-                            class="editor-input rounded-none cursor-pointer w-4 h-4"
-                            v-model="centerPanel"
-                            :disabled="centerSlide"
-                            @change.stop="toggleCenterPanel()"
-                        />
-                        <label class="ml-0" for="inToc">
-                            <span class="mx-2 font-bold"> {{ $t('editor.slides.includeInToc') }}</span>
-                        </label>
-                        <input
-                            type="checkbox"
-                            id="inToc"
-                            class="editor-input rounded-none cursor-pointer w-4 h-4"
-                            v-model="includeInToc"
-                            @change.stop="toggleIncludeInToc()"
-                        />
+                    <!-- Slide options -->
+                    <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
+                        <!-- Make the current panel the full slide -->
+                        <div class="flex flex-row items-center">
+                            <input
+                                type="checkbox"
+                                id="fullSlide"
+                                class="rounded-none cursor-pointer w-4 h-4"
+                                v-model="onePanelOnly"
+                                :disabled="determineEditorType(currentSlide.panel[panelIndex]) === 'dynamic'"
+                                @change.stop="
+                                    if (currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])) {
+                                        $vfm.open(`one-panel-only-${slideIndex}`);
+                                    } else {
+                                        $vfm.open(`one-to-two-panels-${slideIndex}`);
+                                    }
+                                "
+                            />
+                            <label class="ml-0" for="fullSlide">
+                                <span class="font-bold ml-0">{{ $t('editor.slides.makeFull') }}</span>
+                            </label>
+                        </div>
+                        <!-- Center slide content -->
+                        <div class="flex flex-row items-center">
+                            <input
+                                type="checkbox"
+                                id="centerSlide"
+                                class="rounded-none cursor-pointer w-4 h-4"
+                                v-model="centerSlide"
+                                :disabled="centerPanel"
+                                @change.stop="toggleCenterSlide()"
+                            />
+                            <label class="ml-0" for="centerSlide">
+                                <span class="font-bold">{{ $t('editor.slides.centerSlide') }}</span>
+                            </label>
+                        </div>
+                        <!-- Center panel content -->
+                        <div class="flex flex-row items-center">
+                            <input
+                                type="checkbox"
+                                id="centerPanel"
+                                class="rounded-none cursor-pointer w-4 h-4"
+                                v-model="centerPanel"
+                                :disabled="centerSlide"
+                                @change.stop="toggleCenterPanel()"
+                            />
+                            <label class="ml-0" for="centerPanel">
+                                <span class="font-bold">{{ $t('editor.slides.centerPanel') }}</span>
+                            </label>
+                        </div>
+                        <!-- Include slide in ToC -->
+                        <div class="flex flex-row items-center">
+                            <input
+                                type="checkbox"
+                                id="inToc"
+                                class="rounded-none cursor-pointer w-4 h-4"
+                                v-model="includeInToc"
+                                @change.stop="toggleIncludeInToc()"
+                            />
+                            <label class="ml-0" for="inToc">
+                                <span class="font-bold"> {{ $t('editor.slides.includeInToc') }}</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
             <br />
-            <div class="flex border-b border-black" v-if="currentSlide.panel.length === 2">
+            <!-- Panel select -->
+            <div class="flex gap-3 border-b border-black pl-2" v-if="currentSlide.panel.length === 2">
+                <!-- Left panel -->
                 <button
                     @click="
                         () => {
@@ -92,7 +116,7 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button border-t border-l border-r"
+                    class="editor-button panel-select-button"
                     :class="panelIndex == 0 && !advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
@@ -131,6 +155,7 @@
                     </span>
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.leftPanel') }}</span>
                 </button>
+                <!-- Right panel -->
                 <button
                     @click="
                         () => {
@@ -139,7 +164,7 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button border-t border-l border-r"
+                    class="editor-button panel-select-button"
                     :class="panelIndex == 1 && !advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
@@ -179,6 +204,7 @@
 
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.rightPanel') }}</span>
                 </button>
+                <!-- Advanced editor -->
                 <button
                     @click="
                         () => {
@@ -187,13 +213,14 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button border-t border-l border-r"
+                    class="editor-button panel-select-button"
                     :class="advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
                 </button>
             </div>
-            <div v-else class="border-b border-black">
+            <div v-else class="border-b border-black space-x-3 pl-2">
+                <!-- Fullscreen (Loner panel) -->
                 <button
                     @click="
                         () => {
@@ -201,7 +228,7 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button border-t border-l border-r"
+                    class="editor-button panel-select-button"
                     :class="!advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block">
@@ -241,6 +268,7 @@
 
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.fullscreenPanel') }}</span>
                 </button>
+                <!-- Advanced editor -->
                 <button
                     @click="
                         () => {
@@ -248,22 +276,25 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button border-t border-l border-r"
+                    class="editor-button panel-select-button"
                     :class="advancedEditorView ? 'border-black' : 'border-white'"
                 >
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
                 </button>
             </div>
             <div>
-                <div class="flex mt-4">
-                    <span class="font-bold text-xl">{{ $t('editor.slides.content') }}:</span>
-                    <span class="ml-auto flex-grow"></span>
-                    <div v-if="!advancedEditorView" class="flex flex-col mr-8">
-                        <label class="editor-label text-left text-lg" for="contentTypeSelect"
-                            >{{ $t('editor.slides.contentType') }}:</label
+                <div class="flex items-center justify-between mt-4 flex-wrap">
+                    <span class="font-bold text-2xl">{{ $t('editor.slides.content') }}</span>
+                    <div v-if="!advancedEditorView" class="flex flex-col mr-3">
+                        <label
+                            style="margin-left: 0"
+                            class="editor-label text-left text-md font-semibold"
+                            for="contentTypeSelect"
+                            >{{ $t('editor.slides.contentType') }}</label
                         >
                         <select
                             id="contentTypeSelect"
+                            class="rounded shadow w-48"
                             ref="typeSelector"
                             @input="
                                 newType = ($event.target as HTMLInputElement).value;
@@ -322,16 +353,13 @@
                 ></component>
             </div>
         </div>
-        <div v-else class="flex h-full mt-4 justify-center text-gray-600 text-xl">
+        <div v-else class="flex h-fit mt-4 justify-center text-gray-600 text-xl">
             <span>{{ $t('editor.slides.select') }}</span>
         </div>
-        <confirmation-modal
+        <action-modal
             :name="`change-slide-${slideIndex}`"
-            :message="
-                $t('editor.slides.changeSlide.confirm', {
-                    title: currentSlide.title
-                })
-            "
+            :title="$t('editor.slides.changePanelType.title', { type: newType })"
+            :message="$t('editor.slides.changePanelType.message')"
             @ok="
                 changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
                 toggleCenterPanel();
@@ -339,20 +367,30 @@
             "
             @Cancel="cancelTypeChange"
         />
-        <confirmation-modal
-            :name="`right-only-${slideIndex}`"
-            :message="
-                $t('editor.slides.changeSlide.confirm', {
-                    title: currentSlide.title
-                })
-            "
-            @ok="toggleRightOnly()"
-            @Cancel="rightOnly = !rightOnly"
+        <action-modal
+            :name="`one-panel-only-${slideIndex}`"
+            :title="$t('editor.slides.changeToOnePanel.title')"
+            :message="$t('editor.slides.changeToOnePanel.message')"
+            @ok="toggleOnePanelOnly()"
+            @Cancel="onePanelOnly = !onePanelOnly"
+        />
+        <multi-option-modal
+            :name="`one-to-two-panels-${slideIndex}`"
+            :title="$t('editor.slides.addBlankPanel.title')"
+            :message="$t('editor.slides.addBlankPanel.message')"
+            :options="[
+                { label: $t('editor.slides.addBlankPanel.left'), action: () => toggleOnePanelOnly('left') },
+                { label: $t('editor.slides.addBlankPanel.right'), action: () => toggleOnePanelOnly('right') }
+            ]"
+            @cancel="onePanelOnly = !onePanelOnly"
+            :cancelAllowed="true"
         />
     </div>
 </template>
 
 <script lang="ts">
+import ActionModal from '@/components/helpers/action-modal.vue';
+import MultiOptionModal from '@/components/helpers/multi-option-modal.vue';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -387,6 +425,8 @@ import { toRaw } from 'vue';
 
 @Options({
     components: {
+        MultiOptionModal,
+        ActionModal,
         'chart-editor': ChartEditorV,
         'custom-editor': CustomEditorV,
         'image-editor': ImageEditorV,
@@ -412,7 +452,7 @@ export default class SlideEditorV extends Vue {
     panelIndex = 0;
     advancedEditorView = false;
     newType = '';
-    rightOnly = false;
+    onePanelOnly = false;
     centerSlide = false;
     centerPanel = false;
     includeInToc = true;
@@ -438,11 +478,13 @@ export default class SlideEditorV extends Vue {
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-        this.currentSlide ? (this.rightOnly = this.currentSlide.panel.length === 1) : false;
+        this.currentSlide ? (this.onePanelOnly = this.currentSlide.panel.length === 1) : false;
         this.centerPanel = this.currentSlide.centerPanel ?? false;
         this.centerSlide = this.currentSlide.centerSlide ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.rightOnly = this.currentSlide.rightOnly ?? false;
+        this.onePanelOnly =
+            this.currentSlide.rightOnly ??
+            this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic';
     }
 
     /**
@@ -634,14 +676,15 @@ export default class SlideEditorV extends Vue {
         return PanelType.Slideshow;
     }
 
-    toggleRightOnly(): void {
-        this.currentSlide.rightOnly = this.rightOnly;
+    toggleOnePanelOnly(addToWhichSide?: 'left' | 'right'): void {
+        this.currentSlide.rightOnly = this.onePanelOnly;
         this.saveChanges();
-        if (this.rightOnly) {
+        if (this.onePanelOnly) {
+            this.currentSlide['panel'] = [this.currentSlide.panel[this.panelIndex]];
             this.panelIndex = 0;
-            this.currentSlide['panel'] = [this.currentSlide.panel[1]];
         } else {
             this.currentSlide['panel'] = [
+                ...(addToWhichSide === 'right' ? [Object.assign({}, this.currentSlide.panel[0])] : []),
                 Object.assign(
                     {},
                     {
@@ -650,8 +693,9 @@ export default class SlideEditorV extends Vue {
                         content: ''
                     }
                 ),
-                Object.assign({}, this.currentSlide.panel[0])
+                ...(addToWhichSide === 'left' ? [Object.assign({}, this.currentSlide.panel[0])] : [])
             ];
+            this.panelIndex = addToWhichSide === 'left' ? 0 : 1;
         }
     }
 
@@ -666,7 +710,7 @@ export default class SlideEditorV extends Vue {
                     ''
                 );
             }
-        } else if (this.rightOnly) {
+        } else if (this.onePanelOnly) {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].customStyles = 'text-align: center;';
             } else {
@@ -731,6 +775,16 @@ export default class SlideEditorV extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.panel-select-button {
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-left-radius: 0.25rem; /* 4px */
+    border-top-right-radius: 0.25rem; /* 4px */
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
 label {
     text-align: left !important;
     margin-left: 0.5rem;
@@ -742,7 +796,7 @@ input[type='checkbox']:checked {
 }
 
 select {
-    border: 1px black solid;
+    border: 1px solid #a1a1a1;
     background: white;
     padding: 0.25rem 0.5rem;
 }
