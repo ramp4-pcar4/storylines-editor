@@ -100,7 +100,7 @@
                                 />
                                 <button
                                     @click="renameProduct"
-                                    class="editor-button editor-forms-button bg-black text-white mr-0"
+                                    class="editor-button editor-forms-button bg-black text-white ml-3 mr-0"
                                     :class="{ 'input-error': error }"
                                     :disabled="changeUuid.length === 0 || checkingUuid || warning === 'rename'"
                                 >
@@ -185,7 +185,7 @@
                                                 generateRemoteConfig().then(fetchHistory);
                                             }
                                         "
-                                        class="editor-button editor-forms-button bg-black text-white mr-0"
+                                        class="editor-button editor-forms-button bg-black text-white ml-3 mr-0"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
                                         v-if="editExisting"
@@ -441,7 +441,7 @@
                                         @logo-source-changed="onLogoSourceInput"
                                     ></metadata-content>
                                     <!-- Save/discard changes buttons (existing only) -->
-                                    <div v-if="editingMetadata && editExisting" class="flex gap-1 mt-2">
+                                    <div v-if="editingMetadata && editExisting" class="flex gap-3 mt-2">
                                         <!-- Save changes -->
                                         <!-- Saves to remote copy on server -->
                                         <!-- NOTE: Changes are saved to local copy automatically as you fill the form. To delete these changes, press the discard button -->
