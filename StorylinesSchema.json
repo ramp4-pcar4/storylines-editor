@@ -185,6 +185,10 @@
                 "title": {
                     "type": "string",
                     "description": "A title that is displayed centered above this map."
+                }, 
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the map."
                 }
             },
             "required": ["config", "type"]
