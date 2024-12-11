@@ -148,9 +148,11 @@ editor.image.slideshowCaption,Slideshow Caption,1,Légende du diaporama,1
 editor.image.loadingError,An error occurred when trying to load image,1,Une erreur est survenue lors du chargement de l’image.,1
 editor.video.title,Video Title,1,Titre de la vidéo,1
 editor.video.label.drag,Drag your video file here,1,Glissez votre fichier vidéo ici,1
+editor.video.label.sizeLimit,({size}MB limit),1,(limite {size}MB),0
 editor.video.label.captions,Video Captions,1,Sous-titres,1
 editor.video.label.transcript,Video Transcript,1,Transcription,1
 editor.video.label.upload,Upload,1,Télécharger,1
+editor.video.sizeExceeded,File too big!,1,Fichier trop gros !,0
 editor.video.label.linkSupport,Supports YouTube links (regular and shortened) as well as direct links to mp4 videos.,1,Prend en charge les liens YouTube (réguliers et raccourcis) ainsi que les liens directs vers des vidéos mp4.,0
 editor.video.delete,Delete Video,1,Supprimer la vidéo,1
 editor.video.pasteUrl,Paste the URL to a video,1,Collez l'url d'une vidéo,0
