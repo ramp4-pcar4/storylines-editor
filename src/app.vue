@@ -8,6 +8,7 @@
 import { Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { useUserStore } from './stores/userStore';
+import { useLockStore } from './stores/lockStore';
 
 export default class App extends Vue {
     @Watch('$route', { immediate: true })
@@ -24,10 +25,10 @@ export default class App extends Vue {
         if (import.meta.env.VITE_APP_CURR_ENV) {
             userStore.fetchUserProfile();
         }
+        const lockStore = useLockStore();
+        lockStore.initConnection(); // start the handshake with the web socket server as soon as the app starts to save time
     }
 }
-
-
 </script>
 
 <style lang="scss">
