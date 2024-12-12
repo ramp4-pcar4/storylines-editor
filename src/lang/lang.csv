@@ -26,6 +26,7 @@ fullscreen.activate,Enter Fullscreen,1,Afficher le mode plein écran,1
 fullscreen.deactivate,Exit Fullscreen,1,Quitter le mode plein écran,1
 editor.lang.en,English,1,Anglais,1
 editor.lang.fr,French,1,Français,1
+editor.ok,Ok,1,D'accord,1
 editor.feedback,Send Us Feedback,1,Envoyez-nous vos commentaires,0
 editor.feedback.subject,Storylines Editor Feedback,1,Commentaires de l'éditeur de scénarios,0
 editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
@@ -49,11 +50,13 @@ editor.editMetadata.message.error.noRequestedVersion,The requested version does 
 editor.editMetadata.message.error.noResponseFromServer,"Failed to load product, no response from server",1,"Échec du chargement du produit, aucune réponse du serveur",0
 editor.editMetadata.message.error.malformedProduct,The requested product {uuid} is malformed.,1,Le produit demandé {uuid} est mal formé.,0
 editor.editMetadata.message.error.failedSave,Failed to save changes.,1,Échec de l'enregistrement des modifications.,0
+editor.editMetadata.message.error.unauthorized,The product is being accessed by another user. Please try again later.,1,[FR] The product is being accessed by another user. Please try again later.,0
 editor.editMetadata.message.error.logoFailedLoad,Failed to load logo image.,1,Échec du chargement de l'image du logo.,0
 editor.editMetadata.message.error.requiredFieldsNotFilled,Please fill out the required fields before proceeding.,1,Veuillez remplir les champs obligatoires avant de continuer.,0
 editor.editMetadata.message.logoSuccessfulLoad,Successfully loaded logo image.,1,Image du logo chargée avec succès.,0
 editor.editMetadata.message.successfulLoad,Successfully loaded storyline!,1,Scénario chargé avec succès!,0
 editor.editMetadata.message.successfulSave,Successfully saved changes!,1,Modifications enregistrées avec succès!,0
+editor.editMetadata.message.noSave,No unsaved changes detected,1,[FR] No unsaved changes detected,0
 editor.editMetadata.message.wait,Please wait. Saving may take a few moments.,1,"Veuillez patienter. L'enregistrement peut prendre quelques instants.",0
 editor.editMetadata.versionHistory.buttonShow,Show previous versions of product,1,Afficher les versions précédentes du produit,0
 editor.editMetadata.versionHistory.buttonHide,Hide previous versions,1,Masquer les versions précédentes,0
@@ -79,6 +82,9 @@ editor.metadataForm.endOfPage.explanation,"This information is displayed at the 
 editor.metadataForm.enabled,Enabled,1,Activé,0
 editor.metadataForm.disabled,Disabled,1,Désactivé,0
 editor.metadataForm.na,N/A,1,N / A,0
+editor.session.ended,"Your session has expired. Don't worry, if you had any unsaved changes, we saved your work automatically before exiting.",1,"[FR] Your session has expired. Don't worry, if you had any unsaved changes, we saved your work automatically before exiting.",0
+editor.session.extended,Session Extended,1,[FR] Session Extended,0
+editor.extendSession,We noticed that you have been working on this product for a while. Your session is going to expire in {mins} minutes and {secs} seconds. Please confirm that you are still working on it to extend your session time by another {totalMins} minutes.,1,[FR] We noticed that you have been working on this product for a while. Your session is going to expire in {mins} minutes and {secs} seconds. Please confirm that you are still working on it to extend your session time by another {totalMins} minutes.,0
 editor.done,Done,1,Fini,0
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
 editor.editMetadata,Edit project metadata,1,Mod. les métadonnées,1
