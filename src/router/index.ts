@@ -15,6 +15,14 @@ const routes = [
         path: '/:lang/editor',
         name: 'home',
         component: HomeV,
+        props: { sessionExpired: false },
+        meta: { title: 'editor.window.title' }
+    },
+    {
+        path: '/:lang/editor',
+        name: 'homeExpired',
+        component: HomeV,
+        props: { sessionExpired: true },
         meta: { title: 'editor.window.title' }
     },
     {
