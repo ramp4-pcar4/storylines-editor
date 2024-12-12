@@ -4,7 +4,7 @@ interface Storyline {
     uuid: string;
     titleEN: string;
     titleFR: string;
-    lastModified: Date;
+    lastModified: string;
     isUserStoryline?: boolean;
 }
 
@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', {
         async fetchUserProfile() {
             const apiUrl = import.meta.env.VITE_APP_CURR_ENV
                 ? import.meta.env.VITE_APP_NET_API_URL
-                : 'https://localhost:6040';
+                : 'http://localhost:6040';
             try {
                 const response = await fetch(apiUrl + '/api/user/profile', {
                     method: 'GET',
