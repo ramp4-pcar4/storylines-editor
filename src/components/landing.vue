@@ -30,11 +30,25 @@
 </template>
 
 <script lang="ts">
+import { ref } from 'vue';
 import { Vue } from 'vue-property-decorator';
 import { useUserStore } from '../stores/userStore';
 
 export default class LandingV extends Vue {
     title = document.title;
+
+    mounted(): void {
+        const socketUrl = `${
+            import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
+        }`;
+
+        const socket = ref(null);
+        socket.value = new WebSocket(socketUrl + '/Storylines-Editor-STB-Server/');
+
+        socket.value.onopen = () => {
+            console.log('Web socket connected');
+        };
+    }
 
     get userName(): string {
         const userStore = useUserStore();
