@@ -163,10 +163,13 @@
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import { Storyline, UserProfile, useUserStore } from '../stores/userStore';
+import Message from 'vue-m-message';
 
 export default class HomeV extends Vue {
+    @Prop({ default: false }) sessionExpired!: boolean; // true if user was redirected here due to session expiring, false otherwise
+
     userStore = useUserStore();
     currLang = 'en';
     sourceFile = 'index.html#';
@@ -175,6 +178,10 @@ export default class HomeV extends Vue {
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
         this.sourceFile = window.location.href.split('/').find((s) => s.includes('#'));
+        // If the user was redirected here due to session end, show session end popup.
+        if (this.sessionExpired) {
+            Message.error(this.$t('editor.session.ended'));
+        }
         this.userStore
             .fetchUserProfile()
             .then(() => {
