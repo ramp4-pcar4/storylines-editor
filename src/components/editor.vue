@@ -395,6 +395,7 @@ import MetadataContentV from './helpers/metadata-content.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import HelpPanelV from './help-panel.vue';
 import HelpSectionV from './helpers/help-section.vue';
+import { useLockStore } from '@/stores/lockStore';
 
 @Options({
     components: {
@@ -613,7 +614,7 @@ export default class EditorV extends Vue {
         previewConfigs.fr!.slides = previewConfigs.fr!.slides.map((slide) => {
             return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
         });
-
+        const lockStore = useLockStore();
         setTimeout(() => {
             const routeData = this.$router.resolve({
                 name: 'preview',
@@ -622,7 +623,9 @@ export default class EditorV extends Vue {
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
                 configs: previewConfigs,
-                configFileStructure: this.configFileStructure
+                configFileStructure: this.configFileStructure,
+                secret: lockStore.secret,
+                timeRemaining: lockStore.timeRemaining
             };
         }, 5);
     }
