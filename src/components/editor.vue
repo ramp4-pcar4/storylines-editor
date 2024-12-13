@@ -767,8 +767,9 @@ window.addEventListener('resize', () => {
     background-color: #e6e5e5;
 }
 
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {
+/* Show the dropdown menu on hover or focus */
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
     display: block;
 }
 
