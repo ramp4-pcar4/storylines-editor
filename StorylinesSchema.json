@@ -285,6 +285,10 @@
                 "type": {
                     "type": "string",
                     "enum": ["video"]
+                }, 
+                "modified": {
+                    "type": "boolean",
+                    "description": "An optional tag that specifies whether the panel has been modified from its default configuration"
                 }
             },
             "required": ["src", "type"]
