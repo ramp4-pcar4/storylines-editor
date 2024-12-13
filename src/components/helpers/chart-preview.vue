@@ -42,13 +42,32 @@
             ></storylines-chart>
         </div>
         <!-- chart description and edit  -->
-        <div class="flex mt-4 items-center">
-            <label class="editor-label name-label font-bold flex-2"
-                >{{ $t('editor.chart.label.name') }}: <span class="font-normal">{{ chartName }}</span></label
-            >
+        <div class="flex mt-4 items-center flex-wrap">
+            <div class="flex flex-2 w-4/5" style="min-width: 130px">
+                <div class="flex flex-col mr-2 justify-between">
+                    <label class="name-label font-bold"> {{ $t('editor.chart.label.name') }}: </label>
+                    <label :for="'chartPreviewCaption' + index" class="name-label font-bold pb-2">
+                        {{ $t('editor.image.label.caption') }}:
+                    </label>
+                </div>
+                <div class="flex flex-col justify-between">
+                    <label class="name-label font-bold">
+                        <span class="font-normal break-all">{{ chartName }}</span>
+                    </label>
+                    <input
+                        :id="'chartPreviewCaption' + index"
+                        class="editor-input w-5/6"
+                        type="text"
+                        v-model="chart.caption"
+                        :placeholder="$t('editor.caption.placeholder')"
+                        @input="$emit('captionEdit')"
+                    />
+                </div>
+            </div>
+
             <!-- edit button -->
             <button
-                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
+                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200 m-0 mt-4"
                 :id="`edit-${chart.name}-btn`"
             >
                 <div class="flex items-center">
@@ -92,6 +111,7 @@ export default class ChartPreviewV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() sourceCounts!: SourceCounts;
     @Prop() lang!: string;
+    @Prop() index!: number;
 
     loading = true;
     chartIdx = 0;
