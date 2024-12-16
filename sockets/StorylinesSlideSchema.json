@@ -192,6 +192,10 @@
                     "type": "string",
                     "description": "A title that is displayed centered above this map."
                 },
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the map."
+                },
                 "timeSlider": {
                     "type": "object",
                     "description": "Configuration for a time slider on the map.",
@@ -256,6 +260,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                }, 
+                "caption": {
+                    "type": "string",
+                    "description": "Supporting text content for the chart."
                 }
             },
             "additionalProperties": false,
@@ -358,6 +366,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                }, 
+                "modified": {
+                    "type": "boolean",
+                    "description": "An optional tag that specifies whether the panel has been modified from its default configuration" 
                 }
             },
             "additionalProperties": false,
