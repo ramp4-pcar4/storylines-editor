@@ -529,7 +529,8 @@ import {
     SlideshowPanel,
     SourceCounts,
     TextPanel,
-    VideoPanel
+    VideoPanel,
+    PanelType
 } from '@/definitions';
 
 import Message from 'vue-m-message';
@@ -652,12 +653,91 @@ export default class SlideTocV extends Vue {
      * Copies an entire slide, creating a new identical slide at the next index.
      * @param index Index of the slide to copy.
      */
-    copySlide(index: number): void {
-        this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
-        this.$emit('slides-updated', this.slides);
-        this.selectSlide(index + 1, this.lang);
-        Message.success(this.$t('editor.slide.copy.success'));
-        this.scrollToElement(index + 1);
+    async copySlide(index: number): Promise<void> {
+        this.$emit('save-slides');
+
+        // Nested setTimeout calls may not be the best option. It works though.
+        // Maybe try replacing with promise chain?
+        setTimeout(async () => {
+            let copiedSlide = cloneDeep(this.slides[index]);
+
+            const getNumberOfMaps = (): number => {
+                let n = 0;
+                this.configFileStructure.rampConfig.forEach(() => {
+                    n += 1;
+                });
+                return n;
+            };
+
+            // Handle special copy cases (MapPanels need new config, etc.)
+            copiedSlide = Object.fromEntries(
+                await Promise.all(
+                    Object.entries(copiedSlide)
+                        .filter(([lang, slide]) => slide !== undefined) // Filter out undefined slides
+                        .map(async ([lang, slide]: [string, Slide]) => {
+                            const slideWithNewMaps: Slide = JSON.parse(JSON.stringify(slide));
+
+                            slideWithNewMaps.panel = await Promise.all(
+                                slide.panel.map(async (panel: BasePanel) => {
+                                    if (panel.type === PanelType.Map) {
+                                        // Create new map config and copy the old one
+                                        const newPanel: MapPanel = JSON.parse(JSON.stringify(panel));
+                                        let currentJson = '';
+
+                                        const assetSrc = `${(panel as MapPanel).config.substring(
+                                            (panel as MapPanel).config.indexOf('/') + 1
+                                        )}`;
+                                        const configFile = this.configFileStructure.zip.file(assetSrc);
+
+                                        const origStrippedFileName =
+                                            (panel as MapPanel).config !== ''
+                                                ? (panel as MapPanel).config.split('/')[2].split('.')[0] + '.json'
+                                                : '';
+                                        const unsavedConfigFile =
+                                            this.configFileStructure.zip.file(origStrippedFileName);
+
+                                        if (unsavedConfigFile) {
+                                            currentJson = await unsavedConfigFile.async('string');
+                                            currentJson = JSON.parse(currentJson);
+                                        } else if (configFile) {
+                                            currentJson = await configFile.async('string');
+                                            currentJson = JSON.parse(currentJson);
+                                        }
+
+                                        newPanel.config = `${this.configFileStructure.uuid}/ramp-config/${
+                                            this.configFileStructure.uuid
+                                        }-map-${getNumberOfMaps() + 1}.json`;
+
+                                        const strippedFileName = newPanel.config.split('/')[2].split('.')[0];
+
+                                        this.configFileStructure.rampConfig.file(
+                                            `${strippedFileName}.json`,
+                                            JSON.stringify(currentJson, null, 4)
+                                        );
+
+                                        return newPanel;
+                                    } else {
+                                        return panel;
+                                    }
+                                })
+                            );
+
+                            return [lang, slideWithNewMaps];
+                        })
+                )
+            );
+
+            // Insert the new slide at the next index and emit updates
+            this.slides.splice(index + 1, 0, copiedSlide);
+            this.$emit('slides-updated', this.slides);
+
+            // Delay changing slide for a bit so things update properly
+            setTimeout(() => {
+                this.selectSlide(index + 1, this.lang);
+                Message.success(this.$t('editor.slide.copy.success'));
+                this.scrollToElement(index + 1);
+            }, 10);
+        }, 20);
     }
 
     removeSlide(index: number): void {

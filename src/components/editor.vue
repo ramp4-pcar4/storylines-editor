@@ -217,6 +217,7 @@
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
+                    @save-slides="saveChanges(false)"
                     :configFileStructure="configFileStructure"
                     :lang="configLang"
                     :sourceCounts="sourceCounts"
@@ -279,6 +280,7 @@
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
+                    @save-slides="saveChanges(false)"
                     :configFileStructure="configFileStructure"
                     :lang="configLang"
                     :sourceCounts="sourceCounts"
@@ -575,14 +577,16 @@ export default class EditorV extends Vue {
         }, 5);
     }
 
-    saveChanges(): void {
+    saveChanges(pushSaveEvent: boolean = true): void {
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
         // emit save changes event
-        this.$emit('save-changes');
+        if (pushSaveEvent) {
+            this.$emit('save-changes');
+        }
     }
 
     beforeWindowUnload(e: BeforeUnloadEvent): void {
