@@ -32,7 +32,6 @@ editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
 editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Êtes-vous sûr de vouloir remplacer le produit « {uuid} » ?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.loadProduct,Load Existing Storylines Product,1,Charger un produit Storylines existant,0
-editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées,1
 editor.chooseOption,What would you like to do?,1,Qu'aimeriez-vous faire?, 0
 editor.dashboard,Dashboard,1,Tableau de bord,0
 editor.previousProducts,Previously Edited Products,1,Produits précédemment édités,0
@@ -40,7 +39,6 @@ editor.previousProducts.productInfo,Project Information,1,Informations sur le pr
 editor.previousProducts.productInfo.title,Title,1,Titre,0
 editor.previousProducts.lastModified,Last Modified,1,Dernière modification,0
 editor.previousProducts.actions,Actions,1,Actes,0
-editor.editMetadata,Edit Project Metadata,1,Modifier les métadonnées d’un projet,1
 editor.editMetadata.load.cancel,Cancel load,1,Annuler le chargement,0
 editor.editMetadata.editExistingHeader,Choose Storylines Product,1,Choisissez le produit Storylines,0
 editor.editMetadata.input.tooltip,Press Esc to erase field.,1,Appuyez sur Esc pour effacer le champ.,0
@@ -83,7 +81,7 @@ editor.metadataForm.disabled,Disabled,1,Désactivé,0
 editor.metadataForm.na,N/A,1,N / A,0
 editor.done,Done,1,Fini,0
 editor.editProduct,Edit Existing Storylines Product,1,Modifier un produit de scénarios,1
-editor.editMetadata,Edit Project Metadata,1,Mod. les métadonnées,1
+editor.editMetadata,Edit project metadata,1,Mod. les métadonnées,1
 editor.productDetails,Storylines product details,1,Détails du produit de scénarios,1
 editor.metadata.instructions.new,Fill in metadata details about your new Storylines product.,1,Inscrivez les métadonnées de votre nouveau produit de scénario.,1
 editor.metadata.instructions.existing,View or edit metadata details about your Storylines product. Use the "Preview" button to see what your slides will look like.,1,Affichez ou modifiez les détails des métadonnées de votre produit Storylines. Utilisez le bouton « Aperçu » pour voir à quoi ressembleront vos diapositives.,0
@@ -93,7 +91,7 @@ editor.uuid.new,New UUID,1,New UUID,0
 editor.warning.mustEnterUuid,You must first enter a UUID.,1,Vous devez d'abord saisir un UUID.,0
 editor.warning.retrievalFailed,"Failed to load product, no response from server.",1,"Échec du chargement du produit, aucune réponse du serveur.",0
 editor.warning.uuid,UUID already exists. Saving this will overwrite existing product.,1,L’IDUU existe déjà. Enregistrer ce produit écrasera le produit existant.,1
-editor.warning.uuidNotFound,The requested UUID '{uuid}' does not exist.,1,L'UUID '{uuid}' ​​demandé n'existe pas,0
+editor.warning.uuidNotFound,The requested UUID '{uuid}' does not exist.,1,L'UUID '{uuid}'   demandé n'existe pas,0
 editor.metadata.uuidInstructions,"Please enter the UUID of an existing storylines product, then click the 'Load' button.",1,"Veuillez saisir l'UUID d'un produit de scénario existant, puis cliquez sur le bouton « Charger ».",0
 editor.metadata.newUuidInstructions,"Enter a unique ID for your new storyline. One has been auto-generated for you, but you can also enter your own.",1,"Entrez un identifiant unique pour votre nouveau scénario. Un a été généré automatiquement pour vous, mais vous pouvez également saisir le vôtre.",0
 editor.warning.rename,UUID already in use. Please choose a different ID.,1,UUID déjà utilisé. Veuillez choisir un autre identifiant.,0
@@ -102,15 +100,15 @@ editor.changingUuid,You are changing this product UUID to '{changeUuid}'. Save c
 editor.title,Title,1,Titre,1
 editor.respectTitle,RAMP Storylines Editor & Creation Tool,1,Éditeur et outil de création de scénarios RAMP,0
 editor.logo,Logo,1,Logo,1
-editor.logoPreview,Logo Preview,1,Aperçu du logo,1
+editor.logoPreview,Logo preview,1,Aperçu du logo,1
 editor.logoPreviewAltText,Preview of product logo,1,Aperçu du logo du produit,0
-editor.logoAltText,Logo Alt Text,1,Lien contextuel,1
+editor.logoAltText,Logo alt text,1,Lien contextuel,1
 editor.logoAltText.desc,"For accessibility purposes, provide description text for the logo.",1,"Pour des raisons d'accessibilité, fournissez un texte descriptif pour le logo.",0
-editor.contextLink,Context Link,1,Lien contextuel,1
+editor.contextLink,Context link,1,Lien contextuel,1
 editor.contextLink.info,Context link shows up at the bottom of the page to provide additional resources for interested users.,1,Le lien contextuel apparaît au bas de la page et fournit des ressources supplémentaires aux utilisateurs intéressés.,1
-editor.contextLabel,Context Label,1,Étiquette de contexte,1
+editor.contextLabel,Context label,1,Étiquette de contexte,1
 editor.contextLabel.info,Context label shows up before the context link to explain what the link is for,1,L’étiquette de contexte apparaît avant le lien contextuel et explique à quoi sert le lien.,1
-editor.dateModified,Date Modified,1,Date de modification,1
+editor.dateModified,Date modified,1,Date de modification,1
 editor.load,Load,1,Charger,1
 editor.rename,Rename,1,Rename,0
 editor.loadPrevious,Load Previous,1,Charger le précédent,0
@@ -260,7 +258,7 @@ editor.slides.slideHeader,SLIDES,1,DIAPOSITIVES,0
 editor.slides.includeInToc,Include in table of contents,1,Inclure dans la table des matières,0
 editor.slide.untitled,Untitled slide,1,Diapositive sans titre,0
 editor.slide.copy.success,Slide copied successfully!,1,Diapositive copiée avec succès !,0
-editor.tocOrientation,Table of Contents Orientation,1,Orientation de la table des matières,0
+editor.tocOrientation,Table of contents orientation,1,Orientation de la table des matières,0
 editor.tocOrientation.info,The table of contents orientation will be set to vertical in mobile view.,1,L'orientation de la table des matières sera définie sur verticale en vue mobile.,0
 editor.tocOrientation.vertical,Vertical,1,Verticale,0
 editor.tocOrientation.horizontal,Horizontal,1,Horizontale,0

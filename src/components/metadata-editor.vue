@@ -100,7 +100,7 @@
                                 />
                                 <button
                                     @click="renameProduct"
-                                    class="editor-button editor-forms-button bg-black text-white mr-0"
+                                    class="editor-button editor-forms-button bg-black text-white mr-0 ml-2"
                                     :class="{ 'input-error': error }"
                                     :disabled="changeUuid.length === 0 || checkingUuid || warning === 'rename'"
                                 >
@@ -185,7 +185,7 @@
                                                 generateRemoteConfig().then(fetchHistory);
                                             }
                                         "
-                                        class="editor-button editor-forms-button bg-black text-white mr-0"
+                                        class="editor-button editor-forms-button bg-black text-white mr-0 ml-2"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
                                         v-if="editExisting"
@@ -526,7 +526,17 @@
                         class="flex justify-center items-center"
                     >
                         <div @click.stop class="flex flex-col space-y-2">
-                            <h2 slot="header" class="text-2xl font-bold mb-3">{{ $t('editor.editMetadata') }}</h2>
+                            <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
+                            <!-- ENG/FR config toggle -->
+                            <div class="mb-3">
+                                <button
+                                    class="editor-button editor-forms-button border border-gray-300"
+                                    @click="swapLang()"
+                                    tabindex="0"
+                                >
+                                    {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                                </button>
+                            </div>
                             <metadata-content
                                 :metadata="metadata"
                                 @metadata-changed="updateMetadata"
@@ -911,6 +921,12 @@ export default class MetadataEditorV extends Vue {
      */
     loadVersion(version: string): Promise<void> {
         return new Promise((resolve, reject) => {
+            if (this.uuid === undefined || this.uuid === '') {
+                Message.error(this.$t('editor.warning.mustEnterUuid'));
+                this.loadStatus = 'waiting';
+                reject();
+                return;
+            }
             // Create a new AbortController for each fetch attempt
             // as they get 'used up' after each successful abort() call
             this.controller = new AbortController();
@@ -925,10 +941,9 @@ export default class MetadataEditorV extends Vue {
                     if (res.status === 404) {
                         // Version not found.
                         if (version === 'latest') {
-                            Message.error(this.$t('editor.warning.uuidNotFound', this.uuid));
+                            Message.error(this.$t('editor.warning.uuidNotFound', { uuid: this.uuid }));
                         } else {
                             Message.error(this.$t('editor.editMetadata.message.error.noRequestedVersion'));
-                            this.loadStatus = 'loaded';
                         }
                         this.error = true;
                         this.loadStatus = 'waiting';
@@ -994,19 +1009,21 @@ export default class MetadataEditorV extends Vue {
         // Note: This part probably doesn't need an manual abort() trigger to kill on load cancel,
         // as the history should be much smaller and quicker to fetch than the config
 
-        if (this.uuid === undefined) Message.error(this.$t('editor.warning.mustEnterUuid'));
+        if (this.uuid === undefined || this.uuid === '') {
+            return;
+        }
         this.loadStatus = 'loading';
         const user = useUserStore().userProfile.userName || 'Guest';
         fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user } }).then((res: Response) => {
             if (res.status === 404) {
                 // Product not found.
-                Message.error(`The requested UUID '${this.uuid ?? ''}' does not exist.`);
+                this.loadStatus = 'waiting';
             } else {
                 res.json().then((json) => {
                     this.storylineHistory = json;
+                    this.loadStatus = 'loaded';
                 });
             }
-            this.loadStatus = 'loaded';
         });
     }
 
@@ -1807,9 +1824,12 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     .vfm__content button {
         border-radius: 3px;
         padding: 5px 12px;
-        margin: 0px 10px;
         font-weight: 600;
         transition-duration: 0.2s;
+    }
+
+    .vfm__content button:focus {
+        transition-duration: 0.075s;
     }
 
     .vfm__content button:hover:enabled {
