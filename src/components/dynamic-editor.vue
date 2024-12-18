@@ -1,5 +1,5 @@
 <template>
-    <div class="block">
+    <div class="block mt-2">
         <!-- left and right panel buttons for dynamic panels -->
         <div class="flex">
             <button
