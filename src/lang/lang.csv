@@ -110,6 +110,9 @@ editor.contextLabel,Context label,1,Étiquette de contexte,1
 editor.contextLabel.info,Context label shows up before the context link to explain what the link is for,1,L’étiquette de contexte apparaît avant le lien contextuel et explique à quoi sert le lien.,1
 editor.dateModified,Date modified,1,Date de modification,1
 editor.load,Load,1,Charger,1
+editor.export,Export,1,Exporter,0
+editor.export.success,Export successful,1,Exportation réussie,0
+editor.export.error,Export failed,1,Échec de l’exportation,0
 editor.rename,Rename,1,Rename,0
 editor.loadPrevious,Load Previous,1,Charger le précédent,0
 editor.viewHistory,View Previous,1,Voir précédent,0
