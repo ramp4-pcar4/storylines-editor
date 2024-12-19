@@ -206,16 +206,33 @@ export default class ImageEditorV extends Vue {
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');
                 const assetFile = this.configFileStructure.zip.file(assetSrc);
+                const assetType = assetSrc.split('.').at(-1);
+
                 if (assetFile) {
-                    this.imagePreviewPromises.push(
-                        assetFile.async('blob').then((res: Blob) => {
-                            return {
-                                ...image,
-                                id: filename ? filename : image.src,
-                                src: URL.createObjectURL(res)
-                            } as ImageFile;
-                        })
-                    );
+                    if (assetType != 'svg') {
+                        this.imagePreviewPromises.push(
+                            assetFile.async('blob').then((res: Blob) => {
+                                return {
+                                    ...image,
+                                    id: filename ? filename : image.src,
+                                    src: URL.createObjectURL(res)
+                                } as ImageFile;
+                            })
+                        );
+                    } else {
+                        this.imagePreviewPromises.push(
+                            assetFile.async('text').then((res) => {
+                                const imageFile = new File([res], filename, {
+                                    type: 'image/svg+xml'
+                                });
+                                return {
+                                    ...image,
+                                    id: filename ? filename : image.src,
+                                    src: URL.createObjectURL(imageFile)
+                                } as ImageFile;
+                            })
+                        );
+                    }
                 }
             });
 
