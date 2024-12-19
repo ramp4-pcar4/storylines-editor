@@ -1,8 +1,8 @@
 <template>
-    <div class="block">
+    <div class="block mt-3">
         <!-- Menu with option to add a new chart -->
         <div class="flex items-center">
-            <span class="font-bold px-4">{{
+            <span class="font-bold pr-4">{{
                 $t('editor.slideshow.label.info', {
                     num: panel.items.length
                 })
@@ -40,12 +40,18 @@
         </div>
         <hr class="border-solid border-t-2 border-gray-300 my-2" />
         <!-- Metadata Editor -->
-        <div class="flex items-center w-full text-left">
-            <label class="editor-label text-label" for="slideshowCaption"
-                >{{ $t('editor.image.slideshowCaption') }}:</label
-            >
-            <input id="slideshowCaption" class="editor-input w-1/3" type="text" v-model="panel.caption" /><br />
+
+        <!-- Slideshow caption -->
+        <div class="mt-5 mb-8">
+            <label class="editor-label" for="slideshowCaption">{{ $t('editor.image.slideshowCaption') }}</label>
+            <input
+                id="slideshowCaption"
+                class="editor-input block w-full lg:w-1/2"
+                type="text"
+                v-model="panel.caption"
+            />
         </div>
+
         <table class="w-2/3 mt-5">
             <thead>
                 <tr class="table-header">
@@ -71,10 +77,11 @@
             <h2 class="text-xl font-bold">{{ $t(`editor.slideshow.label.${editingStatus}`) }}</h2>
             <hr class="border-solid border-t-2 border-gray-300 my-2" />
             <div>
-                <div v-if="editingStatus === 'create'">
+                <div class="mt-3" v-if="editingStatus === 'create'">
                     <!-- Creating new slide -->
-                    <label class="mb-5 text-left">{{ $t('editor.slideshow.label.type') }}: </label>
-                    <select @input="onTypeInput" :value="newSlideType">
+                    <label class="editor-label mb-5 text-left">{{ $t('editor.slideshow.label.type') }}</label>
+                    <br />
+                    <select class="rounded shadow w-48" @input="onTypeInput" :value="newSlideType">
                         <option v-for="thing in Object.keys(editors)" :key="thing" :value="thing">
                             {{ thing }}
                         </option>
@@ -331,5 +338,11 @@ select {
     border: 1px solid black;
     padding: 2px !important;
     margin-top: 0 !important;
+}
+
+select {
+    border: 1px solid #a1a1a1;
+    background: white;
+    padding: 0.25rem 0.5rem;
 }
 </style>

@@ -154,7 +154,7 @@
                     <!-- Save changes button -->
                     <button
                         @click="saveChanges"
-                        class="editor-button m-0 bg-black text-white hover:bg-gray-900"
+                        class="editor-button m-0 bg-black text-white hover:bg-gray-900 border border-black"
                         :disabled="saving"
                     >
                         <span class="inline-block">{{
@@ -287,10 +287,10 @@
                 ></slide-toc>
             </div>
             <!-- Right side -->
-            <div class="editor-area flex flex-col space-between w-full overflow-y-auto">
+            <div class="w-full">
                 <!-- Slide editor -->
                 <slide-editor
-                    class="flex-1 w-full overflow-y-auto"
+                    class="editor-area w-full"
                     ref="slide"
                     :configFileStructure="configFileStructure"
                     :currentSlide="currentSlide"
@@ -612,10 +612,8 @@ window.addEventListener('resize', () => {
 }
 
 .editor-label {
-    width: 10vw;
-    text-align: right;
-    margin-right: 15px;
-    display: inline-block;
+    font-weight: 600;
+    text-align: left;
 }
 
 .editor-h3 {
@@ -623,11 +621,13 @@ window.addEventListener('resize', () => {
 }
 
 .editor-input {
-    padding: 10px 10px;
-    margin-top: 5px;
-    border: 1px solid black;
-    display: inline;
+    padding: 7px 10px;
+    margin-top: 3px;
+    border: 1px solid #a1a1a1;
+    //display: inline;
     border-radius: 5px;
+    --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .editor-container .input-error {
@@ -636,13 +636,14 @@ window.addEventListener('resize', () => {
 }
 
 .editor-button {
+    border-radius: 3px;
     padding: 5px 12px;
     font-weight: 600;
     transition-duration: 0.2s;
 }
 
 .editor-forms-button {
-    padding: 11px 15px;
+    padding: 8px 15px;
     border-radius: 5px;
 }
 
@@ -651,8 +652,12 @@ window.addEventListener('resize', () => {
     color: black;
 }
 
-.editor-button:focus {
+button:focus,
+.editor-button:focus,
+input:focus,
+select:focus {
     outline: 2px solid royalblue;
+    z-index: 2;
     outline-offset: 2px;
     transition-duration: 0.075s;
 }
@@ -709,8 +714,8 @@ window.addEventListener('resize', () => {
 @media only screen and (min-width: 768px) {
     .editor-area {
         overflow-y: auto;
-        height: calc(100vh - 63px);
-        height: calc(calc(var(--vh, 1vh) * 100) - 63px);
+        //height: calc(100vh - 80px);
+        height: calc(calc(var(--vh, 1vh) * 100) - 100px);
     }
 }
 
@@ -729,6 +734,7 @@ window.addEventListener('resize', () => {
     font-weight: 600;
     border: 1px solid black;
     transition: background-color 0.2s;
+    border-radius: 3px;
 }
 
 /* Main dropdown icon - required for positioning */
