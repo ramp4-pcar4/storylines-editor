@@ -514,6 +514,7 @@
                 @save-changes="onSave"
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
+                @export-product="exportProduct"
                 ref="mainEditor"
             >
                 <!-- Metadata editing modal inside the editor -->
@@ -591,6 +592,7 @@ import { useUserStore } from '../stores/userStore';
 import JSZip from 'jszip';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { saveAs } from 'file-saver';
 
 import Message from 'vue-m-message';
 import SlideEditorV from './slide-editor.vue';
@@ -1357,6 +1359,20 @@ export default class MetadataEditorV extends Vue {
         this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
     }
 
+    exportProduct(): void {
+        this.generateConfig(false);
+
+        this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then(
+            (blob) => {
+                saveAs(blob, `${this.configFileStructure?.uuid}.zip`);
+                Message.success(this.$t('editor.export.success'));
+            },
+            (err) => {
+                Message.error(this.$t('editor.export.error'));
+            }
+        );
+    }
+
     /**
      * Conducts various checks before saving.
      */
@@ -1368,9 +1384,9 @@ export default class MetadataEditorV extends Vue {
 
     /**
      * Called when `Save Changes` is pressed. Re-generates the Storylines configuration file
-     * with the new changes, then generates and submits the product file to the server.
+     * with the new changes, and if `publish` is set to true, generates and submits the product file to the server.
      */
-    generateConfig(): ConfigFileStructure {
+    generateConfig(publish = true): ConfigFileStructure {
         this.saving = true;
 
         // Update the configuration files, for both languages.
@@ -1393,97 +1409,107 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure?.zip.file(frFileName, frFormattedConfigFile);
 
         // Upload the ZIP file.
-        this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
-            const formData = new FormData();
-            formData.append('data', content, `${this.uuid}.zip`);
-            const userStore = useUserStore();
-            const headers = { 'Content-Type': 'multipart/form-data', user: userStore.userProfile.userName || 'Guest' };
-            Message.warning(this.$t('editor.editMetadata.message.wait'));
+        if (publish) {
+            this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
+                const formData = new FormData();
+                formData.append('data', content, `${this.uuid}.zip`);
+                const userStore = useUserStore();
+                const headers = {
+                    'Content-Type': 'multipart/form-data',
+                    user: userStore.userProfile.userName || 'Guest'
+                };
+                Message.warning(this.$t('editor.editMetadata.message.wait'));
 
-            axios
-                .post(this.apiUrl + '/upload', formData, { headers })
-                .then((res: AxiosResponse) => {
-                    const responseData = res.data;
-                    responseData.files; // binary representation of the file
-                    responseData.status; // HTTP status
-                    const commitHash = responseData.commitHash; // commit hash of the git commit
-                    this.unsavedChanges = false;
-                    this.loadExisting = true; // if editExisting was false, we can now set it to true
+                axios
+                    .post(this.apiUrl + '/upload', formData, { headers })
+                    .then((res: AxiosResponse) => {
+                        const responseData = res.data;
+                        responseData.files; // binary representation of the file
+                        responseData.status; // HTTP status
+                        const commitHash = responseData.commitHash; // commit hash of the git commit
+                        this.unsavedChanges = false;
+                        this.loadExisting = true; // if editExisting was false, we can now set it to true
 
-                    if (import.meta.env.VITE_APP_CURR_ENV) {
-                        if (responseData.new) {
-                            axios
-                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
-                                    uuid: this.uuid,
-                                    titleEn: this.configs['en']?.title ?? '',
-                                    titleFr: this.configs['fr']?.title ?? ''
+                        if (import.meta.env.VITE_APP_CURR_ENV) {
+                            if (responseData.new) {
+                                axios
+                                    .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
+                                        uuid: this.uuid,
+                                        titleEn: this.configs['en']?.title ?? '',
+                                        titleFr: this.configs['fr']?.title ?? ''
+                                    })
+                                    .then((response: any) => {
+                                        const userStore = useUserStore();
+                                        userStore.fetchUserProfile();
+                                        formData.append('uuid', this.uuid);
+                                        formData.append('titleEn', this.configs['en']?.title ?? '');
+                                        formData.append('titleFr', this.configs['fr']?.title ?? '');
+                                        formData.append('commitHash', commitHash);
+                                        formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
+                                        axios
+                                            .post(
+                                                import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
+                                                formData
+                                            )
+                                            .then((response: any) => {
+                                                Message.success(this.$t('editor.editMetadata.message.successfulSave'));
+                                            })
+                                            .catch((error: any) => console.log(error.response || error))
+                                            .finally(() => {
+                                                // padding to prevent save button from being clicked rapidly
+                                                setTimeout(() => {
+                                                    this.saving = false;
+                                                }, 500);
+                                            });
+                                    })
+                                    .catch((error: any) => console.log(error.response || error));
+                            } else {
+                                formData.append('uuid', this.uuid);
+                                formData.append('titleEn', this.configs['en']?.title ?? '');
+                                formData.append('titleFr', this.configs['fr']?.title ?? '');
+                                formData.append('commitHash', commitHash);
+                                formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
+                                axios
+                                    .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
+                                    .then((response: any) => {
+                                        Message.success(this.$t('editor.editMetadata.message.successfulSave'));
+                                    })
+                                    .catch((error: any) => console.log(error.response || error))
+                                    .finally(() => {
+                                        // padding to prevent save button from being clicked rapidly
+                                        setTimeout(() => {
+                                            this.saving = false;
+                                        }, 500);
+                                    });
+                            }
+
+                            fetch(this.apiUrl + `/retrieveMessages`)
+                                .then((res: any) => {
+                                    if (res.ok) return res.json();
                                 })
-                                .then((response: any) => {
-                                    const userStore = useUserStore();
-                                    userStore.fetchUserProfile();
-                                    formData.append('uuid', this.uuid);
-                                    formData.append('titleEn', this.configs['en']?.title ?? '');
-                                    formData.append('titleFr', this.configs['fr']?.title ?? '');
-                                    formData.append('commitHash', commitHash);
-                                    formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
+                                .then((data) => {
                                     axios
-                                        .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
-                                        .then((response: any) => {
-                                            Message.success(this.$t('editor.editMetadata.message.successfulSave'));
+                                        .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                                            messages: data.messages
                                         })
-                                        .catch((error: any) => console.log(error.response || error))
-                                        .finally(() => {
-                                            // padding to prevent save button from being clicked rapidly
-                                            setTimeout(() => {
-                                                this.saving = false;
-                                            }, 500);
-                                        });
+                                        .catch((error: any) => console.log(error.response || error));
                                 })
                                 .catch((error: any) => console.log(error.response || error));
                         } else {
-                            formData.append('uuid', this.uuid);
-                            formData.append('titleEn', this.configs['en']?.title ?? '');
-                            formData.append('titleFr', this.configs['fr']?.title ?? '');
-                            formData.append('commitHash', commitHash);
-                            formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
-                            axios
-                                .post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit', formData)
-                                .then((response: any) => {
-                                    Message.success(this.$t('editor.editMetadata.message.successfulSave'));
-                                })
-                                .catch((error: any) => console.log(error.response || error))
-                                .finally(() => {
-                                    // padding to prevent save button from being clicked rapidly
-                                    setTimeout(() => {
-                                        this.saving = false;
-                                    }, 500);
-                                });
+                            Message.success(this.$t('editor.editMetadata.message.successfulSave'));
+                            // padding to prevent save button from being clicked rapidly
+                            setTimeout(() => {
+                                this.saving = false;
+                            }, 500);
                         }
-
-                        fetch(this.apiUrl + `/retrieveMessages`)
-                            .then((res: any) => {
-                                if (res.ok) return res.json();
-                            })
-                            .then((data) => {
-                                axios
-                                    .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                                        messages: data.messages
-                                    })
-                                    .catch((error: any) => console.log(error.response || error));
-                            })
-                            .catch((error: any) => console.log(error.response || error));
-                    } else {
-                        Message.success(this.$t('editor.editMetadata.message.successfulSave'));
-                        // padding to prevent save button from being clicked rapidly
-                        setTimeout(() => {
-                            this.saving = false;
-                        }, 500);
-                    }
-                })
-                .catch(() => {
-                    Message.error(this.$t('editor.editMetadata.message.error.failedSave'));
-                });
-        });
+                    })
+                    .catch(() => {
+                        Message.error(this.$t('editor.editMetadata.message.error.failedSave'));
+                    });
+            });
+        } else {
+            this.saving = false;
+        }
 
         return this.configFileStructure as ConfigFileStructure;
     }
