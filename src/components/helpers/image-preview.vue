@@ -39,7 +39,6 @@ export default class ImagePreviewV extends Vue {
 <style lang="scss" scoped>
 .image-item {
     width: 30%;
-
     cursor: move; // fallback
     cursor: grab;
     cursor: -moz-grab;
@@ -59,6 +58,18 @@ export default class ImagePreviewV extends Vue {
 
     button {
         padding: 0 !important;
+    }
+}
+
+@media only screen and (max-width: 1500px) {
+    .image-item {
+        width: 41%;
+    }
+}
+
+@media only screen and (max-width: 900px) {
+    .image-item {
+        width: 90%;
     }
 }
 </style>

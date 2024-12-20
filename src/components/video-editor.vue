@@ -1,11 +1,11 @@
 <template>
     <div class="block">
         <!-- Upload video area -->
-        <div class="flex mt-4 items-center w-full text-left">
-            <label class="editor-label text-label" for="videoTitle">{{ $t('editor.video.title') }}:</label>
+        <div class="flex flex-col mt-4 align-center w-full text-left">
+            <label class="editor-label text-label" for="videoTitle">{{ $t('editor.video.title') }}</label>
             <input
                 id="videoTitle"
-                class="editor-input w-3/5"
+                class="editor-input w-full lg:w-3/5"
                 type="text"
                 v-model="videoPreview.title"
                 @change="onVideoEdited"
@@ -45,44 +45,52 @@
         </div>
 
         <!-- Option 2: provide URL to external or YT link -->
-        <div class="flex mt-4 items-center w-full text-left">
-            <label class="editor-label text-label" for="videoURL"
-                >{{ $t('editor.label.or') + ' ' + $t('editor.video.pasteUrl') }}:</label
-            >
-            <span
-                class="mr-3"
-                :content="$t('editor.video.label.linkSupport')"
-                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
-                tabindex="0"
-            >
-                <svg
-                    class="fill-current"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 416.979 416.979"
-                    xml:space="preserve"
+        <div class="flex flex-col mt-4 w-full text-left">
+            <div class="flex items-center gap-1.5">
+                <label class="editor-label" for="videoURL">{{
+                    $t('editor.label.or') + ' ' + $t('editor.video.pasteUrl')
+                }}</label>
+                <span
+                    class=""
+                    :content="$t('editor.video.label.linkSupport')"
+                    v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
+                    tabindex="0"
                 >
-                    <g>
-                        <path
-                            d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85   c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786   c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576   c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765   c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
-                        />
-                    </g>
-                </svg>
-            </span>
-            <input
-                ref="videoUrl"
-                id="videoURL"
-                class="editor-input w-3/5"
-                type="search"
-                v-model="videoPreview.src"
-                v-if="videoPreview.videoType !== 'local'"
-            />
-            <input ref="videoUrl" id="videoURL" class="editor-input w-3/5" type="search" v-else />
-            <button @click="uploadVideoUrl" class="editor-button bg-white border border-black hover:bg-gray-100">
-                {{ $t('editor.video.label.upload') }}
-            </button>
+                    <svg
+                        class="fill-current"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 416.979 416.979"
+                        xml:space="preserve"
+                    >
+                        <g>
+                            <path
+                                d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85   c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786   c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576   c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765   c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
+                            />
+                        </g>
+                    </svg>
+                </span>
+            </div>
+            <div class="flex items-center gap-1.5 w-full">
+                <input
+                    ref="videoUrl"
+                    id="videoURL"
+                    class="editor-input flex-1"
+                    type="search"
+                    v-model="videoPreview.src"
+                    v-if="videoPreview.videoType !== 'local'"
+                />
+                <input ref="videoUrl" id="videoURL" class="editor-input flex-1" type="search" v-else />
+                <button
+                    style="margin-top: 3px; padding-top: 7px; padding-bottom: 7px"
+                    @click="uploadVideoUrl"
+                    class="editor-button bg-white border border-black hover:bg-gray-100"
+                >
+                    {{ $t('editor.video.label.upload') }}
+                </button>
+            </div>
         </div>
 
         <!-- Preview of video -->
