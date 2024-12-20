@@ -133,6 +133,7 @@ export interface Intro {
     title: string;
     subtitle: string;
     blurb?: string;
+    backgroundImage: string;
 }
 
 export interface Slide {
@@ -141,6 +142,7 @@ export interface Slide {
     // panel: [BasePanel, BasePanel | undefined];
     panel: BasePanel[];
     includeInToc?: boolean;
+    backgroundImage: string;
 }
 
 export interface MultiLanguageSlide {
