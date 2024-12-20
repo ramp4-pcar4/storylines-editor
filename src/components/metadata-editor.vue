@@ -881,6 +881,7 @@ export default class MetadataEditorV extends Vue {
         // Generate a new configuration file and populate required fields.
         this.configs[this.configLang] = this.configHelper();
         const config = this.configs[this.configLang] as StoryRampConfig;
+        config.introSlide.logo.altText = this.metadata.logoAltText ?? '';
 
         // Set the source of the product logo
         if (!this.metadata.logoName) {
