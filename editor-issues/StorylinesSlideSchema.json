@@ -107,6 +107,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                }, 
+                "modified": {
+                    "type": "boolean",
+                    "description": "An optional tag that specifies whether the panel has been modified from its default configuration"
                 }
             },
             "additionalProperties": false,
