@@ -103,6 +103,7 @@
                                     <div class="flex align-center mr-4 space-x-1">
                                         <!-- Copy slide button -->
                                         <button
+                                            :aria-label="$t('editor.slides.toc.copySlide')"
                                             class="slide-toc-button"
                                             :class="{ 'toc-popup-button': isMobileSidebar }"
                                             @click.stop="copySlide(index)"
@@ -127,6 +128,7 @@
                                         </button>
                                         <!-- Delete slide button -->
                                         <button
+                                            :aria-label="$t('editor.slides.toc.deleteSlide')"
                                             class="slide-toc-button"
                                             :class="{ 'toc-popup-button': isMobileSidebar }"
                                             @click.stop="$vfm.open(`delete-slide-${index}`)"
@@ -263,6 +265,7 @@
                             <div class="flex ml-0.5 flex-col space-between">
                                 <!-- Move slide up button -->
                                 <button
+                                    :aria-label="$t('editor.slides.toc.moveSlideUp')"
                                     class="slide-toc-button h-auto grow-0"
                                     :class="{
                                         'toc-popup-button border-none bg-transparent': isMobileSidebar,
@@ -299,6 +302,7 @@
                                 </button>
                                 <!-- Move slide down button -->
                                 <button
+                                    :aria-label="$t('editor.slides.toc.moveSlideDown')"
                                     class="slide-toc-button rotate-180 transform h-auto grow-0 mt-auto"
                                     :class="{
                                         'toc-popup-button border-none bg-transparent': isMobileSidebar,
@@ -363,7 +367,6 @@
 <script lang="ts">
 import ActionModal from '@/components/helpers/action-modal.vue';
 import SlideTocButton from '@/components/helpers/slide-toc-button.vue';
-import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
     ChartPanel,
@@ -379,14 +382,15 @@ import {
     TextPanel,
     VideoPanel
 } from '@/definitions';
+import cloneDeep from 'clone-deep';
+import { VueFinalModal } from 'vue-final-modal';
 
 import Message from 'vue-m-message';
-import { VueFinalModal } from 'vue-final-modal';
-import cloneDeep from 'clone-deep';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 import SlideEditorV from './slide-editor.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
@@ -555,6 +559,7 @@ export default class SlideTocV extends Vue {
      */
     createNewConfig(index: number, currLang: 'en' | 'fr'): void {
         this.slides[index][currLang] = JSON.parse(JSON.stringify(this.defaultBlankSlide));
+
         this.$emit('slides-updated', this.slides);
         this.$emit('slide-change', index, currLang);
     }
