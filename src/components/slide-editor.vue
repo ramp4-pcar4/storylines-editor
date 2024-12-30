@@ -126,10 +126,10 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button"
+                    class="editor-button panel-select-button flex items-center"
                     :class="panelIndex == 0 && !advancedEditorView ? 'border-black' : 'border-white'"
                 >
-                    <span class="align-middle inline-block">
+                    <div class="align-middle inline-block">
                         <svg
                             clip-rule="evenodd"
                             fill-rule="evenodd"
@@ -145,8 +145,8 @@
                                 fill-rule="nonzero"
                             />
                         </svg>
-                    </span>
-                    <span class="align-middle inline-block">
+                    </div>
+                    <div class="align-middle inline-block">
                         <svg
                             clip-rule="evenodd"
                             fill-rule="evenodd"
@@ -162,8 +162,21 @@
                                 fill-rule="nonzero"
                             />
                         </svg>
-                    </span>
-                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.leftPanel') }}</span>
+                    </div>
+                    <div class="flex flex-col pl-3 items-start">
+                        <p class="text-left">{{ $t('editor.slides.leftPanel') }}</p>
+                        <p class="text-xs leading-none text-gray-500">
+                            {{
+                                $t(
+                                    `editor.slide.panel.type.${
+                                        currentSlide.panel[0]?.type !== 'loading-page'
+                                            ? currentSlide.panel[0]?.type
+                                            : 'unknown'
+                                    }`
+                                )
+                            }}
+                        </p>
+                    </div>
                 </button>
                 <!-- Right panel -->
                 <button
@@ -174,10 +187,10 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button"
+                    class="editor-button panel-select-button flex items-center"
                     :class="panelIndex == 1 && !advancedEditorView ? 'border-black' : 'border-white'"
                 >
-                    <span class="align-middle inline-block">
+                    <div class="align-middle inline-block">
                         <svg
                             clip-rule="evenodd"
                             fill-rule="evenodd"
@@ -193,8 +206,8 @@
                                 fill-rule="nonzero"
                             />
                         </svg>
-                    </span>
-                    <span class="align-middle inline-block">
+                    </div>
+                    <div class="align-middle inline-block">
                         <svg
                             clip-rule="evenodd"
                             fill-rule="evenodd"
@@ -210,9 +223,21 @@
                                 fill-rule="nonzero"
                             />
                         </svg>
-                    </span>
-
-                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.rightPanel') }}</span>
+                    </div>
+                    <div class="flex flex-col pl-3 items-start">
+                        <p class="text-left">{{ $t('editor.slides.rightPanel') }}</p>
+                        <p class="text-xs leading-none text-gray-500">
+                            {{
+                                $t(
+                                    `editor.slide.panel.type.${
+                                        currentSlide.panel[1]?.type !== 'loading-page'
+                                            ? currentSlide.panel[1]?.type
+                                            : 'unknown'
+                                    }`
+                                )
+                            }}
+                        </p>
+                    </div>
                 </button>
                 <!-- Advanced editor -->
                 <button
@@ -229,7 +254,7 @@
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
                 </button>
             </div>
-            <div v-else class="border-b border-black space-x-3 pl-2">
+            <div v-else class="border-b border-black space-x-3 pl-2 flex">
                 <!-- Fullscreen (Loner panel) -->
                 <button
                     @click="
@@ -238,10 +263,10 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button"
+                    class="editor-button panel-select-button flex items-center"
                     :class="!advancedEditorView ? 'border-black' : 'border-white'"
                 >
-                    <span class="align-middle inline-block">
+                    <div class="align-middle inline-block">
                         <svg
                             clip-rule="evenodd"
                             fill-rule="evenodd"
@@ -257,8 +282,8 @@
                                 fill-rule="nonzero"
                             />
                         </svg>
-                    </span>
-                    <span class="align-middle inline-block">
+                    </div>
+                    <div class="align-middle inline-block">
                         <svg
                             clip-rule="evenodd"
                             fill-rule="evenodd"
@@ -274,9 +299,21 @@
                                 fill-rule="nonzero"
                             />
                         </svg>
-                    </span>
-
-                    <span class="align-middle inline-block pl-1">{{ $t('editor.slides.fullscreenPanel') }}</span>
+                    </div>
+                    <div class="flex flex-col pl-3 items-start">
+                        <p class="text-left">{{ $t('editor.slides.fullscreenPanel') }}</p>
+                        <p class="text-xs leading-none text-gray-500">
+                            {{
+                                $t(
+                                    `editor.slide.panel.type.${
+                                        currentSlide.panel[0]?.type !== 'loading-page'
+                                            ? currentSlide.panel[0]?.type
+                                            : 'unknown'
+                                    }`
+                                )
+                            }}
+                        </p>
+                    </div>
                 </button>
                 <!-- Advanced editor -->
                 <button
@@ -378,11 +415,16 @@
             :name="`change-slide-${slideIndex}`"
             :title="
                 $t('editor.slides.changePanelType.title', {
-                    type: $t(`editor.slide.panel.type.${newType.toLowerCase()}`)
+                    type: $t(`editor.slide.panel.type.${newType.toLowerCase() || 'unknown'}`)
                 })
             "
             :message="$t('editor.slides.changePanelType.message')"
             @ok="
+                determineEditorType(currentSlide.panel[panelIndex]) === 'map' &&
+                (currentSlide.panel[panelIndex] as MapPanel).shared
+                    ? $emit('slide-change-shared-map', { index: panelIndex, lang: langTranslate })
+                    : '';
+
                 changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
                 toggleCenterPanel();
                 toggleCenterSlide();
