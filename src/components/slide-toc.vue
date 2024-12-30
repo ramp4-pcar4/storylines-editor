@@ -363,7 +363,6 @@
 <script lang="ts">
 import ActionModal from '@/components/helpers/action-modal.vue';
 import SlideTocButton from '@/components/helpers/slide-toc-button.vue';
-import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
     ChartPanel,
@@ -379,14 +378,15 @@ import {
     TextPanel,
     VideoPanel
 } from '@/definitions';
+import cloneDeep from 'clone-deep';
+import { VueFinalModal } from 'vue-final-modal';
 
 import Message from 'vue-m-message';
-import { VueFinalModal } from 'vue-final-modal';
-import cloneDeep from 'clone-deep';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
+import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 import SlideEditorV from './slide-editor.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
 
 @Options({
     components: {
@@ -555,6 +555,7 @@ export default class SlideTocV extends Vue {
      */
     createNewConfig(index: number, currLang: 'en' | 'fr'): void {
         this.slides[index][currLang] = JSON.parse(JSON.stringify(this.defaultBlankSlide));
+
         this.$emit('slides-updated', this.slides);
         this.$emit('slide-change', index, currLang);
     }
