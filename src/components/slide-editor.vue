@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-y-auto top-20 h-auto self-start flex-grow p-5">
+    <div id="slideEditor" class="overflow-y-auto top-20 h-auto self-start flex-grow p-5">
         <div v-if="!!currentSlide">
             <div class="flex">
                 <div class="flex flex-col w-full">

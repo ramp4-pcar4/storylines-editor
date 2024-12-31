@@ -158,12 +158,51 @@ export default class TextEditorV extends Vue {
         }
     };
 
+    toolbarTooltipAdjust(toggle): void {
+        const slideEditor = document.querySelector('#slideEditor');
+        const scrollbarVisible =
+            slideEditor.scrollHeight > slideEditor.clientHeight ||
+            document.documentElement.scrollHeight > document.documentElement.clientHeight;
+        const toggleToRightBorder = slideEditor.getBoundingClientRect().right - toggle.getBoundingClientRect().right;
+        const scrollbarOffset = document.documentElement.clientWidth * 1.3 * 0.01;
+        // limit the right position of the toggle's tooltip if the toggle is sufficiently close to the right
+        // border of the screen (only when scrollbar is visible)
+        if (scrollbarVisible && toggleToRightBorder <= 90) {
+            toggle.children[0].style.right = `${Math.max(
+                Math.min(-40, -toggleToRightBorder + scrollbarOffset),
+                -65
+            )}px`;
+        } else {
+            toggle.children[0].style.right = `${-toggleToRightBorder}px`;
+        }
+    }
+
     mounted(): void {
         if (this.centerSlide && this.dynamicSelected) {
             this.panel.customStyles += 'text-align: left !important;';
         } else if (!this.centerSlide && this.dynamicSelected) {
             this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
         }
+
+        const rightToolbarToggles = Array.from(
+            document.querySelectorAll('.v-md-editor__toolbar-right > .v-md-editor__toolbar-item')
+        );
+        rightToolbarToggles.forEach((toggle) => {
+            toggle.addEventListener('mouseover', () => {
+                this.toolbarTooltipAdjust(toggle);
+            });
+        });
+    }
+
+    unmounted(): void {
+        const rightToolbarToggles = Array.from(
+            document.querySelectorAll('.v-md-editor__toolbar-right > .v-md-editor__toolbar-item')
+        );
+        rightToolbarToggles.forEach((toggle) => {
+            toggle.removeEventListener('mouseover', () => {
+                this.toolbarTooltipAdjust(toggle);
+            });
+        });
     }
 }
 </script>
@@ -174,5 +213,17 @@ label {
 }
 :deep(.v-md-icon-link::before) {
     content: '\1F517';
+}
+:deep(.v-md-editor__tooltip) {
+    text-wrap: wrap;
+    overflow-wrap: break-word;
+}
+
+:deep(.v-md-editor__toolbar-right > .v-md-editor__toolbar-item > .v-md-editor__tooltip) {
+    max-width: 80px;
+}
+
+:deep(.v-md-editor__toolbar-right) {
+    padding-right: 20px;
 }
 </style>
