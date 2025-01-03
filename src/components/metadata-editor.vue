@@ -176,6 +176,13 @@
                                             </ul>
                                         </div>
                                     </div>
+                                    <!-- If config is loading, display a small spinner. -->
+                                    <div
+                                        class="inline-flex align-middle ml-1 mb-1"
+                                        v-if="checkingUuid && !editExisting"
+                                    >
+                                        <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                                    </div>
                                     <!-- Load UUID button -->
                                     <!-- Load storyline with the given UUID, if it exists on the server, and also
                                          any history associated with the product that can be found -->
@@ -479,14 +486,23 @@
                 <!-- Continue button -->
                 <!-- Moves you to the editor -->
                 <div class="ml-auto">
-                    <button
-                        :disabled="!uuid || error || loadStatus === 'loading' || checkingUuid"
-                        @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
-                        class="editor-button editor-forms-button m-0 bg-black text-white"
+                    <div
+                        class="flex justify-end gap-1 items-center"
                         :class="{ hidden: editExisting && loadStatus !== 'loaded' }"
                     >
-                        {{ $t('editor.next') }}
-                    </button>
+                        <!-- If config is loading, display a small spinner. -->
+                        <div class="inline-flex align-middle ml-1 mb-1" v-if="loadingIntoEditor">
+                            <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                        </div>
+                        <button
+                            :disabled="loadingIntoEditor || !uuid || error || loadStatus === 'loading' || checkingUuid"
+                            @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
+                            class="editor-button editor-forms-button m-0 bg-black text-white"
+                        >
+                            {{ $t('editor.next') }}
+                        </button>
+                    </div>
+
                     <confirmation-modal
                         :name="`confirm-uuid-overwrite`"
                         :message="
@@ -522,20 +538,34 @@
                     <vue-final-modal
                         @click="saveMetadata(false)"
                         modalId="metadata-edit-modal"
-                        content-class="max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
+                        content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
                         class="flex justify-center items-center"
                     >
                         <div @click.stop class="flex flex-col space-y-2">
-                            <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
-                            <!-- ENG/FR config toggle -->
-                            <div class="mb-3">
-                                <button
-                                    class="editor-button editor-forms-button border border-gray-300"
-                                    @click="swapLang()"
-                                    tabindex="0"
-                                >
-                                    {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
-                                </button>
+                            <div class="sticky top-0 bg-white pt-5 pb-2 mb-2 border-b border-gray-300">
+                                <div class="flex justify-between items-center flex-wrap gap-y-1.5 gap-x-5 mb-2">
+                                    <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
+                                    <div class="flex flex-row gap-2">
+                                        <!-- ENG/FR config toggle -->
+                                        <button
+                                            class="editor-button editor-forms-button border border-gray-300"
+                                            @click="swapLang()"
+                                            tabindex="0"
+                                        >
+                                            {{
+                                                configLang === 'en'
+                                                    ? $t('editor.frenchConfig')
+                                                    : $t('editor.englishConfig')
+                                            }}
+                                        </button>
+                                        <button
+                                            class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
+                                            @click="saveMetadata(false)"
+                                        >
+                                            {{ $t('editor.done') }}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <metadata-content
                                 :metadata="metadata"
@@ -543,14 +573,6 @@
                                 @logo-changed="onFileChange"
                                 @logo-source-changed="onLogoSourceInput"
                             ></metadata-content>
-                            <div class="w-full flex justify-end">
-                                <button
-                                    class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
-                                    @click="saveMetadata(false)"
-                                >
-                                    {{ $t('editor.done') }}
-                                </button>
-                            </div>
                         </div>
                     </vue-final-modal>
                 </template>
@@ -646,9 +668,10 @@ export default class MetadataEditorV extends Vue {
     reloadExisting = false;
     loadStatus = 'waiting';
     checkingUuid = false;
+    loadingIntoEditor = false;
     loadEditor = false;
     error = false; // whether an error has occurred
-    warning: 'none' | 'uuid' | 'rename' = 'none'; // used for duplicate uuid warning
+    warning: 'none' | 'uuid' | 'rename' | 'blank' = 'none'; // used for duplicate uuid warning
     configLang = 'en';
     currLang = 'en'; // page language
     showDropdown = false;
@@ -1591,6 +1614,15 @@ export default class MetadataEditorV extends Vue {
         if (rename || !this.loadExisting) this.checkingUuid = true;
 
         if (!this.loadExisting || rename) {
+            if (!rename && !this.uuid) {
+                if (!this.loadExisting) {
+                    this.error = true;
+                    this.warning = 'blank';
+                }
+                this.checkingUuid = false;
+                return;
+            }
+
             const user = useUserStore().userProfile.userName || 'Guest';
             // If renaming, show the loading spinner while we check whether the UUID is taken.
             fetch(this.apiUrl + `/retrieve/${rename ? this.changeUuid : this.uuid}/latest`, { headers: { user } }).then(
@@ -1702,23 +1734,29 @@ export default class MetadataEditorV extends Vue {
      * Called when 'next' button is pressed on metadata page to continue to main editor.
      */
     continueToEditor(): void {
-        if (!this.checkRequiredFields()) {
-            return;
-        }
-        if (this.loadExisting) {
-            if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
-                this.loadEditor = true;
-                this.saveMetadata(false);
-                this.updateEditorPath();
-            } else {
-                Message.error(this.$t('editor.editMetadata.message.error.noConfig'));
+        this.loadingIntoEditor = true;
+
+        // Needed in order to show the loading spinner at all
+        // Although it shows, it's still frozen (since app's really just lagging until editor's in)
+        setTimeout(() => {
+            if (!this.checkRequiredFields()) {
+                return;
             }
-        } else if (!this.uuid) {
-            Message.error(this.$t('editor.warning.mustEnterUuid'));
-            this.error = true;
-        } else {
-            this.generateNewConfig();
-        }
+            if (this.loadExisting) {
+                if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
+                    this.loadEditor = true;
+                    this.saveMetadata(false);
+                    this.updateEditorPath();
+                } else {
+                    Message.error(this.$t('editor.editMetadata.message.error.noConfig'));
+                }
+            } else if (!this.uuid) {
+                Message.error(this.$t('editor.warning.mustEnterUuid'));
+                this.error = true;
+            } else {
+                this.generateNewConfig();
+            }
+        }, 25);
     }
 
     /**
@@ -1905,5 +1943,9 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
         border-color: #eab308;
         outline-color: #eab308;
     }
+}
+
+.edit-metadata-content {
+    padding-top: 0 !important;
 }
 </style>
