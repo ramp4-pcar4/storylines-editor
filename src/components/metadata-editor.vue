@@ -480,7 +480,7 @@
                 <!-- Moves you to the editor -->
                 <div class="ml-auto">
                     <button
-                        :disabled="loadStatus === 'loading'"
+                        :disabled="error || loadStatus === 'loading'"
                         @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
                         class="editor-button editor-forms-button m-0 bg-black text-white"
                         :class="{ hidden: editExisting && loadStatus !== 'loaded' }"
@@ -1597,6 +1597,10 @@ export default class MetadataEditorV extends Vue {
                 (res: Response) => {
                     if (res.status !== 404) {
                         this.warning = rename ? 'rename' : 'uuid';
+
+                        if (!this.loadExisting) {
+                            this.error = true;
+                        }
                     }
 
                     if (rename) this.checkingUuid = false;
