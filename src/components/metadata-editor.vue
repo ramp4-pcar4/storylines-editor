@@ -480,7 +480,7 @@
                 <!-- Moves you to the editor -->
                 <div class="ml-auto">
                     <button
-                        :disabled="loadStatus === 'loading'"
+                        :disabled="!uuid || error || loadStatus === 'loading' || checkingUuid"
                         @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
                         class="editor-button editor-forms-button m-0 bg-black text-white"
                         :class="{ hidden: editExisting && loadStatus !== 'loaded' }"
@@ -1588,7 +1588,7 @@ export default class MetadataEditorV extends Vue {
     }
 
     checkUuid = throttle(300, (rename?: boolean): void => {
-        if (rename) this.checkingUuid = true;
+        if (rename || !this.loadExisting) this.checkingUuid = true;
 
         if (!this.loadExisting || rename) {
             const user = useUserStore().userProfile.userName || 'Guest';
@@ -1597,9 +1597,13 @@ export default class MetadataEditorV extends Vue {
                 (res: Response) => {
                     if (res.status !== 404) {
                         this.warning = rename ? 'rename' : 'uuid';
+
+                        if (!this.loadExisting) {
+                            this.error = true;
+                        }
                     }
 
-                    if (rename) this.checkingUuid = false;
+                    if (rename || !this.loadExisting) this.checkingUuid = false;
 
                     fetch(this.apiUrl + `/retrieveMessages`)
                         .then((res: any) => {
