@@ -115,13 +115,13 @@
                     <input
                         type="text"
                         id="metaLogo"
-                        @change="$emit('logo-source-changed', $event)"
+                        @change="$emit('image-source-changed', $event, 'logo')"
                         :value="metadata.logoName"
                         class="metadata-input w-full lg:w-1/2"
                     />
                     <!-- Upload button -->
                     <button
-                        @click.stop="openFileSelector"
+                        @click.stop="openFileSelector('logoUpload')"
                         class="metadata-button mb-0.5 bg-black border border-black text-white hover:bg-gray-800"
                     >
                         {{ $t('editor.browse') }}
@@ -155,7 +155,7 @@
             <input
                 type="file"
                 id="logoUpload"
-                @change="$emit('logo-changed', $event)"
+                @change="$emit('image-changed', $event, 'logo')"
                 class="editor-input w-1/4"
                 style="display: none"
             />
@@ -177,6 +177,66 @@
                 </div>
                 <p v-if="!editing">{{ metadata.logoAltText || $t('editor.metadataForm.na') }}</p>
             </div>
+        </section>
+        <!-- Subsection: Intro background stuff -->
+        <section>
+            <div class="metadata-item">
+                <label class="metadata-label" for="metaIntroBg">{{ $t('editor.introBackground') }}</label>
+                <div v-show="editing">
+                    <!-- Intro slide background URL -->
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <input
+                            type="text"
+                            id="metaIntroBg"
+                            @change="$emit('image-source-changed', $event, 'introBg')"
+                            :value="metadata.introBgName"
+                            class="metadata-input w-full lg:w-1/2"
+                        />
+                        <!-- Upload button -->
+                        <button
+                            @click.stop="openFileSelector('backgroundUpload')"
+                            class="metadata-button mb-0.5 bg-black border border-black text-white hover:bg-gray-800"
+                        >
+                            {{ $t('editor.browse') }}
+                        </button>
+                        <!-- Delete button -->
+                        <button
+                            v-if="metadata.introBgName || metadata.introBgPreview"
+                            @click.stop="removeIntroBackground"
+                            class="metadata-button border mb-0.5 border-black"
+                        >
+                            {{ $t('editor.remove') }}
+                        </button>
+                    </div>
+                    <p class="metadata-subcaption">
+                        {{ $t('editor.metadataForm.caption.introBackground') }}
+                    </p>
+                </div>
+
+                <p class="break-all" v-if="!editing">{{ metadata.introBgName || $t('editor.metadataForm.na') }}</p>
+            </div>
+            <!-- Logo Preview -->
+            <div v-if="!!metadata.introBgPreview" class="metadata-item">
+                <div class="metadata-label">{{ $t('editor.introBackgroundPreview') }}:</div>
+                <img
+                    :src="metadata.introBgPreview"
+                    v-if="!!metadata.introBgPreview && metadata.introBgPreview != 'error'"
+                    class="image-preview"
+                    :alt="$t('editor.introBackgroundPreview')"
+                />
+                <p v-if="metadata.introBgPreview == 'error'" class="image-preview">
+                    {{ $t('editor.image.loadingError') }}
+                </p>
+            </div>
+            <!-- hide the actual file input. Label prevents a WAVE error -->
+            <label style="display: none" for="backgroundUpload">Intro background upload</label>
+            <input
+                type="file"
+                id="backgroundUpload"
+                @change="$emit('image-changed', $event, 'introBg')"
+                class="editor-input w-1/4"
+                style="display: none"
+            />
         </section>
     </section>
     <!-- Section: End of page information -->
@@ -245,8 +305,8 @@ export default class MetadataEditorV extends Vue {
     @Prop() metadata!: MetadataContent;
     @Prop({ default: true }) editing!: boolean;
 
-    openFileSelector(): void {
-        document.getElementById('logoUpload')?.click();
+    openFileSelector(where: string = 'logoUpload'): void {
+        document.getElementById(where)?.click();
     }
 
     metadataChanged(event: Event): void {
@@ -260,6 +320,11 @@ export default class MetadataEditorV extends Vue {
     removeLogo(): void {
         this.metadata.logoName = '';
         this.metadata.logoPreview = '';
+    }
+
+    removeIntroBackground(): void {
+        this.metadata.introBgName = '';
+        this.metadata.introBgPreview = '';
     }
 }
 </script>
