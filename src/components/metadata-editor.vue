@@ -416,8 +416,8 @@
                                         :metadata="metadata"
                                         :editing="editingMetadata"
                                         @metadata-changed="updateMetadata"
-                                        @logo-changed="onFileChange"
-                                        @logo-source-changed="onLogoSourceInput"
+                                        @image-changed="onFileChange"
+                                        @image-source-changed="onImageSourceInput"
                                     ></metadata-content>
                                     <!-- Save/discard changes buttons (existing only) -->
                                     <div v-if="editingMetadata && editExisting" class="flex gap-3 mt-2">
@@ -543,8 +543,8 @@
                             <metadata-content
                                 :metadata="metadata"
                                 @metadata-changed="updateMetadata"
-                                @logo-changed="onFileChange"
-                                @logo-source-changed="onLogoSourceInput"
+                                @image-changed="onFileChange"
+                                @image-source-changed="onImageSourceInput"
                             ></metadata-content>
                         </div>
                     </vue-final-modal>
@@ -684,6 +684,7 @@ export default class MetadataEditorV extends Vue {
     renameMode = false; // if currently in rename mode
     processingRename = false; // only true while we're waiting for the server to process a rename
     logoImage: undefined | File = undefined;
+    introBgImage: undefined | File = undefined;
     metadata: MetadataContent = {
         title: '',
         introTitle: '',
@@ -691,6 +692,8 @@ export default class MetadataEditorV extends Vue {
         logoPreview: '',
         logoName: '',
         logoAltText: '',
+        introBgName: '',
+        introBgPreview: '',
         contextLink: '',
         contextLabel: '',
         tocOrientation: '',
@@ -706,6 +709,8 @@ export default class MetadataEditorV extends Vue {
         logoPreview: '',
         logoName: '',
         logoAltText: '',
+        introBgName: '',
+        introBgPreview: '',
         contextLink: '',
         contextLabel: '',
         tocOrientation: '',
@@ -780,51 +785,39 @@ export default class MetadataEditorV extends Vue {
                 this.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
                 this.unsavedChanges = props.unsavedChanges;
-                // Load product logo (if provided).
-                const logo = this.configs[this.configLang]?.introSlide.logo?.src;
-                const logoSrc = `assets/${this.configLang}/${this.metadata.logoName}`;
 
                 this.loadSlides(props.configs);
 
-                if (logo) {
-                    const logoFile = this.configFileStructure?.zip.file(logoSrc);
-                    const logoType = logoSrc.split('.').at(-1);
-                    if (logoFile) {
-                        if (logoType !== 'svg') {
-                            logoFile.async('blob').then((img: Blob) => {
-                                this.logoImage = new File([img], this.metadata.logoName);
-                                this.metadata.logoPreview = URL.createObjectURL(img);
-                                this.loadStatus = 'loaded';
-                            });
-                        } else {
-                            logoFile.async('text').then((img) => {
-                                const logoImageFile = new File([img], this.metadata.logoName, {
-                                    type: 'image/svg+xml'
-                                });
-                                this.logoImage = logoImageFile;
-                                this.metadata.logoPreview = URL.createObjectURL(logoImageFile);
-                                this.loadStatus = 'loaded';
-                            });
-                        }
-                    } else {
-                        // Fill in the field with this value whether it exists or not.
-                        this.metadata.logoName = logo;
+                // Load product logo and the introduction slide background image (if provided).
+                const logoAsset = this.configs[this.configLang]?.introSlide.logo?.src;
+                const introBgAsset = this.configs[this.configLang]?.introSlide.backgroundImage;
 
-                        // If it doesn't exist, maybe it's a remote file?
-                        fetch(logo).then((data: Response) => {
-                            if (data.status !== 404) {
-                                data.blob().then((blob: Blob) => {
-                                    this.logoImage = new File([blob], this.metadata.logoName);
-                                    this.metadata.logoPreview = logo;
-                                    this.loadStatus = 'loaded';
-                                });
-                            }
-                        });
+                Promise.all([
+                    this.processAsset(logoAsset, this.metadata.logoName),
+                    this.processAsset(introBgAsset, this.metadata.introBgName)
+                ]).then(([logoData, introBgData]) => {
+                    if (logoData) {
+                        this.logoImage = logoData.file;
+                        this.metadata.logoPreview = logoData.preview;
+
+                        // If an external source, fill in the name field whether it exists or not.
+                        if (logoData.external) {
+                            this.metadata.logoName = logoAsset ?? '';
+                        }
                     }
-                } else {
-                    // No logo to load.
+
+                    if (introBgData) {
+                        this.introBgImage = introBgData.file;
+                        this.metadata.introBgPreview = introBgData.preview;
+
+                        // If an external source, fill in the name field whether it exists or not.
+                        if (introBgData.external) {
+                            this.metadata.introBgName = introBgAsset ?? '';
+                        }
+                    }
+
                     this.loadStatus = 'loaded';
-                }
+                });
 
                 this.lockStore.broadcast!.onmessage = (e) => {
                     // session was extended from the preview tab, need to handle in editor tab
@@ -886,6 +879,53 @@ export default class MetadataEditorV extends Vue {
         this.lockStore.resetSession();
         // We need to call this method again because we need to keep checking that the time has not run out.
         this.handleSessionTimeout();
+    }
+
+    processAsset(asset: string | undefined, name: string): Promise<any> {
+        if (!asset) return Promise.resolve();
+
+        // Load asset (if provided).
+        return new Promise((res) => {
+            const assetSrc = `assets/${this.configLang}/${name}`;
+            const assetFile = this.configFileStructure?.zip.file(assetSrc);
+            const assetType = assetSrc.split('.').at(-1);
+
+            if (assetFile) {
+                if (assetType !== 'svg') {
+                    assetFile.async('blob').then((img: Blob) => {
+                        res({
+                            file: new File([img], name),
+                            preview: URL.createObjectURL(img),
+                            external: false // indicates that this asset lives in the ZIP folder
+                        });
+                    });
+                } else {
+                    assetFile.async('text').then((img) => {
+                        const assetImageFile = new File([img], name, {
+                            type: 'image/svg+xml'
+                        });
+                        res({
+                            file: assetImageFile,
+                            preview: URL.createObjectURL(assetImageFile),
+                            external: false
+                        });
+                    });
+                }
+            } else {
+                // If it doesn't exist, maybe it's a remote file?
+                fetch(asset).then((data: Response) => {
+                    if (data.status !== 404) {
+                        data.blob().then((blob: Blob) => {
+                            res({
+                                file: new File([blob], name),
+                                preview: asset,
+                                external: true // indicates that this is an external asset
+                            });
+                        });
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -956,6 +996,16 @@ export default class MetadataEditorV extends Vue {
         } else {
             config.introSlide.logo.src = this.metadata.logoName;
         }
+
+        // Set the source of the introduction slide background image
+        if (!this.metadata.introBgName) {
+            config.introSlide.backgroundImage = '';
+        } else if (!this.metadata.introBgName.includes('http')) {
+            config.introSlide.backgroundImage = `${this.uuid}/assets/${this.configLang}/${this.introBgImage?.name}`;
+        } else {
+            config.introSlide.backgroundImage = this.metadata.introBgName;
+        }
+
         config.slides = [];
 
         const otherLang = this.configLang === 'en' ? 'fr' : 'en';
@@ -971,7 +1021,7 @@ export default class MetadataEditorV extends Vue {
         configZip.file(`${this.uuid}_${otherLang}.json`, formattedOtherLangConfig);
 
         // Generate the file structure, defer uploading the image until the structure is created.
-        this.configFileStructureHelper(configZip, this.logoImage);
+        this.configFileStructureHelper(configZip, [this.logoImage, this.introBgImage]);
     }
 
     configHelper(): StoryRampConfig {
@@ -1409,7 +1459,7 @@ export default class MetadataEditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: typeof JSZip, uploadLogo?: File | undefined): Promise<void> {
+    configFileStructureHelper(configZip: typeof JSZip, uploadFiles?: Array<File | undefined>): void {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -1429,9 +1479,14 @@ export default class MetadataEditorV extends Vue {
             rampConfig: rampConfigFolder as JSZip
         };
 
-        // If uploadLogo is set, upload the logo to the directory.
-        if (uploadLogo !== undefined) {
-            this.configFileStructure.assets[this.configLang].file(uploadLogo?.name, uploadLogo);
+        // Upload each file in the `uploadFiles` array to the ZIP folder. This is typically (and currently only) used
+        // for the product logo and the introduction slide background image.
+        if (uploadFiles !== undefined) {
+            uploadFiles.forEach((file) => {
+                if (file) {
+                    this.configFileStructure!.assets[this.configLang].file(file?.name, file);
+                }
+            });
         }
 
         return this.loadConfig();
@@ -1499,55 +1554,47 @@ export default class MetadataEditorV extends Vue {
 
         this.loadSlides(this.configs);
 
-        const logo = config.introSlide.logo?.src;
-        if (logo) {
-            // Set the alt text for the logo.
-            this.metadata.logoAltText = config.introSlide.logo?.altText ? config.introSlide.logo.altText : '';
-            this.metadata.logoName = logo.split('/').at(-1);
+        // Load product logo and the introduction slide background image (if provided).
+        const logoAsset = config.introSlide.logo?.src;
+        const introBgAsset = config.introSlide.backgroundImage;
 
-            // Fetch the logo from the folder (if it exists).
-            const logoSrc = `${logo.substring(logo.indexOf('/') + 1)}`;
-            const logoName = `${logo.split('/')[logo.split('/').length - 1]}`;
-            const logoFile = this.configFileStructure?.zip.file(logoSrc);
-            const logoType = logoSrc.split('.').at(-1);
-            if (logoFile) {
-                if (logoType !== 'svg') {
-                    logoFile.async('blob').then((img: Blob) => {
-                        this.logoImage = new File([img], this.metadata.logoName);
-                        this.metadata.logoPreview = URL.createObjectURL(img);
-                        this.loadStatus = 'loaded';
-                    });
+        // If the logo source is provided, grab the path without the UUID and the file name.
+
+        const logoPath = logoAsset ? logoAsset.substring(logoAsset.indexOf('/') + 1) : undefined;
+        const logoName = logoAsset ? logoAsset.split('/')[logoAsset.split('/').length - 1] : '';
+
+        // Grab the asset file name.
+        const introBgPath = introBgAsset ? introBgAsset.substring(introBgAsset.indexOf('/') + 1) : undefined;
+        const introBgName = introBgAsset ? introBgAsset.split('/')[introBgAsset.split('/').length - 1] : '';
+
+        // Load in the data from the logo and intro slide background image. If one of these assets is missing, the promise will resolve with undefined.
+        Promise.all([
+            this.processAsset(logoPath, logoName).then((logoData) => {
+                if (logoData) {
+                    this.metadata.logoAltText = config.introSlide.logo?.altText ? config.introSlide.logo.altText : '';
+                    this.logoImage = logoData.file;
+                    this.metadata.logoPreview = logoData.preview;
+                    this.metadata.logoName = logoName;
                 } else {
-                    logoFile.async('text').then((img) => {
-                        const logoImageFile = new File([img], this.metadata.logoName, {
-                            type: 'image/svg+xml'
-                        });
-                        this.logoImage = logoImageFile;
-                        this.metadata.logoPreview = URL.createObjectURL(logoImageFile);
-                        this.loadStatus = 'loaded';
-                    });
+                    // If there's no logo, mark the product as loaded and remove any existing logos
+                    this.metadata.logoName = '';
+                    this.metadata.logoPreview = '';
                 }
-            } else {
-                // Fill in the field with this value whether it exists or not.
-                this.metadata.logoName = logo;
-
-                // If it doesn't exist, maybe it's a remote file?
-                fetch(logo).then((data: Response) => {
-                    if (data.status !== 404) {
-                        data.blob().then((blob: Blob) => {
-                            this.logoImage = new File([blob], logoName);
-                            this.metadata.logoPreview = logo;
-                            this.loadStatus = 'loaded';
-                        });
-                    }
-                });
-            }
-        } else {
-            // If there's no logo, mark the product as loaded and remove any existing logos
-            this.metadata.logoName = '';
-            this.metadata.logoPreview = '';
+            }),
+            this.processAsset(introBgPath, introBgName).then((introBgData) => {
+                if (introBgData) {
+                    this.introBgImage = introBgData.file;
+                    this.metadata.introBgPreview = introBgData.preview;
+                    this.metadata.introBgName = introBgName;
+                } else {
+                    this.metadata.introBgName = '';
+                    this.metadata.introBgPreview = '';
+                }
+            })
+        ]).then(() => {
+            // Once assets are loaded, set status to loaded.
             this.loadStatus = 'loaded';
-        }
+        });
 
         // Load the temp copy of the metadata
         this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
@@ -1792,6 +1839,19 @@ export default class MetadataEditorV extends Vue {
                 config.introSlide.logo.src = this.metadata.logoName;
             }
 
+            // If the introduction slide background image doesn't include HTTP, assume it's a local file.
+            if (!this.metadata.introBgName) {
+                config.introSlide.backgroundImage = '';
+            } else if (!this.metadata.introBgName.includes('http')) {
+                config.introSlide.backgroundImage = `${this.uuid}/assets/${this.configLang}/${this.introBgImage?.name}`;
+                this.configFileStructure?.assets[this.configLang].file(
+                    this.introBgImage?.name as string,
+                    this.introBgImage as File
+                );
+            } else {
+                config.introSlide.backgroundImage = this.metadata.introBgName;
+            }
+
             if (publish) {
                 this.generateConfig();
                 this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
@@ -1902,7 +1962,7 @@ export default class MetadataEditorV extends Vue {
         next();
     }
 
-    onLogoSourceInput(e: InputEvent): void {
+    onImageSourceInput(e: InputEvent, src: string): void {
         const isImgUrl = (url: string) => {
             const img = new Image();
             img.src = url;
@@ -1912,27 +1972,61 @@ export default class MetadataEditorV extends Vue {
             });
         };
 
-        this.metadata.logoName = (e.target as HTMLInputElement).value;
+        switch (src) {
+            case 'logo':
+                this.metadata.logoName = (e.target as HTMLInputElement).value;
 
-        isImgUrl(this.metadata.logoName).then((res) => {
-            if (res) {
-                this.metadata.logoPreview = this.metadata.logoName;
-                Message.success(this.$t('editor.editMetadata.message.logoSuccessfulLoad'));
-            } else {
-                this.metadata.logoPreview = 'error';
-                Message.error(this.$t('editor.editMetadata.message.error.logoFailedLoad'));
-            }
-        });
+                isImgUrl(this.metadata.logoName).then((res) => {
+                    if (res) {
+                        this.metadata.logoPreview = this.metadata.logoName;
+                        Message.success(this.$t('editor.editMetadata.message.imageSuccessfulLoad'));
+                    } else {
+                        this.metadata.logoPreview = 'error';
+                        Message.error(this.$t('editor.editMetadata.message.error.imageFailedLoad'));
+                    }
+                });
+
+                break;
+            case 'introBg':
+                this.metadata.introBgName = (e.target as HTMLInputElement).value;
+
+                isImgUrl(this.metadata.introBgName).then((res) => {
+                    if (res) {
+                        this.metadata.introBgPreview = this.metadata.introBgName;
+                        Message.success(this.$t('editor.editMetadata.message.imageSuccessfulLoad'));
+                    } else {
+                        this.metadata.introBgPreview = 'error';
+                        Message.error(this.$t('editor.editMetadata.message.error.imageFailedLoad'));
+                    }
+                });
+                break;
+            default:
+                console.error('onImageSourceInput received invalid source.');
+        }
     }
 
-    onFileChange(e: Event): void {
+    onFileChange(e: Event, src: string): void {
         // Retrieve the uploaded file.
         const uploadedFile = ((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        this.logoImage = uploadedFile;
 
-        // Generate an image preview.
-        this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
-        this.metadata.logoName = uploadedFile.name;
+        switch (src) {
+            case 'logo':
+                this.logoImage = uploadedFile;
+
+                // Generate an image preview.
+                this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
+                this.metadata.logoName = uploadedFile.name;
+                break;
+            case 'introBg':
+                this.introBgImage = uploadedFile;
+
+                // Generate an image preview.
+                this.metadata.introBgPreview = URL.createObjectURL(uploadedFile);
+                this.metadata.introBgName = uploadedFile.name;
+                break;
+            default:
+                console.error('onFileChange received invalid source.');
+        }
     }
 
     updateEditorPath(): void {
