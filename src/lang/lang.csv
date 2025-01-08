@@ -49,9 +49,9 @@ editor.editMetadata.message.error.noRequestedVersion,The requested version does 
 editor.editMetadata.message.error.noResponseFromServer,"Failed to load product, no response from server",1,"Échec du chargement du produit, aucune réponse du serveur",0
 editor.editMetadata.message.error.malformedProduct,The requested product {uuid} is malformed.,1,Le produit demandé {uuid} est mal formé.,0
 editor.editMetadata.message.error.failedSave,Failed to save changes.,1,Échec de l'enregistrement des modifications.,0
-editor.editMetadata.message.error.logoFailedLoad,Failed to load logo image.,1,Échec du chargement de l'image du logo.,0
+editor.editMetadata.message.error.imageFailedLoad,Failed to load image.,1,Échec du chargement de l'image.,0
 editor.editMetadata.message.error.requiredFieldsNotFilled,Please fill out the required fields before proceeding.,1,Veuillez remplir les champs obligatoires avant de continuer.,0
-editor.editMetadata.message.logoSuccessfulLoad,Successfully loaded logo image.,1,Image du logo chargée avec succès.,0
+editor.editMetadata.message.imageSuccessfulLoad,Successfully loaded image.,1,Logo chargé avec succès.,0
 editor.editMetadata.message.successfulLoad,Successfully loaded storyline!,1,Scénario chargé avec succès!,0
 editor.editMetadata.message.successfulSave,Successfully saved changes!,1,Modifications enregistrées avec succès!,0
 editor.editMetadata.message.wait,Please wait. Saving may take a few moments.,1,"Veuillez patienter. L'enregistrement peut prendre quelques instants.",0
@@ -70,6 +70,7 @@ editor.metadataForm.caption.tocOrientation,"Determines the direction of the stor
 editor.metadataForm.caption.introTitle,"The intro title is the title displayed in large text on the first slide, right underneath the logo (if given).",1,"Le titre d'introduction est le titre affiché en gros texte sur la première diapositive, juste en dessous du logo (s'il est fourni).",0
 editor.metadataForm.caption.introSubtitle,"The intro subtitle displays underneath the intro title, in small text.",1,"Le sous-titre d'introduction s'affiche sous le titre d'introduction, en petit texte.",0
 editor.metadataForm.caption.logoAltText,"For accessibility purposes, provide description text for the logo.",1,"À des fins d’accessibilité, veuillez fournir un texte de description pour le logo.",0
+editor.metadataForm.caption.introBackground,"The background image is displayed on the first slide of the storyline product, behind the intro title and subtitle.",1,"L'image d'arrière-plan est affichée sur la première diapositive du produit de scénario, derrière le titre et le sous-titre d'introduction.",0
 editor.metadataForm.caption.contextLink,"Context link shows up at the bottom of the page to provide additional resources for interested users.",1,"Le lien contextuel apparaît au bas de la page pour fournir des ressources supplémentaires aux utilisateurs intéressés.",0
 editor.metadataForm.caption.contextLabel,"Context label shows up as text. When users click the context link, the linked site appears in a new tab for the user.",1,"L'étiquette de contexte s'affiche sous forme de texte. Lorsque les utilisateurs cliquent sur le lien contextuel, le site lié apparaît dans un nouvel onglet pour l'utilisateur.",0
 editor.metadataForm.introPage.heading,Introduction page details,1,Détails de la page d'introduction,0
@@ -104,6 +105,9 @@ editor.logoPreview,Logo preview,1,Aperçu du logo,1
 editor.logoPreviewAltText,Preview of product logo,1,Aperçu du logo du produit,0
 editor.logoAltText,Logo alt text,1,Lien contextuel,1
 editor.logoAltText.desc,"For accessibility purposes, provide description text for the logo.",1,"Pour des raisons d'accessibilité, fournissez un texte descriptif pour le logo.",0
+editor.introBackground,Background image,1,Image d'arrière-plan,0
+editor.introBackgroundPreview,Background image preview,1,Aperçu de l'image d'arrière-plan,0
+editor.introBackgroundPreview,Preview of background image,1,Aperçu de l'image d'arrière-plan,0
 editor.contextLink,Context link,1,Lien contextuel,1
 editor.contextLink.info,Context link shows up at the bottom of the page to provide additional resources for interested users.,1,Le lien contextuel apparaît au bas de la page et fournit des ressources supplémentaires aux utilisateurs intéressés.,1
 editor.contextLabel,Context label,1,Étiquette de contexte,1

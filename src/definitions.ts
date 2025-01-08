@@ -36,6 +36,8 @@ export interface MetadataContent {
     logoPreview: string;
     logoName: string;
     logoAltText: string;
+    introBgName: string;
+    introBgPreview: string;
     contextLink: string;
     contextLabel: string;
     tocOrientation: string;
@@ -133,6 +135,7 @@ export interface Intro {
     title: string;
     subtitle: string;
     blurb?: string;
+    backgroundImage?: string;
 }
 
 export interface Slide {
