@@ -103,7 +103,7 @@
                 "type": {
                     "type": "string",
                     "enum": ["dynamic"]
-                }, 
+                },
                 "modified": {
                     "type": "boolean",
                     "description": "An optional tag that specifies whether the panel has been modified from its default configuration"
@@ -189,7 +189,7 @@
                 "title": {
                     "type": "string",
                     "description": "A title that is displayed centered above this map."
-                }, 
+                },
                 "caption": {
                     "type": "string",
                     "description": "Supporting text content for the map."
@@ -289,7 +289,7 @@
                 "type": {
                     "type": "string",
                     "enum": ["video"]
-                }, 
+                },
                 "modified": {
                     "type": "boolean",
                     "description": "An optional tag that specifies whether the panel has been modified from its default configuration"
@@ -361,7 +361,20 @@
                 "type": {
                     "type": "string",
                     "description": "The type of chart.",
-                    "enum": ["line", "spline", "area", "areaspline", "column", "bar", "pie", "scatter", "gauge", "arearange", "areasplinerange", "columnrange"]
+                    "enum": [
+                        "line",
+                        "spline",
+                        "area",
+                        "areaspline",
+                        "column",
+                        "bar",
+                        "pie",
+                        "scatter",
+                        "gauge",
+                        "arearange",
+                        "areasplinerange",
+                        "columnrange"
+                    ]
                 },
                 "width": {
                     "type": "number",
@@ -436,6 +449,10 @@
                 "blurb": {
                     "type": "string",
                     "description": "Any additional information to display on the introductory slide."
+                },
+                "backgroundImage": {
+                    "type": "string",
+                    "description": "A background image for the introduction slide."
                 }
             },
             "required": ["logo", "title"]
