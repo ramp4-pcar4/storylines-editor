@@ -36,6 +36,7 @@ import StorylinesViewer from 'ramp-storylines_demo-scenarios-pcar';
 import 'ramp-storylines_demo-scenarios-pcar/dist/style.css';
 
 import { FocusContainer, FocusItem, FocusList } from '@/directives/focus-list';
+import { Truncate } from '@/directives/truncate/truncate';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -56,4 +57,5 @@ app.use(pinia)
 app.directive('focus-container', FocusContainer);
 app.directive('focus-list', FocusList);
 app.directive('focus-item', FocusItem);
+app.directive('truncate', Truncate);
 app.mount('#app');
