@@ -92,6 +92,10 @@
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit')"
+                    @shared-asset="(assetName: string) => {
+                        console.log('emitting shared-asset event from dynamic editor');
+                        $emit('shared-asset', assetName);
+                    }"
                 ></component>
             </div>
         </div>
