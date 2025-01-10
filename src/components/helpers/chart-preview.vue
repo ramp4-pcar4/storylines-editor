@@ -2,26 +2,20 @@
     <li class="chart-item items-center mt-8 mx-5 overflow-hidden">
         <div class="relative border-solid border-2 items-center justify-center text-center w-full">
             <button
-                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-0 p-0 z-10 cursor-pointer"
+                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-2 p-0 z-10 cursor-pointer"
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
                 :aria-label="$t('editor.chart.delete')"
             >
-                <svg
-                    class="absolute transform -translate-x-1/2 -translate-y-1/2"
-                    height="22px"
-                    width="22px"
-                    viewBox="0 0 352 512"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg height="22px" width="22px" viewBox="0 0 352 512" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
                     />
                 </svg>
             </button>
             <button
-                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full bottom-2 -right-1 p-0 z-10 handle"
+                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full bottom-2 right-2 p-0 z-10 handle"
                 :aria-label="$t('editor.chart.delete')"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22px" height="22px" viewBox="0 0 24 24">
@@ -42,32 +36,29 @@
             ></storylines-chart>
         </div>
         <!-- chart description and edit  -->
-        <div class="flex mt-4 items-center flex-wrap">
-            <div class="flex flex-2 w-4/5" style="min-width: 130px">
-                <div class="flex flex-col mr-2 justify-between">
-                    <label class="name-label font-bold"> {{ $t('editor.chart.label.name') }}: </label>
-                    <label :for="'chartPreviewCaption' + index" class="name-label font-bold pb-2">
-                        {{ $t('editor.image.label.caption') }}:
-                    </label>
-                </div>
-                <div class="flex flex-col justify-between">
-                    <label class="name-label font-bold">
-                        <span class="font-normal break-all">{{ chartName }}</span>
-                    </label>
-                    <input
-                        :id="'chartPreviewCaption' + index"
-                        class="editor-input w-5/6"
-                        type="text"
-                        v-model="chart.caption"
-                        :placeholder="$t('editor.caption.placeholder')"
-                        @input="$emit('captionEdit')"
-                    />
-                </div>
+        <div class="flex flex-col-reverse lg:flex-row mt-4 items-start flex-wrap gap-2 gap-x-2 px-1 pb-1">
+            <div class="flex-1 flex flex-col w-full">
+                <label class="editor-label"> {{ $t('editor.chart.label.name') }}</label>
+                <label class="name-label font-bold">
+                    <span class="font-normal break-all">{{ chartName }}</span>
+                </label>
+
+                <label :for="'chartPreviewCaption' + index" class="editor-label mt-2">
+                    {{ $t('editor.image.label.caption') }}
+                </label>
+                <input
+                    :id="'chartPreviewCaption' + index"
+                    class="editor-input w-full"
+                    type="text"
+                    v-model="chart.caption"
+                    :placeholder="$t('editor.caption.placeholder')"
+                    @input="$emit('captionEdit')"
+                />
             </div>
 
             <!-- edit button -->
             <button
-                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200 m-0 mt-4"
+                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
                 :id="`edit-${chart.name}-btn`"
             >
                 <div class="flex items-center">
