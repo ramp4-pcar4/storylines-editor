@@ -177,6 +177,35 @@
                 </div>
                 <p v-if="!editing">{{ metadata.logoAltText || $t('editor.metadataForm.na') }}</p>
             </div>
+            <div class="flex flex-wrap gap-4">
+                <div class="metadata-item">
+                    <span class="metadata-label">{{ $t('editor.introTitleColour') }}</span>
+                    <ColourPickerInput
+                        name="titleColour"
+                        :value="metadata.titleColour"
+                        @change="metadataChanged"
+                        :disabled="!editing"
+                    />
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">{{ $t('editor.introSubtitleColour') }}</span>
+                    <ColourPickerInput
+                        name="subtitleColour"
+                        :value="metadata.subtitleColour"
+                        @change="metadataChanged"
+                        :disabled="!editing"
+                    />
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">{{ $t('editor.introButtonColour') }}</span>
+                    <ColourPickerInput
+                        name="buttonColour"
+                        :value="metadata.buttonColour"
+                        @change="metadataChanged"
+                        :disabled="!editing"
+                    />
+                </div>
+            </div>
         </section>
     </section>
     <!-- Section: End of page information -->
@@ -239,8 +268,14 @@
 
 <script lang="ts">
 import { MetadataContent } from '@/definitions';
-import { Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
+import ColourPickerInput from './colour-picker-input.vue';
 
+@Options({
+    components: {
+        ColourPickerInput: ColourPickerInput
+    }
+})
 export default class MetadataEditorV extends Vue {
     @Prop() metadata!: MetadataContent;
     @Prop({ default: true }) editing!: boolean;

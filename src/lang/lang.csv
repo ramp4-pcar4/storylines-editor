@@ -104,6 +104,11 @@ editor.logoPreview,Logo preview,1,Aperçu du logo,1
 editor.logoPreviewAltText,Preview of product logo,1,Aperçu du logo du produit,0
 editor.logoAltText,Logo alt text,1,Lien contextuel,1
 editor.logoAltText.desc,"For accessibility purposes, provide description text for the logo.",1,"Pour des raisons d'accessibilité, fournissez un texte descriptif pour le logo.",0
+editor.introTitleColour,"Title colour",1,Couleur du titre,0
+editor.introSubtitleColour,"Subtitle colour",1,Couleur du sous-titre,0
+editor.introButtonColour,"Button colour",1,Couleur du bouton,0
+editor.colourPicker.open,Open colour picker,1,Ouvrir le sélecteur de couleur,0
+editor.colourPicker.close,Close colour picker,1,Fermer le sélecteur de couleur,0
 editor.contextLink,Context link,1,Lien contextuel,1
 editor.contextLink.info,Context link shows up at the bottom of the page to provide additional resources for interested users.,1,Le lien contextuel apparaît au bas de la page et fournit des ressources supplémentaires aux utilisateurs intéressés.,1
 editor.contextLabel,Context label,1,Étiquette de contexte,1
