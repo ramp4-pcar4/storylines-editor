@@ -45,7 +45,7 @@ app.use(cors());
 // POST requests made to /upload will be handled here.
 app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     // TODO: Putting this on the header isn't great. The body has the zipped folder. And usernames in the URL doesn't look great either. Maybe improve this somehow.
-    const user = req.headers.user 
+    const user = req.headers.user;
     if (!user) {
         // Send back error if the user uploading the storyline was not provided.
         responseMessages.push({
@@ -72,11 +72,7 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
     // Upload the file to the server, into the /files/ folder.
     form.parse(req, async function (err, field, file) {
         if (err) {
-            responseMessages.push({
-                type: 'WARNING',
-                message: 'Upload Aborted: an error has occurred while parsing the uploaded form: ' + err
-            });
-            logger('WARNING', 'Upload Aborted: an error has occurred while parsing the uploaded form: ', err);
+            logger('WARNING', 'Upload Aborted: an error has occurred while parsing the uploaded form: ' + err);
             res.status(500).send({ status: 'Internal Server Error' });
             return;
         }
@@ -90,10 +86,6 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
         //if (!projectNameRegex.test(fileName)) {
         // SECURITY FEATURE (temporary): Make sure the project name isn't `scripts`, or `help`, and doesn't contain . or / in order to prevent overwriting folders.
         if (fileName !== 'scripts' && fileName !== 'help' && !fileName.includes('/') && !fileName.includes('.')) {
-            responseMessages.push({
-                type: 'WARNING',
-                message: 'Upload Aborted: file does not match Storylines UUID standards.'
-            });
             logger('WARNING', 'Upload Aborted: file does not match Storylines UUID standards.');
             // Delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
@@ -103,12 +95,10 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
 
         // Before unzipping, create the product folder in /public/ if it doesn't exist already.
         if (!fs.existsSync(fileName)) {
-            responseMessages.push({ type: 'INFO', message: `Successfully created new product ${fileName}` });
             logger('INFO', `Successfully created new product ${fileName}`);
             fs.mkdirSync(fileName);
             newStorylines = true;
         }
-
         // Unzip the contents of the uploaded zip file into the target directory. Will overwrite
         // old files in the folder.
         decompress(secureFilename, fileName).then(async () => {
@@ -118,15 +108,13 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
             // files.forEach((file) => {
             //     validateFile(file, fileName);
             // });
-            responseMessages.push({ type: 'INFO', message: `Uploaded files to product ${fileName}` });
             logger('INFO', `Uploaded files to product ${fileName}`);
             // Initialize a new git repo if this is a new storyline.
             // Otherwise, simply create a new commit with the zipped folder.
             if (!newStorylines) {
-                await commitToRepo(fileName, user, false)
-            }
-            else {
-                await initGitRepo(fileName, user)
+                await commitToRepo(fileName, user, false);
+            } else {
+                await initGitRepo(fileName, user);
             }
             // Finally, delete the uploaded zip file.
             safeRM(secureFilename, UPLOAD_PATH);
@@ -143,10 +131,10 @@ app.route(ROUTE_PREFIX + '/upload').post(function (req, res, next) {
 // GET requests made to /retrieve/ID/commitHash will be handled here.
 // Calling this with commitHash as "latest" simply fetches the product as normal.
 app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
-    // This user is only needed for backwards compatibility. 
+    // This user is only needed for backwards compatibility.
     // If we have an existing storylines product that is not a git repo, we need to initialize a git repo
     // and make an initial commit for it, but we need the user for the commit.
-    const user = req.headers.user 
+    const user = req.headers.user;
     if (!user) {
         // Send back error if the user uploading the storyline was not provided.
         responseMessages.push({
@@ -161,7 +149,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
     var archive = archiver('zip');
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
     const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
-    const commitHash = req.params.hash
+    const commitHash = req.params.hash;
 
     // Check if the product exists.
     if (
@@ -169,27 +157,26 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
             if (!error) {
                 // Backwards compatibility. If the existing product is not a git repo i.e. it existed before git version control,
                 // we make a git repo for it before returning the version history. Otherwise, the code below will explode.
-                await initGitRepo(PRODUCT_PATH, user)
+                await initGitRepo(PRODUCT_PATH, user);
                 const git = simpleGit(PRODUCT_PATH);
                 // Get the current branch. We do it this way instead of assuming its "main" in case someone has it set to master.
-                const branches = await git.branchLocal()
-                const currBranch = branches.current
+                const branches = await git.branchLocal();
+                const currBranch = branches.current;
                 if (commitHash !== 'latest') {
-                    // If the user does not ask for the latest commit, we checkout a new branch at the point of the requested commit, 
+                    // If the user does not ask for the latest commit, we checkout a new branch at the point of the requested commit,
                     // and then proceed with getting the zipped folder below.
                     try {
                         // First, we check if the requested commit exists.
                         // NOTE: When calling from frontend, the catch block should never run.
                         const commitExists = await git.catFile(['-t', commitHash]);
                         if (commitExists !== 'commit\n') {
-                            throw new Error()
+                            throw new Error();
                         }
                     } catch (error) {
-                        responseMessages.push({
-                            type: 'INFO',
-                            message: `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`
-                        });
-                        logger('INFO', `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`);
+                        logger(
+                            'INFO',
+                            `Access attempt to version ${commitHash} of product ${req.params.id} failed, does not exist.`
+                        );
                         res.status(404).send({ status: 'Not Found' });
                         return;
                     }
@@ -219,10 +206,9 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
                             // Since the user has not asked for the latest commit, we need to clean up.
                             // Go back to the main branch and delete the newly created branch.
                             await git.checkout(currBranch);
-                            await git.deleteLocalBranch(`version-${commitHash}`)
+                            await git.deleteLocalBranch(`version-${commitHash}`);
                         }
                     });
-
                 });
 
                 // Write the product data to the ZIP file.
@@ -233,14 +219,8 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
                 });
                 archive.finalize();
 
-                responseMessages.push({ type: 'INFO', message: `Successfully loaded product ${req.params.id}` });
                 logger('INFO', `Successfully loaded product ${req.params.id}`);
-
             } else {
-                responseMessages.push({
-                    type: 'INFO',
-                    message: `Access attempt to ${req.params.id} failed, does not exist.`
-                });
                 logger('INFO', `Access attempt to ${req.params.id} failed, does not exist.`);
                 res.status(404).send({ status: 'Not Found' });
             }
@@ -260,29 +240,17 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
                     if (!err) {
                         // return JSON config file as response
                         const configJson = JSON.parse(data.toString());
-                        responseMessages.push({
-                            type: 'INFO',
-                            message: `Successfully loaded config file for ${req.params.id}, language ${req.params.lang}`
-                        });
                         logger(
                             'INFO',
                             `Successfully loaded config file for ${req.params.id}, language ${req.params.lang}`
                         );
                         res.json(configJson);
                     } else {
-                        responseMessages.push({
-                            type: 'INFO',
-                            message: `Access attempt to ${req.params.id} failed, error status ${err.status}`
-                        });
                         logger('INFO', `Access attempt to ${req.params.id} failed, error status ${err.status}`);
                         res.status(err.status);
                     }
                 });
             } else {
-                responseMessages.push({
-                    type: 'INFO',
-                    message: `Access attempt to ${req.params.id} failed, does not exist.`
-                });
                 logger('INFO', `Access attempt to ${req.params.id} failed, does not exist.`);
                 res.status(404).send({ status: 'Not Found' });
             }
@@ -291,10 +259,10 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:lang').get(function (req, res) {
 });
 
 app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
-    // This user is only needed for backwards compatibility. 
+    // This user is only needed for backwards compatibility.
     // If we have an existing storylines product that is not a git repo, we need to initialize a git repo
     // and make an initial commit for it, but we need the user for the commit.
-    const user = req.headers.user 
+    const user = req.headers.user;
     if (!user) {
         // Send back error if the user uploading the storyline was not provided.
         responseMessages.push({
@@ -316,23 +284,136 @@ app.route(ROUTE_PREFIX + '/history/:id').get(function (req, res, next) {
             });
             logger('INFO', `Access attempt to versions of ${req.params.id} failed, does not exist.`);
             res.status(404).send({ status: 'Not Found' });
-        }
-        else {
+        } else {
             // Backwards compatibility. If the existing product is not a git repo i.e. it existed before git version control,
             // we make a git repo for it before returning the version history. Otherwise, the code below will explode.
-            await initGitRepo(PRODUCT_PATH, user)
+            await initGitRepo(PRODUCT_PATH, user);
             // Get version history for this product via git log command
             const git = simpleGit(PRODUCT_PATH);
-            const log = await git.log()
+            const log = await git.log();
             // TODO: Remove the 10 version limit once pagination is implemented
-            const history = log.all.slice(0, 10).map((commit) => ({hash: commit.hash, created: commit.date, storylineUUID: req.params.id}))
-            res.json(history)
+            const history = log.all.slice(0, 10).map((commit) => ({
+                hash: commit.hash,
+                created: commit.date,
+                storylineUUID: req.params.id
+            }));
+            res.json(history);
         }
-    })
+    });
+});
 
-})
+/**
+ * Handles renaming of products. Payload should contain both the old and the new UUID, as well as the newly updated configs.
+ */
+app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
+    const oldId = req.body.previousUuid;
+    const newId = req.body.newUuid;
+    const user = req.body.user;
+    const configs = req.body.configs;
+    const PRODUCT_PATH = `${TARGET_PATH}/${oldId}`; // the existing product path
+    const NEW_PATH = `${TARGET_PATH}/${newId}`;
 
-// GET reuests made to /retrieveMessages will recieve all the responseMessages currently queued.
+    if (!oldId || !newId) {
+        res.status(400).send({ status: 'Bad Request' });
+        logger('INFO', 'Rename attempt failed. Payload was missing old or new UUID.');
+        return;
+    }
+
+    // Check if the old product exists.
+    fs.access(PRODUCT_PATH, (error) => {
+        if (error) {
+            res.status(400).send({ status: 'Bad Request' });
+            logger('INFO', 'Rename attempt failed. Provided old UUID does not exist in file system.');
+            return;
+        } else {
+            // Check to see if the new UUID is already in use (this is also checked on the front-end, but we should double check).
+            fs.access(NEW_PATH, (error) => {
+                if (error) {
+                    if (error.code === 'ENOENT') {
+                        // file does not exist, so we can rename the product.
+                        fs.rename(PRODUCT_PATH, NEW_PATH, async (err) => {
+                            if (err) {
+                                res.status(500).send({ status: 'Internal Server Error' });
+                                logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
+                                return;
+                            } else {
+                                // Delete the two previous configuration files.
+                                fs.rmSync(NEW_PATH + `/${oldId}_en.json`);
+                                fs.rmSync(NEW_PATH + `/${oldId}_fr.json`);
+
+                                // Delete and then re-initialize the Git repo to remove previous history.
+                                fs.rmSync(NEW_PATH + `/.git`, { recursive: true, force: true });
+                                const git = simpleGit(NEW_PATH);
+                                await git.init();
+
+                                // Create the new config files.
+                                fs.writeFileSync(NEW_PATH + `/${newId}_en.json`, configs.en);
+                                fs.writeFileSync(NEW_PATH + `/${newId}_fr.json`, configs.fr);
+
+                                // Rename the map configuration files (the paths should have already been updated above).
+                                const configPath = NEW_PATH + `/ramp-config/`;
+                                fs.readdir(configPath, (err, files) => {
+                                    if (err) {
+                                        res.status(500).send({ status: 'Internal Server Error' });
+                                        logger('WARNING', 'Error occured while changing map names.' + err);
+                                        return;
+                                    }
+
+                                    files.forEach(function (file) {
+                                        const newName = file.replace(`${oldId}-map-`, `${newId}-map-`);
+                                        fs.renameSync(configPath + file, configPath + newName);
+                                    });
+                                });
+
+                                // Commit the changes to the repo.
+                                await commitToRepo(NEW_PATH, user, true);
+
+                                res.status(200).send({ status: 'OK' });
+                                logger('INFO', `Product successfully renamed product from ${oldId} to ${newId}`);
+                                return;
+                            }
+                        });
+                    } else {
+                        res.status(500).send({ status: 'Internal Server Error' });
+                        logger('WARNING', 'Error occured while renaming a Storylines product.', error);
+                        return;
+                    }
+                } else {
+                    res.status(400).send({ status: 'Bad Request' });
+                    logger('INFO', 'Rename attempt failed. Provided new UUID already exists in file system.');
+                    return;
+                }
+            });
+        }
+    });
+});
+
+/**
+ * Checks to see if the provided UUID already exists.
+ */
+app.route(ROUTE_PREFIX + '/check/:id').get(function (req, res) {
+    const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
+    fs.access(PRODUCT_PATH, (err) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                // file does not exist. We won't log this to the console because this endpoint
+                // may be hit quite often.
+                res.status(404).send({ status: 'Not Found' });
+                return;
+            } else {
+                res.status(500).send({ status: err.code });
+                logger('WARNING', 'Product check failed with non-ENOENT error: ', err);
+                return;
+            }
+        } else {
+            // If the file system access request succeeds, the folder already exists.
+            res.status(200).send({ status: 'Found' });
+            return;
+        }
+    });
+});
+
+// GET requests made to /retrieveMessages will recieve all the responseMessages currently queued.
 app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
     res.json({ messages: responseMessages });
     responseMessages.length = 0;
@@ -341,7 +422,7 @@ app.route(ROUTE_PREFIX + '/retrieveMessages').get(function (req, res) {
 /*
  * Initializes a git repo at the requested path, if one does not already exist.
  * Creates an initial commit with any currently existing files in the directory.
- * 
+ *
  * @param {string} path the path of the git repo
  * @param {string} username the name of the user initializing the repo
  */
@@ -357,16 +438,16 @@ async function initGitRepo(path, username) {
             // Product directory is in a git repo but not top-level, we are working locally.
             repoExists = false;
         }
-    } catch(error) {
+    } catch (error) {
         // Product directory is not a git repo nor is it within a git repo.
         repoExists = false;
     }
 
     if (!repoExists) {
-        // Repo does not exist for the storyline product. 
+        // Repo does not exist for the storyline product.
         // Initialize a git repo and add an initial commit with all existing files.
-        await git.init()
-        await commitToRepo(path, username, true)
+        await git.init();
+        await commitToRepo(path, username, true);
     }
 }
 
@@ -378,20 +459,22 @@ async function initGitRepo(path, username) {
  * @param {boolean} initial specifies whether this is the initial commit
  */
 async function commitToRepo(path, username, initial) {
-    const date = moment().format('YYYY-MM-DD')
-    const time = moment().format('hh:mm:ss a')
+    const date = moment().format('YYYY-MM-DD');
+    const time = moment().format('hh:mm:ss a');
     // Initialize git
     const git = simpleGit(path);
-    let versionNumber = 1
+    let versionNumber = 1;
     if (!initial) {
         // Compute version number for storyline if this is not the initial commit.
-        const log = await git.log()
-        const lastMessage = log.latest.message
-        versionNumber = lastMessage.split(' ')[3]
+        const log = await git.log();
+        const lastMessage = log.latest.message;
+        versionNumber = lastMessage.split(' ')[3];
         versionNumber = Number(versionNumber) + 1;
     }
     // Commit the files for this storyline to its repo.
-    await git.add('./*').commit(`Add product version ${versionNumber} on ${date} at ${time}`, {'--author': `"${username} <>"`}) 
+    await git.add('./*').commit(`Add product version ${versionNumber} on ${date} at ${time}`, {
+        '--author': `"${username} <>"`
+    });
 }
 
 /*
@@ -431,6 +514,9 @@ function safeRM(path, folder) {
  */
 function logger(type, message) {
     let currentDate = moment().format('MM/DD/YYYY HH:mm:ss a');
+
+    // Push to responseMessages.
+    responseMessages.push({ type: type, message: message });
 
     // Append to log file.
     logFile.write(`${currentDate} [${type}] ${message}\n`);
