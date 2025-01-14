@@ -1,5 +1,57 @@
 <template>
-    <div>
+    <div class="toc-container">
+        <div class="flex items-center border-b p-2" :class="[isMobileSidebar ? 'justify-between' : 'justify-center']">
+            <!-- Edit metadata button -->
+            <!-- Opens the edit metadata modal -->
+            <button class="toc-popup-button" @click.stop="$emit('open-metadata-modal')">
+                <span class="align-middle inline-block pr-1"
+                    ><svg
+                        clip-rule="evenodd"
+                        fill-rule="evenodd"
+                        width="16"
+                        height="16"
+                        stroke-linejoin="round"
+                        stroke-miterlimit="2"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
+                            fill-rule="nonzero"
+                        />
+                    </svg>
+                </span>
+                <span class="align-middle inline-block">{{ $t('editor.editMetadata') }}</span>
+            </button>
+            <!-- Close ToC sidebar button -->
+            <button
+                v-if="isMobileSidebar"
+                class="editor-button toc-popup-button p-3 bg-transparent"
+                @click="$emit('close-sidebar')"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    x="0px"
+                    y="0px"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 122.88 122.88"
+                    style="enable-background: new 0 0 122.88 122.88"
+                    xml:space="preserve"
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                >
+                    <g>
+                        <path
+                            class="st0"
+                            d="M1.63,97.99l36.55-36.55L1.63,24.89c-2.17-2.17-2.17-5.73,0-7.9L16.99,1.63c2.17-2.17,5.73-2.17,7.9,0 l36.55,36.55L97.99,1.63c2.17-2.17,5.73-2.17,7.9,0l15.36,15.36c2.17,2.17,2.17,5.73,0,7.9L84.7,61.44l36.55,36.55 c2.17,2.17,2.17,5.73,0,7.9l-15.36,15.36c-2.17,2.17-5.73,2.17-7.9,0L61.44,84.7l-36.55,36.55c-2.17,2.17-5.73,2.17-7.9,0 L1.63,105.89C-0.54,103.72-0.54,100.16,1.63,97.99L1.63,97.99z"
+                        />
+                    </g>
+                </svg>
+            </button>
+        </div>
+
         <!-- Sidebar header -->
         <div class="flex toc-header px-3 pt-2 mt-5 pb-2 border-b align-bottom items-end">
             <!-- Header title ("SLIDES" or equivalent) -->
@@ -20,7 +72,7 @@
         </div>
 
         <!-- Slide list -->
-        <ul :class="[isMobileSidebar ? 'toc-list-mobile' : 'toc-list']">
+        <ul class="toc-slide-list" :class="[isMobileSidebar ? 'toc-list-mobile' : 'toc-list']">
             <!-- Slide -->
             <!-- Dragging is turned off on mobile version as you can't scroll otherwise (component would think a scroll === a drag) -->
             <draggable
@@ -422,7 +474,7 @@ export default class SlideTocV extends Vue {
         setTimeout(() => {
             document
                 .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 10);
     }
 
@@ -574,6 +626,23 @@ window.addEventListener('resize', () => {
 </script>
 
 <style lang="scss" scoped>
+.toc-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.toc-header {
+    grid-area: header;
+}
+
+.toc-slide-list {
+    grid-area: slide-list;
+    flex: 1 1 0%;
+    overflow: auto;
+}
+
 .toc-slide-button {
     border: none !important;
     background: none !important;
@@ -597,21 +666,19 @@ window.addEventListener('resize', () => {
     margin: 10px 0px 0px 0px !important;
 }
 
-/* Hard coded height :(
-   TODO: Change positioning of app components so we don't need to hardcode
-   TODO: Change height here when any new changes cause overshoot
- */
-.toc-list {
-    height: calc(100vh - 177px);
-    height: calc(calc(var(--vh, 1vh) * 100) - 177px);
-    overflow-y: auto;
+.slide-toc-button {
+    border-radius: 3px;
+    padding: 2px;
+}
+.slide-toc-button:hover {
+    background-color: rgb(209, 213, 219);
 }
 
-/* TODO: Change height here when any new changes cause overshoot */
-.toc-list-mobile {
-    height: calc(100vh - 123px);
-    height: calc(calc(var(--vh, 1vh) * 100) - 123px);
-    overflow-y: auto;
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .selected-toc-config-item {
