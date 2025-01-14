@@ -1662,7 +1662,10 @@ export default class MetadataEditorV extends Vue {
 
         if (this.loadEditor) {
             (this.$refs.mainEditor as EditorV).updateSlides(this.slides);
-            (this.$refs.mainEditor as EditorV).selectSlide(-1);
+
+            // Commented out as it was causing issues with the "Edit Metadata" modal's config swap button.
+            // Is it actually needed?
+            // (this.$refs.mainEditor as EditorV).selectSlide(0);
         }
     }
 

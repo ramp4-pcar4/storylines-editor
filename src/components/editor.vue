@@ -225,42 +225,23 @@
             </div>
         </div>
         <!-- Body content -->
-        <div class="flex">
+        <div class="editor-body flex">
             <!-- Left side -->
 
             <!-- Sidebar, desktop version -->
-            <div id="sidebar-desktop" class="w-80 flex-shrink-0 border-r border-black editor-toc hidden md:block">
-                <div class="flex items-center justify-center border-b p-2">
-                    <!-- Edit metadata button -->
-                    <!-- Opens the edit metadata modal -->
-                    <button class="toc-popup-button border-gray-400" @click.stop="$vfm.open('metadata-edit-modal')">
-                        <span class="align-middle inline-block pr-1"
-                            ><svg
-                                clip-rule="evenodd"
-                                fill-rule="evenodd"
-                                width="16"
-                                height="16"
-                                stroke-linejoin="round"
-                                stroke-miterlimit="2"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
-                                    fill-rule="nonzero"
-                                />
-                            </svg>
-                        </span>
-                        <span class="align-middle inline-block">{{ $t('editor.editMetadata') }}</span>
-                    </button>
-                </div>
+            <div
+                id="sidebar-desktop flex flex-col"
+                class="w-80 flex-shrink-0 border-r border-black editor-toc hidden md:block"
+            >
                 <!-- ToC -->
                 <slide-toc
+                    class="flex-1"
                     :slides="slides"
                     :currentSlide="currentSlide"
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
+                    @open-metadata-modal="$vfm.open('metadata-edit-modal')"
                     :configFileStructure="configFileStructure"
                     :lang="configLang"
                     :sourceCounts="sourceCounts"
@@ -268,53 +249,6 @@
             </div>
             <!-- Sidebar, mobile version -->
             <div id="sidebar-mobile" class="w-0 flex-shrink-0 border-r border-black editor-toc md:hidden">
-                <div class="flex items-center justify-between border-b p-2">
-                    <!-- Edit metadata button -->
-                    <!-- Opens the edit metadata modal -->
-                    <button class="toc-popup-button" @click.stop="$vfm.open('metadata-edit-modal')">
-                        <span class="align-middle inline-block pr-1"
-                            ><svg
-                                clip-rule="evenodd"
-                                fill-rule="evenodd"
-                                width="16"
-                                height="16"
-                                stroke-linejoin="round"
-                                stroke-miterlimit="2"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
-                                    fill-rule="nonzero"
-                                />
-                            </svg>
-                        </span>
-                        <span class="align-middle inline-block">{{ $t('editor.editMetadata') }}</span>
-                    </button>
-                    <!-- Close ToC sidebar button -->
-                    <button class="editor-button toc-popup-button p-3 bg-transparent" @click="closeSidebar">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            x="0px"
-                            y="0px"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 122.88 122.88"
-                            style="enable-background: new 0 0 122.88 122.88"
-                            xml:space="preserve"
-                            fill-rule="evenodd"
-                            clip-rule="evenodd"
-                        >
-                            <g>
-                                <path
-                                    class="st0"
-                                    d="M1.63,97.99l36.55-36.55L1.63,24.89c-2.17-2.17-2.17-5.73,0-7.9L16.99,1.63c2.17-2.17,5.73-2.17,7.9,0 l36.55,36.55L97.99,1.63c2.17-2.17,5.73-2.17,7.9,0l15.36,15.36c2.17,2.17,2.17,5.73,0,7.9L84.7,61.44l36.55,36.55 c2.17,2.17,2.17,5.73,0,7.9l-15.36,15.36c-2.17,2.17-5.73,2.17-7.9,0L61.44,84.7l-36.55,36.55c-2.17,2.17-5.73,2.17-7.9,0 L1.63,105.89C-0.54,103.72-0.54,100.16,1.63,97.99L1.63,97.99z"
-                                />
-                            </g>
-                        </svg>
-                    </button>
-                </div>
                 <!-- Mobile ToC -->
                 <!-- Bigger buttons, more visual dividers, more colors -->
                 <slide-toc
@@ -323,6 +257,8 @@
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
+                    @open-metadata-modal="$vfm.open('metadata-edit-modal')"
+                    @close-sidebar="closeSidebar"
                     :configFileStructure="configFileStructure"
                     :lang="configLang"
                     :sourceCounts="sourceCounts"
@@ -661,6 +597,15 @@ window.addEventListener('resize', () => {
 <style lang="scss">
 .editor-container {
     margin: 0 auto;
+
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        'header'
+        'main';
 }
 
 .editor-label {
@@ -729,8 +674,14 @@ select:focus {
 }
 
 .editor-header {
+    grid-area: header;
     top: -1px;
     padding-top: 9px;
+}
+
+.editor-body {
+    grid-area: main;
+    overflow: hidden;
 }
 
 .fade-enter-active,
