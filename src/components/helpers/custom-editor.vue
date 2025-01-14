@@ -129,6 +129,7 @@ export default class CustomEditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log('customeditor.vue - saving changes after opening advanced editor ');
         this.$emit('config-edited', this.updatedConfig);
         this.edited = false;
 
