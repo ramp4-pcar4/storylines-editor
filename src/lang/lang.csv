@@ -121,6 +121,8 @@ editor.export,Export,1,Exporter,0
 editor.export.success,Export successful,1,Exportation réussie,0
 editor.export.error,Export failed,1,Échec de l’exportation,0
 editor.rename,Rename,1,Rename,0
+editor.openSidebar,Open sidebar,1,Ouvrir la barre latérale,0
+editor.leaveEditor,Leave Editor,1,Quitter l'éditeur,0
 editor.loadPrevious,Load Previous,1,Charger le précédent,0
 editor.viewHistory,View Previous,1,Voir précédent,0
 editor.browse,Browse,1,Parcourir,1
@@ -132,14 +134,14 @@ editor.confirm,Confirm,1,Confirmer,1
 editor.cancel,Cancel,1,Annuler,1
 editor.caption.placeholder,Add a caption,1,Ajouter une légende,0
 editor.unsavedChanges,Unsaved changes,1,Modifications non enregistrées,1
-editor.saveChanges,Save changes,1,Enregistrer les modifications,1
-editor.discardChanges,Discard changes,1,Annuler les modifications,0
+editor.saveChanges,Save,1,Enregistrer,1
+editor.discardChanges,Discard changes,1,Annuler,0
 editor.label.or,or,1,ou,1
 editor.label.browse,browse,1,parcourir,1
 editor.label.upload,to upload,1,téléverser,1
 editor.savingChanges,Saving...,1,Enregistrement...,1
 editor.confirmOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Are you sure you want to overwrite product '{uuid}'?,0
-editor.resetChanges,Reset Changes,1,Annuler les modifications,1
+editor.resetChanges,Reset Changes,1,Annuler,1
 editor.refreshChanges.modal,"Are you sure you want to reload the product? All unsaved changes will be lost.",1,"Voulez-vous vraiment recharger ce produit? Toute modification non enregistrée sera perdue.",1
 editor.changeLang.modal,"Are you sure you want to switch languages? Unsaved changes may be lost.",1,"Voulez-vous vraiment changer de langue? Toute modification non enregistrée sera perdue.",1
 editor.frenchConfig,View French Config,1,Afficher la configuration en français,1
