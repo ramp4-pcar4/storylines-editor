@@ -10,6 +10,33 @@
             </router-link>
         </div>
         <div class="relative" style="margin-right: 10%; margin-left: 10%">
+            <div v-if="showExpired" class="w-full rounded-md bg-red-100 p-2 mt-5">
+                <span class="flex flex-row items-center">
+                    <svg
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1024 1024"
+                        style="color: rgb(245, 108, 108)"
+                        class="w-10 h-10 pr-2"
+                    >
+                        <path
+                            fill="currentColor"
+                            d="M512,952C269,952,72,755,72,512S269,72,512,72s440,197,440,440S755,952,512,952z M579.7,512l101.6-101.6 c18.7-18.7,18.7-49,0-67.7c-18.7-18.7-49-18.7-67.7,0l0,0L512,444.3L410.4,342.7c-18.7-18.7-49-18.7-67.7,0s-18.7,49,0,67.7 L444.3,512L342.7,613.6c-18.7,18.7-18.7,49,0,67.7c18.7,18.7,49,18.7,67.7,0L512,579.7l101.6,101.6c18.7,18.7,49,18.7,67.7,0 c18.7-18.7,18.7-49,0-67.7L579.7,512z"
+                        ></path>
+                    </svg>
+                    {{ $t('editor.session.ended') }}
+                    <button
+                        @click.stop="
+                            () => {
+                                showExpired = false;
+                            }
+                        "
+                        class="editor-button bg-black text-white hover:bg-gray-800 ml-auto"
+                    >
+                        {{ $t('editor.ok') }}
+                    </button>
+                </span>
+            </div>
             <h2 class="pt-10 text-4xl font-semibold">{{ $t('editor.dashboard') }}</h2>
             <div class="text-xl font-semibold text-right pt-2 pb-2">
                 {{ $t('editor.landing.greeting') }} {{ userName }}!
@@ -163,18 +190,26 @@
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-property-decorator';
+import { Prop, Vue } from 'vue-property-decorator';
 import { Storyline, UserProfile, useUserStore } from '../stores/userStore';
+import Message from 'vue-m-message';
 
 export default class HomeV extends Vue {
+    @Prop({ default: false }) sessionExpired!: boolean; // true if user was redirected here due to session expiring, false otherwise
+
     userStore = useUserStore();
     currLang = 'en';
     sourceFile = 'index.html#';
     profile: UserProfile = {};
+    showExpired: boolean = false;
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
         this.sourceFile = window.location.href.split('/').find((s) => s.includes('#'));
+        // If the user was redirected here due to session end, show session end popup.
+        if (this.sessionExpired) {
+            this.showExpired = true;
+        }
         this.userStore
             .fetchUserProfile()
             .then(() => {
