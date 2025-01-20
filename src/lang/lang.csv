@@ -97,11 +97,12 @@ editor.uuid.required,(required),1,(obligatoire),0
 editor.uuid.new,New UUID,1,New UUID,0
 editor.warning.mustEnterUuid,You must first enter a UUID.,1,Vous devez d'abord saisir un UUID.,0
 editor.warning.retrievalFailed,"Failed to load product, no response from server.",1,"Échec du chargement du produit, aucune réponse du serveur.",0
-editor.warning.uuid,UUID already exists. Saving this will overwrite existing product.,1,L’IDUU existe déjà. Enregistrer ce produit écrasera le produit existant.,1
+editor.warning.uuid,UUID already exists. Please choose a different one.,1,L’IDUU existe déjà. Veuillez en choisir un autre.,0
 editor.warning.uuidNotFound,The requested UUID '{uuid}' does not exist.,1,L'UUID '{uuid}'   demandé n'existe pas,0
 editor.metadata.uuidInstructions,"Please enter the UUID of an existing storylines product, then click the 'Load' button.",1,"Veuillez saisir l'UUID d'un produit de scénario existant, puis cliquez sur le bouton « Charger ».",0
 editor.metadata.newUuidInstructions,"Enter a unique ID for your new storyline. One has been auto-generated for you, but you can also enter your own.",1,"Entrez un identifiant unique pour votre nouveau scénario. Un a été généré automatiquement pour vous, mais vous pouvez également saisir le vôtre.",0
 editor.warning.rename,UUID already in use. Please choose a different ID.,1,UUID déjà utilisé. Veuillez choisir un autre identifiant.,0
+editor.warning.blank,UUID field cannot be blank. Please enter a unique UUID.,1,Le champ UUID ne peut pas être vide. Veuillez saisir un UUID unique.,0
 editor.warning.renameFailed,Failed to rename product.,1,Échec du renommage du produit.,0
 editor.changeUuid,Click here to change UUID,1,Cliquez ici pour changer,0
 editor.title,Title,1,Titre,1
