@@ -231,7 +231,7 @@ editor.slides.toc.copySlide,Copy Slide,1,Copier la diapositive,0
 editor.slides.toc.deleteSlide,Delete Slide,1,Supprimer la diapositive,0
 editor.slides.toc.newENGSlideText,New EN Slide*,1,Nouvelle diapositive AN*,0
 editor.slides.toc.newFRSlideText,New FR Slide*,1,Nouvelle diapositive FR*,0
-editor.slides.toc.noENGslide,(No English Config),1,(Pas de configuration Anglais),0
+editor.slide.toc.noENGslide,(No English Config),1,(Pas de configuration Anglais),0
 editor.slide.toc.noFRSlide,(No French Config),1,(Pas de configuration française),0
 editor.slide.toc.untitledENG,(Untitled English slide),1,(Diapositive anglaise sans titre),0
 editor.slide.toc.untitledFR,(Untitled French slide),1,(Diapositive française sans titre),0
