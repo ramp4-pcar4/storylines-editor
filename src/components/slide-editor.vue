@@ -1,5 +1,5 @@
 <template>
-    <div class="p-5">
+    <div id="slideEditor" class="p-5">
         <div v-if="!!currentSlide">
             <div class="flex">
                 <div class="flex flex-col w-full">
