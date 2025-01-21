@@ -1,5 +1,11 @@
 <template>
-    <div id="app" class="storyramp-app bg-white">
+    <div
+        id="app"
+        class="storyramp-app bg-white"
+        :class="{
+            'canada-ca-site': currentPath.includes('index-ca-en.html') || currentPath.includes('index-ca-fr.html')
+        }"
+    >
         <router-view :key="$route.path"></router-view>
     </div>
 </template>
@@ -11,6 +17,8 @@ import { useUserStore } from './stores/userStore';
 import { useLockStore } from './stores/lockStore';
 
 export default class App extends Vue {
+    currentPath = window.location.href;
+
     @Watch('$route', { immediate: true })
     onRouteUpdate(to: RouteLocationNormalized): void {
         this.$i18n.locale = (to.params.lang as string) ?? 'en';
@@ -73,6 +81,38 @@ body {
             transform: translateY(0);
             animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
         }
+    }
+}
+
+// Making the margins align with the canada.ca template
+
+.canada-ca-site {
+    width: 1536px;
+    max-width: 100%;
+    justify-self: center;
+}
+
+@media only screen and (max-width: 1535px) {
+    .canada-ca-site {
+        width: 1280px;
+    }
+}
+
+@media only screen and (max-width: 1279px) {
+    .canada-ca-site {
+        width: 1024px;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .canada-ca-site {
+        width: 768px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .canada-ca-site {
+        width: 640px;
     }
 }
 </style>
