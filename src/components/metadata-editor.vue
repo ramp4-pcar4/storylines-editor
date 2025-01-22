@@ -818,6 +818,9 @@ export default class MetadataEditorV extends Vue {
                                     this.metadata.logoPreview = logo;
                                     this.loadStatus = 'loaded';
                                 });
+                            } else {
+                                this.loadStatus = 'loaded';
+                                this.metadata.logoPreview = 'error';
                             }
                         });
                     }
@@ -1539,6 +1542,9 @@ export default class MetadataEditorV extends Vue {
                             this.metadata.logoPreview = logo;
                             this.loadStatus = 'loaded';
                         });
+                    } else {
+                        this.loadStatus = 'loaded';
+                        this.metadata.logoPreview = 'error';
                     }
                 });
             }
