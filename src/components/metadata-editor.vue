@@ -809,17 +809,24 @@ export default class MetadataEditorV extends Vue {
                     } else {
                         // Fill in the field with this value whether it exists or not.
                         this.metadata.logoName = logo;
-
                         // If it doesn't exist, maybe it's a remote file?
-                        fetch(logo).then((data: Response) => {
-                            if (data.status !== 404) {
-                                data.blob().then((blob: Blob) => {
-                                    this.logoImage = new File([blob], this.metadata.logoName);
-                                    this.metadata.logoPreview = logo;
+                        fetch(logo)
+                            .then((data: Response) => {
+                                if (data.status === 200) {
+                                    data.blob().then((blob: Blob) => {
+                                        this.logoImage = new File([blob], this.metadata.logoName);
+                                        this.metadata.logoPreview = logo;
+                                        this.loadStatus = 'loaded';
+                                    });
+                                } else {
                                     this.loadStatus = 'loaded';
-                                });
-                            }
-                        });
+                                    this.metadata.logoPreview = 'error';
+                                }
+                            })
+                            .catch((err) => {
+                                this.loadStatus = 'loaded';
+                                this.metadata.logoPreview = 'error';
+                            });
                     }
                 } else {
                     // No logo to load.
@@ -1530,17 +1537,24 @@ export default class MetadataEditorV extends Vue {
             } else {
                 // Fill in the field with this value whether it exists or not.
                 this.metadata.logoName = logo;
-
                 // If it doesn't exist, maybe it's a remote file?
-                fetch(logo).then((data: Response) => {
-                    if (data.status !== 404) {
-                        data.blob().then((blob: Blob) => {
-                            this.logoImage = new File([blob], logoName);
-                            this.metadata.logoPreview = logo;
+                fetch(logo)
+                    .then((data: Response) => {
+                        if (data.status === 200) {
+                            data.blob().then((blob: Blob) => {
+                                this.logoImage = new File([blob], logoName);
+                                this.metadata.logoPreview = logo;
+                                this.loadStatus = 'loaded';
+                            });
+                        } else {
                             this.loadStatus = 'loaded';
-                        });
-                    }
-                });
+                            this.metadata.logoPreview = 'error';
+                        }
+                    })
+                    .catch((err) => {
+                        this.loadStatus = 'loaded';
+                        this.metadata.logoPreview = 'error';
+                    });
             }
         } else {
             // If there's no logo, mark the product as loaded and remove any existing logos
