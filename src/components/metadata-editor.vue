@@ -2140,7 +2140,6 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
 
     .vfm__content {
         max-width: 80%;
-        min-width: 70%;
         max-height: 90%;
         padding: 20px;
     }

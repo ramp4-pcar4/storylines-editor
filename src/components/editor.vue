@@ -338,6 +338,9 @@
                     ref="slide"
                     :configFileStructure="configFileStructure"
                     :currentSlide="currentSlide"
+                    :otherLangSlide="
+                        slides[slideIndex]?.[slides.find((slide) => slide.fr === currentSlide) ? 'en' : 'fr']
+                    "
                     :lang="slides.find((slide) => slide.fr === currentSlide) ? 'fr' : 'en'"
                     :slideIndex="slideIndex"
                     :isLast="slideIndex === slides.length - 1"
@@ -383,6 +386,7 @@ import {
     Slide,
     SourceCounts,
     StoryRampConfig,
+    SupportedLanguages,
     TextPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
@@ -500,7 +504,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number, lang?: string): void {
+    selectSlide(index: number, lang?: SupportedLanguages): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();
@@ -518,7 +522,10 @@ export default class EditorV extends Vue {
             } else {
                 const selectedLang = (lang ?? this.configLang) as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
-                this.currentSlide = selectedSlide ?? '';
+
+                // If the requested language config for a slide doesn't exist, open the other language
+                // This edge case should ONLY pop up while using the "Next/Previous Slide" buttons
+                this.currentSlide = selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
             }
 
             this.slideIndex = index;
