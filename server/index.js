@@ -580,24 +580,40 @@ function logger(type, message) {
     console.log(`${currentDate} [${type}] ${message}`);
 }
 
+const clients = new Set();
+
+// Used to broadcast messages to all connected clients
+function broadcastToClients(message){
+    const payload = JSON.stringify(message);
+    clients.forEach((client) => {
+        if(client.readyState === WebSocket.OPEN){
+            logger('INFO', `Payload sent to the client`);
+            client.send(payload);
+        }
+    });
+}
+
 wss.on('connection', (ws) => {
     logger('INFO', `A client connected to the web socket server.`);
+    clients.add(ws);
 
     // The following messages can be received in stringified JSON format:
     // { uuid: <uuid>, lock: true }
     // { uuid: <uuid>, lock: false }
     ws.on('message', function (msg) {
         const message = JSON.parse(msg);
-        const uuid = message.uuid;
+        const {uuid, lock} = message;
+
         if (!uuid) {
             ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
         }
+        logger('INFO', `${msg}`);
         // User wants to lock storyline since they are about to load/edit it.
-        if (message.lock) {
-            // Unlock any storyline that the user was previously locking.
-            delete lockedUuids[ws.uuid];
+        if (lock) {
+            const currentLock = lockedUuids[uuid];
+
             // Someone else is currently accessing this storyline, do not allow the user to lock!
-            if (!!lockedUuids[uuid] && ws.uuid !== uuid) {
+            if (currentLock && ws.uuid !== uuid) {
                 logger('INFO', `A client failed to lock the storyline ${uuid}.`);
                 ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
             }
@@ -610,6 +626,11 @@ wss.on('connection', (ws) => {
                 lockedUuids[uuid] = secret;
                 ws.uuid = uuid;
                 ws.send(JSON.stringify({ status: 'success', secret }));
+
+                broadcastToClients({
+                    type:'lock',
+                    uuid,
+                });
             }
         } else {
             // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
@@ -625,9 +646,14 @@ wss.on('connection', (ws) => {
             // Unlock the storyline for any other user/connection to use.
             else {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
-                delete ws.uuid;
                 delete lockedUuids[uuid];
+                delete ws.uuid;
                 ws.send(JSON.stringify({ status: 'success' }));
+
+                broadcastToClients({
+                    type:'unlock',
+                    uuid,
+                });
             }
         }
     });
@@ -636,9 +662,18 @@ wss.on('connection', (ws) => {
         logger('INFO', `Client connection with web socket server has closed.`);
         // Connection was closed, unlock this user's locked storyline
         if (ws.uuid) {
-            delete lockedUuids[ws.uuid];
-            delete ws.uuid;
+            const currentLock = lockedUuids[ws.uuid];
+            if (currentLock) {
+                logger('INFO', `Releasing lock on storyline ${ws.uuid} after connection closed`);
+                delete lockedUuids[ws.uuid];
+                broadcastToClients({
+                    type: 'unlock',
+                    uuid: ws.uuid,
+                });
+            }
         }
+
+        clients.delete(ws);
     });
 });
 
