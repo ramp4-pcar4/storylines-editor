@@ -17,9 +17,7 @@
                     >
                         <!-- ENG/FR page toggle -->
                         <router-link
-                            v-if="
-                                !currentRoute.includes('index-ca-en.html') && !currentRoute.includes('index-ca-fr.html')
-                            "
+                            v-if="!currentRoute.includes('index-ca')"
                             :to="{
                                 name: editExisting ? 'metadataExisting' : 'metadataNew',
                                 params: { lang: currLang === 'en' ? 'fr' : 'en' }
