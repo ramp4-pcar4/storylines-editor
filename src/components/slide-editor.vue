@@ -45,7 +45,8 @@
                     <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
                         <!-- Make the current panel the full slide -->
                         <div
-                            class="flex flex-row items-center"
+                            class="flex flex-row"
+                            :class="{ 'items-center': !currentRoute.includes('index-ca') }"
                             v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'"
                         >
                             <input
@@ -71,7 +72,7 @@
                             </label>
                         </div>
                         <!-- Center slide content -->
-                        <div class="flex flex-row items-center">
+                        <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
                             <input
                                 type="checkbox"
                                 id="centerSlide"
@@ -85,7 +86,7 @@
                             </label>
                         </div>
                         <!-- Center panel content -->
-                        <div class="flex flex-row items-center">
+                        <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
                             <input
                                 type="checkbox"
                                 id="centerPanel"
@@ -99,7 +100,7 @@
                             </label>
                         </div>
                         <!-- Include slide in ToC -->
-                        <div class="flex flex-row items-center">
+                        <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
                             <input
                                 type="checkbox"
                                 id="inToc"
@@ -471,6 +472,8 @@ export default class SlideEditorV extends Vue {
     centerPanel = false;
     includeInToc = true;
     dynamicSelected = false;
+
+    currentRoute = window.location.href;
 
     langTranslate = '';
 

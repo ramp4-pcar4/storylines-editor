@@ -17,9 +17,7 @@
                     >
                         <!-- ENG/FR page toggle -->
                         <router-link
-                            v-if="
-                                !currentRoute.includes('index-ca-en.html') && !currentRoute.includes('index-ca-fr.html')
-                            "
+                            v-if="!currentRoute.includes('index-ca')"
                             :to="{
                                 name: editExisting ? 'metadataExisting' : 'metadataNew',
                                 params: { lang: currLang === 'en' ? 'fr' : 'en' }
@@ -594,7 +592,7 @@ import {
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
 import { useUserStore } from '../stores/userStore';
-import { computed } from "vue";
+import { computed } from 'vue';
 
 import JSZip from 'jszip';
 import axios from 'axios';
@@ -763,7 +761,7 @@ export default class MetadataEditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
-        
+
         // set any metadata default values for creating new product
         if (!this.loadExisting) {
             // set current date as default
@@ -2100,6 +2098,7 @@ export default class MetadataEditorV extends Vue {
                 } else {
                     Message.error(this.$t('editor.editMetadata.message.error.noConfig'));
                 }
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             } else if (!this.uuid) {
                 Message.error(this.$t('editor.warning.mustEnterUuid'));
                 this.error = true;
@@ -2115,6 +2114,9 @@ export default class MetadataEditorV extends Vue {
                     .catch(() => {
                         this.error = true;
                         Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                    })
+                    .finally(() => {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
                     });
             }
         }, 25);
