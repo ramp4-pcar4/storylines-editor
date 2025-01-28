@@ -134,7 +134,7 @@
                         class="border-b border-solid"
                         :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
                     >
-                        <div class="m-2 mt-4 ml-3">UUID: {{ storyline.uuid }}</div>
+                        <div class="m-2 mt-4 ml-3">{{ $t('editor.uuid') }}: {{ storyline.uuid }}</div>
                         <div class="m-2 mb-4 ml-3">
                             {{ $t('editor.previousProducts.productInfo.title') + ': ' + storyline.titleEN }}
                         </div>
