@@ -2,9 +2,6 @@
     <div
         id="app"
         class="storyramp-app bg-white"
-        :class="{
-            'canada-ca-site': currentPath.includes('index-ca-en.html') || currentPath.includes('index-ca-fr.html')
-        }"
     >
         <router-view :key="$route.path"></router-view>
     </div>

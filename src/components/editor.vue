@@ -4,7 +4,7 @@
         <!-- Should prevent stuff in the background from being scrolled or interacted with. Click it to close the sidebar -->
         <div id="overlay" class="overlay" @click="closeSidebar"></div>
         <!-- Header bar -->
-        <div class="sticky top-0">
+        <div class="sticky top-0" style="z-index: 999">
             <div class="editor-header-upper sticky top-0 bg-white border-b border-black max-h-full">
                 <div class="flex flex-row justify-between items-center px-3 py-0.5 md:py-0">
                     <div class="flex flex-row items-center gap-2">
@@ -12,19 +12,13 @@
                         <router-link
                             :to="{ name: 'home' }"
                             class=""
-                            v-tippy="{
-                                delay: '200',
-                                placement: 'bottom',
-                                content: $t('editor.returnToLanding'),
-                                animateFill: true,
-                                touch: ['hold', 500]
-                            }"
                             target
                             :aria-label="$t('editor.returnToLanding')"
                             tabindex="-1"
                         >
                             <button
-                                class="editor-button py-2 md:py-1.5 my-1 md:my-1.5 flex flex-row items-center gap-2 w-fit"
+                                class="editor-button py-2 md:py-1.5 my-1 md:my-1.5 flex flex-row items-center md:gap-2 w-fit"
+                                truncate-trigger
                                 tabindex="0"
                             >
                                 <svg
@@ -39,7 +33,20 @@
                                         transform="translate(-0.5)"
                                     />
                                 </svg>
-                                <p class="mobile-hidden-text border md:border-0 border-black font-medium">
+                                <p
+                                    class="mobile-hidden-text border md:border-0 border-black font-medium"
+                                    v-truncate="{
+                                        externalTrigger: true,
+                                        options: {
+                                            delay: '200',
+                                            placement: 'bottom',
+                                            content: $t('editor.returnToLanding'),
+                                            animateFill: true,
+                                            touch: ['hold', 500],
+                                            offset: [0, 20]
+                                        }
+                                    }"
+                                >
                                     {{ $t('editor.leaveEditor') }}
                                 </p>
                             </button>
@@ -55,7 +62,8 @@
                                 placement: 'bottom',
                                 content: $t('editor.openSidebar'),
                                 animateFill: true,
-                                touch: ['hold', 500]
+                                touch: ['hold', 500],
+                                offset: [0, 2]
                             }"
                         >
                             <svg
@@ -94,6 +102,7 @@
                                 animateFill: true,
                                 touch: ['hold', 500]
                             }"
+                            tabindex="0"
                         >
                             <div class="mr-1 pb-1 fill-current">
                                 <svg
@@ -121,13 +130,7 @@
                             :disabled="!unsavedChanges"
                             @click="$vfm.open(`reload-config`)"
                             class="editor-button flex flex-row border border-gray-700 text-gray-800 rounded my-0"
-                            v-tippy="{
-                                delay: '200',
-                                placement: 'bottom',
-                                content: $t('editor.resetChanges'),
-                                animateFill: true,
-                                touch: ['hold', 500]
-                            }"
+                            truncate-trigger
                         >
                             <svg
                                 class="inline fill-current mb-0.5"
@@ -141,21 +144,29 @@
                                     d="M 2 2 L 4.9394531 4.9394531 C 3.1262684 6.7482143 2 9.2427079 2 12 C 2 17.514 6.486 22 12 22 C 17.514 22 22 17.514 22 12 C 22 6.486 17.514 2 12 2 L 12 4 C 16.411 4 20 7.589 20 12 C 20 16.411 16.411 20 12 20 C 7.589 20 4 16.411 4 12 C 4 9.7940092 4.9004767 7.7972757 6.3496094 6.3496094 L 9 9 L 9 2 L 2 2 z"
                                 />
                             </svg>
-                            <span class="mobile-hidden-text font-medium ml-1">{{ $t('editor.resetChanges') }}</span>
+                            <span
+                                class="mobile-hidden-text font-medium md:ml-1"
+                                v-truncate="{
+                                    externalTrigger: true,
+                                    options: {
+                                        delay: '200',
+                                        placement: 'bottom',
+                                        content: $t('editor.resetChanges'),
+                                        animateFill: true,
+                                        touch: ['hold', 500],
+                                        offset: [-10, 32]
+                                    }
+                                }"
+                                >{{ $t('editor.resetChanges') }}</span
+                            >
                         </button>
 
                         <!-- Save changes button -->
                         <button
                             @click="saveChanges"
-                            class="editor-button flex flex-row gap-1.5 items-center m-0 bg-black text-white hover:bg-gray-900 border border-black"
+                            class="editor-button flex flex-row md:gap-1.5 items-center m-0 bg-black text-white hover:bg-gray-900 border border-black"
                             :disabled="!unsavedChanges || saving"
-                            v-tippy="{
-                                delay: '200',
-                                placement: 'bottom',
-                                content: $t('editor.saveChanges'),
-                                animateFill: true,
-                                touch: ['hold', 500]
-                            }"
+                            truncate-trigger
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -177,9 +188,21 @@
                                     />
                                 </g>
                             </svg>
-                            <span class="mobile-hidden-text font-medium">{{
-                                saving ? $t('editor.savingChanges') : $t('editor.saveChanges')
-                            }}</span>
+                            <span
+                                class="mobile-hidden-text font-medium"
+                                v-truncate="{
+                                    externalTrigger: true,
+                                    options: {
+                                        delay: '200',
+                                        placement: 'bottom',
+                                        content: $t('editor.saveChanges'),
+                                        animateFill: true,
+                                        touch: ['hold', 500],
+                                        offset: [-10, 20]
+                                    }
+                                }"
+                                >{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span
+                            >
                             <span v-if="saving" class="align-middle inline-block px-1">
                                 <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
                             </span>
@@ -196,13 +219,6 @@
                             :to="{
                                 name: 'editor',
                                 params: { lang: currentRoute.includes('#/en') ? 'fr' : 'en', uid: uuid }
-                            }"
-                            v-tippy="{
-                                delay: '200',
-                                placement: 'bottom',
-                                content: currentRoute.includes('#/en') ? 'Français' : 'English',
-                                animateFill: true,
-                                touch: ['hold', 500]
                             }"
                             class="underline text-black font-medium px-2"
                         >
@@ -222,12 +238,14 @@
                             <span
                                 tabindex="0"
                                 class="font-semibold text-lg line-clamp-1 leading-snug"
-                                v-tippy="{
-                                    delay: '200',
-                                    placement: 'bottom-start',
-                                    content: metadata.title,
-                                    animateFill: true,
-                                    touch: ['hold', 500]
+                                v-truncate="{
+                                    options: {
+                                        delay: '200',
+                                        placement: 'bottom-start',
+                                        content: metadata.title,
+                                        animateFill: true,
+                                        touch: ['hold', 500]
+                                    }
                                 }"
                                 >{{ metadata.title }}</span
                             >
@@ -235,14 +253,16 @@
                                 tabindex="0"
                                 class="line-clamp-1"
                                 :class="metadata.title ? 'text-xs' : ''"
-                                v-tippy="{
-                                    delay: '200',
-                                    placement: 'bottom-start',
-                                    content: uuid,
-                                    animateFill: true,
-                                    touch: ['hold', 500]
+                                v-truncate="{
+                                    options: {
+                                        delay: '200',
+                                        placement: 'bottom-start',
+                                        content: uuid,
+                                        animateFill: true,
+                                        touch: ['hold', 500]
+                                    }
                                 }"
-                                >UUID: {{ uuid }}</span
+                                >{{ $t('editor.uuid') }}: {{ uuid }}</span
                             >
                         </div>
                         <span class="ml-auto"></span>
@@ -251,16 +271,7 @@
                             <!-- Preview dropdown -->
                             <div class="dropdown editor-button">
                                 <!-- The "Preview" button - hover over it to show the options -->
-                                <button
-                                    v-tippy="{
-                                        delay: '200',
-                                        placement: 'top',
-                                        content: $t('editor.preview'),
-                                        animateFill: true,
-                                        touch: ['hold', 500]
-                                    }"
-                                    class="dropbtn flex gap-2 items-center cursor-default"
-                                >
+                                <button class="dropbtn flex gap-2 items-center cursor-default">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -317,7 +328,7 @@
                                     class="bg-white border border-black rounded-full w-9 h-9 flex items-center justify-center hover:bg-gray-100"
                                     v-tippy="{
                                         delay: '200',
-                                        placement: 'top',
+                                        placement: 'bottom',
                                         content: $t('editor.export'),
                                         animateFill: true,
                                         touch: ['hold', 500]
@@ -362,7 +373,7 @@
                                     class="bg-white border border-black rounded-full w-9 h-9 hover:bg-gray-100"
                                     v-tippy="{
                                         delay: '200',
-                                        placement: 'top',
+                                        placement: 'bottom',
                                         content: $t('help.title'),
                                         animateFill: true,
                                         touch: ['hold', 500]
@@ -376,7 +387,7 @@
                                     class="bg-white border border-black rounded-full w-9 h-9 hover:bg-gray-100"
                                     v-tippy="{
                                         delay: '200',
-                                        placement: 'top',
+                                        placement: 'bottom',
                                         content: $t('editor.feedback'),
                                         animateFill: true,
                                         touch: ['hold', 500]
@@ -416,7 +427,7 @@
         </div>
 
         <!-- Body content -->
-        <div class="editor-body flex">
+        <div class="editor-body flex" style="z-index: 1">
             <!-- Left side -->
             <!-- Sidebar, desktop version -->
             <div id="sidebar-desktop" class="w-80 flex flex-col flex-shrink-0 border-r border-black editor-toc hidden">
@@ -858,12 +869,12 @@ select:focus {
 
 .editor-header-upper {
     grid-area: 'header-upper';
-    z-index: 20;
+    z-index: 1000;
 }
 
 .editor-header {
     grid-area: header;
-    z-index: 19;
+    z-index: 999;
 }
 
 .editor-body {
@@ -973,7 +984,7 @@ select:focus {
 }
 
 #sidebar-mobile {
-    z-index: 25; // should be on top
+    z-index: 2001; // should be on top
     height: 100%;
     width: 0; /* Initial width is 0 to be hidden */
     max-width: 100%;
@@ -992,7 +1003,7 @@ select:focus {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* Translucent black */
-    z-index: 21; /* Ensure it appears just under the sidebar */
+    z-index: 2000; /* Ensure it appears just under the sidebar */
     display: none; /* Initially hidden */
 }
 
@@ -1003,24 +1014,24 @@ select:focus {
     -webkit-line-clamp: 1;
 }
 
-.line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
 .mobile-hidden-text {
-    display: none;
+    width: auto;
 }
 
 @media only screen and (min-width: 768px) {
     #sidebar-desktop {
         display: block !important;
     }
+}
 
+@media only screen and (max-width: 768px) {
     .mobile-hidden-text {
-        display: block !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        border: none;
     }
 }
 </style>
