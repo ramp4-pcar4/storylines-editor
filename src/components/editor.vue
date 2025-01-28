@@ -4,7 +4,7 @@
         <!-- Should prevent stuff in the background from being scrolled or interacted with. Click it to close the sidebar -->
         <div id="overlay" class="overlay" @click="closeSidebar"></div>
         <!-- Header bar -->
-        <div class="sticky top-0" style="z-index: 999">
+        <div class="sticky top-0">
             <div class="editor-header-upper sticky top-0 bg-white border-b border-black max-h-full">
                 <div class="flex flex-row justify-between items-center px-3 py-0.5 md:py-0">
                     <div class="flex flex-row items-center gap-2">
@@ -427,7 +427,7 @@
         </div>
 
         <!-- Body content -->
-        <div class="editor-body flex" style="z-index: 1">
+        <div class="editor-body flex">
             <!-- Left side -->
             <!-- Sidebar, desktop version -->
             <div id="sidebar-desktop" class="w-80 flex flex-col flex-shrink-0 border-r border-black editor-toc hidden">
@@ -869,12 +869,12 @@ select:focus {
 
 .editor-header-upper {
     grid-area: 'header-upper';
-    z-index: 1000;
+    z-index: 150;
 }
 
 .editor-header {
     grid-area: header;
-    z-index: 999;
+    z-index: 150;
 }
 
 .editor-body {
@@ -984,7 +984,7 @@ select:focus {
 }
 
 #sidebar-mobile {
-    z-index: 2001; // should be on top
+    z-index: 201; // should be on top
     height: 100%;
     width: 0; /* Initial width is 0 to be hidden */
     max-width: 100%;
@@ -996,6 +996,10 @@ select:focus {
     background-color: white;
 }
 
+#sidebar-desktop {
+    z-index: 201;
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -1003,7 +1007,7 @@ select:focus {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* Translucent black */
-    z-index: 2000; /* Ensure it appears just under the sidebar */
+    z-index: 199; /* Ensure it appears just under the sidebar */
     display: none; /* Initially hidden */
 }
 

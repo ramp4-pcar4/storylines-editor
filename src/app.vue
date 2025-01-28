@@ -1,8 +1,5 @@
 <template>
-    <div
-        id="app"
-        class="storyramp-app bg-white"
-    >
+    <div id="app" class="storyramp-app bg-white">
         <router-view :key="$route.path"></router-view>
     </div>
 </template>
@@ -14,8 +11,6 @@ import { useUserStore } from './stores/userStore';
 import { useLockStore } from './stores/lockStore';
 
 export default class App extends Vue {
-    currentPath = window.location.href;
-
     @Watch('$route', { immediate: true })
     onRouteUpdate(to: RouteLocationNormalized): void {
         this.$i18n.locale = (to.params.lang as string) ?? 'en';
