@@ -28,6 +28,7 @@ fullscreen.deactivate,Exit Fullscreen,1,Quitter le mode plein écran,1
 editor.lang.en,English,1,Anglais,1
 editor.lang.fr,French,1,Français,1
 editor.ok,Ok,1,D'accord,1
+editor.untitledProject,Untitled project,1,Projet sans titre,0
 editor.swapConfigs,Switch to other language configuration,1,Passer à la configuration dans une autre langue,1
 editor.feedback,Send Us Feedback,1,Envoyez-nous vos commentaires,0
 editor.feedback.subject,Storylines Editor Feedback,1,Commentaires de l'éditeur de scénarios,0
@@ -246,6 +247,8 @@ editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
+editor.slides.toc.noSlides,No Slides,1,Pas de diapositives,0
+editor.slides.toc.selectNewSlideMessage,Select 'New Blank Slide' to add your first slide.,1,Sélectionnez « Nouvelle diapositive vierge » pour ajouter votre première diapositive.,0
 editor.slides.toc.dropdownTooltip,Options,1,Options,0
 editor.slides.toc.dropdown.copy,Copy from other config,1,Copier à partir d'une autre config.,0
 editor.slides.toc.dropdown.clear,Clear content,1,Contenu clair,0
@@ -283,6 +286,7 @@ editor.slides.advanced.details,Click here for more details.,1,Cliquez ici pour p
 editor.slides.advanced.error,This configuration contains one or more errors. Leaving it as-is may cause unexpected behaviour in the editor and published product.,1,Cette configuration contient une ou plusieurs erreurs. La laisser telle quelle peut entraîner un comportement inattendu dans l'éditeur et dans le produit publié.,0
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
+editor.slides.selectHeader,No slide selected,1,Aucune diapositive sélectionnée,0
 editor.slides.assetNameChange,Asset {oldName} has been uploaded with name {newName},1,L'actif {oldName} a été téléchargé avec le nom {newName},0
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1
 editor.slides.panelNumber,Panel {num},1,Panneau {num},0
