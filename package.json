@@ -25,6 +25,7 @@
         "markdown-it": "^12.0.6",
         "marked": "^4.0.10",
         "nouislider": "^15.5.0",
+        "pinia-plugin-persistedstate": "^4.2.0",
         "ramp-config-editor_editeur-config-pcar": "^3.6.0",
         "ramp-pcar": "^4.10.2",
         "ramp-storylines_demo-scenarios-pcar": "^3.2.9",

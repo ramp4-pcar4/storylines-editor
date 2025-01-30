@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './app.vue';
 import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 import './router/componentHooks';
 import router from './router';
@@ -40,6 +41,7 @@ import { Truncate } from '@/directives/truncate/truncate';
 
 const app = createApp(App);
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 app.use(pinia)
     .use(router)
