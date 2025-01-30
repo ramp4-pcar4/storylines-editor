@@ -237,6 +237,7 @@
                             <span
                                 tabindex="0"
                                 class="font-semibold text-lg line-clamp-1 leading-snug"
+                                :class="{ italic: !metadata.title }"
                                 v-truncate="{
                                     options: {
                                         delay: '200',
@@ -246,7 +247,7 @@
                                         touch: ['hold', 500]
                                     }
                                 }"
-                                >{{ metadata.title }}</span
+                                >{{ metadata.title || $t('editor.untitledProject') }}</span
                             >
                             <span
                                 tabindex="0"
@@ -440,6 +441,7 @@
                     :currentSlide="currentSlide"
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
+                    @slide-edit="$emit('save-status', undefined, 'ToC')"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
                     @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
@@ -522,6 +524,7 @@
 </template>
 
 <script lang="ts">
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -573,6 +576,8 @@ export default class EditorV extends Vue {
     @Prop() unsavedChanges!: boolean;
 
     currentRoute = window.location.href;
+
+    stateStore = useStateStore();
 
     // Form properties.
     uuid = '';
@@ -713,6 +718,8 @@ export default class EditorV extends Vue {
         );
         this.configs.en!.slides = this.slides.map((slides) => slides.en!);
         this.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
+
+        this.$emit("save-status", undefined, 'Slide updated');
     }
 
     /**

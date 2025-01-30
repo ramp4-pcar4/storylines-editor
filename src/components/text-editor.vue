@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue, Watch } from 'vue-property-decorator';
 import { TextPanel } from '@/definitions';
 
 interface MDEditor {
@@ -24,6 +24,11 @@ export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    @Watch('panel.content', { deep: true })
+    onContentChanged() {
+        this.$emit('slide-edit');
+    }
 
     // Default font size is 16, so it's skipped here
     fontSizes = [5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 18, 20, 22, 24, 26, 28, 36, 48, 72];

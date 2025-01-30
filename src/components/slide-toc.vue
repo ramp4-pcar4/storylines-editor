@@ -71,6 +71,14 @@
             <br />
         </div>
 
+        <!-- No slides message -->
+        <div v-if="slides.length === 0" class="text-center px-6 py-6">
+            <h4 class="text-lg font-bold">
+                {{ $t('editor.slides.toc.noSlides') }}
+            </h4>
+            <p class="text-sm font-semibold text-gray-500">{{ $t('editor.slides.toc.selectNewSlideMessage') }}</p>
+        </div>
+
         <!-- Slide list -->
         <ul class="toc-slide-list">
             <!-- Slide -->
@@ -588,13 +596,15 @@ export default class SlideTocV extends Vue {
 
     removeSlide(index: number): void {
         if (index === this.slideIndex) {
-            this.$emit('slide-change', -1);
+            this.selectSlide(-1, this.lang);
+            // this.$emit('slide-change', -1);
         }
 
         // Before removing the slide, updated the sources for the panels.
         this.removeSourceCounts(index);
 
         this.slides.splice(index, 1);
+        this.selectSlide(this.slides.length - 1, this.lang);
         this.$emit('slides-updated', this.slides);
     }
 
