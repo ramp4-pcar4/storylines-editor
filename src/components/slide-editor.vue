@@ -350,15 +350,7 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
-                    @slide-edit="(changedFromDefault: boolean = true) => {
-                        $emit('slide-edit');
-
-                        // changedFromDefault should hold a boolean indicating whether the panel is actually modified 
-                        // (different from initial state). Only needed for some multimedia editors; text editors
-                        // write directly to currentSlide constantly, which is handled by panelModified().
-                        currentSlide.panel[panelIndex].modified = changedFromDefault || undefined;
-                    }
-                    "
+                    @slide-edit="$emit('slide-edit')"
                     v-else
                 ></component>
             </div>
@@ -500,15 +492,12 @@ export default class SlideEditorV extends Vue {
 
     /**
      * Determines whether a given panel has been modified from the default configuration of its type.
-     * Note that some editors (e.g. text) write directly to currentSlide after each change,
-     * while other editors (e.g. image) do not. The first type is handled completely in
-     * panelModified; the second type requires you to set `panel.modified` for the given panel beforehand,
-     * indicating whether changes have been made from the specific editor sub-component (see
-     * `<component>`'s `@slide-edit` event handler).
+     *
      * @param {BasePanel} panel The panel to analyze.
      * @returns {boolean} Whether panel has been modified.
      */
     panelModified(panel: BasePanel): boolean {
+        this.saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
         const prevType = this.currentSlide.panel[this.panelIndex].type;
 
         let startingConfig = {
@@ -537,14 +526,9 @@ export default class SlideEditorV extends Vue {
         };
 
         const oldStartingConfig = startingConfig[panel.type as keyof DefaultConfigs];
-
         let newConfig = Object.assign({}, toRaw(panel));
         newConfig.customStyles = newConfig.customStyles || undefined;
-
-        return (
-            JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig) ||
-            this.currentSlide.panel[this.panelIndex].modified === true
-        );
+        return JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig);
     }
 
     changePanelType(prevType: string, newType: string): void {

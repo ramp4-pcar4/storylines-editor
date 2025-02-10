@@ -733,7 +733,7 @@ export default class MetadataEditorV extends Vue {
     };
     slides: MultiLanguageSlide[] = [];
     sourceCounts: SourceCounts = {};
-    sessionExpired: boolean = false;
+    sessionExpired = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     mounted(): void {
@@ -1289,6 +1289,7 @@ export default class MetadataEditorV extends Vue {
                         // Update the path to the RAMP config in the product config file.
                         panel.config = panel.config.replace(`/${prevUuid}-map-`, `/${this.changeUuid}-map-`);
                     }
+                    break;
                 default:
                     // Base case. This is a panel that doesn't have any children (i.e., not dynamic, slideshow).
                     // Rename the source.
