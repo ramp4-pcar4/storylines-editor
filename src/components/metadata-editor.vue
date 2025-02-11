@@ -1217,8 +1217,8 @@ export default class MetadataEditorV extends Vue {
                 })
                 .then(async (res: AxiosResponse) => {
                     // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
-                    if (process.env.VUE_APP_NET_API_URL !== undefined) {
-                        await axios.post(process.env.VUE_APP_NET_API_URL + '/api/version/update', {
+                    if (import.meta.env.VITE_APP_NET_API_URL !== undefined) {
+                        await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
                             uuid: prevUuid,
                             changeUuid: this.changeUuid
                         });
