@@ -1088,6 +1088,7 @@ export default class MetadataEditorV extends Vue {
                         this.clearConfig();
                         // Product was not found, unlock the UUID
                         this.lockStore.unlockStoryline();
+                        reject();
                     } else {
                         const configZip = new JSZip();
                         // Files retrieved. Convert them into a JSZip object.

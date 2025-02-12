@@ -48,7 +48,6 @@ editor.editMetadata.loading,Storyline product is loading. Larger products can ta
 editor.editMetadata.message.error.noConfig,No config exists for storylines product.,1,Aucune configuration n'existe pour le produit Storylines.,0
 editor.editMetadata.message.error.failedZipFile,Failed to process ZIP file.,1,Échec du traitement du fichier ZIP.,0
 editor.editMetadata.message.error.noRequestedVersion,The requested version does not exist.,1,La version demandée n'existe pas.,0
-editor.editMetadata.message.error.noResponseFromServer,"Failed to load product, no response from server",1,"Échec du chargement du produit, aucune réponse du serveur",0
 editor.editMetadata.message.error.malformedProduct,The requested product {uuid} is malformed.,1,Le produit demandé {uuid} est mal formé.,0
 editor.editMetadata.message.error.failedSave,Failed to save changes.,1,Échec de l'enregistrement des modifications.,0
 editor.editMetadata.message.error.unauthorized,The product is being accessed by another user. Please try again later.,1,[FR] The product is being accessed by another user. Please try again later.,0
