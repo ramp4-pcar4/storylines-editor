@@ -499,10 +499,13 @@
                 :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
+                @shared-asset="updateToSharedAsset"
+                @process-panel="panelHelper"
                 @save-changes="onSave"
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
                 @export-product="exportProduct"
+                @lang-change="changeLang"
                 ref="mainEditor"
             >
                 <!-- Metadata editing modal inside the editor -->
@@ -744,7 +747,8 @@ export default class MetadataEditorV extends Vue {
     };
     slides: MultiLanguageSlide[] = [];
     sourceCounts: SourceCounts = {};
-    sessionExpired: boolean = false;
+    sessionExpired = false;
+    logoSource = ''; // used to keep track of logo location
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     mounted(): void {
@@ -775,7 +779,6 @@ export default class MetadataEditorV extends Vue {
             this.metadata.tocOrientation = 'vertical';
             this.metadata.returnTop = true;
         }
-
         // Find which view to render based on route
         if (this.$route.name === 'editor') {
             this.loadEditor = true;
@@ -887,12 +890,12 @@ export default class MetadataEditorV extends Vue {
         this.handleSessionTimeout();
     }
 
-    processAsset(asset: string | undefined, name: string): Promise<any> {
-        if (!asset) return Promise.resolve();
+    processAsset(assetPath: string | undefined, name: string): Promise<any> {
+        if (!assetPath) return Promise.resolve();
 
         // Load asset (if provided).
         return new Promise((res) => {
-            const assetSrc = `assets/${this.configLang}/${name}`;
+            const assetSrc = assetPath.split('/').slice(1).join('/'); // Omit product UUID
             const assetFile = this.configFileStructure?.zip.file(assetSrc);
             const assetType = assetSrc.split('.').at(-1);
 
@@ -919,12 +922,12 @@ export default class MetadataEditorV extends Vue {
                 }
             } else {
                 // If it doesn't exist, maybe it's a remote file?
-                fetch(asset).then((data: Response) => {
+                fetch(assetPath).then((data: Response) => {
                     if (data.status !== 404) {
                         data.blob().then((blob: Blob) => {
                             res({
                                 file: new File([blob], name),
-                                preview: asset,
+                                preview: assetPath,
                                 external: true // indicates that this is an external asset
                             });
                         });
@@ -934,9 +937,14 @@ export default class MetadataEditorV extends Vue {
         });
     }
 
+    // this gets called at same time as swapLang(), causing issues
+    changeLang(lang: string): void {
+        this.configLang = lang;
+    }
+
     /**
      * Open current editor config as a new Storylines product in new tab.
-     * Note: Preview button on metadata editor will only show when editing an existing product, not cwhen creating a new one
+     * Note: Preview button on metadata editor will only show when editing an existing product, not when creating a new one
      * This is a design decision, can change if we decide that people would want to preview new products for some reason
      */
     preview(): void {
@@ -998,7 +1006,7 @@ export default class MetadataEditorV extends Vue {
         if (!this.metadata.logoName) {
             config.introSlide.logo.src = '';
         } else if (!this.metadata.logoName.includes('http')) {
-            config.introSlide.logo.src = `${this.uuid}/assets/${this.configLang}/${this.logoImage?.name}`;
+            config.introSlide.logo.src = `${this.uuid}/assets/shared/${this.logoImage?.name}`;
         } else {
             config.introSlide.logo.src = this.metadata.logoName;
         }
@@ -1007,7 +1015,7 @@ export default class MetadataEditorV extends Vue {
         if (!this.metadata.introBgName) {
             config.introSlide.backgroundImage = '';
         } else if (!this.metadata.introBgName.includes('http')) {
-            config.introSlide.backgroundImage = `${this.uuid}/assets/${this.configLang}/${this.introBgImage?.name}`;
+            config.introSlide.backgroundImage = `${this.uuid}/assets/shared/${this.introBgImage?.name}`;
         } else {
             config.introSlide.backgroundImage = this.metadata.introBgName;
         }
@@ -1411,6 +1419,10 @@ export default class MetadataEditorV extends Vue {
                 this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.logo.src);
             }
 
+            if (configs[lang].introSlide.backgroundImage) {
+                this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.backgroundImage);
+            }
+
             configs[lang]?.slides.forEach((slide) => {
                 if (Object.keys(slide).length !== 0) {
                     (slide as Slide).panel.forEach((panel) => {
@@ -1465,6 +1477,267 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
+    decrementSourceCount(src: string): void {
+        if (this.sourceCounts[src]) {
+            this.sourceCounts[src] -= 1;
+        }
+        if (this.sourceCounts[src] <= 0) {
+            const relativePath = src.split('/').slice(1).join('/');
+            this.configFileStructure.zip.remove(relativePath);
+        }
+    }
+
+    /**
+     * Executes a callback for each ImagePanel/VideoPanel within the provided BasePanel
+     *
+     * @param panel The panel which we are processing
+     * @param callback The callback function that is called on each ImagePanel/VideoPanel in the provided BasePanel
+     * @param callbackArgs The additional argument(s) for the callback function (can be empty)
+     */
+    panelHelper(panel: BasePanel, callback: (panel: ImagePanel | VideoPanel, ...args) => void, ...callbackArgs): void {
+        switch (panel.type) {
+            case 'slideshow':
+                panel.items.forEach((item) => this.panelHelper(item, callback, ...callbackArgs));
+                break;
+            case 'dynamic':
+                panel.children.forEach((child) => this.panelHelper(child.panel, callback, ...callbackArgs));
+                break;
+            case 'image':
+            case 'video':
+                callback(panel, ...callbackArgs);
+        }
+    }
+
+    /**
+     * Updates the source of an asset from the opposite lang's assets folder to the shared assets folder
+     *
+     * @param oppositeAssetPath Path of the asset within the opposite langs asset folder that has been moved
+     * @param sharedAssetName Path of the asset within the shared asset folder
+     * @param oppositeLang Language from which the asset was removed
+     */
+    updateToSharedAsset(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string): void {
+        const oppositeConfig = this.configs[oppositeLang];
+
+        const updateAssetSrc = (panel: ImagePanel | VideoPanel, oppositeAssetPath: string, sharedAssetPath: string) => {
+            if (panel.src) {
+                if (panel.src === oppositeAssetPath) {
+                    panel.src = sharedAssetPath;
+                }
+            }
+        };
+
+        // Need to check logo seperately
+        if (oppositeConfig.introSlide.logo.src === oppositeAssetPath) {
+            oppositeConfig.introSlide.logo.src = sharedAssetPath;
+        }
+
+        oppositeConfig?.slides.forEach((slide) => {
+            slide.panel.forEach((panel) => {
+                this.panelHelper(panel, updateAssetSrc, oppositeAssetPath, sharedAssetPath);
+            });
+        });
+
+        this.updateSaveStatus(true);
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the image/video editors
+    // (maybe wait until after migration to composition api is complete?)
+    // Converts a file into a promise that resolves to an ArrayBuffer containing the files data
+    readBinaryData(file: File): Promise<ArrayBuffer> {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = () => {
+                reject(new Error('Could not load file reader'));
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the image/video editors
+    // Converts a file into a promise that resolves to its hash, as an array of 8-bit integers
+    obtainHashData(file: File): Promise<Uint8Array> {
+        return this.readBinaryData(file)
+            .then((res) => {
+                res = new Uint8Array(res);
+                return window.crypto.subtle.digest('SHA-256', res);
+            })
+            .then((res) => {
+                res = new Uint8Array(res);
+                return res;
+            });
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the image/video editors
+    /**
+     * Helper used to find all instances of the specified file in the specified asset folder
+     *
+     * @param file File that was uploaded
+     * @param folder The asset folder withinn which we should be searching
+     * @param checkNested Flag that indicates whether we should consider assets with nested subfolders
+     */
+    filesInAssetFolder(file: File, folder: string, checkNested = true): Array<Promise<string>> {
+        // Here, if a file in the specified folder has the same name and hash as the file uploaded, then we consider the
+        // two to be the same. Otherwise, we consider them to be different. We even consider if the asset is within a
+        // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
+        // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
+        // an array of duplicate asset promises
+        const sharedAssetPromises = [];
+        this.configFileStructure.assets[folder].forEach(async (relativePath, compressedBinary) => {
+            const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
+            if (assetName === file.name) {
+                sharedAssetPromises.push(
+                    this.compareFiles(file, compressedBinary, assetName).then((fileSame) =>
+                        fileSame ? relativePath : 'N/A'
+                    )
+                );
+            }
+        });
+
+        return sharedAssetPromises;
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the image/video editors
+    /**
+     * Compares the hashes of two files
+     *
+     * @param file File that was uploaded
+     * @param compressedBinary Compressed binary file from configFileStructure
+     * @param compressedName The name of the compressed binary file
+     */
+    async compareFiles(file: File, compressedBinary: JSZip.JSZipObject, compressedName: string): Promise<boolean> {
+        const fileHash = await this.obtainHashData(file);
+        const compressedType = compressedName.split('.').at(-1);
+
+        return compressedBinary
+            .async(compressedType !== 'svg' ? 'blob' : 'text')
+            .then((assetFile) => {
+                if (compressedType === 'svg') {
+                    assetFile = new File([assetFile], compressedName, {
+                        type: 'image/svg+xml'
+                    });
+                }
+                return this.obtainHashData(assetFile);
+            })
+            .then((hash) => {
+                return hash.join() === fileHash.join();
+            });
+    }
+
+    // TODO: move method into a plugin. That way it isn't repeated in the image/video editors
+    /**
+     * Helper used to upload a new asset for the current langs config. Only needed when uploading a new asset to an
+     * existing config (not when creating a new product). Here, an asset can either be a logo or a background image
+     *
+     * @param asset The asset being uploaded
+     * @param config The config within which the asset was uploaded
+     * @param type The type of asset being uploaded (either a logo or background image)
+     */
+    async uploadAsset(asset: File, config: StoryRampConfig, type: 'logo' | 'backgroundImage'): Promise<void> {
+        const oppositeLang = this.configLang === 'en' ? 'fr' : 'en';
+        const sharedAssetPaths = await Promise.all(this.filesInAssetFolder(asset, 'shared', false));
+        let inSharedAsset = false;
+        let oppositeSourceCount = 0;
+        let newAssetName = asset.name;
+        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${asset.name}`;
+
+        // Should contain either 0 or 1 promise.
+        sharedAssetPaths.forEach((sharedAssetPath) => {
+            inSharedAsset = sharedAssetPath !== 'N/A';
+        });
+
+        if (!inSharedAsset) {
+            const oppositeAssetPaths = await Promise.all(this.filesInAssetFolder(asset, oppositeLang));
+            // If the current promise is empty, then the current path refers to an asset in the opposite asset
+            // folder that has the same name, but different contents, as the asset uploaded. In this case we do
+            // nothing, as this asset is not a valid duplicate.
+            for (const oppositeAssetPath of oppositeAssetPaths) {
+                if (oppositeAssetPath !== 'N/A') {
+                    const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${oppositeAssetPath}`;
+                    oppositeSourceCount += this.sourceCounts[oppositeFileSource] ?? 0;
+                    this.sourceCounts[oppositeFileSource] = 0;
+                    this.configFileStructure.assets[oppositeLang].remove(oppositeAssetPath);
+
+                    // Add asset to shared folder if asset is yet to be moved to the shared folder. If an asset with the
+                    // same name, but different content, is already in the shared folder, we must give the asset we are
+                    // uploading a unique name. Otherwise the existing asset will be overwritten
+                    if (!inSharedAsset) {
+                        let i = 2;
+                        while (this.configFileStructure.assets['shared'].file(newAssetName)) {
+                            // If the updated name is the same as a file that already exists in the shared asset folder,
+                            // we must compare that file with the uploaded file, since they wouldnt have been compared
+                            // on the first run due to having different names
+                            if (i > 2) {
+                                const filesEqual = await this.compareFiles(
+                                    asset,
+                                    this.configFileStructure.assets[this.configLang].file(newAssetName),
+                                    newAssetName
+                                );
+                                if (filesEqual) break;
+                            }
+                            newAssetName = `${asset.name.split('.').at(0)}(${i}).${asset.name.split('.').at(-1)}`;
+                            i++;
+                        }
+                        uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
+                        this.configFileStructure.assets['shared'].file(newAssetName, asset);
+                        inSharedAsset = true;
+                    }
+                    this.updateToSharedAsset(oppositeFileSource, uploadSource, oppositeLang);
+                }
+            }
+        }
+
+        // If the asset uploaded is in the shared asset folder, then no need to upload to the current langs assets folder
+        if (!inSharedAsset) {
+            const currAssetPaths = await Promise.all(this.filesInAssetFolder(asset, this.configLang, false));
+            // Should contain either 0 or 1 promise.
+            for (const currAssetPath of currAssetPaths) {
+                // If asset w/ same name but different contents is in curr lang asset folder, set name in curr lang
+                // asset folder to a unique name, to avoid overwriting an existing file.
+                if (currAssetPath === 'N/A') {
+                    let i = 2;
+                    while (this.configFileStructure.assets[this.configLang].file(newAssetName)) {
+                        // If the updated name is the same as a file that already exists in the current langs asset folder,
+                        // we must compare that file with the uploaded file, since they wouldnt have been compared
+                        // on the first run due to having different names
+                        if (i > 2) {
+                            const filesEqual = await this.compareFiles(
+                                asset,
+                                this.configFileStructure.assets[this.configLang].file(newAssetName),
+                                newAssetName
+                            );
+                            if (filesEqual) break;
+                        }
+                        newAssetName = `${asset.name.split('.').at(0)}(${i}).${asset.name.split('.').at(-1)}`;
+                        i++;
+                    }
+                }
+            }
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.configLang}/${newAssetName}`;
+            this.configFileStructure.assets[this.configLang].file(newAssetName, asset);
+        }
+
+        // Check if the asset src is the same as before. If it's not, then we increment the source count of the new
+        // asset source. We also decrement source count of previous asset, as it has now been replaced
+        if (type === 'backgroundImage') {
+            if (config.introSlide.backgroundImage !== uploadSource) {
+                this.incrementSourceCount(uploadSource);
+                this.decrementSourceCount(config.introSlide.backgroundImage);
+                this.sourceCounts[uploadSource] += oppositeSourceCount;
+                config.introSlide.backgroundImage = uploadSource;
+            }
+        } else {
+            if (config.introSlide.logo.src !== uploadSource) {
+                this.incrementSourceCount(uploadSource);
+                this.decrementSourceCount(config.introSlide.logo.src);
+                this.sourceCounts[uploadSource] += oppositeSourceCount;
+                config.introSlide.logo.src = uploadSource;
+            }
+        }
+    }
+
     /**
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
@@ -1480,7 +1753,8 @@ export default class MetadataEditorV extends Vue {
             configs: this.configs as unknown as { [key: string]: StoryRampConfig },
             assets: {
                 en: (assetsFolder as JSZip).folder('en') as JSZip,
-                fr: (assetsFolder as JSZip).folder('fr') as JSZip
+                fr: (assetsFolder as JSZip).folder('fr') as JSZip,
+                shared: (assetsFolder as JSZip).folder('shared') as JSZip
             },
             charts: {
                 en: (chartsFolder as JSZip).folder('en') as JSZip,
@@ -1489,16 +1763,16 @@ export default class MetadataEditorV extends Vue {
             rampConfig: rampConfigFolder as JSZip
         };
 
-        // Upload each file in the `uploadFiles` array to the ZIP folder. This is typically (and currently only) used
-        // for the product logo and the introduction slide background image.
+        // Upload each file in the `uploadFiles` array to the shared ZIP folder (due to cloning of configs in
+        // generateNewConfig()). This is typically (and currently only) used for the product logo and the introduction
+        // slide background image.
         if (uploadFiles !== undefined) {
             uploadFiles.forEach((file) => {
                 if (file) {
-                    this.configFileStructure!.assets[this.configLang].file(file?.name, file);
+                    this.configFileStructure.assets['shared'].file(file?.name, file);
                 }
             });
         }
-
         return this.loadConfig();
     }
 
@@ -1539,7 +1813,7 @@ export default class MetadataEditorV extends Vue {
         // Load in project data.
         if (this.configs[this.configLang]) {
             this.useConfig(this.configs[this.configLang] as StoryRampConfig);
-            this.findSources(this.configs);
+            this.findSources(this.configs); // increments source counts for all panels
             // Update router path
             if (this.reloadExisting) {
                 this.loadEditor = true;
@@ -1570,19 +1844,12 @@ export default class MetadataEditorV extends Vue {
         // Load product logo and the introduction slide background image (if provided).
         const logoAsset = config.introSlide.logo?.src;
         const introBgAsset = config.introSlide.backgroundImage;
-
-        // If the logo source is provided, grab the path without the UUID and the file name.
-
-        const logoPath = logoAsset ? logoAsset.substring(logoAsset.indexOf('/') + 1) : undefined;
         const logoName = logoAsset ? logoAsset.split('/')[logoAsset.split('/').length - 1] : '';
-
-        // Grab the asset file name.
-        const introBgPath = introBgAsset ? introBgAsset.substring(introBgAsset.indexOf('/') + 1) : undefined;
         const introBgName = introBgAsset ? introBgAsset.split('/')[introBgAsset.split('/').length - 1] : '';
 
         // Load in the data from the logo and intro slide background image. If one of these assets is missing, the promise will resolve with undefined.
         Promise.all([
-            this.processAsset(logoPath, logoName).then((logoData) => {
+            this.processAsset(logoAsset, logoName).then((logoData) => {
                 if (logoData) {
                     this.metadata.logoAltText = config.introSlide.logo?.altText ? config.introSlide.logo.altText : '';
                     this.logoImage = logoData.file;
@@ -1594,7 +1861,7 @@ export default class MetadataEditorV extends Vue {
                     this.metadata.logoPreview = '';
                 }
             }),
-            this.processAsset(introBgPath, introBgName).then((introBgData) => {
+            this.processAsset(introBgAsset, introBgName).then((introBgData) => {
                 if (introBgData) {
                     this.introBgImage = introBgData.file;
                     this.metadata.introBgPreview = introBgData.preview;
@@ -1657,10 +1924,10 @@ export default class MetadataEditorV extends Vue {
         const frFileName = `${this.uuid}_fr.json`;
 
         // Replace undefined slides with empty objects
-        this.configs.en!.slides = this.configs.en!.slides.map((slide) => {
+        this.configs.en.slides = this.configs.en?.slides.map((slide) => {
             return slide ?? {};
         });
-        this.configs.fr!.slides = this.configs.fr!.slides.map((slide) => {
+        this.configs.fr.slides = this.configs.fr?.slides.map((slide) => {
             return slide ?? {};
         });
         this.loadSlides(this.configs);
@@ -1816,10 +2083,11 @@ export default class MetadataEditorV extends Vue {
     }
 
     /**
-     * Called when `Save Changes` is pressed on metadata page. Save metadata content fields
-     * to config file. If `publish` is set to true, publish to server as well.
+     * Called when `Save Changes` or `Next` (for existing products only) is pressed on metadata page, as well as when
+     * `Done` is pressed in the metadata editor within editor-main. Save metadata content fields to config file. If
+     * `publish` is set to true, publish to server as well.
      */
-    saveMetadata(publish = false): void {
+    async saveMetadata(publish = false): Promise<void> {
         // update metadata content to existing config only if it has been successfully loaded
         const config = this.configs[this.configLang];
         if (config !== undefined) {
@@ -1846,24 +2114,16 @@ export default class MetadataEditorV extends Vue {
             if (!this.metadata.logoName) {
                 config.introSlide.logo.src = '';
             } else if (!this.metadata.logoName.includes('http')) {
-                config.introSlide.logo.src = `${this.uuid}/assets/${this.configLang}/${this.logoImage?.name}`;
-                this.configFileStructure?.assets[this.configLang].file(
-                    this.logoImage?.name as string,
-                    this.logoImage as File
-                );
+                await this.uploadAsset(this.logoImage as File, config, 'logo');
             } else {
                 config.introSlide.logo.src = this.metadata.logoName;
             }
 
-            // If the introduction slide background image doesn't include HTTP, assume it's a local file.
+            // If the introduction slide's background image doesn't include HTTP, assume it's a local file.
             if (!this.metadata.introBgName) {
                 config.introSlide.backgroundImage = '';
             } else if (!this.metadata.introBgName.includes('http')) {
-                config.introSlide.backgroundImage = `${this.uuid}/assets/${this.configLang}/${this.introBgImage?.name}`;
-                this.configFileStructure?.assets[this.configLang].file(
-                    this.introBgImage?.name as string,
-                    this.introBgImage as File
-                );
+                await this.uploadAsset(this.introBgImage as File, config, 'backgroundImage');
             } else {
                 config.introSlide.backgroundImage = this.metadata.introBgName;
             }
@@ -2094,8 +2354,9 @@ export default class MetadataEditorV extends Vue {
             if (this.loadExisting) {
                 if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
                     this.loadEditor = true;
-                    this.saveMetadata(false);
-                    this.updateEditorPath();
+                    this.saveMetadata(false).then(() => {
+                        this.updateEditorPath();
+                    });
                 } else {
                     Message.error(this.$t('editor.editMetadata.message.error.noConfig'));
                 }

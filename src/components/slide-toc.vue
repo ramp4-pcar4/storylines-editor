@@ -320,8 +320,8 @@ import {
     DynamicPanel,
     ImagePanel,
     MapPanel,
-    Slide,
     MultiLanguageSlide,
+    Slide,
     SlideshowPanel,
     SourceCounts,
     TextPanel,
@@ -353,7 +353,7 @@ export default class SlideTocV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
-    @Prop() closeSidebar!: Function;
+    @Prop() closeSidebar!: () => void;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     defaultBlankSlide: Slide = {
@@ -410,6 +410,7 @@ export default class SlideTocV extends Vue {
      * @param currLang The config to delete, either 'en' for English of 'fr' for French.
      */
     deleteConfig(slides: MultiLanguageSlide, currLang: 'en' | 'fr'): void {
+        slides[currLang].panels.forEach((panel: BasePanel) => this.removeSourceHelper(panel));
         slides[currLang] = undefined;
         this.$emit('slides-updated', this.slides);
     }
@@ -428,9 +429,71 @@ export default class SlideTocV extends Vue {
 
     // Assumes that you've already checked that the other lang DOES have a config.
     copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
-        this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][currLang === 'en' ? 'fr' : 'en']));
-        this.$emit('slides-updated', this.slides);
-        this.$emit('slide-change', index, currLang);
+        const oppositeLang = currLang === 'en' ? 'fr' : 'en';
+        // Called on each image/video panel in the opposite lang's config (at the provided index)
+        // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
+        // there). However, we must check beforehand whether an asset with the same name and contents already exists
+        // in the shared folder (in which case we do nothing), and if an asset with the same name and different
+        // contents already exists in the shared folder (in which case we give the asset uploaded to the shared
+        // asset folder a unique name)
+        const oppositeToSharedFolder = (panel: ImagePanel | VideoPanel, oppositeLang: string): void => {
+            if (panel.src) {
+                const assetSrc = panel.src.split('/');
+                const fileName = assetSrc.at(-1);
+                const assetType = fileName.split('.').at(-1);
+                let inSharedAssets = assetSrc[2] === 'shared';
+                let sharedFileSource = `${this.configFileStructure.uuid}/assets/shared/${fileName}`;
+
+                // If the asset for this panel refers to the opposite lang's asset folder, we will assume that there
+                // is no asset in the shared asset folder with the same name and contents as this asset. Otherwise
+                // it would have already been moved there upon being uploaded
+                if (!inSharedAssets) {
+                    const oppositeFileSource = panel.src;
+                    const oppositeRelativePath = assetSrc.slice(3).join('/');
+                    let sharedAssetName = fileName;
+                    let compressedFile = this.configFileStructure.assets[oppositeLang].file(oppositeRelativePath);
+                    let i = 2;
+
+                    // If an asset with the same name, but different content, is already in the shared folder, we must
+                    // give the asset we are uploading a unique name. Otherwise the existing asset will be overwritten
+                    while (this.configFileStructure.assets['shared'].file(sharedAssetName)) {
+                        sharedAssetName = `${compressedFile.name.split('.').at(0)}(${i}).${compressedFile.name
+                            .split('.')
+                            .at(-1)}`;
+                        i++;
+                    }
+                    sharedFileSource = `${this.configFileStructure.uuid}/assets/shared/${sharedAssetName}`;
+
+                    compressedFile.async(assetType !== 'svg' ? 'blob' : 'text').then((assetFile) => {
+                        if (assetType === 'svg') {
+                            assetFile = new File([assetFile], fileName, {
+                                type: 'image/svg+xml'
+                            });
+                        }
+                        this.configFileStructure.assets[oppositeLang].remove(oppositeRelativePath);
+                        this.configFileStructure.assets['shared'].file(sharedAssetName, assetFile);
+                        this.sourceCounts[sharedFileSource] = this.sourceCounts[oppositeFileSource] ?? 0;
+                        this.sourceCounts[oppositeFileSource] = 0;
+                        this.$emit('shared-asset', oppositeFileSource, sharedFileSource, oppositeLang);
+                    });
+                }
+                this.sourceCounts[sharedFileSource] += 1;
+            }
+        };
+
+        this.slides[index][oppositeLang].panel.forEach((panel) => {
+            this.$emit('process-panel', panel, oppositeToSharedFolder, oppositeLang);
+        });
+
+        // TODO: find better alternative to setTimeout. This code MUST execute after the callback above executes on each
+        // panel in the opposite lang's slide. Otherwise it will copy the contents of the opposite config before its
+        // src values are updated
+        setTimeout(() => {
+            this.slides[index][currLang].panel.forEach((panel) => this.removeSourceHelper(panel));
+            this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][oppositeLang]));
+            this.$emit('slides-updated', this.slides);
+            this.$emit('slide-change', index, currLang);
+        }, 300);
     }
 
     /**
@@ -450,6 +513,16 @@ export default class SlideTocV extends Vue {
      */
     copySlide(index: number): void {
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
+
+        // increment source count of each asset in this slide
+        const incrementSourceCounts = (panel: ImagePanel | VideoPanel) => {
+            if (panel.src) {
+                this.sourceCounts[panel.src] += 1;
+            }
+        };
+        this.slides[index].en.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts));
+        this.slides[index].fr.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts));
+
         this.$emit('slides-updated', this.slides);
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
