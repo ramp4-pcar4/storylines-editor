@@ -691,6 +691,9 @@ export default class MetadataEditorV extends Vue {
         logoPreview: '',
         logoName: '',
         logoAltText: '',
+        titleColour: '#1f2937',
+        subtitleColour: '#6b7280',
+        buttonColour: '#00d2d3',
         contextLink: '',
         contextLabel: '',
         tocOrientation: '',
@@ -706,6 +709,9 @@ export default class MetadataEditorV extends Vue {
         logoPreview: '',
         logoName: '',
         logoAltText: '',
+        titleColour: '',
+        subtitleColour: '',
+        buttonColour: '',
         contextLink: '',
         contextLabel: '',
         tocOrientation: '',
@@ -990,7 +996,10 @@ export default class MetadataEditorV extends Vue {
                     src: ''
                 },
                 title: this.metadata.introTitle,
-                subtitle: this.metadata.introSubtitle
+                subtitle: this.metadata.introSubtitle,
+                titleColour: this.metadata.titleColour,
+                subtitleColour: this.metadata.subtitleColour,
+                buttonColour: this.metadata.buttonColour
             },
             slides: [],
             contextLabel: this.metadata.contextLabel,
@@ -1498,6 +1507,9 @@ export default class MetadataEditorV extends Vue {
         this.metadata.title = config.title;
         this.metadata.introTitle = config.introSlide.title;
         this.metadata.introSubtitle = config.introSlide.subtitle;
+        this.metadata.titleColour = config.introSlide.titleColour ?? '#1f2937';
+        this.metadata.subtitleColour = config.introSlide.subtitleColour ?? '#6b7280';
+        this.metadata.buttonColour = config.introSlide.buttonColour ?? '#00d2d3';
         this.metadata.contextLink = config.contextLink;
         this.metadata.contextLabel = config.contextLabel;
         this.metadata.tocOrientation = config.tocOrientation;
@@ -1780,6 +1792,9 @@ export default class MetadataEditorV extends Vue {
             config.title = this.metadata.title;
             config.introSlide.title = this.metadata.introTitle;
             config.introSlide.subtitle = this.metadata.introSubtitle;
+            config.introSlide.titleColour = this.metadata.titleColour;
+            config.introSlide.subtitleColour = this.metadata.subtitleColour;
+            config.introSlide.buttonColour = this.metadata.buttonColour;
             config.contextLink = this.metadata.contextLink;
             config.contextLabel = this.metadata.contextLabel;
             config.tocOrientation = this.metadata.tocOrientation;
@@ -1827,6 +1842,9 @@ export default class MetadataEditorV extends Vue {
             title: '',
             introTitle: '',
             introSubtitle: '',
+            titleColour: '',
+            subtitleColour: '',
+            buttonColour: '',
             contextLink: '',
             contextLabel: '',
             dateModified: '',

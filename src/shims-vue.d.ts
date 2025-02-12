@@ -18,3 +18,4 @@ declare module 'vue-m-message';
 declare module 'vue3-json-editor';
 declare module 'highcharts-vue';
 declare module 'vue-tippy';
+declare module 'vue-accessible-color-picker';
