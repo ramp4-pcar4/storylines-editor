@@ -36,6 +36,8 @@ export interface MetadataContent {
     logoPreview: string;
     logoName: string;
     logoAltText: string;
+    introBgName: string;
+    introBgPreview: string;
     titleColour?: string;
     subtitleColour?: string;
     buttonColour?: string;
@@ -136,6 +138,7 @@ export interface Intro {
     title: string;
     subtitle: string;
     blurb?: string;
+    backgroundImage?: string;
     backgroundImage: string;
     titleColour?: string;
     subtitleColour?: string;
