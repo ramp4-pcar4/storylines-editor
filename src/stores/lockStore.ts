@@ -17,6 +17,7 @@ export const useLockStore = defineStore('lock', {
     actions: {
         // Opens a connection with the web socket
         initConnection() {
+            console.log('lockStore - initConnection');
             const socketUrl = `${
                 import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
             }`;
@@ -38,6 +39,9 @@ export const useLockStore = defineStore('lock', {
         // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.
         lockStoryline(uuid: string): Promise<void> {
+            console.log('lockStore - lockStoryline');
+            console.log(this);
+            console.log(this.$state);
             // Stop the previous storyline's timer.
             clearInterval(this.timeInterval);
             return new Promise((resolve, reject) => {
@@ -59,6 +63,8 @@ export const useLockStore = defineStore('lock', {
                                     this.uuid = uuid;
                                     this.secret = this.result.secret;
                                     this.broadcast = new BroadcastChannel(this.result.secret);
+                                    console.log('lockStore - name of BC');
+                                    console.log(this.result.secret);
                                     resolve();
                                 }
                             }
@@ -79,6 +85,7 @@ export const useLockStore = defineStore('lock', {
         },
         // Resets the current session back to a full 30 minutes.
         resetSession(overrideTime?: number) {
+            console.log('lockStore - resetSession');
             this.timeRemaining =
                 overrideTime !== undefined
                     ? overrideTime
