@@ -215,6 +215,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
                 // This event listener is fired when the write stream has finished. This means that the
                 // ZIP file should be correctly populated. Now, we can set the correct headers and send the
                 // ZIP file to the client.
+
                 output.on('close', () => {
                     res.writeHead(200, {
                         'Content-Type': 'application/zip',

@@ -259,8 +259,7 @@ export default class DynamicEditorV extends Vue {
 
     determineEditorType(panel: BasePanel): string {
         if (panel.type !== PanelType.Slideshow) return panel.type;
-        if ((panel as SlideshowPanel).items.length === 0 || (panel as SlideshowPanel).userCreated)
-            return PanelType.Slideshow;
+        if ((panel as SlideshowPanel).items.length === 0) return PanelType.Slideshow;
 
         // Determine whether the slideshow consists of only charts. If so, display the chart editor.
         const allCharts = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Chart);

@@ -4,7 +4,7 @@ export interface StoryRampConfig {
     title: string;
     lang: string;
     introSlide: Intro;
-    slides: (Slide | {})[];
+    slides: (Slide | Record<string, never>)[];
     contextLink: string;
     contextLabel: string;
     tocOrientation: string;
@@ -252,7 +252,6 @@ export interface SlideshowPanel extends BasePanel {
     items: Array<ChartPanel | TextPanel | ImagePanel | MapPanel>;
     loop?: boolean;
     caption?: string;
-    userCreated?: boolean; // used to determine whether this was automatically converted to slideshow or not
     customStyles?: string;
 }
 
@@ -322,8 +321,7 @@ export const BaseStartingConfig: DefaultConfigs = {
     slideshow: {
         type: PanelType.Slideshow,
         items: [],
-        caption: '',
-        userCreated: true
+        caption: ''
     },
     image: {
         type: PanelType.Image,

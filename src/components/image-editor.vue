@@ -364,8 +364,9 @@ export default class ImageEditorV extends Vue {
 
                 // Turn each of the image configs into an image panel and add them to the slidesow.
                 (this.panel as SlideshowPanel).items = this.imagePreviews.map((imageFile: ImageFile) => {
+                    const { id, ...restOfImage } = imageFile; // we don't need the id
                     return {
-                        ...imageFile,
+                        ...restOfImage,
                         src: `${this.configFileStructure.uuid}/assets/${this.lang}/${imageFile.id}`,
                         type: PanelType.Image
                     } as ImagePanel;
@@ -377,7 +378,7 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit', this.imagePreviews.length !== 0);
+        this.$emit('slide-edit');
     }
 }
 </script>
