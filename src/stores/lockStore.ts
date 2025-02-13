@@ -78,7 +78,6 @@ export const useLockStore = defineStore('lock', {
                         this.uuid = uuid;
                         this.secret = data.secret;
                         this.broadcast = new BroadcastChannel(data.secret);
-
                         resolve();
                     }
                 };

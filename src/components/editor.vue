@@ -774,6 +774,7 @@ export default class EditorV extends Vue {
             return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
         });
         const lockStore = useLockStore();
+
         setTimeout(() => {
             const routeData = this.$router.resolve({
                 name: 'preview',
