@@ -274,10 +274,6 @@
             "type": "object",
             "description": "A multimedia image component.",
             "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "The image ID."
-                },
                 "width": {
                     "type": "number",
                     "description": "The image width."
