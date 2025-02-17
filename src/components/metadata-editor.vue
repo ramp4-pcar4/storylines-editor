@@ -829,6 +829,7 @@ export default class MetadataEditorV extends Vue {
                     // session was extended from the preview tab, need to handle in editor tab
                     const msg = e.data;
                     if (msg.action === 'extend') {
+                        console.log('metadata - received extend message from preview');
                         this.$vfm.close('confirm-extend-session-editor');
                         this.extendSession(msg.showPopup);
                     }
@@ -853,6 +854,7 @@ export default class MetadataEditorV extends Vue {
             document.onmousemove = () => undefined;
             document.onkeydown = () => undefined;
             this.$vfm.open(`confirm-extend-session-editor`);
+            console.log('metadata - broadcast confirm message to preview');
             this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
         }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000);
         // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
@@ -878,6 +880,7 @@ export default class MetadataEditorV extends Vue {
         clearTimeout(this.lockStore.endTimeout);
         clearTimeout(this.lockStore.confirmationTimeout);
         if (showPopup) {
+            console.log('metadata - broadcasting extend message to preview');
             Message.success(this.$t('editor.session.extended'));
             this.lockStore.broadcast?.postMessage({ action: 'extend' });
         }
@@ -1157,6 +1160,7 @@ export default class MetadataEditorV extends Vue {
                         // session was extended from the preview tab, need to handle in editor tab
                         const msg = e.data;
                         if (msg.action === 'extend') {
+                            console.log('metadata - received extend message from preview');
                             this.$vfm.close('confirm-extend-session-editor');
                             this.extendSession(msg.showPopup);
                         }

@@ -113,12 +113,14 @@ export default class StoryPreviewV extends Vue {
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     extendSession(showPopup?: boolean): void {
-        if (!this.savedProduct) {
-            this.broadcast?.postMessage({ action: 'extend', showPopup });
-        }
+        // if (!this.savedProduct) {
+        console.log('preview - sending extend message to metadata');
+        this.broadcast?.postMessage({ action: 'extend', showPopup });
+        // }
     }
 
     async mounted() {
+        console.log('preview - mounted');
         this.uid = this.$route.params.uid as string;
         this.lang = this.$route.params.lang as string;
         const lockStore = useLockStore();
@@ -128,63 +130,6 @@ export default class StoryPreviewV extends Vue {
             this.config = JSON.parse(JSON.stringify(window.props.configs[this.lang]));
             this.configs = window.props.configs;
             this.configFileStructure = window.props.configFileStructure;
-            // this broadcast channel will be used to communicate regarding sessions with the main editor tab
-            this.broadcast = new BroadcastChannel(window.props.secret);
-            this.broadcast.onmessage = (e) => {
-                const msg = e.data;
-                if (msg.action === 'confirm') {
-                    // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
-                    document.onmousemove = () => undefined;
-                    document.onkeydown = () => undefined;
-                    // main tab says show confirmation modal
-                    this.lockStore.resetSession(msg.value);
-                    this.$vfm.open(`confirm-extend-session-preview`);
-                } else if (msg.action === 'close') {
-                    // main tab says close modal
-                    this.$vfm.close(`confirm-extend-session-preview`);
-                } else if (msg.action === 'extend') {
-                    // main tab says extend the session
-                    Message.success(this.$t('editor.session.extended'));
-                    this.$vfm.close(`confirm-extend-session-preview`);
-                    // Now add back event listeners to detect inactivity
-                    document.onmousemove = () => this.extendSession();
-                    document.onkeydown = () => this.extendSession();
-                } else if (msg.action === 'saving') {
-                    // main editor tab is saving
-                    // disable session extend on activity
-                    this.$vfm.close(`confirm-extend-session-preview`);
-                    document.onmousemove = () => undefined;
-                    document.onkeydown = () => undefined;
-                } else if (msg.action === 'saved') {
-                    // main editor tab is done saving
-                    // re-enable session extend on activity
-                    document.onmousemove = () => this.extendSession();
-                    document.onkeydown = () => this.extendSession();
-                } else {
-                    // main tab says end the session
-                    // we display the toast to say the session has ended in the other tab
-                    // but keep showing the preview since technically that does not require any locks
-                    this.$vfm.close('confirm-extend-session-preview');
-                    Message.error(this.$t('editor.session.ended'));
-                    // Remove inactivity listeners since session has expired.
-                    document.onmousemove = () => undefined;
-                    document.onkeydown = () => undefined;
-                }
-            };
-            const minsRemaining = window.props.timeRemaining / 60;
-            const warnMins = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
-            if (minsRemaining <= warnMins) {
-                // Preview tab was opened with < the amount of time remaining in a session timeout that we have to show the warning
-                // Therefore, display warning immediately and do not track activity.
-                document.onmousemove = () => undefined;
-                document.onkeydown = () => undefined;
-                this.lockStore.resetSession(minsRemaining * 60);
-                this.$vfm.open(`confirm-extend-session-preview`);
-            } else {
-                // Extend the session in the main editor tab if the user does something in the preview tab
-                document.onmousemove = () => this.extendSession();
-                document.onkeydown = () => this.extendSession();
-            }
             this.loadStatus = 'loaded';
         } else {
             this.savedProduct = true;
@@ -252,11 +197,70 @@ export default class StoryPreviewV extends Vue {
                 fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
                     axios
                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                            messages: res.data.messages
+                            messages: res.data?.messages
                         })
                         .catch((error: AxiosError) => console.log(error.response || error));
                 });
             });
+        }
+
+        // This broadcast channel will be used to communicate regarding sessions with the main editor tab
+        this.broadcast = new BroadcastChannel(lockStore.secret); // perhaps more than one of these are being created on lang change
+        this.broadcast.onmessage = (e) => {
+            console.log('preview - message received from metadata');
+            const msg = e.data;
+            if (msg.action === 'confirm') {
+                // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+                // main tab says show confirmation modal
+                this.lockStore.resetSession(msg.value);
+                this.$vfm.open(`confirm-extend-session-preview`);
+            } else if (msg.action === 'close') {
+                // main tab says close modal
+                this.$vfm.close(`confirm-extend-session-preview`);
+            } else if (msg.action === 'extend') {
+                // main tab says extend the session
+                Message.success(this.$t('editor.session.extended'));
+                this.$vfm.close(`confirm-extend-session-preview`);
+                // Now add back event listeners to detect inactivity
+                document.onmousemove = () => this.extendSession();
+                document.onkeydown = () => this.extendSession();
+            } else if (msg.action === 'saving') {
+                // main editor tab is saving
+                // disable session extend on activity
+                this.$vfm.close(`confirm-extend-session-preview`);
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+            } else if (msg.action === 'saved') {
+                // main editor tab is done saving
+                // re-enable session extend on activity
+                document.onmousemove = () => this.extendSession();
+                document.onkeydown = () => this.extendSession();
+            } else {
+                // main tab says end the session
+                // we display the toast to say the session has ended in the other tab
+                // but keep showing the preview since technically that does not require any locks
+                this.$vfm.close('confirm-extend-session-preview');
+                Message.error(this.$t('editor.session.ended'));
+                // Remove inactivity listeners since session has expired.
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+            }
+        };
+        const minsRemaining = lockStore.timeRemaining / 60;
+        const warnMins = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
+        if (minsRemaining <= warnMins) {
+            // Preview tab was opened with < the amount of time remaining in a session timeout that we have to show the warning
+            // Therefore, display warning immediately and do not track activity.
+            document.onmousemove = () => undefined;
+            document.onkeydown = () => undefined;
+            this.lockStore.resetSession(minsRemaining * 60);
+            this.$vfm.open(`confirm-extend-session-preview`);
+        } else {
+            // Extend the session in the main editor tab if the user does something in the preview tab
+            document.onmousemove = () => this.extendSession();
+            document.onkeydown = () => this.extendSession();
         }
 
         // Purge undefined slides from configs
@@ -278,6 +282,7 @@ export default class StoryPreviewV extends Vue {
 
     // reload preview page with FR config
     changeLang(): void {
+        this.broadcast?.close();
         const newLang = this.lang === 'en' ? 'fr' : 'en';
         const routeData = this.$router.resolve({
             name: 'preview',
