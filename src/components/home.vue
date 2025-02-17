@@ -4,7 +4,7 @@
             <h1 class="text-4xl">{{ $t('editor.respectTitle') }}</h1>
             <router-link
                 :to="{ name: 'home', params: { lang: currLang === 'en' ? 'fr' : 'en' } }"
-                v-if="sourceFile !== 'index-ca-en.html#' && sourceFile !== 'index-ca-fr.html#'"
+                v-if="!sourceFile.includes('index-ca')"
             >
                 <div class="underline">{{ `${currLang === 'en' ? 'Français' : 'English'}` }}</div>
             </router-link>
@@ -134,7 +134,7 @@
                         class="border-b border-solid"
                         :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
                     >
-                        <div class="m-2 mt-4 ml-3">UUID: {{ storyline.uuid }}</div>
+                        <div class="m-2 mt-4 ml-3">{{ $t('editor.uuid') }}: {{ storyline.uuid }}</div>
                         <div class="m-2 mb-4 ml-3">
                             {{ $t('editor.previousProducts.productInfo.title') + ': ' + storyline.titleEN }}
                         </div>
