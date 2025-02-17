@@ -1,5 +1,7 @@
 import JSZip from 'jszip';
 
+export type SupportedLanguages = 'en' | 'fr';
+
 export interface StoryRampConfig {
     title: string;
     lang: string;
