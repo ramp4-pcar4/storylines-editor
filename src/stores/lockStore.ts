@@ -12,59 +12,67 @@ export const useLockStore = defineStore('lock', {
         result: {} as any,
         broadcast: undefined as BroadcastChannel | undefined,
         confirmationTimeout: undefined as NodeJS.Timeout | undefined, // the timer to show the session extension confirmation modal
-        endTimeout: undefined as NodeJS.Timeout | undefined // the timer to kill the session due to timeout
+        endTimeout: undefined as NodeJS.Timeout | undefined, // the timer to kill the session due to timeout
     }),
     actions: {
         // Opens a connection with the web socket
         initConnection() {
-            const socketUrl = `${
-                import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
-            }`;
-            this.socket = new WebSocket(socketUrl);
+            return new Promise((resolve) => {
+                const socketUrl = `${
+                    import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
+                }`;
+                this.socket = new WebSocket(socketUrl);
 
-            // Connection opened
-            this.socket.onopen = () => {
-                this.connected = true;
-                return false;
-            };
+                // Connection opened
+                this.socket.onopen = () => {
+                    this.connected = true;
+                    resolve();
+                };
 
-            // Listen for messages
-            this.socket.onmessage = (event) => {
-                const res = JSON.parse(event.data);
-                this.received = true;
-                this.result = res;
-            };
+                // Listen for messages
+                this.socket.onmessage = (event) => {
+                    const res = JSON.parse(event.data);
+                    this.received = true;
+                    this.result = res;
+                };
+            });
         },
-        // Attempts to lock a storyline for this user.
+         // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.
-        lockStoryline(uuid: string): Promise<void> {
-            // Stop the previous storyline's timer.
+        async lockStoryline(uuid: string): Promise<void> {
+            // Stop the previous storyline's timer
             clearInterval(this.timeInterval);
+
+            // If not connected or socket isn't open, try to connect first
+            if (!this.connected || !this.socket || this.socket.readyState !== WebSocket.OPEN) {
+                await this.initConnection();
+            }
+
             return new Promise((resolve, reject) => {
-                // First we need to keep polling for the connection to be established.
-                // Is there a better way to do this? :(
-                const connectionPoll = setInterval(() => {
-                    if (this.connected) {
-                        // Now that we are connected, we need to poll for the message to be received back from the
-                        // web socket server.
-                        clearInterval(connectionPoll);
-                        this.received = false;
-                        this.socket?.send(JSON.stringify({ uuid, lock: true }));
-                        const receiptPoll = setInterval(() => {
-                            if (this.received) {
-                                clearInterval(receiptPoll);
-                                if (this.result.status === 'fail') {
-                                    reject();
-                                } else {
-                                    this.uuid = uuid;
-                                    this.secret = this.result.secret;
-                                    this.broadcast = new BroadcastChannel(this.result.secret);
-                                    resolve();
-                                }
-                            }
-                        });
+                this.received = false;
+                this.socket?.send(JSON.stringify({ uuid, lock: true }));
+
+                const handleMessage = (event: MessageEvent) => {
+                    const data = JSON.parse(event.data);
+
+                    if(data !== undefined){
+                        if(data.status === 'fail'){
+                            this.socket!.removeEventListener('message', handleMessage);
+                            reject(new Error(data.message || 'Failed to lock storyline.'));
+                        }
+                        else if (data.status === 'success') {
+                            this.socket!.removeEventListener('message', handleMessage);
+
+                            this.uuid = uuid;
+                            this.secret = data.secret; 
+                            this.broadcast = new BroadcastChannel(data.secret);
+
+                            resolve();
+                        }
                     }
-                }, 100);
+                };
+
+                this.socket!.addEventListener('message', handleMessage);
             });
         },
         // Unlocks the curent storyline for this user. Only to be called on session end.

@@ -594,6 +594,7 @@ import {
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
 import { useUserStore } from '../stores/userStore';
+import { computed } from "vue";
 
 import JSZip from 'jszip';
 import axios from 'axios';
@@ -646,7 +647,7 @@ export default class MetadataEditorV extends Vue {
     @Prop({ default: true }) editExisting!: boolean; // true if editing existing storylines product, false if new product
 
     currentRoute = window.location.href;
-
+    user = computed(() => useUserStore().userProfile.userName || 'Guest');
     configs: {
         [key: string]: StoryRampConfig | undefined;
     } = { en: undefined, fr: undefined };
@@ -762,7 +763,7 @@ export default class MetadataEditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
-
+        
         // set any metadata default values for creating new product
         if (!this.loadExisting) {
             // set current date as default
@@ -841,7 +842,15 @@ export default class MetadataEditorV extends Vue {
 
         // If a product UUID is provided, fetch the contents from the server.
         if (this.$route.params.uid) {
-            this.generateRemoteConfig();
+            this.generateRemoteConfig().catch(() => {
+                // Handle any connection/lock errors here
+                Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                if (this.$route.name === 'editor') {
+                    setTimeout(() => {
+                        this.$router.push({ name: 'home' });
+                    }, 2000);
+                }
+            });
         }
     }
 
@@ -1069,10 +1078,9 @@ export default class MetadataEditorV extends Vue {
             this.controller = new AbortController();
 
             this.loadStatus = 'loading';
-            const user = useUserStore().userProfile.userName || 'Guest';
             const secret = this.lockStore.secret;
             fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, {
-                headers: { user, secret: secret },
+                headers: { user: this.user, secret: secret },
                 signal: this.controller.signal
             })
                 .then((res: Response) => {
@@ -1196,9 +1204,8 @@ export default class MetadataEditorV extends Vue {
             return;
         }
         this.loadStatus = 'loading';
-        const user = useUserStore().userProfile.userName || 'Guest';
         const secret = this.lockStore.secret;
-        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user, secret } }).then((res: Response) => {
+        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user: this.user, secret } }).then((res: Response) => {
             if (res.status === 404) {
                 // Product not found.
                 this.loadStatus = 'waiting';
@@ -1263,7 +1270,7 @@ export default class MetadataEditorV extends Vue {
             // First, hit the Express server `rename` endpoint to perform the `rename` syscall on the file system.
             await axios
                 .post(this.apiUrl + `/rename`, {
-                    user: userStore.userProfile.userName || 'Guest',
+                    user: this.user,
                     previousUuid: prevUuid,
                     newUuid: this.changeUuid,
                     configs: { en: convertedEnglish, fr: convertedFrench }
@@ -1677,10 +1684,9 @@ export default class MetadataEditorV extends Vue {
             this.configFileStructure?.zip.generateAsync({ type: 'blob' }).then((content: Blob) => {
                 const formData = new FormData();
                 formData.append('data', content, `${this.uuid}.zip`);
-                const userStore = useUserStore();
                 const headers = {
                     'Content-Type': 'multipart/form-data',
-                    user: userStore.userProfile.userName || 'Guest',
+                    user: this.user,
                     secret: this.lockStore.secret
                 };
                 Message.warning(this.$t('editor.editMetadata.message.wait'));
