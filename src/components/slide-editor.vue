@@ -77,7 +77,7 @@
                                 id="centerSlide"
                                 class="rounded-none cursor-pointer w-4 h-4"
                                 v-model="centerSlide"
-                                :disabled="centerPanel"
+                                :disabled="centerPanel || onePanelOnly"
                                 @change.stop="toggleCenterSlide()"
                             />
                             <label class="ml-0" for="centerSlide">
@@ -350,15 +350,7 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
-                    @slide-edit="(changedFromDefault: boolean = true) => {
-                        $emit('slide-edit');
-
-                        // changedFromDefault should hold a boolean indicating whether the panel is actually modified 
-                        // (different from initial state). Only needed for some multimedia editors; text editors
-                        // write directly to currentSlide constantly, which is handled by panelModified().
-                        currentSlide.panel[panelIndex].modified = changedFromDefault || undefined;
-                    }
-                    "
+                    @slide-edit="$emit('slide-edit')"
                     v-else
                 ></component>
             </div>
@@ -491,24 +483,33 @@ export default class SlideEditorV extends Vue {
 
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
+        // When there is a single panel, centering slide content AND panel content produces the same styling
+        // ('text-align: center'). So, we just disable the center panel content control upon full screen panel. This
+        // also clears up confusion, as the user may believe that the two controls produce different results for a
+        // single panel slide
+        this.onePanelOnly = this.currentSlide?.panel.length === 1;
+        const centerPanel = this.currentSlide.panel.reduce(
+            (panelsCentered, currPanel) => panelsCentered && currPanel.customStyles?.includes('text-align: center'),
+            true
+        );
+        const centerSlide = this.onePanelOnly
+            ? false
+            : this.currentSlide.panel[0].customStyles?.includes('text-align: right') &&
+              this.currentSlide.panel[1].customStyles?.includes('text-align: left');
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-        this.centerPanel = this.currentSlide.centerPanel ?? false;
-        this.centerSlide = this.currentSlide.centerSlide ?? false;
+        this.centerPanel = centerPanel ?? false;
+        this.centerSlide = centerSlide ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel.length === 1;
     }
 
     /**
      * Determines whether a given panel has been modified from the default configuration of its type.
-     * Note that some editors (e.g. text) write directly to currentSlide after each change,
-     * while other editors (e.g. image) do not. The first type is handled completely in
-     * panelModified; the second type requires you to set `panel.modified` for the given panel beforehand,
-     * indicating whether changes have been made from the specific editor sub-component (see
-     * `<component>`'s `@slide-edit` event handler).
+     *
      * @param {BasePanel} panel The panel to analyze.
      * @returns {boolean} Whether panel has been modified.
      */
     panelModified(panel: BasePanel): boolean {
+        this.saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
         const prevType = this.currentSlide.panel[this.panelIndex].type;
 
         let startingConfig = {
@@ -537,14 +538,9 @@ export default class SlideEditorV extends Vue {
         };
 
         const oldStartingConfig = startingConfig[panel.type as keyof DefaultConfigs];
-
         let newConfig = Object.assign({}, toRaw(panel));
         newConfig.customStyles = newConfig.customStyles || undefined;
-
-        return (
-            JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig) ||
-            this.currentSlide.panel[this.panelIndex].modified === true
-        );
+        return JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig);
     }
 
     changePanelType(prevType: string, newType: string): void {
@@ -579,8 +575,6 @@ export default class SlideEditorV extends Vue {
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }
-
-        this.currentSlide.rightOnly = this.currentSlide.panel.length === 1;
     }
 
     removeSourceCounts(panel: BasePanel): void {
@@ -674,8 +668,7 @@ export default class SlideEditorV extends Vue {
 
     determineEditorType(panel: BasePanel): string {
         if (panel.type !== PanelType.Slideshow) return panel.type;
-        if ((panel as SlideshowPanel).items.length === 0 || (panel as SlideshowPanel).userCreated)
-            return PanelType.Slideshow;
+        if ((panel as SlideshowPanel).items.length === 0) return PanelType.Slideshow;
 
         // Determine whether the slideshow consists of only charts. If so, display the chart editor.
         const allCharts = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Chart);
@@ -690,11 +683,21 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleOnePanelOnly(addToWhichSide?: 'left' | 'right'): void {
-        this.currentSlide.rightOnly = this.onePanelOnly;
         this.saveChanges();
+
         if (this.onePanelOnly) {
             this.currentSlide['panel'] = [this.currentSlide.panel[this.panelIndex]];
             this.panelIndex = 0;
+
+            // Since we disable the 'center slide content' control in this case, we need to check if it is
+            // toggled on. If so, we toggle it off, and toggle on the 'center panel content' control, since they
+            // are equivalent in the case of a fullscreen panel
+            if (this.centerSlide) {
+                this.centerSlide = false;
+                this.toggleCenterSlide();
+                this.centerPanel = true;
+                this.toggleCenterPanel();
+            }
         } else {
             this.currentSlide['panel'] = [
                 ...(addToWhichSide === 'right' ? [Object.assign({}, this.currentSlide.panel[0])] : []),
@@ -709,11 +712,15 @@ export default class SlideEditorV extends Vue {
                 ...(addToWhichSide === 'left' ? [Object.assign({}, this.currentSlide.panel[0])] : [])
             ];
             this.panelIndex = addToWhichSide === 'left' ? 0 : 1;
+
+            // Need to apply centering to both panels
+            if (this.centerPanel) {
+                this.toggleCenterPanel();
+            }
         }
     }
 
     toggleCenterSlide(): void {
-        this.currentSlide.centerSlide = this.centerSlide;
         if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].customStyles = 'text-align: right;';
@@ -758,7 +765,6 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleCenterPanel(): void {
-        this.currentSlide.centerPanel = this.centerPanel;
         if (this.centerPanel) {
             for (const p in this.currentSlide.panel) {
                 this.currentSlide.panel[p].customStyles = 'text-align: center;';
