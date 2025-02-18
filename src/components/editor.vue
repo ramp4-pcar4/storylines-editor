@@ -242,6 +242,14 @@
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
+                    @process-panel="
+                        (panel, callback, ...args) => {
+                            $emit('process-panel', panel, callback, ...args);
+                        }
+                    "
                     :configFileStructure="configFileStructure"
                     :lang="configLang"
                     :sourceCounts="sourceCounts"
@@ -259,6 +267,14 @@
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
                     @close-sidebar="closeSidebar"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
+                    @process-panel="
+                        (panel, callback, ...args) => {
+                            $emit('process-panel', panel, callback, ...args);
+                        }
+                    "
                     :configFileStructure="configFileStructure"
                     :lang="configLang"
                     :sourceCounts="sourceCounts"
@@ -278,6 +294,9 @@
                     :slideIndex="slideIndex"
                     :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
                     @slide-change="selectSlide"
                     @slide-edit="onSlidesEdited"
                     @custom-slide-updated="updateCustomSlide"
@@ -312,14 +331,17 @@
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
+    BasePanel,
     ConfigFileStructure,
     HelpSection,
+    ImagePanel,
     MetadataContent,
     MultiLanguageSlide,
     Slide,
     SourceCounts,
     StoryRampConfig,
-    TextPanel
+    TextPanel,
+    VideoPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import axios from 'axios';
@@ -448,15 +470,19 @@ export default class EditorV extends Vue {
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
+        const newLang = lang || this.configLang || 'en';
+        if (this.configLang !== newLang) {
+            this.$emit('lang-change', newLang);
+        }
+
         setTimeout(() => {
             if (index === -1 || !this.loadSlides) {
                 this.currentSlide = '';
             } else {
-                const selectedLang = (lang ?? this.configLang) as keyof MultiLanguageSlide;
+                const selectedLang = newLang as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
                 this.currentSlide = selectedSlide ?? '';
             }
-
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;

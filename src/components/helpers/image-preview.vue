@@ -17,7 +17,7 @@
             <div class="flex-grow image-container">
                 <img
                     class="image-file object-cover"
-                    :title="imageFile.id"
+                    :title="imageFile.id.split('/').at(-1)"
                     :src="imageFile.src"
                     :alt="imageFile.altText"
                 />

@@ -336,7 +336,12 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => $emit('custom-slide-updated', slideConfig, save, lang)"
+                    @config-edited="(slideConfig: Slide, save?: boolean = false) => {
+                        $emit('custom-slide-updated', slideConfig, save, lang)
+                    }"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -350,6 +355,9 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
+                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                    }"
                     @slide-edit="(changedFromDefault: boolean = true) => {
                         $emit('slide-edit');
 
@@ -495,7 +503,7 @@ export default class SlideEditorV extends Vue {
         this.centerPanel = this.currentSlide.centerPanel ?? false;
         this.centerSlide = this.currentSlide.centerSlide ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel.length === 1;
+        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel?.length === 1;
     }
 
     /**
