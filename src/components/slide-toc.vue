@@ -372,8 +372,8 @@ import {
     DynamicPanel,
     ImagePanel,
     MapPanel,
-    Slide,
     MultiLanguageSlide,
+    Slide,
     SlideshowPanel,
     SourceCounts,
     TextPanel,
@@ -405,7 +405,7 @@ export default class SlideTocV extends Vue {
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
-    @Prop() closeSidebar!: Function;
+    @Prop() closeSidebar!: () => void;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     defaultBlankSlide: Slide = {
