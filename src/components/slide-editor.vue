@@ -437,15 +437,7 @@
                     @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
                         $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
                     }"
-                    @slide-edit="(changedFromDefault: boolean = true) => {
-                        $emit('slide-edit');
-
-                        // changedFromDefault should hold a boolean indicating whether the panel is actually modified 
-                        // (different from initial state). Only needed for some multimedia editors; text editors
-                        // write directly to currentSlide constantly, which is handled by panelModified().
-                        currentSlide.panel[panelIndex].modified = changedFromDefault || undefined;
-                    }
-                    "
+                    @slide-edit="$emit('slide-edit')"
                     v-else
                 ></component>
             </div>
@@ -510,6 +502,8 @@ import {
     MapPanel,
     PanelType,
     Slide,
+    SlideshowChartPanel,
+    SlideshowImagePanel,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -587,24 +581,27 @@ export default class SlideEditorV extends Vue {
 
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
+        this.onePanelOnly = this.currentSlide?.panel.length === 1;
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-        this.centerPanel = this.currentSlide.centerPanel ?? false;
-        this.centerSlide = this.currentSlide.centerSlide ?? false;
+        this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
+        this.centerSlide =
+            (this.onePanelOnly
+                ? this.determineEditorType(this.currentSlide.panel[0]) === 'dynamic'
+                    ? this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight')
+                    : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideFull')
+                : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight') &&
+                  this.currentSlide.panel[1]?.cssClasses?.includes('centerSlideLeft')) ?? false;
         this.includeInToc = this.currentSlide.includeInToc ?? true;
-        this.onePanelOnly = this.currentSlide?.rightOnly || this.currentSlide?.panel?.length === 1;
     }
 
     /**
      * Determines whether a given panel has been modified from the default configuration of its type.
-     * Note that some editors (e.g. text) write directly to currentSlide after each change,
-     * while other editors (e.g. image) do not. The first type is handled completely in
-     * panelModified; the second type requires you to set `panel.modified` for the given panel beforehand,
-     * indicating whether changes have been made from the specific editor sub-component (see
-     * `<component>`'s `@slide-edit` event handler).
+     *
      * @param {BasePanel} panel The panel to analyze.
      * @returns {boolean} Whether panel has been modified.
      */
     panelModified(panel: BasePanel): boolean {
+        this.saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
         const prevType = this.currentSlide.panel[this.panelIndex].type;
 
         let startingConfig = {
@@ -633,14 +630,9 @@ export default class SlideEditorV extends Vue {
         };
 
         const oldStartingConfig = startingConfig[panel.type as keyof DefaultConfigs];
-
         let newConfig = Object.assign({}, toRaw(panel));
         newConfig.customStyles = newConfig.customStyles || undefined;
-
-        return (
-            JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig) ||
-            this.currentSlide.panel[this.panelIndex].modified === true
-        );
+        return JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig);
     }
 
     changePanelType(prevType: string, newType: string): void {
@@ -675,8 +667,6 @@ export default class SlideEditorV extends Vue {
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
         }
-
-        this.currentSlide.rightOnly = this.currentSlide.panel.length === 1;
     }
 
     removeSourceCounts(panel: BasePanel): void {
@@ -713,7 +703,9 @@ export default class SlideEditorV extends Vue {
                 break;
             }
 
-            case 'slideshow': {
+            case 'slideshow':
+            case 'slideshowImage':
+            case 'slideshowChart': {
                 const slideshowPanel = panel as SlideshowPanel;
                 slideshowPanel.items.forEach((item: TextPanel | ImagePanel | MapPanel | ChartPanel) => {
                     this.removeSourceCounts(item);
@@ -769,25 +761,21 @@ export default class SlideEditorV extends Vue {
     }
 
     determineEditorType(panel: BasePanel): string {
-        if (panel.type !== PanelType.Slideshow) return panel.type;
-        if ((panel as SlideshowPanel).items.length === 0 || (panel as SlideshowPanel).userCreated)
-            return PanelType.Slideshow;
-
         // Determine whether the slideshow consists of only charts. If so, display the chart editor.
-        const allCharts = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Chart);
-        if (allCharts) return PanelType.Chart;
+        if (panel.type === 'slideshowChart') return PanelType.Chart;
 
         // Determine whether the slideshow consists of only images. If so, display the image editor.
-        const allImages = (panel as SlideshowPanel).items.every((item: BasePanel) => item.type === PanelType.Image);
-        if (allImages) return PanelType.Image;
+        if (panel.type === 'slideshowImage') return PanelType.Image;
+
+        if (panel.type !== PanelType.Slideshow) return panel.type;
 
         // Otherwise display the slideshow editor.
         return PanelType.Slideshow;
     }
 
     toggleOnePanelOnly(addToWhichSide?: 'left' | 'right'): void {
-        this.currentSlide.rightOnly = this.onePanelOnly;
         this.saveChanges();
+
         if (this.onePanelOnly) {
             this.currentSlide['panel'] = [this.currentSlide.panel[this.panelIndex]];
             this.panelIndex = 0;
@@ -806,47 +794,52 @@ export default class SlideEditorV extends Vue {
             ];
             this.panelIndex = addToWhichSide === 'left' ? 0 : 1;
         }
+        if (this.centerPanel) {
+            this.toggleCenterPanel();
+        }
+        if (this.centerSlide) {
+            this.toggleCenterSlide();
+        }
     }
 
     toggleCenterSlide(): void {
-        this.currentSlide.centerSlide = this.centerSlide;
         if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
             if (this.centerSlide) {
-                this.currentSlide.panel[0].customStyles = 'text-align: right;';
+                this.currentSlide.panel[0].cssClasses = 'centerSlideRight';
             } else {
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
-                    'text-align: right;',
+                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
+                    'centerSlideRight',
                     ''
                 );
             }
         } else if (this.onePanelOnly || this.currentSlide.panel.length === 1) {
             if (this.centerSlide) {
-                this.currentSlide.panel[0].customStyles = 'text-align: center;';
+                this.currentSlide.panel[0].cssClasses = 'centerSlideFull';
             } else {
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
-                    'text-align: right;',
+                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
+                    'centerSlideRight',
                     ''
                 );
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
-                    'text-align: left;',
+                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
+                    'centerSlideLeft',
                     ''
                 );
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
-                    'text-align: center;',
+                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
+                    'centerSlideFull',
                     ''
                 );
             }
         } else {
             if (this.centerSlide) {
-                this.currentSlide.panel[0].customStyles = 'text-align: right;';
-                this.currentSlide.panel[1].customStyles = 'text-align: left;';
+                this.currentSlide.panel[0].cssClasses = 'centerSlideRight';
+                this.currentSlide.panel[1].cssClasses = 'centerSlideLeft';
             } else {
-                this.currentSlide.panel[0].customStyles = (this.currentSlide.panel[0].customStyles || '').replace(
-                    'text-align: right;',
+                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
+                    'centerSlideRight',
                     ''
                 );
-                this.currentSlide.panel[1].customStyles = (this.currentSlide.panel[1].customStyles || '').replace(
-                    'text-align: left;',
+                this.currentSlide.panel[1].cssClasses = (this.currentSlide.panel[1].cssClasses || '').replace(
+                    'centerSlideLeft',
                     ''
                 );
             }
@@ -854,15 +847,14 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleCenterPanel(): void {
-        this.currentSlide.centerPanel = this.centerPanel;
         if (this.centerPanel) {
             for (const p in this.currentSlide.panel) {
-                this.currentSlide.panel[p].customStyles = 'text-align: center;';
+                this.currentSlide.panel[p].cssClasses = 'centerPanel';
             }
         } else {
             for (const p in this.currentSlide.panel) {
-                this.currentSlide.panel[p].customStyles = (this.currentSlide.panel[p].customStyles || '').replace(
-                    'text-align: center;',
+                this.currentSlide.panel[p].cssClasses = (this.currentSlide.panel[p].cssClasses || '').replace(
+                    'centerPanel',
                     ''
                 );
             }
