@@ -514,12 +514,11 @@ export default class ImageEditorV extends Vue {
 
                 // Turn each of the image configs into an image panel and add them to the slideshow.
                 (this.panel as SlideshowPanel).items = this.imagePreviews.map((imageFile: ImageFile) => {
-                    const imageSrc = imageFile.id;
-                    const imageId = imageFile.id.split('/').at(-1);
+                    const { id, ...restOfImage } = imageFile; // we don't need the id
+                    const imageSrc = id;
                     return {
-                        ...imageFile,
+                        ...restOfImage,
                         src: imageSrc,
-                        id: imageId,
                         type: PanelType.Image
                     } as ImagePanel;
                 });
@@ -530,7 +529,7 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit', this.imagePreviews.length !== 0);
+        this.$emit('slide-edit');
     }
 }
 </script>
