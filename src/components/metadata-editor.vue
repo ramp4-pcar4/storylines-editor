@@ -1102,6 +1102,7 @@ export default class MetadataEditorV extends Vue {
                                 this.extendSession();
                                 this.error = false;
                                 this.warning = 'none';
+                                this.loadStatus = 'loaded';
                             });
                         });
                     }
@@ -1209,7 +1210,6 @@ export default class MetadataEditorV extends Vue {
             } else {
                 res.json().then((json) => {
                     this.storylineHistory = json;
-                    this.loadStatus = 'loaded';
                 });
             }
         });
