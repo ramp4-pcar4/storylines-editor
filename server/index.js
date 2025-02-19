@@ -595,10 +595,10 @@ function logger(type, message) {
 const clients = new Set();
 
 // Used to broadcast messages to all connected clients
-function broadcastToClients(message){
+function broadcastToClients(message) {
     const payload = JSON.stringify(message);
     clients.forEach((client) => {
-        if(client.readyState === WebSocket.OPEN){
+        if (client.readyState === WebSocketServer.OPEN) {
             logger('INFO', `Payload sent to the client`);
             client.send(payload);
         }
@@ -614,7 +614,7 @@ wss.on('connection', (ws) => {
     // { uuid: <uuid>, lock: false }
     ws.on('message', function (msg) {
         const message = JSON.parse(msg);
-        const {uuid, lock} = message;
+        const { uuid, lock } = message;
 
         if (!uuid) {
             ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
@@ -640,8 +640,8 @@ wss.on('connection', (ws) => {
                 ws.send(JSON.stringify({ status: 'success', secret }));
 
                 broadcastToClients({
-                    type:'lock',
-                    uuid,
+                    type: 'lock',
+                    uuid
                 });
             }
         } else {
@@ -663,8 +663,8 @@ wss.on('connection', (ws) => {
                 ws.send(JSON.stringify({ status: 'success' }));
 
                 broadcastToClients({
-                    type:'unlock',
-                    uuid,
+                    type: 'unlock',
+                    uuid
                 });
             }
         }
@@ -680,7 +680,7 @@ wss.on('connection', (ws) => {
                 delete lockedUuids[ws.uuid];
                 broadcastToClients({
                     type: 'unlock',
-                    uuid: ws.uuid,
+                    uuid: ws.uuid
                 });
             }
         }
