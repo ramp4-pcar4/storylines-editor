@@ -22,7 +22,7 @@
                             "
                             :to="{
                                 name: editExisting ? 'metadataExisting' : 'metadataNew',
-                                params: { lang: currLang === 'en' ? 'fr' : 'en' }
+                                params: { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
                             }"
                             class="sub-link"
                         >
@@ -594,7 +594,7 @@ import {
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
 import { useUserStore } from '../stores/userStore';
-import { computed } from "vue";
+import { computed } from 'vue';
 
 import JSZip from 'jszip';
 import axios from 'axios';
@@ -755,7 +755,6 @@ export default class MetadataEditorV extends Vue {
 
     created(): void {
         this.loadExisting = this.editExisting;
-
         // Generate UUID for new product
         this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
         this.configLang = (this.$route.params.lang as string) || 'en';
@@ -763,7 +762,7 @@ export default class MetadataEditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
-        
+
         // set any metadata default values for creating new product
         if (!this.loadExisting) {
             // set current date as default

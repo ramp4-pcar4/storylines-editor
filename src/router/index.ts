@@ -32,7 +32,7 @@ const routes = [
         }
     },
     {
-        path: '/:lang/editor-metadata',
+        path: '/:lang/editor-metadata/:uid?',
         name: 'metadataExisting',
         component: MetadataEditorV,
         props: { editExisting: true },
