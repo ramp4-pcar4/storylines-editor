@@ -595,10 +595,10 @@ function logger(type, message) {
 const clients = new Set();
 
 // Used to broadcast messages to all connected clients
-function broadcastToClients(message){
+function broadcastToClients(message) {
     const payload = JSON.stringify(message);
     clients.forEach((client) => {
-        if(client.readyState === WebSocket.OPEN){
+        if (client.readyState === WebSocket.OPEN) {
             logger('INFO', `Payload sent to the client`);
             client.send(payload);
         }
@@ -614,7 +614,7 @@ wss.on('connection', (ws) => {
     // { uuid: <uuid>, lock: false }
     ws.on('message', function (msg) {
         const message = JSON.parse(msg);
-        const {uuid, lock} = message;
+        const { uuid, lock } = message;
 
         if (!uuid) {
             ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
@@ -637,11 +637,14 @@ wss.on('connection', (ws) => {
                 const secret = generateKey();
                 lockedUuids[uuid] = secret;
                 ws.uuid = uuid;
+                // This msg is not being received by lockStore upon loading product via router params (in particular
+                // from editor-main to editor-metadata). However the below msg is received (upon unlocking). Both
+                // messages sent at exact same time.
                 ws.send(JSON.stringify({ status: 'success', secret }));
 
                 broadcastToClients({
-                    type:'lock',
-                    uuid,
+                    type: 'lock',
+                    uuid
                 });
             }
         } else {
@@ -660,11 +663,13 @@ wss.on('connection', (ws) => {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
                 delete lockedUuids[uuid];
                 delete ws.uuid;
-                ws.send(JSON.stringify({ status: 'success' }));
+                // Gets sent at same time as above msg upon loading product via router params. Do we need this?
+                // A call to unlock the product already occurs upon switching pages
+                // ws.send(JSON.stringify({ status: 'success' }));
 
                 broadcastToClients({
-                    type:'unlock',
-                    uuid,
+                    type: 'unlock',
+                    uuid
                 });
             }
         }
@@ -680,7 +685,7 @@ wss.on('connection', (ws) => {
                 delete lockedUuids[ws.uuid];
                 broadcastToClients({
                     type: 'unlock',
-                    uuid: ws.uuid,
+                    uuid: ws.uuid
                 });
             }
         }
