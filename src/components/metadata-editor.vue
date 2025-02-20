@@ -20,7 +20,7 @@
                             v-if="!currentRoute.includes('index-ca')"
                             :to="{
                                 name: editExisting ? 'metadataExisting' : 'metadataNew',
-                                params: { lang: currLang === 'en' ? 'fr' : 'en' }
+                                params: { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
                             }"
                             class="sub-link"
                         >
@@ -747,7 +747,6 @@ export default class MetadataEditorV extends Vue {
 
     created(): void {
         this.loadExisting = this.editExisting;
-
         // Generate UUID for new product
         this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
         this.configLang = (this.$route.params.lang as string) || 'en';
