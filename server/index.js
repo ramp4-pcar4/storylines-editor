@@ -637,6 +637,9 @@ wss.on('connection', (ws) => {
                 const secret = generateKey();
                 lockedUuids[uuid] = secret;
                 ws.uuid = uuid;
+                // This msg is not being received by lockStore upon loading product via router params (in particular
+                // from editor-main to editor-metadata). However the below msg is received (upon unlocking). Both
+                // messages sent at exact same time.
                 ws.send(JSON.stringify({ status: 'success', secret }));
 
                 broadcastToClients({
@@ -660,7 +663,9 @@ wss.on('connection', (ws) => {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
                 delete lockedUuids[uuid];
                 delete ws.uuid;
-                ws.send(JSON.stringify({ status: 'success' }));
+                // Gets sent at same time as above msg upon loading product via router params. Do we need this?
+                // A call to unlock the product already occurs upon switching pages
+                // ws.send(JSON.stringify({ status: 'success' }));
 
                 broadcastToClients({
                     type: 'unlock',
