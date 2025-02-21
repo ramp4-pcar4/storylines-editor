@@ -103,6 +103,7 @@ editor.metadata.uuidInstructions,"Please enter the UUID of an existing storyline
 editor.metadata.newUuidInstructions,"Enter a unique ID for your new storyline. One has been auto-generated for you, but you can also enter your own.",1,"Entrez un identifiant unique pour votre nouveau scénario. Un a été généré automatiquement pour vous, mais vous pouvez également saisir le vôtre.",0
 editor.warning.rename,UUID already in use. Please choose a different ID.,1,UUID déjà utilisé. Veuillez choisir un autre identifiant.,0
 editor.warning.blank,UUID field cannot be blank. Please enter a unique UUID.,1,Le champ UUID ne peut pas être vide. Veuillez saisir un UUID unique.,0
+editor.warning.blankExisting,UUID field cannot be blank. Please enter a valid UUID to proceed.,1,Le champ UUID ne peut pas être vide. Veuillez saisir un UUID valide pour continuer.,0
 editor.warning.renameFailed,Failed to rename product.,1,Échec du renommage du produit.,0
 editor.changeUuid,Click here to change UUID,1,Cliquez ici pour changer,0
 editor.title,Title,1,Titre,1
