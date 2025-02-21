@@ -104,6 +104,7 @@ editor.metadata.newUuidInstructions,"Enter a unique ID for your new storyline. O
 editor.warning.rename,UUID already in use. Please choose a different ID.,1,UUID déjà utilisé. Veuillez choisir un autre identifiant.,0
 editor.warning.blank,UUID field cannot be blank. Please enter a unique UUID.,1,Le champ UUID ne peut pas être vide. Veuillez saisir un UUID unique.,0
 editor.warning.renameFailed,Failed to rename product.,1,Échec du renommage du produit.,0
+editor.warning.badChar,"Illegal character entered. You cannot use these characters in your UUID: : / # ? & @ % +",1,"Caractère illégal saisi. Vous ne pouvez pas utiliser ces caractères dans votre UUID : : / # ? & @ % +",0
 editor.changeUuid,Click here to change UUID,1,Cliquez ici pour changer,0
 editor.title,Title,1,Titre,1
 editor.respectTitle,RAMP Storylines Editor & Creation Tool,1,Éditeur et outil de création de scénarios RAMP,0

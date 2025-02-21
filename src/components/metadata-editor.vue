@@ -107,6 +107,7 @@
                                         changeUuid.length === 0 ||
                                         checkingUuid ||
                                         processingRename ||
+                                        error ||
                                         warning === 'rename'
                                     "
                                 >
@@ -237,7 +238,7 @@
                                 >
                                     <span
                                         class="align-middle inline-block mr-1 fill-current"
-                                        :class="{ 'sm:ml-28': warning === 'rename' }"
+                                        :class="{ 'sm:ml-24': renameMode }"
                                     >
                                         <svg
                                             clip-rule="evenodd"
@@ -659,7 +660,7 @@ export default class MetadataEditorV extends Vue {
     loadingIntoEditor = false;
     loadEditor = false;
     error = false; // whether an error has occurred
-    warning: 'none' | 'uuid' | 'rename' | 'blank' = 'none'; // used for duplicate uuid warning
+    warning: 'none' | 'uuid' | 'rename' | 'blank' | 'badChar' = 'none'; // used for duplicate uuid warning
     configLang = 'en';
     currLang = 'en'; // page language
     showDropdown = false;
@@ -1926,7 +1927,20 @@ export default class MetadataEditorV extends Vue {
     checkUuid = throttle(300, (rename?: boolean): void => {
         if (rename || !this.loadExisting) this.checkingUuid = true;
 
+
+
         if (!this.loadExisting || rename) {
+            // All reserved characters in URLs. The user can't use these for their UUID
+            const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
+            const illegalCharsContained = illegalChars.filter(badChar => (rename ? this.changeUuid : this.uuid).includes(badChar));
+
+            if (illegalCharsContained.length) {
+                this.error = true;
+                this.warning = 'badChar';
+                this.checkingUuid = false;
+                return;
+            }
+
             if (!rename && !this.uuid) {
                 if (!this.loadExisting) {
                     this.error = true;
