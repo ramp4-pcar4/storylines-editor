@@ -595,10 +595,10 @@ function logger(type, message) {
 const clients = new Set();
 
 // Used to broadcast messages to all connected clients
-function broadcastToClients(message){
+function broadcastToClients(message) {
     const payload = JSON.stringify(message);
     clients.forEach((client) => {
-        if(client.readyState === WebSocket.OPEN){
+        if (client.readyState === (process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#' ? WebSocket.OPEN : 1)) {
             logger('INFO', `Payload sent to the client`);
             client.send(payload);
         }
@@ -614,7 +614,7 @@ wss.on('connection', (ws) => {
     // { uuid: <uuid>, lock: false }
     ws.on('message', function (msg) {
         const message = JSON.parse(msg);
-        const {uuid, lock} = message;
+        const { uuid, lock } = message;
 
         if (!uuid) {
             ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
@@ -639,10 +639,10 @@ wss.on('connection', (ws) => {
                 ws.uuid = uuid;
                 ws.send(JSON.stringify({ status: 'success', secret }));
 
-                broadcastToClients({
-                    type:'lock',
-                    uuid,
-                });
+                /* broadcastToClients({
+                    type: 'lock',
+                    uuid
+                }); */
             }
         } else {
             // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
@@ -662,10 +662,10 @@ wss.on('connection', (ws) => {
                 delete ws.uuid;
                 ws.send(JSON.stringify({ status: 'success' }));
 
-                broadcastToClients({
-                    type:'unlock',
-                    uuid,
-                });
+                /* broadcastToClients({
+                    type: 'unlock',
+                    uuid
+                }); */
             }
         }
     });
@@ -678,10 +678,10 @@ wss.on('connection', (ws) => {
             if (currentLock) {
                 logger('INFO', `Releasing lock on storyline ${ws.uuid} after connection closed`);
                 delete lockedUuids[ws.uuid];
-                broadcastToClients({
+                /* broadcastToClients({
                     type: 'unlock',
-                    uuid: ws.uuid,
-                });
+                    uuid: ws.uuid
+                }); */
             }
         }
 
