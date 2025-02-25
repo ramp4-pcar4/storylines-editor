@@ -1268,64 +1268,76 @@ export default class MetadataEditorV extends Vue {
             const convertedFrench = JSON.stringify(frenchConfig, null, 4);
 
             // First, hit the Express server `rename` endpoint to perform the `rename` syscall on the file system.
-            await axios
-                .post(this.apiUrl + `/rename`, {
-                    user: this.user,
-                    previousUuid: prevUuid,
-                    newUuid: this.changeUuid,
-                    configs: { en: convertedEnglish, fr: convertedFrench }
+            // Before doing so, we transfer the existing lock to the new uuid
+            this.lockStore
+                .transferLock(this.changeUuid)
+                .then(async () => {
+                    await axios
+                        .post(this.apiUrl + `/rename`, {
+                            user: this.user,
+                            previousUuid: prevUuid,
+                            newUuid: this.changeUuid,
+                            configs: { en: convertedEnglish, fr: convertedFrench }
+                        })
+                        .then(async (res: AxiosResponse) => {
+                            // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
+                            if (import.meta.env.VITE_APP_NET_API_URL) {
+                                await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
+                                    uuid: prevUuid,
+                                    changeUuid: this.changeUuid
+                                });
+                            }
+
+                            // After the server and database have been updated, re-build configFileStructure,
+                            // save the new config files to the server and fetch the new Git history.
+                            if (this.configFileStructure?.zip) {
+                                // Remove the current configuration files from the ZIP folder.
+                                this.configFileStructure?.zip.remove(enFile.name);
+                                this.configFileStructure?.zip.remove(frFile.name);
+
+                                // Re-add the configuration files to the ZIP with the new UUID.
+                                this.configFileStructure?.zip.file(`${this.changeUuid}_en.json`, convertedEnglish);
+                                this.configFileStructure?.zip.file(`${this.changeUuid}_fr.json`, convertedFrench);
+
+                                // Iterate through the RAMP configuration files and rename them using the new UUID.
+                                const configPromises: Promise<void>[] = [];
+                                this.configFileStructure?.zip.folder('ramp-config/')?.forEach((relativePath, file) => {
+                                    configPromises.push(this.renameMapConfig(file.name, prevUuid));
+                                });
+
+                                // Wait for map configuration files to be renamed.
+                                await Promise.all(configPromises);
+
+                                this.uuid = this.changeUuid;
+
+                                // Reset source counts.
+                                this.sourceCounts = {};
+
+                                this.configFileStructureHelper(this.configFileStructure.zip).then(() => {
+                                    this.fetchHistory();
+                                    this.renameMode = this.processingRename = false;
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            /** If the server returns a 500 error for whatever reason (most likely due to file in use),
+                             * roll back the UUID to the previous value and display an error message.
+                             */
+                            if (err.status === 500) {
+                                Message.error(this.$t('editor.warning.renameFailed'));
+                                this.uuid = prevUuid;
+                                this.processingRename = false;
+                                console.log(this.configFileStructure);
+                                return;
+                            }
+                        });
                 })
-                .then(async (res: AxiosResponse) => {
-                    // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
-                    if (import.meta.env.VITE_APP_NET_API_URL !== undefined) {
-                        await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
-                            uuid: prevUuid,
-                            changeUuid: this.changeUuid
-                        });
-                    }
-
-                    // After the server and database have been updated, re-build configFileStructure,
-                    // save the new config files to the server and fetch the new Git history.
-                    if (this.configFileStructure?.zip) {
-                        // Remove the current configuration files from the ZIP folder.
-                        this.configFileStructure?.zip.remove(enFile.name);
-                        this.configFileStructure?.zip.remove(frFile.name);
-
-                        // Re-add the configuration files to the ZIP with the new UUID.
-                        this.configFileStructure?.zip.file(`${this.changeUuid}_en.json`, convertedEnglish);
-                        this.configFileStructure?.zip.file(`${this.changeUuid}_fr.json`, convertedFrench);
-
-                        // Iterate through the RAMP configuration files and rename them using the new UUID.
-                        const configPromises: Promise<void>[] = [];
-                        this.configFileStructure?.zip.folder('ramp-config/')?.forEach((relativePath, file) => {
-                            configPromises.push(this.renameMapConfig(file.name, prevUuid));
-                        });
-
-                        // Wait for map configuration files to be renamed.
-                        await Promise.all(configPromises);
-
-                        this.uuid = this.changeUuid;
-
-                        // Reset source counts.
-                        this.sourceCounts = {};
-
-                        this.configFileStructureHelper(this.configFileStructure.zip).then(() => {
-                            this.fetchHistory();
-                            this.renameMode = this.processingRename = false;
-                        });
-                    }
-                })
-                .catch((err) => {
-                    /** If the server returns a 500 error for whatever reason (most likely due to file in use),
-                     * roll back the UUID to the previous value and display an error message.
-                     */
-                    if (err.status === 500) {
-                        Message.error(this.$t('editor.warning.renameFailed'));
-                        this.uuid = prevUuid;
-                        this.processingRename = false;
-                        console.log(this.configFileStructure);
-                        return;
-                    }
+                .catch(() => {
+                    Message.error(this.$t('editor.warning.renameFailed'));
+                    this.uuid = prevUuid;
+                    this.processingRename = false;
+                    console.log(this.configFileStructure);
+                    return;
                 });
         }
     }

@@ -381,7 +381,9 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                         // file does not exist, so we can rename the product.
                         fs.rename(PRODUCT_PATH, NEW_PATH, async (err) => {
                             if (err) {
-                                res.status(500).send({ status: 'Internal Server Error' });
+                                res.status(500).send({
+                                    status: 'Internal Server Error'
+                                });
                                 logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
                                 return;
                             } else {
@@ -390,7 +392,10 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                                 fs.rmSync(NEW_PATH + `/${oldId}_fr.json`);
 
                                 // Delete and then re-initialize the Git repo to remove previous history.
-                                fs.rmSync(NEW_PATH + `/.git`, { recursive: true, force: true });
+                                fs.rmSync(NEW_PATH + `/.git`, {
+                                    recursive: true,
+                                    force: true
+                                });
                                 const git = simpleGit(NEW_PATH);
                                 await git.init();
 
@@ -402,7 +407,9 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                                 const configPath = NEW_PATH + `/ramp-config/`;
                                 fs.readdir(configPath, (err, files) => {
                                     if (err) {
-                                        res.status(500).send({ status: 'Internal Server Error' });
+                                        res.status(500).send({
+                                            status: 'Internal Server Error'
+                                        });
                                         logger('WARNING', 'Error occured while changing map names.' + err);
                                         return;
                                     }
@@ -417,12 +424,14 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                                 await commitToRepo(NEW_PATH, user, true);
 
                                 res.status(200).send({ status: 'OK' });
-                                logger('INFO', `Product successfully renamed product from ${oldId} to ${newId}`);
+                                logger('INFO', `Product successfully renamed from ${oldId} to ${newId}`);
                                 return;
                             }
                         });
                     } else {
-                        res.status(500).send({ status: 'Internal Server Error' });
+                        res.status(500).send({
+                            status: 'Internal Server Error'
+                        });
                         logger('WARNING', 'Error occured while renaming a Storylines product.', error);
                         return;
                     }
@@ -536,9 +545,9 @@ async function commitToRepo(path, username, initial) {
         versionNumber = Number(versionNumber) + 1;
     }
     // Commit the files for this storyline to its repo.
-    await git
-        .add('./*')
-        .commit(`Add product version ${versionNumber} on ${date} at ${time}`, { '--author': `"${username} <>"` });
+    await git.add('./*').commit(`Add product version ${versionNumber} on ${date} at ${time}`, {
+        '--author': `"${username} <>"`
+    });
     const log = await git.log();
     const commitsAfter = log.total;
     return commitsAfter > commitsBefore;
@@ -620,21 +629,33 @@ wss.on('connection', (ws) => {
             return;
         }
 
-        const { uuid, lock, clientId } = message;
+        const uuid = message.uuid;
+        const type = message.type;
+        const clientId = message.clientId;
 
         if (!uuid) {
-            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.', clientId }));
+            ws.send(
+                JSON.stringify({
+                    status: 'fail',
+                    message: 'UUID not provided.',
+                    clientId
+                })
+            );
         }
         logger('INFO', `${msg}`);
         // User wants to lock storyline since they are about to load/edit it.
-        if (lock) {
+        if (type === 'lock') {
             const currentLock = lockedUuids[uuid];
 
             // Someone else is currently accessing this storyline, do not allow the user to lock!
             if (currentLock && ws.uuid !== uuid) {
                 logger('INFO', `A client failed to lock the storyline ${uuid}.`);
                 ws.send(
-                    JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.', clientId })
+                    JSON.stringify({
+                        status: 'fail',
+                        message: 'Another user has locked this storyline.',
+                        clientId
+                    })
                 );
             }
             // Lock the storyline for this user. No-one else can access it until the user is done with it.
@@ -653,7 +674,7 @@ wss.on('connection', (ws) => {
                     clientId
                 });
             }
-        } else {
+        } else if (type === 'unlock') {
             // Attempting to unlock a different storyline, other than the one this connection has locked, so do not allow.
             if (uuid !== ws.uuid) {
                 logger('INFO', `A client failed to unlock the storyline ${uuid} because they had not locked it.`);
@@ -670,11 +691,45 @@ wss.on('connection', (ws) => {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
                 delete lockedUuids[uuid];
                 delete ws.uuid;
-                ws.send(JSON.stringify({ status: 'success', clientId }));
+                //ws.send(JSON.stringify({ status: "success", clientId }));
 
                 broadcastToClients({
                     type: 'unlock',
                     uuid,
+                    clientId
+                });
+            }
+        } else if (type === 'transfer') {
+            const newUuid = message.newUuid;
+            const currentLock = lockedUuids[uuid];
+
+            // Do not allow lock transfer if another user has product locked
+            if (currentLock && ws.uuid !== uuid) {
+                logger('INFO', `A client failed to transfer from the storyline ${uuid}.`);
+                ws.send(
+                    JSON.stringify({
+                        status: 'fail',
+                        message: 'Another user has locked this storyline, so you may not transfer its lock.',
+                        clientId
+                    })
+                );
+            } else if (lockedUuids[newUuid]) {
+                logger('INFO', `A client failed to transfer to the storyline ${newUuid}.`);
+                ws.send(
+                    JSON.stringify({
+                        status: 'fail',
+                        message: 'Another user has locked this storyline, so you may not transfer a lock to it.',
+                        clientId
+                    })
+                );
+            } else {
+                delete lockedUuids[uuid];
+                lockedUuids[newUuid] = currentLock;
+                ws.uuid = newUuid;
+                ws.send(JSON.stringify({ status: 'success', clientId }));
+                broadcastToClients({
+                    type: 'transfer',
+                    newUuid,
                     clientId
                 });
             }
