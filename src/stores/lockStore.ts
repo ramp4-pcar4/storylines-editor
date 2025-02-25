@@ -60,7 +60,7 @@ export const useLockStore = defineStore('lock', {
 
             return new Promise((resolve, reject) => {
                 this.received = false;
-                this.socket?.send(JSON.stringify({ uuid, lock: true, clientId: this.clientId }));
+                this.socket?.send(JSON.stringify({ type: 'lock', uuid, clientId: this.clientId }));
 
                 const handleMessage = (event: MessageEvent) => {
                     const data = JSON.parse(event.data);
@@ -86,11 +86,37 @@ export const useLockStore = defineStore('lock', {
                 this.socket!.addEventListener('message', handleMessage);
             });
         },
+        async transferLock(renameUuid: string): Promise<void> {
+            return new Promise((resolve, reject) => {
+                this.received = false;
+                this.socket?.send(
+                    JSON.stringify({ type: 'transfer', uuid: this.uuid, newUuid: renameUuid, clientId: this.clientId })
+                );
+                const handleMessage = (event: MessageEvent) => {
+                    const data = JSON.parse(event.data);
+
+                    if (!data || data.status === 'nonsense' || data.clientId !== this.clientId) {
+                        return;
+                    }
+
+                    if (data.status === 'fail') {
+                        this.socket.removeEventListener('message', handleMessage);
+                        reject(new Error(data.message || 'Failed to lock storyline.'));
+                    } else if (data.status === 'success') {
+                        this.socket.removeEventListener('message', handleMessage);
+                        this.uuid = renameUuid;
+                        resolve();
+                    }
+                };
+
+                this.socket.addEventListener('message', handleMessage);
+            });
+        },
         // Unlocks the curent storyline for this user. Only to be called on session end.
         unlockStoryline() {
             clearInterval(this.timeInterval);
             if (this.connected) {
-                this.socket!.send(JSON.stringify({ uuid: this.uuid, lock: false, clientId: this.clientId }));
+                this.socket!.send(JSON.stringify({ type: 'unlock', uuid: this.uuid, clientId: this.clientId }));
                 this.uuid = '';
                 this.secret = '';
                 this.broadcast?.postMessage({ action: 'end' });
