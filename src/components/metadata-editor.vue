@@ -597,7 +597,7 @@ import {
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
 import { useUserStore } from '../stores/userStore';
-import { computed } from "vue";
+import { computed } from 'vue';
 
 import JSZip from 'jszip';
 import axios from 'axios';
@@ -766,7 +766,7 @@ export default class MetadataEditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
-        
+
         // set any metadata default values for creating new product
         if (!this.loadExisting) {
             // set current date as default
@@ -1283,7 +1283,7 @@ export default class MetadataEditorV extends Vue {
                 })
                 .then(async (res: AxiosResponse) => {
                     // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
-                    if (import.meta.env.VITE_APP_NET_API_URL !== undefined) {
+                    if (import.meta.env.VITE_APP_NET_API_URL) {
                         await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
                             uuid: prevUuid,
                             changeUuid: this.changeUuid
@@ -1315,10 +1315,17 @@ export default class MetadataEditorV extends Vue {
                         // Reset source counts.
                         this.sourceCounts = {};
 
-                        this.configFileStructureHelper(this.configFileStructure.zip).then(() => {
-                            this.fetchHistory();
-                            this.renameMode = this.processingRename = false;
-                        });
+                        // Unlock storyline using old UUID, and lock storyline using new UUID
+                        this.lockStore.unlockStoryline();
+                        this.lockStore
+                            .lockStoryline(this.changeUuid)
+                            .then(() => {
+                                this.configFileStructureHelper(this.configFileStructure.zip);
+                            })
+                            .then(() => {
+                                this.fetchHistory();
+                                this.renameMode = this.processingRename = false;
+                            });
                     }
                 })
                 .catch((err) => {

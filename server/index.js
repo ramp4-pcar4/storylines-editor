@@ -381,7 +381,9 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                         // file does not exist, so we can rename the product.
                         fs.rename(PRODUCT_PATH, NEW_PATH, async (err) => {
                             if (err) {
-                                res.status(500).send({ status: 'Internal Server Error' });
+                                res.status(500).send({
+                                    status: 'Internal Server Error'
+                                });
                                 logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
                                 return;
                             } else {
@@ -390,7 +392,10 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                                 fs.rmSync(NEW_PATH + `/${oldId}_fr.json`);
 
                                 // Delete and then re-initialize the Git repo to remove previous history.
-                                fs.rmSync(NEW_PATH + `/.git`, { recursive: true, force: true });
+                                fs.rmSync(NEW_PATH + `/.git`, {
+                                    recursive: true,
+                                    force: true
+                                });
                                 const git = simpleGit(NEW_PATH);
                                 await git.init();
 
@@ -402,7 +407,9 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                                 const configPath = NEW_PATH + `/ramp-config/`;
                                 fs.readdir(configPath, (err, files) => {
                                     if (err) {
-                                        res.status(500).send({ status: 'Internal Server Error' });
+                                        res.status(500).send({
+                                            status: 'Internal Server Error'
+                                        });
                                         logger('WARNING', 'Error occured while changing map names.' + err);
                                         return;
                                     }
@@ -422,7 +429,9 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                             }
                         });
                     } else {
-                        res.status(500).send({ status: 'Internal Server Error' });
+                        res.status(500).send({
+                            status: 'Internal Server Error'
+                        });
                         logger('WARNING', 'Error occured while renaming a Storylines product.', error);
                         return;
                     }
@@ -536,9 +545,9 @@ async function commitToRepo(path, username, initial) {
         versionNumber = Number(versionNumber) + 1;
     }
     // Commit the files for this storyline to its repo.
-    await git
-        .add('./*')
-        .commit(`Add product version ${versionNumber} on ${date} at ${time}`, { '--author': `"${username} <>"` });
+    await git.add('./*').commit(`Add product version ${versionNumber} on ${date} at ${time}`, {
+        '--author': `"${username} <>"`
+    });
     const log = await git.log();
     const commitsAfter = log.total;
     return commitsAfter > commitsBefore;
@@ -595,10 +604,10 @@ function logger(type, message) {
 const clients = new Set();
 
 // Used to broadcast messages to all connected clients
-function broadcastToClients(message){
+function broadcastToClients(message) {
     const payload = JSON.stringify(message);
     clients.forEach((client) => {
-        if(client.readyState === WebSocket.OPEN){
+        if (client.readyState === WebSocket.OPEN) {
             logger('INFO', `Payload sent to the client`);
             client.send(payload);
         }
@@ -614,10 +623,15 @@ wss.on('connection', (ws) => {
     // { uuid: <uuid>, lock: false }
     ws.on('message', function (msg) {
         const message = JSON.parse(msg);
-        const {uuid, lock} = message;
+        const { uuid, lock } = message;
 
         if (!uuid) {
-            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
+            ws.send(
+                JSON.stringify({
+                    status: 'fail',
+                    message: 'UUID not provided.'
+                })
+            );
         }
         logger('INFO', `${msg}`);
         // User wants to lock storyline since they are about to load/edit it.
@@ -627,7 +641,12 @@ wss.on('connection', (ws) => {
             // Someone else is currently accessing this storyline, do not allow the user to lock!
             if (currentLock && ws.uuid !== uuid) {
                 logger('INFO', `A client failed to lock the storyline ${uuid}.`);
-                ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
+                ws.send(
+                    JSON.stringify({
+                        status: 'fail',
+                        message: 'Another user has locked this storyline.'
+                    })
+                );
             }
             // Lock the storyline for this user. No-one else can access it until the user is done with it.
             // Send the secret key back to the client so that they can now get/save the storyline by passing in the
@@ -640,8 +659,8 @@ wss.on('connection', (ws) => {
                 ws.send(JSON.stringify({ status: 'success', secret }));
 
                 broadcastToClients({
-                    type:'lock',
-                    uuid,
+                    type: 'lock',
+                    uuid
                 });
             }
         } else {
@@ -660,11 +679,11 @@ wss.on('connection', (ws) => {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
                 delete lockedUuids[uuid];
                 delete ws.uuid;
-                ws.send(JSON.stringify({ status: 'success' }));
+                //ws.send(JSON.stringify({ status: "success" }));
 
                 broadcastToClients({
-                    type:'unlock',
-                    uuid,
+                    type: 'unlock',
+                    uuid
                 });
             }
         }
@@ -680,7 +699,7 @@ wss.on('connection', (ws) => {
                 delete lockedUuids[ws.uuid];
                 broadcastToClients({
                     type: 'unlock',
-                    uuid: ws.uuid,
+                    uuid: ws.uuid
                 });
             }
         }
