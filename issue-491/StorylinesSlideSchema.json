@@ -65,6 +65,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -107,6 +111,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -228,6 +236,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -264,6 +276,10 @@
                 "caption": {
                     "type": "string",
                     "description": "Supporting text content for the chart."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -313,6 +329,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -362,6 +382,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -414,6 +438,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
