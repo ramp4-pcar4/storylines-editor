@@ -7,22 +7,63 @@
                         <h2 class="text-2xl font-bold">
                             {{ $t('editor.slides.currentLangLabel', { lang: langTranslate, num: slideIndex + 1 }) }}
                         </h2>
+
                         <div class="flex items-stretch">
                             <button
-                                @click.stop="selectSlide(slideIndex - 1)"
+                                :aria-label="$t('editor.swapConfigs')"
+                                @click.stop="
+                                    selectSlide(slideIndex, (lang === 'en' ? 'fr' : 'en') as SupportedLanguages)
+                                "
+                                :disabled="!otherLangSlide"
+                                class="editor-button flex gap-1 items-center rounded border border-black mr-2"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'bottom',
+                                    content: $t('editor.swapConfigs'),
+                                    animateFill: true,
+                                    touch: ['hold', 500]
+                                }"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path
+                                        fill="currentColor"
+                                        d="M5.825 16L7.7 17.875q.275.275.275.688t-.275.712q-.3.3-.712.3t-.713-.3L2.7 15.7q-.15-.15-.213-.325T2.426 15t.063-.375t.212-.325l3.6-3.6q.3-.3.7-.287t.7.312q.275.3.288.7t-.288.7L5.825 14H12q.425 0 .713.288T13 15t-.288.713T12 16zm12.35-6H12q-.425 0-.712-.288T11 9t.288-.712T12 8h6.175L16.3 6.125q-.275-.275-.275-.687t.275-.713q.3-.3.713-.3t.712.3L21.3 8.3q.15.15.212.325t.063.375t-.063.375t-.212.325l-3.6 3.6q-.3.3-.7.288t-.7-.313q-.275-.3-.288-.7t.288-.7z"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                @click.stop="selectSlide(slideIndex - 1, lang as SupportedLanguages)"
                                 :disabled="slideIndex === 0"
-                                class="editor-button rounded-l rounded-r-none border border-black"
+                                class="editor-button flex gap-1 items-center rounded-l rounded-r-none border border-black"
                                 style="border-right-width: 0"
                             >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path
+                                        fill="currentColor"
+                                        d="m11 8.8l-2.9 2.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275L13 8.8V17q0 .425-.288.713T12 18t-.712-.288T11 17z"
+                                    />
+                                </svg>
                                 {{ $t('editor.slides.previousSlide') }}
                             </button>
                             <span class="border-l border-black" style="margin: 0; padding: 0; line-height: 0"> </span>
                             <button
-                                @click.stop="selectSlide(slideIndex + 1)"
+                                @click.stop="selectSlide(slideIndex + 1, lang as SupportedLanguages)"
                                 :disabled="isLast"
-                                class="editor-button rounded-l-none rounded-r border border-black border-l-0"
+                                class="editor-button flex gap-1 items-center rounded-l-none rounded-r border border-black border-l-0"
                                 style="border-left-width: 0"
                             >
+                                <svg
+                                    class="transform rotate-180"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        fill="currentColor"
+                                        d="m11 8.8l-2.9 2.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275L13 8.8V17q0 .425-.288.713T12 18t-.712-.288T11 17z"
+                                    />
+                                </svg>
                                 {{ $t('editor.slides.nextSlide') }}
                             </button>
                         </div>
@@ -429,6 +470,7 @@ import {
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
+    SupportedLanguages,
     TextPanel,
     VideoPanel
 } from '@/definitions';
@@ -470,6 +512,7 @@ export default class SlideEditorV extends Vue {
     @Prop() slideIndex!: number;
     @Prop() isLast!: boolean;
     @Prop() sourceCounts!: SourceCounts;
+    @Prop() otherLangSlide!: Slide;
 
     panelIndex = 0;
     advancedEditorView = false;
@@ -670,8 +713,8 @@ export default class SlideEditorV extends Vue {
         }
     }
 
-    selectSlide(index: number): void {
-        this.$emit('slide-change', index);
+    selectSlide(index: number, lang?: SupportedLanguages): void {
+        this.$emit('slide-change', index, lang);
     }
 
     cancelTypeChange(): void {

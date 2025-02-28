@@ -178,7 +178,7 @@
                                         :name="`delete-slide-${index}-en-config`"
                                         :title="
                                             $t('editor.slides.deleteConfig.title', {
-                                                lang: $t('editor.lang.en'),
+                                                lang: $t('editor.lang.en').substring(0, 2).toUpperCase(),
                                                 num: index + 1
                                             })
                                         "
@@ -230,7 +230,7 @@
                                         :name="`delete-slide-${index}-fr-config`"
                                         :title="
                                             $t('editor.slides.deleteConfig.title', {
-                                                lang: $t('editor.lang.fr'),
+                                                lang: $t('editor.lang.fr').substring(0, 2).toUpperCase(),
                                                 num: index + 1
                                             })
                                         "

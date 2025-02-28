@@ -28,6 +28,7 @@ fullscreen.deactivate,Exit Fullscreen,1,Quitter le mode plein écran,1
 editor.lang.en,English,1,Anglais,1
 editor.lang.fr,French,1,Français,1
 editor.ok,Ok,1,D'accord,1
+editor.swapConfigs,Switch to other language configuration,1,Passer à une autre configuration de langue,0
 editor.feedback,Send Us Feedback,1,Envoyez-nous vos commentaires,0
 editor.feedback.subject,Storylines Editor Feedback,1,Commentaires de l'éditeur de scénarios,0
 editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
@@ -214,12 +215,12 @@ editor.slides.currentLangLabel,Slide {num} ({lang}),1,Diapositive {num} ({lang})
 editor.slides.copyFromLang,"Copy slides from the other language",1,"Copier les diapositives de l’autre langue",1
 editor.slides.deleteSlide.title,Delete slide {num}?,1,Supprimer la diapositive {num} ?,0
 editor.slides.deleteSlide.confirm,"Both English and French configurations will be deleted{title}.",1,"Les configurations anglaise et française seront supprimées{title}.",0
-editor.slides.deleteConfig.title,Slide {num} {lang} config will be cleared,1,La configuration de la diapositive {num} {lang} sera effacée,0
-editor.slides.deleteConfig.confirm,"This will replace the config '{title}' with a blank config.",1,Cela remplacera la configuration '{title}' par une configuration vide.,0
+editor.slides.deleteConfig.title,Slide {num} {lang} configuration will be cleared,1,La configuration de la diapositive {num} {lang} sera effacée,0
+editor.slides.deleteConfig.confirm,"This will replace the config '{title}' with a blank config. All existing contents will be lost.",1,Cela remplacera la configuration '{title}' par une configuration vide. Tout le contenu existant sera perdu.,0
 editor.slides.changeSlide.confirm,"Are you sure you want to change the slide {title}? All unsaved progress will be lost.",1,"Voulez-vous vraiment modifier la diapositive {titre}? Toute modification non enregistrée sera perdue.",1
 editor.slides.changePanelType.title,Panel type will be changed to {type},1,Le type de panneau sera modifié en {type},0
 editor.slides.changePanelType.message,Existing contents will be deleted.,1,Le contenu existant sera supprimé.,0
-editor.slides.changeToOnePanel.title,Current panel will become a fullscreen panel,1,Le panneau actuel deviendra un panneau plein écran,0
+editor.slides.changeToOnePanel.title,Current panel will become fullscreen,1,Le panneau actuel deviendra plein écran,0
 editor.slides.changeToOnePanel.message,The other panel(s) will be deleted.,1,Les autres panneaux seront supprimés.,0
 editor.slides.addBlankPanel.title,Which side should the new panel be added to?,1,De quel côté le nouveau panneau doit-il être ajouté?,0
 editor.slides.addBlankPanel.message,The existing panel will be on the opposite side.,1,Le panneau existant actuel sera du côté opposé.,0
