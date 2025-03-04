@@ -569,7 +569,7 @@
 
 <script lang="ts">
 import ActionModal from '@/components/helpers/action-modal.vue';
-import { Options, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
 import { throttle } from 'throttle-debounce';
@@ -749,9 +749,33 @@ export default class MetadataEditorV extends Vue {
     sessionExpired = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
+    @Watch('loadEditor')
+    @Watch('loadStatus')
+    onEditorStateChange() {
+        // Prevent double scrollbars when in main editor, but NOT in create/load product pages
+        this.updateBodyClass();
+    }
+
+    // Adds a class that hides overflow (whole-page scrollbars) only when the main editor is loaded.
+    // The create/load product forms obviously need scrollbars
+    updateBodyClass() {
+        if (this.loadEditor && this.loadStatus === 'loaded') {
+            document.body.classList.add('editor-mode');
+        } else {
+            document.body.classList.remove('editor-mode');
+        }
+    }
+
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
         this.editingMetadata = !this.editExisting;
+
+        // Prevent double scrollbars when in main editor, but NOT in create/load product pages
+        this.updateBodyClass();
+    }
+
+    beforeDestroy(): void {
+        document.body.classList.remove('editor-mode');
     }
 
     created(): void {
@@ -2481,6 +2505,11 @@ export default class MetadataEditorV extends Vue {
 
 <style lang="scss">
 $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-serif;
+
+.editor-mode {
+    height: 100%;
+    overflow: hidden;
+}
 
 .storyramp-app,
 .vfm {
