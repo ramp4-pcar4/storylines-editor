@@ -201,7 +201,7 @@ export default class HomeV extends Vue {
     currLang = 'en';
     sourceFile = 'index.html#';
     profile: UserProfile = {};
-    showExpired: boolean = false;
+    showExpired = false;
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
@@ -210,16 +210,28 @@ export default class HomeV extends Vue {
         if (this.sessionExpired) {
             this.showExpired = true;
         }
-        this.userStore
-            .fetchUserProfile()
-            .then(() => {
-                if (this.userStore.userProfile) {
-                    this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
+        // this.userStore
+        //     .fetchUserProfile()
+        //     .then(() => {
+        //         if (this.userStore.userProfile) {
+        //             this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         console.error(error);
+        //     });
+        this.profile = {
+            userName: 'a user',
+            role: 'Editor',
+            storylines: [
+                {
+                    uuid: 'TCEI-IECT',
+                    titleEN: 'TCEI',
+                    titleFR: 'TCEI_FR',
+                    lastModified: '2025-01-31T10:26:17.1466888'
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            ]
+        };
     }
 
     get userName(): string {
