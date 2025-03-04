@@ -759,6 +759,7 @@ const clients = new Set();
 // Used to broadcast messages to all connected clients
 function broadcastToClients(message) {
     const payload = JSON.stringify(message);
+    console.log('The value is:', process.env.SERVER_CURR_ENV);
     clients.forEach((client) => {
         if (client.readyState === (process.env.SERVER_CURR_ENV ? WebSocket.OPEN : 1)) {
             logger('INFO', `Payload sent to the client`);
