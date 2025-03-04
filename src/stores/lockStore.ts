@@ -1,23 +1,24 @@
 import { defineStore } from 'pinia';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useLockStore = defineStore('lock', {
     state: () => ({
         socket: undefined as WebSocket | undefined,
         uuid: '',
         secret: '',
+        clientId: '',
         connected: false,
         received: false,
         timeInterval: undefined as NodeJS.Timeout | undefined,
         timeRemaining: 100000000000000, // in seconds
-        result: {} as any,
         broadcast: undefined as BroadcastChannel | undefined,
         confirmationTimeout: undefined as NodeJS.Timeout | undefined, // the timer to show the session extension confirmation modal
-        endTimeout: undefined as NodeJS.Timeout | undefined, // the timer to kill the session due to timeout
+        endTimeout: undefined as NodeJS.Timeout | undefined // the timer to kill the session due to timeout
     }),
     actions: {
         // Opens a connection with the web socket
         initConnection() {
-            return new Promise((resolve) => {
+            return new Promise<void>((resolve) => {
                 const socketUrl = `${
                     import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040'
                 }`;
@@ -26,18 +27,27 @@ export const useLockStore = defineStore('lock', {
                 // Connection opened
                 this.socket.onopen = () => {
                     this.connected = true;
+                    this.clientId = uuidv4();
                     resolve();
                 };
 
-                // Listen for messages
-                this.socket.onmessage = (event) => {
-                    const res = JSON.parse(event.data);
-                    this.received = true;
-                    this.result = res;
+                this.socket.onerror = () => {
+                    console.log('Socket connection errored!');
                 };
+
+                // Spam the server with nonsense messages every 30 seconds to prevent firefox from nuking the connection.
+                const msgSpam = setInterval(() => {
+                    this.socket?.send(JSON.stringify({ status: 'nonsense' }));
+                }, 30000);
+
+                // Close the socket connection before the user closes the window.
+                window.addEventListener('beforeunload', () => {
+                    clearInterval(msgSpam);
+                    this.socket?.close();
+                });
             });
         },
-         // Attempts to lock a storyline for this user.
+        // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.
         async lockStoryline(uuid: string): Promise<void> {
             // Stop the previous storyline's timer
@@ -50,25 +60,26 @@ export const useLockStore = defineStore('lock', {
 
             return new Promise((resolve, reject) => {
                 this.received = false;
-                this.socket?.send(JSON.stringify({ uuid, lock: true }));
+                this.socket?.send(JSON.stringify({ uuid, lock: true, clientId: this.clientId }));
 
                 const handleMessage = (event: MessageEvent) => {
                     const data = JSON.parse(event.data);
 
-                    if(data !== undefined){
-                        if(data.status === 'fail'){
-                            this.socket!.removeEventListener('message', handleMessage);
-                            reject(new Error(data.message || 'Failed to lock storyline.'));
-                        }
-                        else if (data.status === 'success') {
-                            this.socket!.removeEventListener('message', handleMessage);
+                    if (!data || data.status === 'nonsense' || data.clientId !== this.clientId) {
+                        return;
+                    }
 
-                            this.uuid = uuid;
-                            this.secret = data.secret; 
-                            this.broadcast = new BroadcastChannel(data.secret);
+                    if (data.status === 'fail') {
+                        this.socket!.removeEventListener('message', handleMessage);
+                        reject(new Error(data.message || 'Failed to lock storyline.'));
+                    } else if (data.status === 'success') {
+                        this.socket!.removeEventListener('message', handleMessage);
 
-                            resolve();
-                        }
+                        this.uuid = uuid;
+                        this.secret = data.secret;
+                        this.broadcast = new BroadcastChannel(data.secret);
+
+                        resolve();
                     }
                 };
 
@@ -79,7 +90,7 @@ export const useLockStore = defineStore('lock', {
         unlockStoryline() {
             clearInterval(this.timeInterval);
             if (this.connected) {
-                this.socket!.send(JSON.stringify({ uuid: this.uuid, lock: false }));
+                this.socket!.send(JSON.stringify({ uuid: this.uuid, lock: false, clientId: this.clientId }));
                 this.uuid = '';
                 this.secret = '';
                 this.broadcast?.postMessage({ action: 'end' });

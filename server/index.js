@@ -595,10 +595,10 @@ function logger(type, message) {
 const clients = new Set();
 
 // Used to broadcast messages to all connected clients
-function broadcastToClients(message){
+function broadcastToClients(message) {
     const payload = JSON.stringify(message);
     clients.forEach((client) => {
-        if(client.readyState === WebSocket.OPEN){
+        if (client.readyState === (process.env.SERVER_CURR_ENV ? WebSocket.OPEN : 1)) {
             logger('INFO', `Payload sent to the client`);
             client.send(payload);
         }
@@ -614,10 +614,16 @@ wss.on('connection', (ws) => {
     // { uuid: <uuid>, lock: false }
     ws.on('message', function (msg) {
         const message = JSON.parse(msg);
-        const {uuid, lock} = message;
+
+        if (message.status === 'nonsense') {
+            ws.send(JSON.stringify({ status: 'nonsense' }));
+            return;
+        }
+
+        const { uuid, lock, clientId } = message;
 
         if (!uuid) {
-            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.' }));
+            ws.send(JSON.stringify({ status: 'fail', message: 'UUID not provided.', clientId }));
         }
         logger('INFO', `${msg}`);
         // User wants to lock storyline since they are about to load/edit it.
@@ -627,7 +633,9 @@ wss.on('connection', (ws) => {
             // Someone else is currently accessing this storyline, do not allow the user to lock!
             if (currentLock && ws.uuid !== uuid) {
                 logger('INFO', `A client failed to lock the storyline ${uuid}.`);
-                ws.send(JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.' }));
+                ws.send(
+                    JSON.stringify({ status: 'fail', message: 'Another user has locked this storyline.', clientId })
+                );
             }
             // Lock the storyline for this user. No-one else can access it until the user is done with it.
             // Send the secret key back to the client so that they can now get/save the storyline by passing in the
@@ -637,11 +645,12 @@ wss.on('connection', (ws) => {
                 const secret = generateKey();
                 lockedUuids[uuid] = secret;
                 ws.uuid = uuid;
-                ws.send(JSON.stringify({ status: 'success', secret }));
+                ws.send(JSON.stringify({ status: 'success', secret, clientId }));
 
                 broadcastToClients({
-                    type:'lock',
+                    type: 'lock',
                     uuid,
+                    clientId
                 });
             }
         } else {
@@ -651,7 +660,8 @@ wss.on('connection', (ws) => {
                 ws.send(
                     JSON.stringify({
                         status: 'fail',
-                        message: 'You have not locked this storyline, so you may not unlock it.'
+                        message: 'You have not locked this storyline, so you may not unlock it.',
+                        clientId
                     })
                 );
             }
@@ -660,11 +670,12 @@ wss.on('connection', (ws) => {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
                 delete lockedUuids[uuid];
                 delete ws.uuid;
-                ws.send(JSON.stringify({ status: 'success' }));
+                ws.send(JSON.stringify({ status: 'success', clientId }));
 
                 broadcastToClients({
-                    type:'unlock',
+                    type: 'unlock',
                     uuid,
+                    clientId
                 });
             }
         }
@@ -680,7 +691,7 @@ wss.on('connection', (ws) => {
                 delete lockedUuids[ws.uuid];
                 broadcastToClients({
                     type: 'unlock',
-                    uuid: ws.uuid,
+                    uuid: ws.uuid
                 });
             }
         }
