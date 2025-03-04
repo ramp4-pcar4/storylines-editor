@@ -1105,11 +1105,15 @@ export default class MetadataEditorV extends Vue {
                         const configZip = new JSZip();
                         // Files retrieved. Convert them into a JSZip object.
                         res.blob().then((file: Blob) => {
-                            configZip.loadAsync(file).then(() => {
-                                this.configFileStructureHelper(configZip);
-                                // Extend the session on load
-                                this.extendSession();
-                            });
+                            configZip
+                                .loadAsync(file)
+                                .then(() => {
+                                    this.configFileStructureHelper(configZip);
+                                })
+                                .then(() => {
+                                    // Extend the session on load
+                                    this.extendSession();
+                                });
                         });
                     }
 
@@ -1353,6 +1357,7 @@ export default class MetadataEditorV extends Vue {
                         // Update the path to the RAMP config in the product config file.
                         panel.config = panel.config.replace(`/${prevUuid}-map-`, `/${this.changeUuid}-map-`);
                     }
+                    break;
                 default:
                     // Base case. This is a panel that doesn't have any children (i.e., not dynamic, slideshow).
                     // Rename the source.
@@ -1741,14 +1746,44 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
+    async createMainStyles(configZip: typeof JSZip): void {
+        const existingStyles = configZip.folder('styles').file('main.css');
+
+        if (existingStyles) {
+            // need to ensure the classes in this css file are not the same as the default ones...
+            const res = await existingStyles.async('text');
+            let styles = '';
+            if (!res.includes('centerPanel')) {
+                styles += `.centerPanel {\n\ttext-align: center;\n}\n\n`;
+            }
+            if (!res.includes('centerSlideLeft')) {
+                styles += `.centerSlideLeft {\n\ttext-align: left;\n}\n\n`;
+            }
+            if (!res.includes('centerSlideRight')) {
+                styles += `.centerSlideRight {\n\ttext-align: right;\n}\n\n`;
+            }
+            if (!res.includes('centerSlideFull')) {
+                styles += `.centerSlideFull {\n\ttext-align: center;\n}\n\n`;
+            }
+            styles += res;
+            configZip.folder('styles').file('main.css', styles);
+        } else {
+            const styles = `.centerPanel {\n\ttext-align: center;\n}\n\n.centerSlideLeft {\n\ttext-align: left;\n}\n
+.centerSlideRight {\n\ttext-align: right;\n}\n\n.centerSlideFull {\n\ttext-align: center;\n}\n\n`;
+            configZip.folder('styles').file('main.css', styles);
+        }
+    }
+
     /**
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    configFileStructureHelper(configZip: typeof JSZip, uploadFiles?: Array<File | undefined>): void {
+    async configFileStructureHelper(configZip: typeof JSZip, uploadFiles?: Array<File | undefined>): Promise<void> {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
+        const styles = configZip.folder('styles');
+        await this.createMainStyles(configZip);
 
         this.configFileStructure = {
             uuid: this.uuid,
@@ -1763,7 +1798,8 @@ export default class MetadataEditorV extends Vue {
                 en: (chartsFolder as JSZip).folder('en') as JSZip,
                 fr: (chartsFolder as JSZip).folder('fr') as JSZip
             },
-            rampConfig: rampConfigFolder as JSZip
+            rampConfig: rampConfigFolder as JSZip,
+            styles: styles as JSZip
         };
 
         // Upload each file in the `uploadFiles` array to the shared ZIP folder (due to cloning of configs in
