@@ -201,7 +201,7 @@ export default class HomeV extends Vue {
     currLang = 'en';
     sourceFile = 'index.html#';
     profile: UserProfile = {};
-    showExpired: boolean = false;
+    showExpired = false;
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';

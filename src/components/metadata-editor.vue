@@ -488,6 +488,14 @@
             </div>
         </template>
 
+        <!-- Loading spinner for when product is still being fetched -->
+        <template v-if="loadEditor && productLoading">
+            <div class="flex flex-col justify-center items-center" style="margin-top: 15%">
+                <div class="py-10 text-xl">{{ $t('editor.editMetadata.loading') }}</div>
+                <spinner size="200px" color="#009cd1"></spinner>
+            </div>
+        </template>
+
         <!-- The editor -->
         <template v-if="loadEditor && loadStatus === 'loaded'">
             <editor
@@ -597,7 +605,7 @@ import {
 import { VueSpinnerOval } from 'vue3-spinners';
 import { VueFinalModal } from 'vue-final-modal';
 import { useUserStore } from '../stores/userStore';
-import { computed } from "vue";
+import { computed } from 'vue';
 
 import JSZip from 'jszip';
 import axios from 'axios';
@@ -750,6 +758,7 @@ export default class MetadataEditorV extends Vue {
     sourceCounts: SourceCounts = {};
     sessionExpired = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
+    productLoading = false;
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
@@ -766,7 +775,7 @@ export default class MetadataEditorV extends Vue {
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
         this.configFileStructure = undefined;
-        
+
         // set any metadata default values for creating new product
         if (!this.loadExisting) {
             // set current date as default
@@ -844,15 +853,20 @@ export default class MetadataEditorV extends Vue {
 
         // If a product UUID is provided, fetch the contents from the server.
         if (this.$route.params.uid) {
-            this.generateRemoteConfig().catch(() => {
-                // Handle any connection/lock errors here
-                Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                if (this.$route.name === 'editor') {
-                    setTimeout(() => {
-                        this.$router.push({ name: 'home' });
-                    }, 2000);
-                }
-            });
+            this.productLoading = true;
+            this.generateRemoteConfig()
+                .then(() => {
+                    this.productLoading = false;
+                })
+                .catch(() => {
+                    // Handle any connection/lock errors here
+                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                    if (this.$route.name === 'editor') {
+                        setTimeout(() => {
+                            this.$router.push({ name: 'home' });
+                        }, 2000);
+                    }
+                });
         }
     }
 
