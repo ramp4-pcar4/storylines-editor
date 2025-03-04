@@ -857,13 +857,15 @@ export default class MetadataEditorV extends Vue {
     handleSessionTimeout(): void {
         // We prompt the user to extend the session when session warn minutes have passed.
         const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
+        const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+        const timeBuffer = isFirefox ? 2000 : 0;
         this.lockStore.confirmationTimeout = setTimeout(() => {
             // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
             document.onmousemove = () => undefined;
             document.onkeydown = () => undefined;
             this.$vfm.open(`confirm-extend-session-editor`);
             this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
-        }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000);
+        }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000 + timeBuffer);
         // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
         this.lockStore.endTimeout = setTimeout(() => {
             // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
@@ -876,7 +878,7 @@ export default class MetadataEditorV extends Vue {
             } else {
                 this.generateConfig();
             }
-        }, this.lockStore.timeRemaining * 1000 + 1000);
+        }, this.lockStore.timeRemaining * 1000 + 1000 + timeBuffer);
         // Now add event listeners to detect for inactivity.
         document.onmousemove = () => this.extendSession();
         document.onkeydown = () => this.extendSession();
