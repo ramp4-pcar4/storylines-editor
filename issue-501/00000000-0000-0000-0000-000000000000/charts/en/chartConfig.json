@@ -1,0 +1,65 @@
+{
+    "credits": {
+        "enabled": false
+    },
+    "title": {
+        "text": "Greenhouse gas emissions, 2004 to 2019"
+    },
+    "subtitle": {
+        "text": "Key Lake Operation, Cameco Corporation, Saskatchewan"
+    },
+    "yAxis": {
+        "title": {
+            "text": "Kilotonnes of carbon dioxide equivalent"
+        }
+    },
+    "plotOptions": {
+        "column": {
+            "pointPadding": 0,
+            "borderWidth": 0
+        }
+    },
+    "xAxis": {
+        "categories": [
+            2004,
+            2005,
+            2006,
+            2007,
+            2008,
+            2009,
+            2010,
+            2011,
+            2012,
+            2013,
+            2014,
+            2015,
+            2016,
+            2017,
+            2018,
+            2019
+        ],
+        "title": {
+            "text": "Year"
+        }
+    },
+    "series": [
+        {
+            "name": "Facility emissions (kilotonnes of carbon dioxide equivalent)",
+            "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33.96, 23.08, 17.5],
+            "type": "column",
+            "color": "#0f4c6a"
+        },
+        {
+            "name": "Reporting threshold",
+            "data": [100, 100, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 10],
+            "type": "line",
+            "step": "center",
+            "color": "#e8ba1f"
+        }
+    ],
+    "exporting": {
+        "menuItemDefinitions": {
+            "viewData": null
+        }
+    }
+}
