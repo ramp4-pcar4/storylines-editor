@@ -433,7 +433,7 @@
                 },
                 "type": {
                     "type": "string",
-                    "enum": ["slideshow"]
+                    "enum": ["slideshow", "slideshowImage", "slideshowChart"]
                 },
                 "customStyles": {
                     "type": "string",
