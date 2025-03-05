@@ -133,13 +133,7 @@
                                                 checkUuid();
                                             "
                                             v-model.trim="uuid"
-                                            v-on:keyup.enter="
-                                                () => {
-                                                    generateRemoteConfig()
-                                                        .then(fetchHistory)
-                                                        .catch(() => {}); // Prevent grousing in console
-                                                }
-                                            "
+                                            v-on:keyup.enter="handleUuidEnter"
                                             @focus="showDropdown = true"
                                             @blur="showDropdown = false"
                                             @keydown.down.prevent="highlightNext"
@@ -192,11 +186,7 @@
                                     <!-- Load storyline with the given UUID, if it exists on the server, and also
                                          any history associated with the product that can be found -->
                                     <button
-                                        @click="
-                                            () => {
-                                                generateRemoteConfig().then(fetchHistory);
-                                            }
-                                        "
+                                        @click="handleUuidLoad"
                                         class="editor-button editor-forms-button bg-black text-white ml-3 mr-0"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
@@ -255,7 +245,7 @@
                                     </span>
                                     <div>
                                         <span class="inline-block select-none text-sm">{{
-                                            $t(`editor.warning.${warning}`)
+                                            $t(`editor.warning.${warning}`, warning === 'uuidNotFound' ? { uuid } : {})
                                         }}</span>
                                     </div>
                                     <br />
@@ -660,7 +650,7 @@ export default class MetadataEditorV extends Vue {
     loadingIntoEditor = false;
     loadEditor = false;
     error = false; // whether an error has occurred
-    warning: 'none' | 'uuid' | 'rename' | 'blank' = 'none'; // used for duplicate uuid warning
+    warning: 'none' | 'uuid' | 'rename' | 'blank' | 'uuidNotFound' = 'none'; // used for duplicate uuid warning
     configLang = 'en';
     currLang = 'en'; // page language
     showDropdown = false;
@@ -1096,6 +1086,7 @@ export default class MetadataEditorV extends Vue {
                             Message.error(this.$t('editor.editMetadata.message.error.noRequestedVersion'));
                         }
                         this.error = true;
+                        this.warning = 'uuidNotFound';
                         this.loadStatus = 'waiting';
                         this.clearConfig();
                         // Product was not found, unlock the UUID
@@ -1109,6 +1100,8 @@ export default class MetadataEditorV extends Vue {
                                 this.configFileStructureHelper(configZip);
                                 // Extend the session on load
                                 this.extendSession();
+                                this.error = false;
+                                this.warning = 'none';
                             });
                         });
                     }
@@ -2417,6 +2410,29 @@ export default class MetadataEditorV extends Vue {
             next(false);
         } else {
             next();
+        }
+    }
+
+    async handleUuidEnter(): void {
+        if (this.editExisting) {
+            this.handleUuidLoad();
+        } else {
+            // UUID is not taken and is not blank so we proceed to editor-main
+            if (!this.error) {
+                this.continueToEditor();
+            } else if (this.warning !== 'none') {
+                Message.error(this.$t(`editor.warning.${this.warning}`));
+            }
+        }
+    }
+
+    handleUuidLoad(): void {
+        if (this.uuid) {
+            this.generateRemoteConfig().then(this.fetchHistory);
+        } else {
+            this.error = true;
+            this.warning = 'blank';
+            Message.error(this.$t(`editor.warning.${this.warning}`));
         }
     }
 
