@@ -12,7 +12,7 @@ export const useLockStore = defineStore('lock', {
         result: {} as any,
         broadcast: undefined as BroadcastChannel | undefined,
         confirmationTimeout: undefined as NodeJS.Timeout | undefined, // the timer to show the session extension confirmation modal
-        endTimeout: undefined as NodeJS.Timeout | undefined, // the timer to kill the session due to timeout
+        endTimeout: undefined as NodeJS.Timeout | undefined // the timer to kill the session due to timeout
     }),
     actions: {
         // Opens a connection with the web socket
@@ -37,7 +37,7 @@ export const useLockStore = defineStore('lock', {
                 };
             });
         },
-         // Attempts to lock a storyline for this user.
+        // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.
         async lockStoryline(uuid: string): Promise<void> {
             // Stop the previous storyline's timer
@@ -55,16 +55,16 @@ export const useLockStore = defineStore('lock', {
                 const handleMessage = (event: MessageEvent) => {
                     const data = JSON.parse(event.data);
 
-                    if(data !== undefined){
-                        if(data.status === 'fail'){
+                    if (data !== undefined) {
+                        if (data.status === 'fail') {
                             this.socket!.removeEventListener('message', handleMessage);
                             reject(new Error(data.message || 'Failed to lock storyline.'));
-                        }
-                        else if (data.status === 'success') {
+                        } else if (data.status === 'success') {
+                            // Should this case only be used for locking storylines? Or unlocking as well?
                             this.socket!.removeEventListener('message', handleMessage);
 
                             this.uuid = uuid;
-                            this.secret = data.secret; 
+                            this.secret = data.secret;
                             this.broadcast = new BroadcastChannel(data.secret);
 
                             resolve();
