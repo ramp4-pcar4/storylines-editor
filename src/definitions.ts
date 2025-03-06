@@ -197,6 +197,7 @@ export interface MapPanel extends BasePanel {
     scrollguard: boolean;
     customStyles?: string;
     caption?: string;
+    shared?: boolean; // Potentially needed for shared map configs later
 }
 export interface TimeSliderConfig {
     range: number[];
