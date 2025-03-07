@@ -1,44 +1,5 @@
 <template>
-    <div class="block mt-3">
-        <!-- Menu with option to add a new chart -->
-        <div class="flex items-center">
-            <span class="font-bold pr-4">{{
-                $t('editor.slideshow.label.info', {
-                    num: panel.items.length
-                })
-            }}</span>
-
-            <!-- add item button -->
-            <button class="editor-button bg-gray-100 cursor-pointer hover:bg-gray-200" @click="this.changeEditStatus()">
-                <div class="flex items-center">
-                    <svg
-                        height="18px"
-                        width="18px"
-                        viewBox="0 0 23 21"
-                        xmlns="http://www.w3.org/2000/svg"
-                        v-if="editingStatus !== 'create'"
-                    >
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                    </svg>
-                    <svg
-                        class="fill-current"
-                        height="18px"
-                        width="18px"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 352 512"
-                        v-else
-                    >
-                        <path
-                            d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-                        ></path>
-                    </svg>
-                    <span class="px-2">
-                        {{ editingStatus === 'create' ? $t('editor.cancel') : $t('editor.slideshow.label.create') }}
-                    </span>
-                </div>
-            </button>
-        </div>
-        <hr class="border-solid border-t-2 border-gray-300 my-2" />
+    <div class="block my-3">
         <!-- Metadata Editor -->
 
         <!-- Slideshow caption -->
@@ -48,33 +9,211 @@
                 id="slideshowCaption"
                 class="editor-input block w-full lg:w-1/2"
                 type="text"
+                :placeholder="$t('editor.slideshow.addSlideTitle')"
                 v-model="panel.caption"
             />
         </div>
 
-        <table class="w-2/3 mt-5">
-            <thead>
-                <tr class="table-header">
-                    <th :aria-label="$t('editor.slideshow.label.slideNumber')"></th>
-                    <th>{{ $t('editor.slideshow.label.type') }}</th>
-                    <th>{{ $t('dynamic.panel.actions') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-contents" v-for="(item, idx) in panel.items" :key="idx">
-                    <td>{{ idx + 1 }}.</td>
-                    <td>{{ item.type }}</td>
-                    <td>
-                        <span @click="editItem(idx)" class="underline">Edit</span>
-                        |
-                        <span @click="deleteItem(idx)" class="underline">Remove</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Slideshow items heading -->
+        <div class="flex items-center">
+            <span class="font-bold pr-4">{{
+                $t('editor.slideshow.label.info', {
+                    num: panel.items.length
+                })
+            }}</span>
+        </div>
+        <hr class="border-solid border-t-2 border-gray-300 my-2" />
+        <div class="w-full lg:w-4/5 max-h-96 overflow-y-auto mt-5 border border-gray-400 rounded-md">
+            <table class="w-full border-separate">
+                <thead class="bg-white sticky top-0 z-10">
+                    <tr style="top: 2px" class="table-header sticky z-20">
+                        <th
+                            style="width: 10%; text-align: left !important"
+                            class="rounded-tl"
+                            :aria-label="$t('editor.slideshow.label.slideNumber')"
+                        ></th>
+                        <th
+                            style="width: 40%; text-align: left !important"
+                            :aria-label="$t('editor.slideshow.label.slideNumber')"
+                        >
+                            {{ $t('editor.slideshow.label.slideNumber') }}
+                        </th>
+                        <th style="width: 20%">{{ $t('editor.slideshow.label.type') }}</th>
+                        <th style="width: 30%" class="rounded-tr">{{ $t('dynamic.panel.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-if="panel.items.length > 0"
+                        class="table-contents"
+                        style="cursor: default !important"
+                        v-for="(item, idx) in panel.items"
+                        :key="idx"
+                        :class="{
+                            'bg-gray-100': idx % 2 !== 0,
+                            'bg-blue-200 hover-editing':
+                                editingStatus !== 'none' && editingStatus !== 'create' && editingIdx === idx
+                        }"
+                    >
+                        <td class="space-y-1" :class="{ 'rounded-bl': idx === panel.items.length - 1 }">
+                            <button
+                                :disabled="idx === 0 || editingStatus === 'edit'"
+                                @click="moveSlideUp(idx)"
+                                style="border: none !important"
+                                class="editor-button py-1 px-1.5"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'top',
+                                    content: $t('editor.slides.toc.moveSlideUp'),
+                                    touch: ['hold', 500]
+                                }"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    x="0px"
+                                    y="0px"
+                                    viewBox="0 0 122.88 66.91"
+                                    style="enable-background: new 0 0 122.88 66.91"
+                                    xml:space="preserve"
+                                    height="14"
+                                    width="14"
+                                    class="fill-current"
+                                >
+                                    <g>
+                                        <path
+                                            d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
+                                        />
+                                    </g>
+                                </svg>
+                            </button>
+                            <button
+                                :disabled="idx === panel.items.length - 1 || editingStatus === 'edit'"
+                                @click="moveSlideDown(idx)"
+                                style="border: none !important"
+                                class="editor-button py-1 px-1.5 rotate-180 transform"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'top',
+                                    content: $t('editor.slides.toc.moveSlideDown'),
+                                    touch: ['hold', 500]
+                                }"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    x="0px"
+                                    y="0px"
+                                    viewBox="0 0 122.88 66.91"
+                                    style="enable-background: new 0 0 122.88 66.91"
+                                    xml:space="preserve"
+                                    height="14"
+                                    width="14"
+                                    class="fill-current"
+                                >
+                                    <g>
+                                        <path
+                                            d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
+                                        />
+                                    </g>
+                                </svg>
+                            </button>
+                        </td>
+                        <td style="text-align: left !important" class="truncate">
+                            {{ idx + 1 }}. {{ item.title || $t('editor.slideshow.noTitle') }}
+                        </td>
+                        <td>{{ $t(`editor.slide.panel.type.${item.type}`) }}</td>
+                        <td :class="{ 'rounded-br': idx === panel.items.length - 1 }">
+                            <span
+                                @click="editItem(idx)"
+                                @keydown.enter="editItem(idx)"
+                                class="slideshow-text-button underline cursor-pointer rounded-sm"
+                                tabindex="0"
+                                >{{ $t('editor.chart.label.edit') }}</span
+                            >
+                            |
+                            <a
+                                @click="deleteItem(idx)"
+                                @keydown.enter="deleteItem(idx)"
+                                class="slideshow-text-button underline cursor-pointer rounded-sm text-red-700"
+                                tabindex="0"
+                                >{{ $t('editor.remove') }}</a
+                            >
+                        </td>
+                    </tr>
+                    <tr v-else>
+                        <td class="self-center text-center italic" colspan="4">
+                            {{ $t('editor.slideshow.noSlides') }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- add item button -->
+        <button
+            class="editor-button w-full lg:w-4/5 mt-5 border max-h-96 bg-gray-100 border-gray-400 rounded-md cursor-pointer hover:bg-gray-200 flex items-center"
+            @click="this.changeEditStatus()"
+        >
+            <svg
+                height="18px"
+                width="18px"
+                viewBox="0 0 23 21"
+                xmlns="http://www.w3.org/2000/svg"
+                v-if="editingStatus !== 'create'"
+            >
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            <svg
+                class="fill-current"
+                height="18px"
+                width="18px"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 352 512"
+                v-else
+            >
+                <path
+                    d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                ></path>
+            </svg>
+            <span class="px-2">
+                {{ editingStatus === 'create' ? $t('editor.cancel') : $t('editor.slideshow.label.create') }}
+            </span>
+        </button>
+
         <br /><br />
-        <div v-if="editingStatus !== 'none'">
-            <h2 class="text-xl font-bold">{{ $t(`editor.slideshow.label.${editingStatus}`) }}</h2>
+        <div
+            id="create-and-edit-area"
+            v-if="editingStatus !== 'none'"
+            class="border-2 rounded-lg p-4"
+            :class="[editingStatus !== 'create' ? 'border-blue-300' : 'border-gray-300']"
+        >
+            <div class="flex w-full justify-between items-center">
+                <h2 class="text-xl font-bold">
+                    {{
+                        $t(`editor.slideshow.label.${editingStatus}`) +
+                        (editingStatus === 'edit' ? ` (#${editingIdx + 1})` : '')
+                    }}
+                </h2>
+                <!-- Save new slide -->
+                <button
+                    v-if="editingStatus === 'create'"
+                    id="add-new-item"
+                    class="editor-button bg-black text-white hover:bg-gray-800"
+                    @click="saveItem(true)"
+                >
+                    {{ $t('editor.slideshow.label.add') }}
+                </button>
+                <!-- Save changes to existing slide -->
+                <button
+                    v-else
+                    id="edit-existing-item"
+                    class="editor-button bg-black text-white hover:bg-gray-800"
+                    @click="saveItem()"
+                >
+                    {{ $t('editor.saveChanges') }}
+                </button>
+            </div>
+
             <hr class="border-solid border-t-2 border-gray-300 my-2" />
             <div>
                 <div class="mt-3" v-if="editingStatus === 'create'">
@@ -83,7 +222,7 @@
                     <br />
                     <select class="rounded shadow w-48" @input="onTypeInput" :value="newSlideType">
                         <option v-for="thing in Object.keys(editors)" :key="thing" :value="thing">
-                            {{ thing }}
+                            {{ $t(`editor.slide.panel.type.${thing}`) }}
                         </option>
                     </select>
                     <component
@@ -99,15 +238,6 @@
                             $emit('shared-asset', oppositeAssetPath, sharedAssetName, oppositeLang);
                         }"
                     ></component>
-                    <div class="mt-3 w-full flex justify-end">
-                        <button
-                            id="add-new-item"
-                            class="editor-button bg-black text-white hover:bg-gray-800"
-                            @click="saveItem(true)"
-                        >
-                            {{ $t('editor.slideshow.label.add') }}
-                        </button>
-                    </div>
                 </div>
                 <div v-else>
                     <!-- Editing existing slide-->
@@ -124,11 +254,6 @@
                             $emit('shared-asset', oppositeAssetPath, sharedAssetName, oppositeLang);
                         }"
                     ></component>
-                    <div class="mt-3 w-full flex justify-end">
-                        <button class="editor-button bg-black text-white hover:bg-gray-800" @click="saveItem()">
-                            {{ $t('editor.saveChanges') }}
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -208,6 +333,11 @@ export default class SlideshowEditorV extends Vue {
         this.saveChanges();
         this.editingIdx = idx;
         this.editingStatus = 'edit';
+
+        // After switching the edit status, scroll to the add button.
+        this.$nextTick(() => {
+            document.getElementById('create-and-edit-area')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
     }
 
     deleteItem(item: number): void {
@@ -259,6 +389,52 @@ export default class SlideshowEditorV extends Vue {
         }
     }
 
+    moveSlideUp(index: number): void {
+        if (index === 0) {
+            return;
+        }
+
+        const item = JSON.parse(JSON.stringify(this.panel.items[index]));
+
+        this.panel.items.splice(index, 1);
+        this.panel.items.splice(index - 1, 0, item);
+
+        // Just in case we decide to allow it: handling edge case where a slide
+        // being edited is moved. In that case, ensure focus remains on that slide
+        if (this.editingStatus === 'edit') {
+            // If slide being edited is current slide
+            if (this.editingIdx === index) {
+                this.editingIdx -= 1;
+                // If slide being edited is previous slide (shift it down)
+            } else if (this.editingIdx === index - 1) {
+                this.editingIdx += 1;
+            }
+        }
+    }
+
+    moveSlideDown(index: number): void {
+        if (index === this.panel.items.length - 1) {
+            return;
+        }
+
+        const item = JSON.parse(JSON.stringify(this.panel.items[index]));
+
+        this.panel.items.splice(index, 1);
+        this.panel.items.splice(index + 1, 0, item);
+
+        // Just in case we decide to allow it: handling edge case where a slide
+        // being edited is moved. In that case, ensure focus remains on that slide
+        if (this.editingStatus === 'edit') {
+            // If slide being edited is current slide
+            if (this.editingIdx === index) {
+                this.editingIdx += 1;
+                // If slide being edited is next slide (shift it up)
+            } else if (this.editingIdx === index + 1) {
+                this.editingIdx -= 1;
+            }
+        }
+    }
+
     saveItem(add = false): void {
         let itemConfig;
 
@@ -299,7 +475,9 @@ export default class SlideshowEditorV extends Vue {
 
             // After switching the edit status, scroll to the add button.
             this.$nextTick(() => {
-                document.getElementById('add-new-item')?.scrollIntoView({ behavior: 'smooth' });
+                document
+                    .getElementById('create-and-edit-area')
+                    ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             });
         }
     }
@@ -319,11 +497,11 @@ select {
 .table-header th {
     text-align: center;
     background-color: #ddd;
-    padding: 5px;
+    padding: 5px 10px;
 }
 .table-contents td {
     text-align: center;
-    padding: 5px;
+    padding: 5px 10px;
 }
 .table-contents:hover {
     background-color: #eee;
@@ -346,9 +524,20 @@ select {
     margin-top: 0 !important;
 }
 
+.hover-editing:hover {
+    background-color: rgb(219, 234, 254);
+}
+
 select {
     border: 1px solid #a1a1a1;
     background: white;
     padding: 0.25rem 0.5rem;
+}
+
+.slideshow-text-button:focus {
+    outline: 2px solid royalblue;
+    z-index: 2;
+    outline-offset: 2px;
+    transition-duration: 0.075s;
 }
 </style>
