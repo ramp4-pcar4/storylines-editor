@@ -73,7 +73,7 @@ import {
     ConfigFileStructure,
     Highchart,
     PanelType,
-    SlideshowPanel,
+    SlideshowChartPanel,
     SourceCounts
 } from '@/definitions';
 import ChartPreviewV from './helpers/chart-preview.vue';
@@ -88,7 +88,7 @@ import draggable from 'vuedraggable';
     }
 })
 export default class ChartEditorV extends Vue {
-    @Prop() panel!: ChartPanel | SlideshowPanel;
+    @Prop() panel!: ChartPanel | SlideshowChartPanel;
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
@@ -121,7 +121,7 @@ export default class ChartEditorV extends Vue {
 
         // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
         const charts =
-            this.panel.type === PanelType.Slideshow
+            this.panel.type === PanelType.SlideshowChart
                 ? (this.panel.items as Array<ChartPanel>)
                 : this.panel.src
                 ? [this.panel]
@@ -281,10 +281,10 @@ export default class ChartEditorV extends Vue {
                     (this.panel as ChartPanel)[key] = newChart[key];
                 });
             } else {
-                this.panel.type = PanelType.Slideshow;
+                this.panel.type = PanelType.SlideshowChart;
 
                 // Turn each of the chart configs into a chart panel and add them to the slideshow.
-                (this.panel as SlideshowPanel).items = this.chartConfigs.map((chart: ChartConfig) => {
+                (this.panel as SlideshowChartPanel).items = this.chartConfigs.map((chart: ChartConfig) => {
                     return {
                         ...chart,
                         type: PanelType.Chart
@@ -298,7 +298,7 @@ export default class ChartEditorV extends Vue {
 
     onChartsEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit', this.chartConfigs.length !== 0);
+        this.$emit('slide-edit');
     }
 }
 </script>

@@ -185,6 +185,10 @@ export default class StoryPreviewV extends Vue {
                 document.onmousemove = () => this.extendSession();
                 document.onkeydown = () => this.extendSession();
             }
+            // Link stylesheets from the config, if any
+            if (this.config.stylesheets) {
+                this.addStylesheets(this.config.stylesheets);
+            }
             this.loadStatus = 'loaded';
         } else {
             this.savedProduct = true;
@@ -243,6 +247,10 @@ export default class StoryPreviewV extends Vue {
                                 this.config = config;
                                 this.loadStatus = 'loaded';
                                 document.title = this.config.title + ' - Canada.ca';
+                                // Link stylesheets from the config, if any
+                                if (this.config.stylesheets) {
+                                    this.addStylesheets(this.config.stylesheets);
+                                }
                             });
                         });
                     });
@@ -274,6 +282,19 @@ export default class StoryPreviewV extends Vue {
         const html = document.documentElement;
         html.setAttribute('lang', this.lang);
         this.$i18n.locale = this.lang;
+    }
+
+    addStylesheets(paths: string[]): void {
+        paths.forEach(async (path) => {
+            const filePath = path.split('/').slice(1).join('/');
+            const styleFile = this.configFileStructure.zip.file(filePath);
+            if (styleFile) {
+                const styles = await styleFile.async('text');
+                const styleEl = document.createElement('style');
+                styleEl.textContent = styles;
+                document.head.appendChild(styleEl);
+            }
+        });
     }
 
     // reload preview page with FR config
