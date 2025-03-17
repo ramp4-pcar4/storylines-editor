@@ -73,7 +73,6 @@ export default class CustomEditorV extends Vue {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Prop() config!: string;
 
-    schemaUrl = './StorylinesSlideSchema.json';
     updatedConfig = '';
     edited = false;
 
@@ -85,21 +84,20 @@ export default class CustomEditorV extends Vue {
     storylinesSchema = '';
 
     mounted(): void {
-        // add storylines config schema for validation purposes
-        fetch(this.schemaUrl).then((schema) => {
-            // parse JSON schema
-            schema.json().then(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (res: any) => {
-                    this.storylinesSchema = res;
-                    this.validate();
-                },
-                (err) => {
-                    console.error(err);
-                }
-            );
+        import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
+            this.storylinesSchema = {
+                ...StorylinesSchema.$defs.slide,
+                $defs: StorylinesSchema.$defs,
+                additionalProperties: StorylinesSchema.additionalProperties
+            };
+
+            this.updatedConfig = this.config;
+            this.validate();
         });
-        this.updatedConfig = this.config;
+        // // add storylines config schema for validation purposes
+        // this.$nextTick(() => {
+
+        // });
     }
 
     // returns true if no validation errors, false if errors
