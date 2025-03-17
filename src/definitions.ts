@@ -48,6 +48,7 @@ export interface MetadataContent {
     tocOrientation: string;
     returnTop: boolean;
     dateModified: string;
+    schemaVersion: string;
 }
 
 export interface HelpSection {

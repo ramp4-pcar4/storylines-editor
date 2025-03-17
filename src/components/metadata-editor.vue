@@ -657,6 +657,8 @@ export default class MetadataEditorV extends Vue {
     showDropdown = false;
     highlightedIndex = -1;
     lockStore = useLockStore();
+    schemaUrl = './StorylinesSlideSchema.json';
+    latestSchemaVersion = '';
 
     storylineHistory: History[] = [];
     selectedHistory: History | null = null;
@@ -694,7 +696,8 @@ export default class MetadataEditorV extends Vue {
         contextLabel: '',
         tocOrientation: '',
         returnTop: true,
-        dateModified: ''
+        dateModified: '',
+        schemaVersion: ''
     };
     editingMetadata = false;
     temporaryMetadataCopy: MetadataContent = {
@@ -714,7 +717,8 @@ export default class MetadataEditorV extends Vue {
         contextLabel: '',
         tocOrientation: '',
         returnTop: true,
-        dateModified: ''
+        dateModified: '',
+        schemaVersion: ''
     };
     defaultBlankSlide: Slide = {
         title: '',
@@ -743,6 +747,18 @@ export default class MetadataEditorV extends Vue {
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
         this.editingMetadata = !this.editExisting;
+        fetch(this.schemaUrl).then((schema) => {
+            // parse JSON schema
+            schema.json().then(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (res: any) => {
+                    this.latestSchemaVersion = res.version;
+                },
+                (err) => {
+                    console.error(err);
+                }
+            );
+        });
     }
 
     created(): void {
@@ -994,11 +1010,11 @@ export default class MetadataEditorV extends Vue {
      */
     generateNewConfig(): void {
         const configZip = new JSZip();
-
         // Generate a new configuration file and populate required fields.
         this.configs[this.configLang] = this.configHelper();
         const config = this.configs[this.configLang] as StoryRampConfig;
         config.introSlide.logo.altText = this.metadata.logoAltText ?? '';
+        config.schemaVersion = this.latestSchemaVersion;
 
         // Set the source of the product logo
         if (!this.metadata.logoName) {
@@ -1837,6 +1853,10 @@ export default class MetadataEditorV extends Vue {
         this.metadata.tocOrientation = config.tocOrientation;
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.dateModified = config.dateModified;
+        this.metadata.schemaVersion = config.schemaVersion;
+
+        // TODO: check schema version in the config, and if it doesn't match the current version in the schema (stored in
+        // this.latestSchemaVersion), the product's local repo should be re-initialized
 
         this.loadSlides(this.configs);
 

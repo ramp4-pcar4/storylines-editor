@@ -2,7 +2,7 @@
     "title": "Storylines Slide Config Schema",
     "type": "object",
     "additionalProperties": false,
-
+    "version": "1.0.0",
     "$defs": {
         "panel": {
             "type": "array",
