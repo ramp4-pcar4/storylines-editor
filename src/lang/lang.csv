@@ -276,6 +276,7 @@ editor.slides.advanced.details,Click here for more details.,1,Cliquez ici pour p
 editor.slides.advanced.error,This configuration contains one or more errors. Leaving it as-is may cause unexpected behaviour in the editor and published product.,1,Cette configuration contient une ou plusieurs erreurs. La laisser telle quelle peut entraîner un comportement inattendu dans l'éditeur et dans le produit publié.,0
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
+editor.slides.assetNameChange,Asset {oldName} has been uploaded with name {newName},1,L'actif {oldName} a été téléchargé avec le nom {newName},0
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1
 editor.slides.panelNumber,Panel {num},1,Panneau {num},0
 editor.slides.panel.body,Panel body,1,Corps du panneau,1

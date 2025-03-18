@@ -378,11 +378,13 @@ export default class MetadataEditorV extends Vue {
     removeLogo(): void {
         this.metadata.logoName = '';
         this.metadata.logoPreview = '';
+        this.$emit('logoRemoved');
     }
 
     removeIntroBackground(): void {
         this.metadata.introBgName = '';
         this.metadata.introBgPreview = '';
+        this.$emit('backgroundRemoved');
     }
 }
 </script>

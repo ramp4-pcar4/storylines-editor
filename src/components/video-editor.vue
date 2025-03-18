@@ -370,6 +370,11 @@ export default class VideoEditorV extends Vue {
             this.configFileStructure.assets[this.lang].file(newAssetName, file);
         }
 
+        // Notify user of the change in the name of their uploaded asset, to avoid any confusion
+        if (file.name !== newAssetName) {
+            Message.info(this.$t('editor.slides.assetNameChange', { oldName: file.name, newName: newAssetName }));
+        }
+
         if (this.sourceCounts[uploadSource]) {
             this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
         } else {
