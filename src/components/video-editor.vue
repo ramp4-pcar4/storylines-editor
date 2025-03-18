@@ -334,6 +334,12 @@ export default class VideoEditorV extends Vue {
                         uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
                         this.configFileStructure.assets['shared'].file(newAssetName, file);
                         inSharedAsset = true;
+                        Message.info(
+                            this.$t('editor.slides.movedToShared', {
+                                assetName: newAssetName,
+                                oppositeFolder: `assets/${oppositeLang}`
+                            })
+                        );
                     }
                     this.$emit('shared-asset', oppositeFileSource, uploadSource, oppositeLang); // must be emitted for each duplicate asset
                 }
@@ -368,6 +374,11 @@ export default class VideoEditorV extends Vue {
             }
             uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${newAssetName}`;
             this.configFileStructure.assets[this.lang].file(newAssetName, file);
+        }
+
+        // Notify user of the change in the name of their uploaded asset, to avoid any confusion
+        if (file.name !== newAssetName) {
+            Message.info(this.$t('editor.slides.assetNameChange', { oldName: file.name, newName: newAssetName }));
         }
 
         if (this.sourceCounts[uploadSource]) {
@@ -485,6 +496,13 @@ export default class VideoEditorV extends Vue {
             if (this.sourceCounts[videoSource] === 0) {
                 this.configFileStructure.assets[videoFolder].remove(videoRelativePath);
                 URL.revokeObjectURL(this.videoPreview.src);
+                Message.info(
+                    this.$t('editor.slides.assetRemoved', {
+                        assetType: 'Video',
+                        assetName: videoRelativePath,
+                        folder: `assets/${videoFolder}`
+                    })
+                );
             }
         }
         (this.$refs.videoFileInput as HTMLInputElement).value = '';

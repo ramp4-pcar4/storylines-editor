@@ -407,6 +407,8 @@
                                         @metadata-changed="updateMetadata"
                                         @image-changed="onFileChange"
                                         @image-source-changed="onImageSourceInput"
+                                        @logo-removed="decrementSourceCount('Logo')"
+                                        @background-removed="decrementSourceCount('Background')"
                                     ></metadata-content>
                                     <!-- Save/discard changes buttons (existing only) -->
                                     <div v-if="editingMetadata && editExisting" class="flex gap-3 mt-2">
@@ -537,6 +539,8 @@
                                 @metadata-changed="updateMetadata"
                                 @image-changed="onFileChange"
                                 @image-source-changed="onImageSourceInput"
+                                @logo-removed="decrementSourceCount('Logo')"
+                                @background-removed="decrementSourceCount('Background')"
                             ></metadata-content>
                         </div>
                     </vue-final-modal>
@@ -1476,13 +1480,34 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    decrementSourceCount(src: string): void {
-        if (this.sourceCounts[src]) {
-            this.sourceCounts[src] -= 1;
+    decrementSourceCount(src: string | 'Logo' | 'Background'): void {
+        if (src === 'Logo') {
+            src = this.configs[this.configLang].introSlide.logo.src;
         }
-        if (this.sourceCounts[src] <= 0) {
-            const relativePath = src.split('/').slice(1).join('/');
-            this.configFileStructure.zip.remove(relativePath);
+
+        if (src === 'Background') {
+            src = this.configs[this.configLang].introSlide.backgroundImage;
+        }
+
+        if (src) {
+            const srcSplit = src.split('/');
+            const folder = srcSplit.slice(1, 3).join('/');
+            const assetName = srcSplit.slice(3).join('/');
+
+            if (this.sourceCounts[src]) {
+                this.sourceCounts[src] -= 1;
+            }
+            if (this.sourceCounts[src] <= 0) {
+                const relativePath = src.split('/').slice(1).join('/');
+                this.configFileStructure.zip.remove(relativePath);
+                Message.info(
+                    this.$t('editor.slides.assetRemoved', {
+                        assetType: 'Image',
+                        assetName,
+                        folder
+                    })
+                );
+            }
         }
     }
 
@@ -1682,6 +1707,12 @@ export default class MetadataEditorV extends Vue {
                         uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
                         this.configFileStructure.assets['shared'].file(newAssetName, asset);
                         inSharedAsset = true;
+                        Message.info(
+                            this.$t('editor.slides.movedToShared', {
+                                assetName: newAssetName,
+                                oppositeFolder: `assets/${oppositeLang}`
+                            })
+                        );
                     }
                     this.updateToSharedAsset(oppositeFileSource, uploadSource, oppositeLang);
                 }
@@ -1716,6 +1747,11 @@ export default class MetadataEditorV extends Vue {
             }
             uploadSource = `${this.configFileStructure.uuid}/assets/${this.configLang}/${newAssetName}`;
             this.configFileStructure.assets[this.configLang].file(newAssetName, asset);
+        }
+
+        // Notify user of the change in the name of their uploaded asset, to avoid any confusion
+        if (asset.name !== newAssetName) {
+            Message.info(this.$t('editor.slides.assetNameChange', { oldName: asset.name, newName: newAssetName }));
         }
 
         // Check if the asset src is the same as before. If it's not, then we increment the source count of the new
