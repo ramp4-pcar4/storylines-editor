@@ -527,6 +527,13 @@ export default class SlideTocV extends Vue {
                         this.sourceCounts[sharedFileSource] = this.sourceCounts[oppositeFileSource] ?? 0;
                         this.sourceCounts[oppositeFileSource] = 0;
                         this.$emit('shared-asset', oppositeFileSource, sharedFileSource, oppositeLang);
+                        Message.info(
+                            this.$t('editor.slides.movedToShared', {
+                                assetName: sharedAssetName,
+                                oppositeFolder: `assets/${oppositeLang}`
+                            }),
+                            { duration: -1, closable: true }
+                        );
                     });
                 }
                 this.sourceCounts[sharedFileSource] += 1;

@@ -273,6 +273,9 @@ editor.slides.advanced.details,Click here for more details.,1,Cliquez ici pour p
 editor.slides.advanced.error,This configuration contains one or more errors. Leaving it as-is may cause unexpected behaviour in the editor and published product.,1,Cette configuration contient une ou plusieurs erreurs. La laisser telle quelle peut entraîner un comportement inattendu dans l'éditeur et dans le produit publié.,0
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
+editor.slides.assetNameChange,Asset {oldName} has been uploaded with name {newName},1,L'actif {oldName} a été téléchargé avec le nom {newName},0
+editor.slides.movedToShared,"Asset {assetName} has been moved to the shared folder, and subsequently deleted from the {oppositeFolder} folder",1,"L'actif {assetName} a été déplacé vers le dossier partagé, puis supprimé du dossier {oppositeFolder}",0
+editor.slides.assetRemoved,{assetType} {assetName} no longer exists in the product. Saving changes will delete this file from the {folder} folder (if it exists),1,{assetType} {assetName} n'existe plus dans le produit. L'enregistrement des modifications supprimera ce fichier du dossier {folder} (si ça existe),0
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1
 editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
