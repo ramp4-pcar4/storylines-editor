@@ -598,7 +598,7 @@ const clients = new Set();
 function broadcastToClients(message) {
     const payload = JSON.stringify(message);
     clients.forEach((client) => {
-        if (client.readyState === (process.env.SERVER_CURR_ENV ? WebSocket.OPEN : 1)) {
+        if (client.readyState === 1) {
             logger('INFO', `Payload sent to the client`);
             client.send(payload);
         }
