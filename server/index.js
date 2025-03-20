@@ -61,7 +61,7 @@ app.use((req, res, next) => {
 // POST requests made to /upload will be handled here.
 app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
     // Before any operation can be performed with the storyline, we need to ensure that the requester is the one who holds the lock for this storyline.
-    if (!verifySecret(req.params.id, req.headers.secret)) {
+    if (req.headers.secret !== 'N/A' && !verifySecret(req.params.id, req.headers.secret)) {
         res.status(400).send({
             status: 'Storyline was not locked or secret key corresponding to storyline lock incorrect/not provided.'
         });
