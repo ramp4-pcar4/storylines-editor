@@ -3,11 +3,13 @@ import vue from '@vitejs/plugin-vue';
 import dsv from '@rollup/plugin-dsv';
 import path from 'path';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import viteWrappedCssPlugin from './vite-plugin-wrapped-css';
 
 export default defineConfig({
     plugins: [
         vue(),
         dsv(),
+        viteWrappedCssPlugin(),
         viteStaticCopy({
             targets: [
                 { src: 'scripts/*', dest: './scripts' },

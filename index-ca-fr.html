@@ -38,6 +38,27 @@
         <!-- template footer and no-script fallback -->
         <div id="def-footer"></div>
 
+        
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                const appEl = document.querySelector('#app');
+                const styleElements = Array.from(document.getElementsByTagName('style'));
+
+                // Wrap all Vue component styles with the #app selector, to make them more specific than the 
+                // Canada.ca styles. 
+                styleElements.forEach(style => {
+                    const appStyle = style.cloneNode(true);
+                        appStyle.textContent = `#app{${appStyle.textContent}}`
+                        document.head.appendChild(appStyle);
+                });
+
+                // Update font size 
+                const textStyling = document.createElement('style');
+                textStyling.textContent = ' html { font-size: 16px; }'
+                document.head.appendChild(textStyling);
+            });
+        </script>
+
         <script type="text/javascript">
 
             const getUrlRoute = (strUrl = window.location.href) => {
@@ -137,12 +158,6 @@
         </script>
 
         <script type="module" src="/src/main.ts"></script>
-
-        <style>
-            html {
-                font-size: 16px;
-            }
-        </style>
     </body>
 </html>
 <noscript>
