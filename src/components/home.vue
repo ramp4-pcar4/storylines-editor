@@ -42,8 +42,8 @@
                 {{ $t('editor.landing.greeting') }} {{ userName }}!
             </div>
             <div class="mb-5 text-2xl font-semibold">{{ $t('editor.chooseOption') }}</div>
-            <div class="flex justify-center">
-                <div class="home-btn-container border border-gray-400 border-solid mr-5 flex-1 home-buttons">
+            <div class="button-grid">
+                <div class="home-btn-container border border-gray-400 border-solid home-buttons">
                     <router-link :to="{ name: 'metadataNew' }" class="flex justify-center h-full" target>
                         <button class="dashboard-option-button flex items-center text-xl font-bold px-2" tabindex="-1">
                             <svg
@@ -62,7 +62,7 @@
                         </button>
                     </router-link>
                 </div>
-                <div class="home-btn-container border border-gray-400 border-solid flex-1 home-buttons">
+                <div class="home-btn-container border border-gray-400 border-solid home-buttons">
                     <router-link :to="{ name: 'metadataExisting' }" class="flex justify-center h-full" target>
                         <button class="dashboard-option-button flex items-center text-xl font-bold" tabindex="-1">
                             <span class="pr-3">
@@ -103,7 +103,124 @@
                         </button>
                     </router-link>
                 </div>
+                <div
+                    class="home-btn-container border border-gray-400 border-solid home-buttons flex justify-center h-full"
+                    target
+                    @click="$vfm.open('admin-upload-modal')"
+                    v-if="profile.role !== 'Admin'"
+                >
+                    <button
+                        class="dashboard-option-button flex items-center justify-center text-xl font-bold w-full"
+                        tabindex="-1"
+                    >
+                        <span class="pr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="55" height="55">
+                                <path
+                                    d="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M20 18H16V16H14V18H4V8H14V10H16V8H20V18M16 12V10H18V12H16M14 12H16V14H14V12M18 16H16V14H18V16Z"
+                                />
+                            </svg>
+                        </span>
+                        <div style="font-size: calc(60% + 0.25vw)">{{ $t('editor.adminUpload') }}</div>
+                    </button>
+                </div>
             </div>
+
+            <vue-final-modal
+                modalId="admin-upload-modal"
+                content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
+                class="flex justify-center items-center"
+            >
+                <div class="p-5">
+                    <div class="text-xl text-center pb-8 font-bold">{{ $t('editor.adminUpload') }}</div>
+                    <div class="flex flex-col items-center pb-5">
+                        <label for="product-uuid">{{ $t('editor.uuid.new') }}: </label>
+                        <input
+                            type="text"
+                            name="uuid"
+                            id="product-uuid"
+                            class="editor-input w-5/6 text-center"
+                            v-model="productUuid"
+                            @input="checkUuid"
+                            placeholder="4523ae53-5d58-4a0e-8b01-54d9824871f5"
+                            :class="{
+                                'input-error': error
+                            }"
+                        />
+                        <!-- TODO: try to keep this fixed in size, so the modal doesn't resize when rendered -->
+                        <div class="w-5/6 h-1/6">
+                            <!-- Display a warning if there is one. -->
+                            <span
+                                v-if="warning !== 'none'"
+                                class="flex flex-row items-center text-accent-dark-orange rounded p-1"
+                            >
+                                <span class="align-middle inline-block mr-1 fill-current">
+                                    <svg
+                                        clip-rule="evenodd"
+                                        fill-rule="evenodd"
+                                        stroke-linejoin="round"
+                                        stroke-miterlimit="2"
+                                        viewBox="0 0 24 24"
+                                        width="18"
+                                        height="18"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="m2.095 19.886 9.248-16.5c.133-.237.384-.384.657-.384.272 0 .524.147.656.384l9.248 16.5c.064.115.096.241.096.367 0 .385-.309.749-.752.749h-18.496c-.44 0-.752-.36-.752-.749 0-.126.031-.252.095-.367zm9.907-6.881c-.414 0-.75.336-.75.75v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5c0-.414-.336-.75-.75-.75zm-.002-3c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1z"
+                                            fill-rule="nonzero"
+                                        />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <span class="inline-block select-none text-sm">
+                                        {{ $t(`editor.warning.${warning}`) }}
+                                    </span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex flex-col items-center justify-center m-5 p-12 bg-blue-100 border-4 border-dashed border-blue-300"
+                        :class="{ dragging: isDragging }"
+                        @dragover.prevent="() => (dragging = true)"
+                        @dragleave.prevent="() => (dragging = false)"
+                        @drop.prevent="productZipDropped($event)"
+                    >
+                        <label class="cursor-pointer p-4">
+                            <span>{{ $t('editor.image.label.drag', { fileType: 'zip file' }) }}</span>
+                            {{ $t('editor.label.or') }}
+                            <span class="text-blue-700 font-bold">{{ $t('editor.label.browse') }}</span>
+                            {{ $t('editor.label.upload') }}
+                            <input
+                                type="file"
+                                name="zip"
+                                id="product-zip-file"
+                                @change="productZipUploaded"
+                                multiple="false"
+                                accept="application/x-zip-compressed"
+                                class="cursor-pointer"
+                            />
+                        </label>
+                        <div>{{ $t('editor.adminUpload.fileName') }}: {{ productZipName || 'N/A' }}</div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <div class="inline-flex align-middle mr-2" v-if="loading">
+                            <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                        </div>
+                        <button
+                            type="submit"
+                            @click="uploadZip"
+                            class="editor-button editor-forms-button bg-black text-white hover:bg-gray-80 mr-2"
+                            :disabled="error"
+                        >
+                            {{ $t('editor.video.label.upload') }}
+                        </button>
+                        <button @click="closeModal" class="editor-button editor-forms-button border border-gray-300">
+                            {{ $t('editor.cancel') }}
+                        </button>
+                    </div>
+                </div>
+            </vue-final-modal>
 
             <h2 class="pt-8 pb-5 text-2xl font-semibold">{{ $t('editor.previousProducts') }}</h2>
             <table class="shadow-lg bg-white w-full pr-0 mr-0">
@@ -190,18 +307,40 @@
 </template>
 
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { Storyline, UserProfile, useUserStore } from '../stores/userStore';
+import { useLockStore } from '../stores/lockStore';
 import Message from 'vue-m-message';
+import { VueFinalModal } from 'vue-final-modal';
+import { AxiosResponse } from 'axios';
+import axios from 'axios';
+import { VueSpinnerOval } from 'vue3-spinners';
+import { throttle } from 'throttle-debounce';
 
+@Options({
+    components: {
+        'vue-final-modal': VueFinalModal,
+        spinner: VueSpinnerOval
+    }
+})
 export default class HomeV extends Vue {
     @Prop({ default: false }) sessionExpired!: boolean; // true if user was redirected here due to session expiring, false otherwise
 
     userStore = useUserStore();
+    lockStore = useLockStore();
     currLang = 'en';
     sourceFile = 'index.html#';
     profile: UserProfile = {};
     showExpired = false;
+    apiUrl = import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040';
+    productZip = '';
+    productZipName = '';
+    productUuid = '';
+    loading = false;
+    dragging = false;
+    error = false;
+    checkingUuid = false;
+    warning = 'none';
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
@@ -228,6 +367,10 @@ export default class HomeV extends Vue {
 
     get userStorylines(): Array<Storyline> {
         return this.profile?.storylines?.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified)) || {};
+    }
+
+    get isDragging(): boolean {
+        return this.dragging;
     }
 
     dateFormatter(date: string | null): string {
@@ -258,6 +401,119 @@ export default class HomeV extends Vue {
     editProduct(uuid: number): void {
         this.$router.push({ name: 'editor', params: { uid: uuid } });
     }
+
+    productZipUploaded(e: Event): void {
+        // TODO: If a product folder was uploaded instead of a zip, zip it
+        const fileUploaded = ((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+        this.productZip = fileUploaded;
+        this.productZipName = fileUploaded.name;
+    }
+
+    productZipDropped(e: Event) {
+        // TODO: If a product folder was uploaded instead of a zip, zip it
+        if (e.dataTransfer !== null) {
+            const fileUploaded = e.dataTransfer.files[0];
+            if (e.dataTransfer.files.length > 1) {
+                Message.info(this.$t('editor.adminUpload.oneFileOnly'));
+            }
+
+            if (fileUploaded.type === 'application/x-zip-compressed') {
+                this.productZip = fileUploaded;
+                this.productZipName = fileUploaded.name;
+            } else {
+                Message.error(this.$t('editor.adminUpload.incorrectType'));
+            }
+            this.dragging = false;
+        }
+    }
+
+    checkUuid = throttle(300, (): void => {
+        // All reserved characters in URLs. The user can't use these for their UUID
+        const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
+        const illegalCharsContained = illegalChars.filter((badChar) => this.productUuid.includes(badChar));
+
+        if (illegalCharsContained.length) {
+            this.error = true;
+            this.checkingUuid = false;
+            this.warning = 'badChar';
+            return;
+        } else {
+            this.error = false;
+        }
+
+        fetch(this.apiUrl + `/check/${this.productUuid}`).then((res: Response) => {
+            if (res.status !== 404) {
+                this.error = true;
+                this.warning = 'uuid';
+            } else {
+                this.error = false;
+            }
+            this.checkingUuid = false;
+        });
+
+        if (this.error === false) {
+            this.warning = 'none';
+        }
+    });
+
+    uploadZip(): void {
+        if (this.productUuid && this.productZip) {
+            // Need to use UUID provided by user
+            const zipFileName = `${this.productUuid}.zip`;
+            this.productZip = new File([this.productZip], zipFileName, { type: 'application/x-zip-compressed' });
+            this.loading = true;
+            this.lockStore
+                .lockStoryline(this.productUuid)
+                .then(() => {
+                    const formData = new FormData();
+                    formData.append('data', this.productZip);
+                    const headers = {
+                        'Content-Type': 'multipart/form-data',
+                        user: this.userName,
+                        secret: this.lockStore.secret
+                    };
+                    axios
+                        .post(this.apiUrl + `/upload/${this.productUuid}`, formData, { headers })
+                        .then(() => {
+                            axios
+                                .post(this.apiUrl + `/adminRename`, {
+                                    user: this.userName,
+                                    newUuid: this.productUuid
+                                })
+                                .then(() => {
+                                    Message.success(this.$t('editor.adminUpload.successfulUpload'));
+                                })
+                                .catch(() => {
+                                    Message.error(this.$t('editor.warning.renameFailed'));
+                                });
+                        })
+                        .catch(() => {
+                            Message.error(this.$t('editor.editMetadata.message.error.failedZipFile'));
+                        })
+                        .finally(() => {
+                            this.closeModal();
+                            this.loading = false;
+                            this.lockStore.unlockStoryline();
+                        });
+                })
+                .catch(() => {
+                    Message.error(this.$t('editor.adminUpload.lockFail', { uuid: this.productUuid }));
+                });
+        } else {
+            Message.error(this.$t('editor.adminUpload.missingInput'));
+        }
+    }
+
+    closeModal(): void {
+        this.$vfm.close('admin-upload-modal');
+        this.productUuid = '';
+        this.productZip = '';
+        this.productZipName = '';
+        const fileInput = document.querySelector('#product-zip-file');
+        fileInput.value = '';
+        this.error = false;
+        this.warning = 'none';
+    }
 }
 </script>
 
@@ -267,9 +523,9 @@ export default class HomeV extends Vue {
 }
 
 .home-btn-container {
-    height: 12vh;
-    width: 45vh;
+    width: 100%;
     min-height: 110px;
+    justify-self: center;
 }
 .home-buttons:hover {
     background-color: #e7e7e7;
@@ -283,5 +539,62 @@ td {
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(25vw, 1fr));
+}
+
+input[type='file']:not(:focus-visible) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.dragging {
+    background-color: #fffaf0 !important;
+    border-color: #fff !important;
+}
+
+.editor-button {
+    border-radius: 3px;
+    padding: 5px 12px;
+    font-weight: 600;
+    transition-duration: 0.2s;
+}
+
+.editor-forms-button {
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.editor-button:hover:enabled {
+    background-color: #dbdbdb;
+    color: black;
+}
+
+.input-error {
+    border: 1px solid red !important;
+    outline-color: red !important;
+}
+
+// At smaller screen widths, display all buttons in one column
+@media (width <= 1000px) {
+    .button-grid {
+        grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
+    }
+    .home-btn-container {
+        width: 80vw;
+    }
+    .home-btn-container {
+        justify-self: start;
+    }
 }
 </style>

@@ -18,20 +18,20 @@ let lockedUuids = {}; // the uuids of the storylines currently in use, along wit
 require('dotenv').config();
 
 // CONFIGURATION
-PORT = process.env.port ? process.env.port : 6040; // the Express server will run on this port.
-UPLOAD_PATH =
+const PORT = process.env.port ? process.env.port : 6040; // the Express server will run on this port.
+const UPLOAD_PATH =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? process.env.SERVER_UPLOAD_PATH
         : './files'; // files uploaded from the app will be uploaded to this folder (deleted after processing)
-TARGET_PATH =
+const TARGET_PATH =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? process.env.SERVER_TARGET_PATH
         : './public'; // ZIP files in the UPLOAD_PATH folder will be extracted here.
-LOG_PATH =
+const LOG_PATH =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? process.env.SERVER_LOG_PATH
         : './logfile.txt'; // the path to the logfile
-ROUTE_PREFIX =
+const ROUTE_PREFIX =
     process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
         ? '/Storylines-Editor-STB-Server'
         : '';
@@ -431,6 +431,112 @@ app.route(ROUTE_PREFIX + '/rename').post(function (req, res) {
                     logger('INFO', 'Rename attempt failed. Provided new UUID already exists in file system.');
                     return;
                 }
+            });
+        }
+    });
+});
+
+app.route(ROUTE_PREFIX + '/adminRename').post(function (req, res) {
+    const newUuid = req.body.newUuid;
+    const user = req.body.user;
+    const PRODUCT_PATH = `${TARGET_PATH}/${newUuid}`; // the existing product path
+    let configUuid = '';
+    console.log('newUuid');
+    console.log(req.body.newUuid);
+
+    if (!newUuid) {
+        res.status(400).send({ status: 'Bad Request' });
+        logger('INFO', 'Admin rename attempt failed. Payload was missing old or new UUID.');
+        return;
+    }
+
+    // Check if the old product exists.
+    fs.access(PRODUCT_PATH, (error) => {
+        if (error) {
+            res.status(400).send({ status: 'Bad Request' });
+            logger('INFO', 'Admin rename attempt failed. Provided old UUID does not exist in file system.');
+            return;
+        } else {
+            fs.readdir(PRODUCT_PATH, (err, files) => {
+                if (err) {
+                    res.status(500).send({ status: 'Internal Server Error' });
+                    logger('WARNING', 'Error occured while reading product.' + err);
+                    return;
+                }
+
+                // Determine the uuid used throughout the configs of the product
+                files.forEach(function (file) {
+                    if (file.includes('json')) {
+                        configUuid = file.split(/_fr|_en/)[0];
+                        return;
+                    }
+                });
+
+                // Replace all instances of the previously used UUID (within a path) with newUuid in the en config
+                fs.readFile(PRODUCT_PATH + `/${configUuid}_en.json`, async (err, data) => {
+                    if (err) {
+                        res.status(500).send({ status: 'Internal Server Error' });
+                        logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
+                        return;
+                    }
+                    let configEn = JSON.stringify(JSON.parse(data), null, 4);
+                    configEn = configEn.replaceAll(`${configUuid}/`, `${newUuid}/`);
+
+                    // Create the new en config file
+                    fs.writeFile(PRODUCT_PATH + `/${newUuid}_en.json`, configEn, 'utf8', async (err) => {
+                        if (err) {
+                            res.status(500).send({ status: 'Internal Server Error' });
+                            logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
+                            return;
+                        }
+                        // Remove the old en config from the product
+                        fs.unlink(PRODUCT_PATH + `/${configUuid}_en.json`, (err) => {
+                            if (err) {
+                                res.status(500).send({ status: 'Internal Server Error' });
+                                logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
+                                return;
+                            }
+                            // Replace all instances of the previously used UUID (within a path) with newUuid in the
+                            // fr config
+                            fs.readFile(PRODUCT_PATH + `/${configUuid}_fr.json`, async (err, data) => {
+                                if (err) {
+                                    res.status(500).send({ status: 'Internal Server Error' });
+                                    logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
+                                    return;
+                                }
+                                let configFr = JSON.stringify(JSON.parse(data), null, 4);
+                                configFr = configFr.replaceAll(`${configUuid}/`, `${newUuid}/`);
+
+                                // Create the new fr config file
+                                fs.writeFile(PRODUCT_PATH + `/${newUuid}_fr.json`, configFr, 'utf8', async (err) => {
+                                    if (err) {
+                                        res.status(500).send({ status: 'Internal Server Error' });
+                                        logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
+                                        return;
+                                    }
+
+                                    // Remove the old fr config from the product
+                                    fs.unlink(PRODUCT_PATH + `/${configUuid}_fr.json`, (err) => {
+                                        if (err) {
+                                            res.status(500).send({ status: 'Internal Server Error' });
+                                            logger(
+                                                'WARNING',
+                                                'Error occured while renaming a Storylines product.' + err
+                                            );
+                                            return;
+                                        }
+                                        res.status(200).send({ status: 'OK' });
+                                        logger(
+                                            'INFO',
+                                            `Product successfully renamed product from ${configUuid} to ${newUuid}`
+                                        );
+                                        return;
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
             });
         }
     });
