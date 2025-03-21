@@ -31,6 +31,7 @@
         <!-- template top and no-script fallback -->
         <div id="def-top"></div>
 
+        <!-- TODO: Storylines editor app is in here. Put into shadow dom or wrap with iframe -->
         <div id="wb-cont">
             <div id="app"></div>
         </div>
@@ -39,59 +40,94 @@
         <div id="def-footer"></div>
 
         <script type="text/javascript">
-            // URL Parsing for Language Switch
-            var url = new URL(window.location.href);
-            var hashParams = url.hash.split('/');
 
-            // If there's an empty item at the end of the paramater list (occurs if there's a trailing slash in the URL), clear it.
-            if (hashParams.at(-1).length === 0) {
-                hashParams.pop();
+            const getUrlRoute = (strUrl = window.location.href) => {
+                // URL Parsing for Language Switch
+                var url = new URL(strUrl);
+                var hashParams = url.hash.split('/');
+
+                // If there's an empty item at the end of the paramater list (occurs if there's a trailing slash in the URL), clear it.
+                if (hashParams.at(-1).length === 0) {
+                    hashParams.pop();
+                }
+
+                // If content after the last slash in the URL is an anchor, clear it.
+                if (hashParams.at(-1).startsWith('#')) {
+                    hashParams.pop();
+                }
+
+                // Finally, extract the StoryRAMP ID from the URL. If it has an anchor tag in it, remove it since it's not useful on the new page.
+                var latestParam = hashParams.pop();
+                var newURLRoute = '';
+                var productID = '';
+
+                // in this case there is no product id in the url. The url param before this one will be the lang, 
+                // which we should not include
+                if (latestParam === 'editor' || latestParam === 'editor-metadata') {
+                    newURLRoute = latestParam;
+                } else {
+                    productID = latestParam;
+
+                    if (productID.includes('#')) {
+                        productID = productID.split('#')[0];
+                    }
+                    
+                    // Check to see if the 'editor' route is included in the URL. If so, keep it.
+                    var location = hashParams.pop();
+                    console.log(location);
+
+                    // Build new URL route.
+                    newURLRoute = location + '/' + productID;
+
+                }
+                return newURLRoute;
             }
 
-            // If content after the last slash in the URL is an anchor, clear it.
-            if (hashParams.at(-1).startsWith('#')) {
-                hashParams.pop();
+            const setAttributes = () => {
+                var url = new URL(window.location.href);
+                
+                document.querySelectorAll('.wb-sl').forEach(function (skipLink) {
+                    skipLink.setAttribute('href', url.href.split(/#[^\/]/)[0] + '#' + skipLink.href.split('#')[1]);
+                });
+                var interval = setInterval(function () {
+                    var links = document.querySelectorAll('.wb-sl');
+                    if (links.length === 3) {
+                        clearInterval(interval);
+                        links[2].setAttribute('href', url.href.split(/#[^\/]/)[0] + '?' + links[2].href.split('?')[1]);
+                    }
+                }, 200);
             }
 
-            // Finally, extract the StoryRAMP ID from the URL. If it has an anchor tag in it, remove it since it's not useful on the new page.
-            var productID = hashParams.pop();
-
-            if (productID.includes('#')) {
-                productID = productID.split('#')[0];
-            }
-
-            // Check to see if the 'editor' route is included in the URL. If so, keep it.
-            var hasEditor = hashParams.pop() === 'editor';
-
-            // Build new URL route.
-            var newURLRoute = hasEditor ? 'editor/' + productID : productID;
-
+            let urlRoute = getUrlRoute();
             var defTop = document.getElementById('def-top');
             defTop.outerHTML = wet.builder.top({
                 lngLinks: [
                     {
-                        lang: 'fr',
-                        href: 'index-ca-fr#/fr/' + newURLRoute,
+                        lang: 'en',
+                        id: 'test',
+                        href: 'index-ca-fr#/fr/' + urlRoute,
                         text: 'Français'
                     }
                 ],
                 breadcrumbs: [
                     {
-                        title: 'Environment and natural resources',
-                        href: 'https://www.canada.ca/en/services/environment.html'
+                        title: 'Environnement et ressources naturelles',
+                        href: 'https://www.canada.ca/fr/services/environnement/meteo.html'
                     }
                 ]
             });
-            document.querySelectorAll('.wb-sl').forEach(function (skipLink) {
-                skipLink.setAttribute('href', url.href.split(/#[^\/]/)[0] + '#' + skipLink.href.split('#')[1]);
-            });
-            var interval = setInterval(function () {
-                var links = document.querySelectorAll('.wb-sl');
-                if (links.length === 3) {
-                    clearInterval(interval);
-                    links[2].setAttribute('href', url.href.split(/#[^\/]/)[0] + '?' + links[2].href.split('?')[1]);
+
+            setAttributes();
+
+            var langChangeContainer = document.querySelector('#wb-lng');
+            var langChange = langChangeContainer.querySelector('a');
+            window.navigation.addEventListener("navigate", (event) => {
+                urlRoute = getUrlRoute(event.destination.url);
+                if (langChange.getAttribute('href') !== 'index-ca-fr#/fr/' + urlRoute){
+                    langChange.setAttribute('href', 'index-ca-fr#/fr/' + urlRoute);
+                    setAttributes();
                 }
-            }, 200);
+            });
         </script>
 
         <script>
