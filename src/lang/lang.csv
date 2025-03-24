@@ -274,6 +274,7 @@ editor.slides.advanced.error,This configuration contains one or more errors. Lea
 editor.slides.contentType,Content type,1,Type de contenu,1
 editor.slides.content,Content,1,Contenu,1
 editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une diapositive à modifier,1
+editor.slides.panelNumber,Panel {num},1,Panneau {num},0
 editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slide.panel.type.text,Text,1,Texte,1
@@ -283,6 +284,7 @@ editor.slide.panel.type.chart,Chart,1,Graphique,1
 editor.slide.panel.type.map,Map,1,Carte,1
 editor.slide.panel.type.video,Video,1,Vidéo,1
 editor.slide.panel.type.dynamic,Dynamic,1,Dynamique,1
+editor.slide.panel.type.unknown,Loading,1,Chargement,0
 editor.slides.intro,Intro subtitle,1,Sous-titre de l’introduction,1
 editor.slides.title,Intro title,1,Titre de l’introduction,1
 editor.slides.slideHeader,SLIDES,1,DIAPOSITIVES,0
