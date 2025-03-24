@@ -477,6 +477,14 @@
             </div>
         </template>
 
+        <!-- Loading spinner for when product is still being fetched -->
+        <template v-if="loadEditor && productLoading">
+            <div class="flex flex-col justify-center items-center" style="margin-top: 15%">
+                <div class="py-10 text-xl">{{ $t('editor.editMetadata.loading') }}</div>
+                <spinner size="200px" color="#009cd1"></spinner>
+            </div>
+        </template>
+
         <!-- The editor -->
         <template v-if="loadEditor && loadStatus === 'loaded'">
             <editor
@@ -739,6 +747,7 @@ export default class MetadataEditorV extends Vue {
     sourceCounts: SourceCounts = {};
     sessionExpired: boolean = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
+    productLoading = false;
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
@@ -833,15 +842,20 @@ export default class MetadataEditorV extends Vue {
 
         // If a product UUID is provided, fetch the contents from the server.
         if (this.$route.params.uid) {
-            this.generateRemoteConfig().catch(() => {
-                // Handle any connection/lock errors here
-                Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                if (this.$route.name === 'editor') {
-                    setTimeout(() => {
-                        this.$router.push({ name: 'home' });
-                    }, 2000);
-                }
-            });
+            this.productLoading = true;
+            this.generateRemoteConfig()
+                .then(() => {
+                    this.productLoading = false;
+                })
+                .catch(() => {
+                    // Handle any connection/lock errors here
+                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                    if (this.$route.name === 'editor') {
+                        setTimeout(() => {
+                            this.$router.push({ name: 'home' });
+                        }, 2000);
+                    }
+                });
         }
     }
 
