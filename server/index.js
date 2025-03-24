@@ -670,7 +670,7 @@ wss.on('connection', (ws) => {
                 logger('INFO', `A client successfully unlocked the storyline ${uuid}.`);
                 delete lockedUuids[uuid];
                 delete ws.uuid;
-                ws.send(JSON.stringify({ status: 'success', clientId }));
+                //ws.send(JSON.stringify({ status: 'success', clientId }));
 
                 broadcastToClients({
                     type: 'unlock',
