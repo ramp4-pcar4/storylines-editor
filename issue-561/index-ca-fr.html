@@ -61,7 +61,7 @@
                 var newURLRoute = '';
                 var productID = '';
 
-                // in this case there is no product id in the url. The url param before this one will be the lang, 
+                // In this case there is no product id in the url. The url param before this one will be the lang, 
                 // which we should not include
                 if (latestParam === 'editor' || latestParam === 'editor-metadata') {
                     newURLRoute = latestParam;
@@ -74,7 +74,6 @@
                     
                     // Check to see if the 'editor' route is included in the URL. If so, keep it.
                     var location = hashParams.pop();
-                    console.log(location);
 
                     // Build new URL route.
                     newURLRoute = location + '/' + productID;
