@@ -113,6 +113,7 @@ export default class StoryPreviewV extends Vue {
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     extendSession(showPopup?: boolean): void {
+        // Only send message to other BroadcastChannel if preview is connected to editor
         if (!this.savedProduct) {
             this.broadcast?.postMessage({ action: 'extend', showPopup });
         }
@@ -128,7 +129,7 @@ export default class StoryPreviewV extends Vue {
             this.config = JSON.parse(JSON.stringify(window.props.configs[this.lang]));
             this.configs = window.props.configs;
             this.configFileStructure = window.props.configFileStructure;
-            // this broadcast channel will be used to communicate regarding sessions with the main editor tab
+            // This broadcast channel will be used to communicate regarding sessions with the main editor tab
             this.broadcast = new BroadcastChannel(window.props.secret);
             this.broadcast.onmessage = (e) => {
                 const msg = e.data;
@@ -252,7 +253,7 @@ export default class StoryPreviewV extends Vue {
                 fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
                     axios
                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                            messages: res.data.messages
+                            messages: res.data?.messages
                         })
                         .catch((error: AxiosError) => console.log(error.response || error));
                 });
@@ -278,17 +279,22 @@ export default class StoryPreviewV extends Vue {
 
     // reload preview page with FR config
     changeLang(): void {
+        this.broadcast?.close();
         const newLang = this.lang === 'en' ? 'fr' : 'en';
         const routeData = this.$router.resolve({
             name: 'preview',
             params: { lang: newLang, uid: this.uid }
         });
+        const secret = window.props.secret;
+        const timeRemaining = window.props.timeRemaining;
 
         // update window props on refresh (to prevent having to fetch from server again)
         const refreshTab = window.open(routeData.href, '_self');
         (refreshTab as Window).props = {
             configs: this.configs,
-            configFileStructure: this.configFileStructure
+            configFileStructure: this.configFileStructure,
+            secret,
+            timeRemaining
         };
         this.$forceUpdate();
     }
