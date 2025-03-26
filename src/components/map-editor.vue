@@ -200,7 +200,7 @@ export default class MapEditorV extends Vue {
     }
 
     onConfigEdit(): void {
-        this.$emit('slide-edit');
+        this.$emit('slide-edit', 'Map editor');
     }
 
     onTimeSliderInput(property: 'range' | 'start' | 'attribute' | 'layers', index: number, value: string): void {

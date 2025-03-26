@@ -8,7 +8,7 @@
                 class="editor-input w-full lg:w-3/5"
                 type="text"
                 v-model="videoPreview.title"
-                @change="onVideoEdited"
+                @input="onVideoEdited"
             />
         </div>
 
@@ -407,8 +407,7 @@ export default class VideoEditorV extends Vue {
             return;
         }
 
-        this.addUploadedFile(file, 'src');
-        this.onVideoEdited();
+        this.addUploadedFile(file, 'src').then(this.onVideoEdited);
     }
 
     findFileType(file: string): void {
@@ -453,6 +452,7 @@ export default class VideoEditorV extends Vue {
         };
         this.edited = true;
         this.$emit('slide-edit');
+        this.onVideoEdited();
     }
 
     updateCaptions(e: Event): void {
@@ -495,6 +495,7 @@ export default class VideoEditorV extends Vue {
     saveChanges(): void {
         if (this.edited && this.videoPreview) {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
+            console.log('SAVING PROPERLY');
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
 
@@ -507,7 +508,9 @@ export default class VideoEditorV extends Vue {
 
     onVideoEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit', this.videoPreview?.videoType || this.videoPreview?.title?.length ? true : false);
+        this.saveChanges();
+        console.log('VID PANEL STUFF', JSON.parse(JSON.stringify(this.panel)));
+        this.$emit('slide-edit', 'Video editor');
     }
 }
 </script>
