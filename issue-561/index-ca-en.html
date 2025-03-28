@@ -121,12 +121,12 @@
 
             var langChangeContainer = document.querySelector('#wb-lng');
             var langChange = langChangeContainer.querySelector('a');
-            window.navigation.addEventListener("navigate", (event) => {
-                urlRoute = getUrlRoute(event.destination.url);
-                if (langChange.getAttribute('href') !== 'index-ca-fr#/fr/' + urlRoute){
-                    langChange.setAttribute('href', 'index-ca-fr#/fr/' + urlRoute);
-                    setAttributes();
-                }
+
+            // Ignores the href in the a tag, and instead navigates to the fr equivalent of the current page
+            langChange.addEventListener('click', (e) => {
+                e.preventDefault();
+                const urlRoute = getUrlRoute();
+                window.location.href = 'index-ca-fr#/fr/' + urlRoute;
             });
         </script>
 

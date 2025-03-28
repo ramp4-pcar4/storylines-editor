@@ -119,12 +119,12 @@
             
             var langChangeContainer = document.querySelector('#wb-lng');
             var langChange = langChangeContainer.querySelector('a');
-            window.navigation.addEventListener("navigate", (event) => {
-                urlRoute = getUrlRoute(event.destination.url);
-                if (langChange.getAttribute('href') !== 'index-ca-en#/en/' + urlRoute){
-                    langChange.setAttribute('href', 'index-ca-en#/en/' + urlRoute);
-                    setAttributes();
-                }
+
+            // Ignores the href in the a tag, and instead navigates to the en equivalent of the current page
+            langChange.addEventListener('click', (e) => {
+                e.preventDefault();
+                const urlRoute = getUrlRoute();
+                window.location.href = 'index-ca-en#/en/' + urlRoute;
             });
         </script>
 
