@@ -65,6 +65,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -107,10 +111,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
-                }, 
-                "modified": {
-                    "type": "boolean",
-                    "description": "An optional tag that specifies whether the panel has been modified from its default configuration"
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -232,6 +236,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -268,6 +276,10 @@
                 "caption": {
                     "type": "string",
                     "description": "Supporting text content for the chart."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -278,10 +290,6 @@
             "type": "object",
             "description": "A multimedia image component.",
             "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "The image ID."
-                },
                 "width": {
                     "type": "number",
                     "description": "The image width."
@@ -321,6 +329,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -370,10 +382,10 @@
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
-                }, 
-                "modified": {
-                    "type": "boolean",
-                    "description": "An optional tag that specifies whether the panel has been modified from its default configuration" 
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -419,18 +431,17 @@
                     "type": "text",
                     "description": "A caption to display below the slideshow."
                 },
-                "userCreated": {
-                    "type": "boolean",
-                    "description": "Specifies whether this slideshow was automatically created from an image panel or if this is actually a slideshow panel.",
-                    "default": false
-                },
                 "type": {
                     "type": "string",
-                    "enum": ["slideshow"]
+                    "enum": ["slideshow", "slideshowImage", "slideshowChart"]
                 },
                 "customStyles": {
                     "type": "string",
                     "description": "Additional CSS styles to apply to the panel."
+                },
+                "cssClasses": {
+                    "type": "string",
+                    "description": "Optional string of css classes to add to the panel."
                 }
             },
             "additionalProperties": false,
@@ -520,21 +531,6 @@
             "type": "boolean",
             "description": "Optional attribute that indicates whether or not to include slide in table of contents. Defaults to true.",
             "default": true
-        },
-        "rightOnly": {
-            "type": "boolean",
-            "description": "Optional attribute that indicates whether or not the right panel should take up all of the space in the slide. Defaults to false.",
-            "default": false
-        },
-        "centerSlide": {
-            "type": "boolean",
-            "description": "Optional attribute that indicates whether or not to center the content of the slide. Defaults to false. Must be false if centerPanel (below) is true",
-            "default": false
-        },
-        "centerPanel": {
-            "type": "boolean",
-            "description": "Optional attribute that indicates whether or not to center the content of each panel. Defaults to false. Must be false if centerSlide (above) is true",
-            "default": false
         }
         
     },
