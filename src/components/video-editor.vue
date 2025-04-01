@@ -507,7 +507,7 @@ export default class VideoEditorV extends Vue {
 
     onVideoEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit', this.videoPreview?.videoType || this.videoPreview?.title?.length ? true : false);
+        this.$emit('slide-edit');
     }
 }
 </script>

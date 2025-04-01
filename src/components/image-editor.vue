@@ -149,7 +149,14 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import { ConfigFileStructure, ImageFile, ImagePanel, PanelType, SlideshowPanel, SourceCounts } from '@/definitions';
+import {
+    ConfigFileStructure,
+    ImageFile,
+    ImagePanel,
+    PanelType,
+    SlideshowImagePanel,
+    SourceCounts
+} from '@/definitions';
 import draggable from 'vuedraggable';
 import ImagePreviewV from './helpers/image-preview.vue';
 import JSZip from 'jszip';
@@ -161,7 +168,7 @@ import JSZip from 'jszip';
     }
 })
 export default class ImageEditorV extends Vue {
-    @Prop() panel!: ImagePanel | SlideshowPanel;
+    @Prop() panel!: ImagePanel | SlideshowImagePanel;
     @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
@@ -184,7 +191,7 @@ export default class ImageEditorV extends Vue {
     mounted(): void {
         // This basically allows us to access the image(s) using one consistent variable instead of needing to check panel type.
         const images =
-            this.panel.type === PanelType.Slideshow
+            this.panel.type === PanelType.SlideshowImage
                 ? (this.panel.items as Array<ImagePanel>)
                 : this.panel.src
                 ? [this.panel]
@@ -508,18 +515,17 @@ export default class ImageEditorV extends Vue {
                 });
                 (this.panel as ImagePanel).src = imageFile.id;
             } else {
-                // Otherwise, convert this to a slideshow panel.
-                this.panel.type = PanelType.Slideshow;
+                // Otherwise, convert this to a slideshowImage panel.
+                this.panel.type = PanelType.SlideshowImage;
                 this.panel.caption = this.slideshowCaption ?? undefined;
 
                 // Turn each of the image configs into an image panel and add them to the slideshow.
-                (this.panel as SlideshowPanel).items = this.imagePreviews.map((imageFile: ImageFile) => {
-                    const imageSrc = imageFile.id;
-                    const imageId = imageFile.id.split('/').at(-1);
+                (this.panel as SlideshowImagePanel).items = this.imagePreviews.map((imageFile: ImageFile) => {
+                    const { id, ...restOfImage } = imageFile; // we don't need the id
+                    const imageSrc = id;
                     return {
-                        ...imageFile,
+                        ...restOfImage,
                         src: imageSrc,
-                        id: imageId,
                         type: PanelType.Image
                     } as ImagePanel;
                 });
@@ -530,7 +536,7 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit', this.imagePreviews.length !== 0);
+        this.$emit('slide-edit');
     }
 }
 </script>
