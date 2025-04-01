@@ -45,14 +45,14 @@
                 const styleElements = Array.from(document.getElementsByTagName('style'));
 
                 // Wrap all Vue component styles with the #app selector, to make them more specific than the 
-                // Canada.ca styles. 
+                // Canada.ca styles
                 styleElements.forEach(style => {
                     const appStyle = style.cloneNode(true);
                         appStyle.textContent = `#app{${appStyle.textContent}}`
                         document.head.appendChild(appStyle);
                 });
 
-                // Update font size 
+                // Update font size
                 const textStyling = document.createElement('style');
                 textStyling.textContent = ' html { font-size: 16px; }'
                 document.head.appendChild(textStyling);
