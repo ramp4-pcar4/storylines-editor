@@ -35,6 +35,18 @@ import { useUserStore } from '../stores/userStore';
 
 export default class LandingV extends Vue {
     title = document.title;
+    url = window.location.href;
+
+    beforeCreate(): void {
+        // Automatically choose lang and re-route when the user is using Canada.ca template
+        if (this.url.includes('index-ca')) {
+            const lang = this.url.includes('index-ca-en') ? 'en' : 'fr';
+            this.$router.push({
+                name: 'home',
+                params: { lang }
+            });
+        }
+    }
 
     get userName(): string {
         const userStore = useUserStore();
