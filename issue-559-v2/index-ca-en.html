@@ -48,15 +48,15 @@
                 // Canada.ca styles
                 styleElements.forEach(style => {
                     const appStyle = style.cloneNode(true);
-                        appStyle.textContent = `#app{${appStyle.textContent}}`
-                        document.head.appendChild(appStyle);
+                    appStyle.textContent = `#app{${appStyle.textContent}}`
+                    document.head.appendChild(appStyle);
                 });
 
                 // Update font size
                 const textStyling = document.createElement('style');
                 textStyling.textContent = ' html { font-size: 16px; }'
                 document.head.appendChild(textStyling);
-            });
+            }); 
         </script>
 
         <script type="text/javascript">
