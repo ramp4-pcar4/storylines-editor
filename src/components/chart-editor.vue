@@ -79,6 +79,7 @@ import {
 import ChartPreviewV from './helpers/chart-preview.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
+import Message from 'vue-m-message';
 
 @Options({
     components: {
@@ -249,6 +250,14 @@ export default class ChartEditorV extends Vue {
             this.sourceCounts[`${this.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] -= 1;
             if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] === 0) {
                 this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
+                Message.info(
+                    this.$t('editor.slides.assetRemoved', {
+                        assetType: 'Chart',
+                        assetName: `${chart.name}.json`,
+                        folder: `charts/${this.lang}`
+                    }),
+                    { duration: -1, closable: true }
+                );
             }
             this.chartConfigs.splice(idx, 1);
         }
