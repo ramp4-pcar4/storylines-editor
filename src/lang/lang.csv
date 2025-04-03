@@ -211,6 +211,9 @@ editor.slideshow.label.edit,Edit existing item,1,Modifier un élément existant,
 editor.slideshow.label.type,Type,1,Type,0
 editor.slideshow.label.add,Add,1,Ajouter,1
 editor.slideshow.label.slideNumber,Slide Number,1,Numéro de diapositive,0
+editor.slideshow.addSlideTitle,Add a slideshow caption,1,Ajouter une légende de diaporama,0
+editor.slideshow.noTitle,(No title),1,(Pas de titre),0
+editor.slideshow.noSlides,No slides,1,Pas de diapositives,0
 editor.slides.continue,Continue,1,Continuer,0
 editor.slides.title,Intro title,1,Titre de l’introduction,1
 editor.slides.addSlide,"New blank slide",1,Nouvelle diapositive,0
