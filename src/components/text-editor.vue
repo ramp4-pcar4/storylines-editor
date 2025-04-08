@@ -3,12 +3,14 @@
         <label class="editor-label" for="panelTitle">{{ $t('editor.slides.panel.title') }}</label>
         <input class="editor-input" type="text" id="panelTitle" v-model="panel.title" />
         <div class="editor-label text-left mt-4 mb-1">{{ $t('editor.slides.panel.body') }}</div>
-        <v-md-editor
-            v-model="panel.content"
-            height="400px"
-            left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
-            :toolbar="toolbar"
-        ></v-md-editor>
+        <div style="border: 1px solid #a1a1a1; z-index: 150" class="text-editor-container rounded-md p-1 shadow-md">
+            <v-md-editor
+                v-model="panel.content"
+                height="400px"
+                left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
+                :toolbar="toolbar"
+            ></v-md-editor>
+        </div>
     </div>
 </template>
 
@@ -24,6 +26,152 @@ export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    // A ridiculous workaround to make the toolbar buttons (and the preview) in the md-editor tabbable.
+    // Hopefully a better solution can be found eventually.
+    makeTextEditorElementsTabbable() {
+        // Make preview tabbable
+        const preview = this.$el.querySelector('.v-md-editor__preview-wrapper') as HTMLElement;
+        if (preview) {
+            preview.setAttribute('tabindex', '0');
+        }
+
+        // Allow tabbing out of the text editor area
+        // TODO: Need two tabs to get into the preview (scrollable area). Can definitely be improved.
+        const patchCodeMirrorTabBehavior = (): void => {
+            // Find the actual CodeMirror instance (it's on the .CodeMirror class div)
+            const cmWrapper = this.$el.querySelector('.CodeMirror') as any;
+            if (!cmWrapper || !cmWrapper.CodeMirror) return;
+
+            const cm = cmWrapper.CodeMirror;
+
+            // Define the key behavior
+            cm.setOption('extraKeys', {
+                Tab: (cm: any) => {
+                    this.moveFocus(1);
+                },
+                'Shift-Tab': (cm: any) => {
+                    this.moveFocus(-1);
+                }
+            });
+        };
+        patchCodeMirrorTabBehavior();
+
+        const toolbar = this.$el.querySelector('.v-md-editor__toolbar');
+        if (!toolbar) return;
+
+        const makeButtonInteractive = (el) => {
+            el.setAttribute('tabindex', '0');
+
+            if (!el.dataset.keyboardEnabled) {
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+
+                        // Close any previously-opened menus first, with exceptions
+                        const openToggles = toolbar.querySelectorAll('.v-md-editor__toolbar-item--active');
+                        openToggles.forEach((openEl: HTMLElement) => {
+                            // skip the element we're about to open
+                            if (openEl === el) return;
+
+                            // ...and skip any "menus" (e.g. markdown preview) from the buttons inside the right toolbar
+                            // (they live under the UL[disabled-mens], or equivalently `.v-md-editor__toolbar-right`)
+                            if (openEl.closest('.v-md-editor__toolbar-right')) return;
+
+                            // otherwise, close it
+                            openEl.click();
+                        });
+
+                        // Now open this one
+                        el.click();
+
+                        // If it has a submenu, focus its first item after a delay
+                        const menu = el.querySelector('.v-md-editor__menu');
+                        if (menu) {
+                            setTimeout(() => {
+                                const firstItem = menu.querySelector('.v-md-editor__menu-item');
+                                firstItem?.focus();
+                            }, 100);
+                        }
+                    }
+                });
+                el.dataset.keyboardEnabled = 'true';
+            }
+        };
+
+        const makeDropdownItemsInteractive = () => {
+            const items = toolbar.querySelectorAll('.v-md-editor__menu-item');
+            items.forEach((item) => {
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('role', 'menuitem');
+
+                if (!item.dataset.keyboardEnabled) {
+                    item.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            item.click();
+                        } else if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            const next = item.nextElementSibling;
+                            if (next?.classList.contains('v-md-editor__menu-item')) {
+                                next.focus();
+                            }
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            const prev = item.previousElementSibling;
+                            if (prev?.classList.contains('v-md-editor__menu-item')) {
+                                prev.focus();
+                            }
+                        } else if (e.key === 'Escape') {
+                            // Return focus to the dropdown toggle
+                            item.closest('.v-md-editor__toolbar-item')?.focus();
+                        }
+                    });
+                    item.dataset.keyboardEnabled = 'true';
+                }
+            });
+        };
+
+        const patchEverything = () => {
+            const buttons = toolbar.querySelectorAll('[role="button"], button, .v-md-editor__toolbar-item');
+            buttons.forEach(makeButtonInteractive);
+            makeDropdownItemsInteractive();
+        };
+
+        const observer = new MutationObserver(patchEverything);
+
+        observer.observe(toolbar, {
+            childList: true,
+            subtree: true
+        });
+
+        patchEverything();
+    }
+
+    // TODO: May not play well with tabbing to preview (currently have bespoke code for that elsewhere). Maybe combine?
+    moveFocus(direction: number): void {
+        const focusableSelectors = [
+            'a[href]',
+            'button:not([disabled])',
+            'input:not([disabled])',
+            'select:not([disabled])',
+            'textarea:not([disabled])',
+            '[tabindex]:not([tabindex="-1"])'
+        ].join(',');
+
+        const focusables = Array.from(document.querySelectorAll<HTMLElement>(focusableSelectors)).filter(
+            (el) => el.offsetParent !== null && !el.hasAttribute('disabled')
+        );
+
+        const current = document.activeElement as HTMLElement;
+        const index = focusables.indexOf(current);
+        if (index === -1) return;
+
+        const next = focusables[index + direction];
+        if (next) {
+            next.focus();
+        }
+    }
 
     // Default font size is 16, so it's skipped here
     fontSizes = [5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 18, 20, 22, 24, 26, 28, 36, 48, 72];
@@ -192,6 +340,8 @@ export default class TextEditorV extends Vue {
                 this.toolbarTooltipAdjust(toggle);
             });
         });
+
+        this.makeTextEditorElementsTabbable();
     }
 
     unmounted(): void {
@@ -208,6 +358,34 @@ export default class TextEditorV extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.text-editor-container:has(:focus-within) {
+    outline: 2px solid royalblue;
+    z-index: 2;
+    outline-offset: 2px;
+    transition-duration: 0.075s;
+}
+
+:deep(.v-md-editor__toolbar-right-wrapper) {
+    background-color: #f3f4f6;
+    border-radius: 3px;
+}
+
+:deep(.v-md-editor__toolbar-right) {
+    gap: 2px;
+    justify-content: center !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    width: fit-content !important;
+}
+
+:deep(.v-md-editor__toolbar-item:hover) {
+    background-color: #d1d5db !important;
+}
+
+:deep(.v-md-editor__toolbar-item--active) {
+    background-color: #c0c6cc !important;
+}
+
 label {
     text-align: left !important;
 }
@@ -221,10 +399,6 @@ label {
 
 :deep(.v-md-editor__toolbar-right > .v-md-editor__toolbar-item > .v-md-editor__tooltip) {
     max-width: 80px;
-}
-
-:deep(.v-md-editor__toolbar-right) {
-    padding-right: 20px;
 }
 
 :deep(.v-md-icon-preview) {
