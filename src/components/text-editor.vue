@@ -3,12 +3,19 @@
         <label class="editor-label" for="panelTitle">{{ $t('editor.slides.panel.title') }}</label>
         <input class="editor-input" type="text" id="panelTitle" v-model="panel.title" />
         <div class="editor-label text-left mt-4 mb-1">{{ $t('editor.slides.panel.body') }}</div>
-        <v-md-editor
-            v-model="panel.content"
-            height="400px"
-            left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
-            :toolbar="toolbar"
-        ></v-md-editor>
+        <div
+            @keydown.esc="handleKeydown"
+            style="border: 1px solid #a1a1a1; z-index: 150"
+            class="text-editor-container rounded-md p-1 shadow-md"
+        >
+            <v-md-editor
+                v-model="panel.content"
+                height="400px"
+                left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
+                :toolbar="toolbar"
+                @change="console.log('change!!')"
+            ></v-md-editor>
+        </div>
     </div>
 </template>
 
@@ -24,6 +31,95 @@ export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    // Allow ESCing out of the md-editor
+    handleKeydown(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            // Blur the editor — this works if the internal textarea/input is focused
+            e.target.blur();
+        }
+    }
+
+    // A ridiculous workaround to make the toolbar buttons in the md-editor tabbable.
+    // Hopefully a better solution can be found eventually.
+    makeToolbarButtonsTabbable() {
+        const toolbar = this.$el.querySelector('.v-md-editor__toolbar');
+        if (!toolbar) return;
+
+        const makeButtonInteractive = (el) => {
+            el.setAttribute('tabindex', '0');
+
+            if (!el.dataset.keyboardEnabled) {
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        el.click();
+
+                        // If it's a dropdown button, focus the first item after a short delay
+                        const menu = el.querySelector('.v-md-editor__menu');
+                        if (menu) {
+                            setTimeout(() => {
+                                const firstItem = menu.querySelector('.v-md-editor__menu-item');
+                                if (firstItem) {
+                                    firstItem.focus();
+                                }
+                            }, 100); // Give time for the menu to become visible
+                        }
+                    }
+                });
+                el.dataset.keyboardEnabled = 'true';
+            }
+        };
+
+        const makeDropdownItemsInteractive = () => {
+            const items = toolbar.querySelectorAll('.v-md-editor__menu-item');
+            items.forEach((item) => {
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('role', 'menuitem');
+
+                if (!item.dataset.keyboardEnabled) {
+                    item.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            item.click();
+                        } else if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            const next = item.nextElementSibling;
+                            if (next?.classList.contains('v-md-editor__menu-item')) {
+                                next.focus();
+                            }
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            const prev = item.previousElementSibling;
+                            if (prev?.classList.contains('v-md-editor__menu-item')) {
+                                prev.focus();
+                            }
+                        } else if (e.key === 'Escape') {
+                            // Return focus to the dropdown toggle
+                            item.closest('.v-md-editor__toolbar-item')?.focus();
+                        }
+                    });
+                    item.dataset.keyboardEnabled = 'true';
+                }
+            });
+        };
+
+        const patchEverything = () => {
+            const buttons = toolbar.querySelectorAll('[role="button"], button, .v-md-editor__toolbar-item');
+            buttons.forEach(makeButtonInteractive);
+            makeDropdownItemsInteractive();
+        };
+
+        const observer = new MutationObserver(patchEverything);
+
+        observer.observe(toolbar, {
+            childList: true,
+            subtree: true
+        });
+
+        patchEverything();
+    }
 
     // Default font size is 16, so it's skipped here
     fontSizes = [5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 18, 20, 22, 24, 26, 28, 36, 48, 72];
@@ -192,6 +288,8 @@ export default class TextEditorV extends Vue {
                 this.toolbarTooltipAdjust(toggle);
             });
         });
+
+        this.makeToolbarButtonsTabbable();
     }
 
     unmounted(): void {
@@ -208,6 +306,34 @@ export default class TextEditorV extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.text-editor-container:has(:focus-within) {
+    outline: 2px solid royalblue;
+    z-index: 2;
+    outline-offset: 2px;
+    transition-duration: 0.075s;
+}
+
+:deep(.v-md-editor__toolbar-right-wrapper) {
+    background-color: #f3f4f6;
+    border-radius: 3px;
+}
+
+:deep(.v-md-editor__toolbar-right) {
+    gap: 2px;
+    justify-content: center !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    width: fit-content !important;
+}
+
+:deep(.v-md-editor__toolbar-item:hover) {
+    background-color: #d1d5db !important;
+}
+
+:deep(.v-md-editor__toolbar-item--active) {
+    background-color: #c0c6cc !important;
+}
+
 label {
     text-align: left !important;
 }
@@ -223,9 +349,9 @@ label {
     max-width: 80px;
 }
 
-:deep(.v-md-editor__toolbar-right) {
-    padding-right: 20px;
-}
+//:deep(.v-md-editor__toolbar-right) {
+//    padding-right: 20px;
+//}
 
 :deep(.v-md-icon-preview) {
     margin-left: 4px;
