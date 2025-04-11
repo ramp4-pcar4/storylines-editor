@@ -160,6 +160,7 @@ import {
 import draggable from 'vuedraggable';
 import ImagePreviewV from './helpers/image-preview.vue';
 import JSZip from 'jszip';
+import Message from 'vue-m-message';
 
 @Options({
     components: {
@@ -262,7 +263,7 @@ export default class ImageEditorV extends Vue {
     }
 
     // TODO: move method into a plugin. That way it isn't repeated in the metadata/video editors
-    // Converts a file into a promise that resolves to its has, as an array of 8-bit integers
+    // Converts a file into a promise that resolves to its hash, as an array of 8-bit integers
     obtainHashData(file: File): Promise<Uint8Array> {
         return this.readBinaryData(file)
             .then((res) => {
@@ -421,6 +422,11 @@ export default class ImageEditorV extends Vue {
             }
             uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${newAssetName}`;
             this.configFileStructure.assets[this.lang].file(newAssetName, file);
+        }
+
+        // Notify user of the change in the name of their uploaded asset, to avoid any confusion
+        if (file.name !== newAssetName) {
+            Message.info(this.$t('editor.slides.assetNameChange', { oldName: file.name, newName: newAssetName }));
         }
 
         if (this.sourceCounts[uploadSource]) {
