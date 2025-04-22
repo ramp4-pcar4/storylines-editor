@@ -30,7 +30,7 @@
             "backgroundImage": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
             "panel": [
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/test-ramp4.json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsDeposits.json",
                     "type": "map",
                     "scrollguard": true
                 },
@@ -89,7 +89,7 @@
                         {
                             "id": "panel-4",
                             "panel": {
-                                "config": "00000000-0000-0000-0000-000000000000/ramp-config/OilSandsFacilityLocations2019.json",
+                                "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json",
                                 "type": "map",
                                 "scrollguard": true
                             }
@@ -156,7 +156,7 @@
                     "type": "text"
                 },
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/OilSandsDeposits.json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsDeposits.json",
                     "type": "map",
                     "scrollguard": true
                 }
@@ -203,7 +203,7 @@
                     "type": "text"
                 },
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/OilSandsFacilityLocations2019.json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json",
                     "type": "map",
                     "title": "Map Title Test"
                 }
@@ -264,7 +264,7 @@
                     "type": "text"
                 },
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
                     "type": "map"
                 }
             ]
@@ -306,7 +306,7 @@
                     "type": "text"
                 },
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
                     "type": "map"
                 }
             ],
@@ -321,7 +321,7 @@
                     "type": "text"
                 },
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/TailingsfromMiningFacilities2010to2019(timeslider).json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/TailingsfromMiningFacilities2010to2019(timeslider).json",
                     "timeSlider": {
                         "range": [2010, 2019],
                         "start": [2010, 2010],
@@ -356,7 +356,7 @@
                     "type": "text"
                 },
                 {
-                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019.json",
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019.json",
                     "type": "map"
                 }
             ],
@@ -422,7 +422,7 @@
                             "customStyles": "border: 2px solid black;"
                         },
                         {
-                            "config": "00000000-0000-0000-0000-000000000000/ramp-config/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
+                            "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
                             "type": "map",
                             "scrollguard": true
                         },
