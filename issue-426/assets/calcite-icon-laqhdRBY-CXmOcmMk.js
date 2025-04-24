@@ -1,0 +1,1 @@
+import{f as t,m as o}from"./icon-BXFbBbop-C_vatmnW.js";import"./themeUtils-YjM7iIiX-D-uMG5l1.js";import"./main-i7itTnUE.js";import"./uuid-Dj9mdEVg-BaKSCiyT.js";import"./dom-N58V0tYi-DBU3jlah.js";import"./observers-BigwqTsw-DiXrpwb0.js";const n=t,a=o;export{n as CalciteIcon,a as defineCustomElement};
