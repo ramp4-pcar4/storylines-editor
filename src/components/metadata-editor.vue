@@ -2329,6 +2329,7 @@ export default class MetadataEditorV extends Vue {
                 this.checkingUuid = false;
                 return;
             }
+
             // If renaming, show the loading spinner while we check whether the UUID is taken.
             fetch(this.apiUrl + `/check/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
                 if (res.status !== 404) {
