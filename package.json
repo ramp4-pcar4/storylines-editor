@@ -19,6 +19,7 @@
         "clone-deep": "^4.0.1",
         "deep-object-diff": "^1.1.9",
         "file-saver": "^2.0.5",
+        "file-selector": "^2.1.2",
         "highcharts": "^9.3.2",
         "highcharts-accessible-configuration-kit": "^1.15.0",
         "highcharts-vue": "^1.4.3",
