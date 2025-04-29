@@ -366,6 +366,10 @@ export default class HomeV extends Vue {
         if (this.sessionExpired) {
             this.showExpired = true;
         }
+        this.obtainUserProfile();
+    }
+
+    obtainUserProfile(): void {
         this.userStore
             .fetchUserProfile()
             .then(() => {
@@ -504,7 +508,9 @@ export default class HomeV extends Vue {
                     };
                     axios
                         .post(this.apiUrl + `/upload/${this.productUuid}`, formData, { headers })
-                        .then(() => {
+                        .then((res: AxiosResponse) => {
+                            const responseData = res.data;
+                            const commitHash = responseData.commitHash; // commit hash of the git commit
                             axios
                                 .post(this.apiUrl + `/admin-rename`, {
                                     user: this.userName,
@@ -512,19 +518,65 @@ export default class HomeV extends Vue {
                                     secret: this.lockStore.secret
                                 })
                                 .then(() => {
-                                    Message.success(this.$t('editor.adminUpload.successfulUpload'));
-                                    this.lockStore.unlockStoryline();
+                                    if (
+                                        import.meta.env.VITE_APP_NET_API_URL &&
+                                        import.meta.env.VITE_APP_CURR_ENV &&
+                                        this.productUuid
+                                    ) {
+                                        axios
+                                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
+                                                uuid: this.productUuid,
+                                                titleEn: '',
+                                                titleFr: ''
+                                            })
+                                            .then(() => {
+                                                //this.obtainUserProfile();
+                                                formData.append('uuid', this.productUuid);
+                                                formData.append('titleEn', '');
+                                                formData.append('titleFr', '');
+                                                formData.append('commitHash', commitHash);
+                                                formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
+                                                axios
+                                                    .post(
+                                                        import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
+                                                        formData
+                                                    )
+                                                    .then(() => {
+                                                        Message.success(this.$t('editor.adminUpload.successfulUpload'));
+                                                        this.lockStore.unlockStoryline();
+                                                        this.closeModal();
+                                                        this.loading = false;
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error(error);
+                                                        this.lockStore.unlockStoryline();
+                                                        this.closeModal();
+                                                        this.loading = false;
+                                                    });
+                                            })
+                                            .catch((error) => {
+                                                console.error(error);
+                                                this.lockStore.unlockStoryline();
+                                                this.closeModal();
+                                                this.loading = false;
+                                            });
+                                    } else {
+                                        Message.success(this.$t('editor.adminUpload.successfulUpload'));
+                                        this.lockStore.unlockStoryline();
+                                        this.closeModal();
+                                        this.loading = false;
+                                    }
                                 })
                                 .catch(() => {
                                     Message.error(this.$t('editor.warning.renameFailed'));
                                     this.lockStore.unlockStoryline();
+                                    this.closeModal();
+                                    this.loading = false;
                                 });
                         })
                         .catch(() => {
                             Message.error(this.$t('editor.editMetadata.message.error.failedZipFile'));
                             this.lockStore.unlockStoryline();
-                        })
-                        .finally(() => {
                             this.closeModal();
                             this.loading = false;
                         });
