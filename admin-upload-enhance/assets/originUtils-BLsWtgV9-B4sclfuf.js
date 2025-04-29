@@ -1,0 +1,1 @@
+import{n as i}from"./multiOriginJSONSupportUtils-DGETddQl-BrWaY9_8.js";function p(t){t?.writtenProperties&&t.writtenProperties.forEach(({target:r,propName:e,newOrigin:n})=>{i(r)&&n&&r.originOf(e)!==n&&r.updateOrigin(e,n)})}export{p as n};
