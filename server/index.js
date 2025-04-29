@@ -124,12 +124,16 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
         // old files in the folder.
         decompress(secureFilename, fileName).then(async (files) => {
             // Below is some logic to remove items from the server directory that are no longer used.
-            const config_en = JSON.stringify(
-                JSON.parse(files.find((file) => file.path === `${req.params.id}_en.json`).data)
-            );
-            const config_fr = JSON.stringify(
-                JSON.parse(files.find((file) => file.path === `${req.params.id}_fr.json`).data)
-            );
+            let config_en = files.find((file) => file.path === `${req.params.id}_en.json`)?.data;
+            if (config_en) {
+                config_en = JSON.stringify(JSON.parse(config_en));
+            }
+
+            let config_fr = files.find((file) => file.path === `${req.params.id}_fr.json`)?.data;
+            if (config_fr) {
+                config_fr = JSON.stringify(JSON.parse(config_fr));
+            }
+
             // Retrieve the existing files in the directory and change the path. Ignore all files within the
             // .git folder
             const existingFiles = recursiveRead(fileName).then((existing) => {
@@ -156,7 +160,7 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
                 difference.forEach((file) => {
                     // TODO: remove this, but leaving it in for now just in case something was
                     // overlooked and files start randomly disappearing.
-                    if (!config_en.includes(file) && !config_fr.includes(file)) {
+                    if (!config_en?.includes(file) && !config_fr?.includes(file)) {
                         logger('WARNING', `Removing ${file} because it no longer exists in the product.`);
                         fs.rm(fileName + '/' + file);
                     }
@@ -538,15 +542,15 @@ app.route(ROUTE_PREFIX + '/admin-rename').post(function (req, res) {
                     let configEn = JSON.stringify(JSON.parse(data), null, 4);
                     configEn = configEn.replaceAll(`${configUuid}/`, `${newUuid}/`);
 
-                    // Create the new en config file
-                    fs.writeFile(PRODUCT_PATH + `/${newUuid}_en.json`, configEn, 'utf8', async (err) => {
+                    // Remove the old en config from the product
+                    fs.unlink(PRODUCT_PATH + `/${configUuid}_en.json`, (err) => {
                         if (err) {
                             res.status(500).send({ status: 'Internal Server Error' });
                             logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
                             return;
                         }
-                        // Remove the old en config from the product
-                        fs.unlink(PRODUCT_PATH + `/${configUuid}_en.json`, (err) => {
+                        // Create the new en config file
+                        fs.writeFile(PRODUCT_PATH + `/${newUuid}_en.json`, configEn, 'utf8', async (err) => {
                             if (err) {
                                 res.status(500).send({ status: 'Internal Server Error' });
                                 logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
@@ -563,31 +567,36 @@ app.route(ROUTE_PREFIX + '/admin-rename').post(function (req, res) {
                                 let configFr = JSON.stringify(JSON.parse(data), null, 4);
                                 configFr = configFr.replaceAll(`${configUuid}/`, `${newUuid}/`);
 
-                                // Create the new fr config file
-                                fs.writeFile(PRODUCT_PATH + `/${newUuid}_fr.json`, configFr, 'utf8', async (err) => {
+                                // Remove the old fr config from the product
+                                fs.unlink(PRODUCT_PATH + `/${configUuid}_fr.json`, (err) => {
                                     if (err) {
                                         res.status(500).send({ status: 'Internal Server Error' });
                                         logger('WARNING', 'Error occured while renaming a Storylines product.' + err);
                                         return;
                                     }
 
-                                    // Remove the old fr config from the product
-                                    fs.unlink(PRODUCT_PATH + `/${configUuid}_fr.json`, (err) => {
-                                        if (err) {
-                                            res.status(500).send({ status: 'Internal Server Error' });
+                                    // Create the new fr config file
+                                    fs.writeFile(
+                                        PRODUCT_PATH + `/${newUuid}_fr.json`,
+                                        configFr,
+                                        'utf8',
+                                        async (err) => {
+                                            if (err) {
+                                                res.status(500).send({ status: 'Internal Server Error' });
+                                                logger(
+                                                    'WARNING',
+                                                    'Error occured while renaming a Storylines product.' + err
+                                                );
+                                                return;
+                                            }
+                                            res.status(200).send({ status: 'OK' });
                                             logger(
-                                                'WARNING',
-                                                'Error occured while renaming a Storylines product.' + err
+                                                'INFO',
+                                                `Product successfully renamed product from ${configUuid} to ${newUuid}`
                                             );
                                             return;
                                         }
-                                        res.status(200).send({ status: 'OK' });
-                                        logger(
-                                            'INFO',
-                                            `Product successfully renamed product from ${configUuid} to ${newUuid}`
-                                        );
-                                        return;
-                                    });
+                                    );
                                 });
                             });
                         });

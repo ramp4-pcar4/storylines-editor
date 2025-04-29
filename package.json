@@ -17,6 +17,7 @@
         "axios": "^1.2.0",
         "clone-deep": "^4.0.1",
         "file-saver": "^2.0.5",
+        "file-selector": "^2.1.2",
         "highcharts": "^9.3.2",
         "highcharts-vue": "^1.4.3",
         "intersection-observer": "^0.12.0",
