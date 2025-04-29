@@ -129,7 +129,7 @@
                     class="home-btn-container border border-gray-400 border-solid home-buttons flex justify-center h-full"
                     target
                     @click="$vfm.open('admin-upload-modal')"
-                    v-if="profile.role === 'Admin'"
+                    v-if="profile.role !== 'Admin'"
                 >
                     <button
                         class="dashboard-option-button flex items-center justify-center text-xl font-bold w-full"
@@ -152,15 +152,15 @@
                 content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
                 class="flex justify-center items-center"
             >
-                <div class="p-5">
+                <div class="modal-contents">
                     <div class="text-xl text-center pb-8 font-bold">{{ $t('editor.adminUpload') }}</div>
-                    <div class="flex flex-col items-center pb-5">
-                        <label for="product-uuid">{{ $t('editor.uuid.new') }}: </label>
+                    <div class="flex flex-col items-center pb-2">
+                        <label class="pb-1" for="product-uuid">{{ $t('editor.uuid.new') }}: </label>
                         <input
                             type="text"
                             name="uuid"
                             id="product-uuid"
-                            class="respected-standard-input w-5/6 text-center"
+                            class="respected-standard-input text-center"
                             v-model="productUuid"
                             @input="checkUuid"
                             placeholder="4523ae53-5d58-4a0e-8b01-54d9824871f5"
@@ -168,12 +168,11 @@
                                 'input-error': error
                             }"
                         />
-                        <!-- TODO: try to keep this fixed in size, so the modal doesn't resize when rendered -->
-                        <div class="w-5/6 h-1/6">
+                        <div class="warning-container">
                             <!-- Display a warning if there is one. -->
                             <span
                                 v-if="warning !== 'none'"
-                                class="flex flex-row items-center text-accent-dark-orange rounded p-1"
+                                class="flex flex-row items-center justify-center text-accent-dark-orange rounded p-1"
                             >
                                 <span class="align-middle inline-block mr-1 fill-current">
                                     <svg
@@ -201,33 +200,65 @@
                         </div>
                     </div>
                     <div
-                        class="flex flex-col items-center justify-center m-5 bg-blue-100 border-4 border-dashed border-blue-300"
+                        class="file-upload flex flex-col items-center justify-center bg-blue-100 border-4 border-dashed border-blue-300"
                         :class="{ dragging: isDragging }"
                         @dragover.prevent="() => (dragging = true)"
                         @dragleave.prevent="() => (dragging = false)"
-                        @drop.prevent="productZipDropped($event)"
+                        @drop.prevent="productDropped($event)"
                     >
-                        <div class="self-end p-0">
-                            <button
-                                class="info-button w-min cursor-default"
-                                :content="$t('editor.adminUpload.zipFileInfo')"
+                        <div class="self-end p-2">
+                            <span
+                                :content="`${$t('editor.adminUpload.zipFileInfo')}<br/><br/>${$t(
+                                    'editor.adminUpload.folderUploadInfo'
+                                )}`"
                                 v-tippy="{
-                                    theme: 'left-align',
-                                    delay: '200',
                                     placement: 'bottom-start',
+                                    theme: 'left-align',
+                                    hideOnClick: false,
+                                    animateFill: true,
                                     touch: ['hold', 500],
                                     allowHTML: true
                                 }"
+                                tabindex="0"
                             >
-                                i
-                            </button>
+                                <svg
+                                    class="fill-current"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 416.979 416.979"
+                                    xml:space="preserve"
+                                >
+                                    <g>
+                                        <path
+                                            d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85   c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786   c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576   c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765   c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
+                                        />
+                                    </g>
+                                </svg>
+                            </span>
                         </div>
-                        <div class="flex flex-col items-center justify-center p-12 pt-4">
-                            <label class="cursor-pointer p-4">
-                                <span>{{ $t('editor.image.label.drag', { fileType: 'zip file' }) }}</span>
-                                {{ $t('editor.label.or') }}
-                                <span class="text-blue-700 font-bold">{{ $t('editor.label.browse') }}</span>
-                                {{ $t('editor.label.upload') }}
+                        <div class="flex gap-3 flex-col items-center justify-center p-6 pt-0">
+                            <span>{{ $t('editor.adminUpload.drag') }}</span>
+                            {{ $t('editor.label.or')[0].toUpperCase() + $t('editor.label.or').slice(1) }}
+
+                            <label
+                                class="cursor-pointer"
+                                :content="$t('editor.adminUpload.zipFileInfo')"
+                                v-tippy="{
+                                    placement: 'bottom-start',
+                                    theme: 'left-align',
+                                    hideOnClick: false,
+                                    animateFill: true,
+                                    touch: ['hold', 500]
+                                }"
+                                @keydown.enter="clickZipUpload"
+                                tabindex="0"
+                            >
+                                <span class="text-blue-700 font-bold">{{
+                                    $t('editor.label.browse')[0].toUpperCase() + $t('editor.label.browse').slice(1)
+                                }}</span>
+                                {{ $t('editor.label.upload.zip') }}
                                 <input
                                     type="file"
                                     name="zip"
@@ -236,20 +267,54 @@
                                     multiple="false"
                                     accept="application/x-zip-compressed"
                                     class="cursor-pointer"
+                                    ref="productZipInput"
+                                    tabindex="-1"
                                 />
                             </label>
-                            <div>{{ $t('editor.adminUpload.fileName') }}: {{ productZipName || 'N/A' }}</div>
+                            <label
+                                class="cursor-pointer pt-4"
+                                :content="$t('editor.adminUpload.folderUploadInfo')"
+                                v-tippy="{
+                                    placement: 'bottom-start',
+                                    theme: 'left-align',
+                                    hideOnClick: false,
+                                    animateFill: true,
+                                    touch: ['hold', 500]
+                                }"
+                                @keydown.enter="clickFolderUpload"
+                                tabindex="0"
+                            >
+                                <span class="text-blue-700 font-bold">{{
+                                    $t('editor.label.browse')[0].toUpperCase() + $t('editor.label.browse').slice(1)
+                                }}</span>
+                                {{ $t('editor.label.upload.folder') }}
+                                <input
+                                    type="file"
+                                    name="folder"
+                                    @change="productFolderUploaded"
+                                    multiple="false"
+                                    webkitdirectory
+                                    directory
+                                    class="cursor-pointer"
+                                    ref="productFolderInput"
+                                    tabindex="-1"
+                                />
+                            </label>
+
+                            <div class="pt-4">
+                                {{ $t('editor.adminUpload.fileName') }}: {{ productUploadName || 'N/A' }}
+                            </div>
                         </div>
                     </div>
+                    <br />
 
-                    <div class="flex justify-end">
-                        <div class="inline-flex align-middle mr-2" v-if="loading">
+                    <div class="modal-footer">
+                        <div class="inline-flex align-middle self-center" v-if="loading">
                             <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
                         </div>
                         <button
                             type="submit"
                             @click="uploadZip"
-                            style="margin-right: 0.5rem"
                             class="respected-standard-button respected-black-bg-button"
                             :disabled="error"
                         >
@@ -288,6 +353,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr v-if="userStorylines.length === 0">
+                        <td style="background-color: #f9f9f9" class="border-b border-solid text-center p-2" colspan="3">
+                            {{ $t('editor.previousProducts.noProducts') }}
+                        </td>
+                    </tr>
                     <tr v-for="(storyline, idx) in userStorylines" :key="idx">
                         <td
                             style="background-color: #f9f9f9; padding-right: 1vw"
@@ -316,7 +386,7 @@
                             :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
                         >
                             <button
-                                class="flex items-center font-semibold rounded-sm py-2 border border-solid border-black home-buttons"
+                                class="flex items-center justify-center font-semibold rounded-sm py-2 border border-solid border-black home-buttons"
                                 style="
                                     padding-right: 1vw;
                                     padding-left: 1vw;
@@ -362,6 +432,8 @@ import { VueFinalModal } from 'vue-final-modal';
 import { AxiosResponse } from 'axios';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { throttle } from 'throttle-debounce';
+import JSZip from 'jszip';
+import { fromEvent } from 'file-selector';
 
 import axios from 'axios';
 import Message from 'vue-m-message';
@@ -383,7 +455,7 @@ export default class HomeV extends Vue {
     showExpired = false;
     apiUrl = import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040';
     productZip: string | File = '';
-    productZipName = '';
+    productUploadName = '';
     productUuid = '';
     loading = false;
     dragging = false;
@@ -464,7 +536,6 @@ export default class HomeV extends Vue {
     }
 
     productZipUploaded(e: Event): void {
-        // TODO: If a product folder was uploaded instead of a zip, zip it
         const uploadedFiles = (e.target as HTMLInputElement).files as ArrayLike<File>;
         if (uploadedFiles.length > 0) {
             if (uploadedFiles.length > 1) {
@@ -473,18 +544,34 @@ export default class HomeV extends Vue {
             const fileUploaded = uploadedFiles[0];
             if (fileUploaded.type === 'application/x-zip-compressed') {
                 this.productZip = fileUploaded;
-                this.productZipName = fileUploaded.name;
+                this.productUploadName = fileUploaded.name;
             } else {
                 Message.error(this.$t('editor.adminUpload.incorrectType'));
             }
         } else {
             this.productZip = '';
-            this.productZipName = '';
+            this.productUploadName = '';
         }
     }
 
-    productZipDropped(e: DragEvent) {
-        // TODO: If a product folder was uploaded instead of a zip, zip it
+    clickZipUpload() {
+        this.$refs['productZipInput'].click();
+    }
+
+    clickFolderUpload() {
+        this.$refs['productFolderInput'].click();
+    }
+
+    productFolderUploaded(e: Event): void {
+        const uploadedFiles = (e.target as HTMLInputElement).files as ArrayLike<File>;
+        uploadedFiles.forEach((file) => {
+            // Add filePath property to each file
+            file.filePath = file.webkitRelativePath;
+        });
+        this.uploadFolderHelper(uploadedFiles);
+    }
+
+    productDropped(e: Event): void {
         if (e.dataTransfer !== null) {
             const fileUploaded = e.dataTransfer.files[0];
             if (e.dataTransfer.files.length > 1) {
@@ -493,11 +580,87 @@ export default class HomeV extends Vue {
 
             if (fileUploaded.type === 'application/x-zip-compressed') {
                 this.productZip = fileUploaded;
-                this.productZipName = fileUploaded.name;
+                this.productUploadName = fileUploaded.name;
             } else {
-                Message.error(this.$t('editor.adminUpload.incorrectType'));
+                fromEvent(e).then((files) => {
+                    files.forEach((file) => {
+                        // Remove initial slash. Creating new property because others are read only
+                        file.filePath = file.relativePath.split('/').slice(1).join('/');
+                    });
+                    this.uploadFolderHelper(files);
+                });
             }
             this.dragging = false;
+        }
+    }
+
+    uploadFolderHelper(uploadedFiles: Array<File>): void {
+        if (uploadedFiles.length > 0) {
+            const configZip = new JSZip();
+            let containsEnConfig = false;
+            let containsFrConfig = false;
+            let folderUuidEn = '';
+            let folderUuidFr = '';
+            configZip.folder('ramp-config');
+            configZip.folder('assets/en');
+            configZip.folder('assets/fr');
+            configZip.folder('charts');
+            configZip.folder('styles');
+
+            uploadedFiles.forEach((file) => {
+                if (file.name.includes('_en.json')) {
+                    containsEnConfig = true;
+                    folderUuidEn = file.name.split('_en.json')[0];
+                }
+
+                if (file.name.includes('_fr.json')) {
+                    containsFrConfig = true;
+                    folderUuidFr = file.name.split('_fr.json')[0];
+                }
+            });
+
+            // Ensure that there exists a json config for each lang
+            if (!(containsEnConfig && containsFrConfig && folderUuidEn === folderUuidFr)) {
+                Message.error(this.$t('editor.adminUpload.folder.invalidStructure'));
+                return;
+            }
+
+            for (const file of uploadedFiles) {
+                // Ignore git files
+                if (!file.filePath.includes('.git')) {
+                    // If this file is not within a valid subfolder, the folder is not valid strcture
+                    if (
+                        ['ramp-config', 'styles', 'assets', 'charts'].every(
+                            (str) => file.filePath.split('/')[1] !== str
+                        )
+                    ) {
+                        if (
+                            file.filePath.split('/')[1] !== `${folderUuidEn}_en.json` &&
+                            file.filePath.split('/')[1] !== `${folderUuidEn}_fr.json`
+                        ) {
+                            Message.error(this.$t('editor.adminUpload.folder.invalidStructure'));
+                            return;
+                        }
+                    }
+
+                    // If this files highest parent is not the same as the names of the config files, the folder is not
+                    // valid structure
+                    if (file.filePath.split('/')[0] !== folderUuidEn) {
+                        Message.error(this.$t('editor.adminUpload.folder.invalidStructure'));
+                        return;
+                    }
+
+                    configZip.file(file.filePath.split('/').slice(1).join('/'), file);
+                }
+            }
+
+            configZip.generateAsync({ type: 'blob' }).then((content: Blob) => {
+                this.productZip = content;
+                this.productUploadName = folderUuidEn;
+            });
+        } else {
+            this.productZip = '';
+            this.productUploadName = '';
         }
     }
 
@@ -673,6 +836,11 @@ td {
     grid-template-columns: repeat(auto-fit, minmax(25vw, 1fr));
 }
 
+.warning-container {
+    width: 30vw;
+    height: 20px;
+}
+
 input[type='file']:not(:focus-visible) {
     position: absolute !important;
     width: 1px !important;
@@ -688,6 +856,41 @@ input[type='file']:not(:focus-visible) {
 .dragging {
     background-color: #fffaf0 !important;
     border-color: #fff !important;
+}
+
+.modal-contents {
+    padding: 1.25em;
+}
+
+.file-upload {
+    margin: 1.25rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: end;
+    gap: 5px;
+}
+
+.editor-button {
+    border-radius: 3px;
+    padding: 5px 12px;
+    font-weight: 600;
+    transition-duration: 0.2s;
+}
+
+.editor-input {
+    width: 85%;
+}
+
+.editor-forms-button {
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.editor-button:hover:enabled {
+    background-color: #dbdbdb;
+    color: black;
 }
 
 .input-error {
@@ -712,6 +915,35 @@ input[type='file']:not(:focus-visible) {
     }
     .home-btn-container {
         justify-self: start;
+    }
+    .warning-container {
+        width: 60vw;
+        height: 25px;
+    }
+}
+
+@media (width <= 400px) {
+    .modal-contents {
+        padding: 5px;
+        padding-top: 15px;
+    }
+
+    .file-upload {
+        margin: 2px;
+        margin-bottom: 10px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .editor-input {
+        width: 100%;
+    }
+
+    .warning-container {
+        width: 70vw;
+        height: 10%;
     }
 }
 </style>
