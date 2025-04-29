@@ -124,12 +124,16 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
         // old files in the folder.
         decompress(secureFilename, fileName).then(async (files) => {
             // Below is some logic to remove items from the server directory that are no longer used.
-            const config_en = JSON.stringify(
-                JSON.parse(files.find((file) => file.path === `${req.params.id}_en.json`).data)
-            );
-            const config_fr = JSON.stringify(
-                JSON.parse(files.find((file) => file.path === `${req.params.id}_fr.json`).data)
-            );
+            let config_en = files.find((file) => file.path === `${req.params.id}_en.json`)?.data;
+            if (config_en) {
+                config_en = JSON.stringify(JSON.parse(config_en));
+            }
+
+            let config_fr = files.find((file) => file.path === `${req.params.id}_fr.json`)?.data;
+            if (config_fr) {
+                config_fr = JSON.stringify(JSON.parse(config_fr));
+            }
+
             // Retrieve the existing files in the directory and change the path. Ignore all files within the
             // .git folder
             const existingFiles = recursiveRead(fileName).then((existing) => {
@@ -156,7 +160,7 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
                 difference.forEach((file) => {
                     // TODO: remove this, but leaving it in for now just in case something was
                     // overlooked and files start randomly disappearing.
-                    if (!config_en.includes(file) && !config_fr.includes(file)) {
+                    if (!config_en?.includes(file) && !config_fr?.includes(file)) {
                         logger('WARNING', `Removing ${file} because it no longer exists in the product.`);
                         fs.rm(fileName + '/' + file);
                     }
