@@ -530,7 +530,6 @@ export default class HomeV extends Vue {
                                                 titleFr: ''
                                             })
                                             .then(() => {
-                                                this.obtainUserProfile();
                                                 formData.append('uuid', this.productUuid);
                                                 formData.append('titleEn', '');
                                                 formData.append('titleFr', '');
