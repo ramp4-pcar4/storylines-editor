@@ -240,7 +240,7 @@
             </vue-final-modal>
 
             <h2 class="pt-8 pb-5 text-2xl font-semibold">{{ $t('editor.previousProducts') }}</h2>
-            <table class="shadow-lg bg-white w-full pr-0 mr-0">
+            <table class="shadow-lg bg-white w-full pr-0 mr-0 mb-10">
                 <colgroup>
                     <col class="w-3/5" />
                     <col span="2" />

@@ -130,6 +130,7 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
             const config_fr = JSON.stringify(
                 JSON.parse(files.find((file) => file.path === `${req.params.id}_fr.json`).data)
             );
+
             // Retrieve the existing files in the directory and change the path. Ignore all files within the
             // .git folder
             const existingFiles = recursiveRead(fileName).then((existing) => {

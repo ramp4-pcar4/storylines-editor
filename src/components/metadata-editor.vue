@@ -480,9 +480,9 @@
         </template>
 
         <!-- Loading spinner for when product is still being fetched -->
-        <template v-if="loadEditor && productLoading">
-            <div class="flex flex-col justify-center items-center" style="margin-top: 15%">
-                <div class="py-10 text-xl">{{ $t('editor.editMetadata.loading') }}</div>
+        <template v-if="loadEditor && loadStatus !== 'loaded'">
+            <div class="flex flex-col justify-center items-center p-20" style="margin-top: 15%">
+                <div class="py-10 text-xl text-center">{{ $t('editor.editMetadata.loading') }}</div>
                 <spinner size="200px" color="#009cd1"></spinner>
             </div>
         </template>
@@ -754,7 +754,6 @@ export default class MetadataEditorV extends Vue {
     sourceCounts: SourceCounts = {};
     sessionExpired: boolean = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
-    productLoading = false;
 
     @Watch('loadEditor')
     @Watch('loadStatus')
@@ -855,7 +854,6 @@ export default class MetadataEditorV extends Vue {
                             this.metadata.introBgName = introBgAsset ?? '';
                         }
                     }
-
                     this.loadStatus = 'loaded';
                 });
 
@@ -875,20 +873,15 @@ export default class MetadataEditorV extends Vue {
 
         // If a product UUID is provided, fetch the contents from the server.
         if (this.$route.params.uid) {
-            this.productLoading = true;
-            this.generateRemoteConfig()
-                .then(() => {
-                    this.productLoading = false;
-                })
-                .catch(() => {
-                    // Handle any connection/lock errors here
-                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                    if (this.$route.name === 'editor') {
-                        setTimeout(() => {
-                            this.$router.push({ name: 'home' });
-                        }, 2000);
-                    }
-                });
+            this.generateRemoteConfig().catch(() => {
+                // Handle any connection/lock errors here
+                Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                if (this.$route.name === 'editor') {
+                    setTimeout(() => {
+                        this.$router.push({ name: 'home' });
+                    }, 2000);
+                }
+            });
         }
     }
 
@@ -1120,7 +1113,6 @@ export default class MetadataEditorV extends Vue {
             // Create a new AbortController for each fetch attempt
             // as they get 'used up' after each successful abort() call
             this.controller = new AbortController();
-
             this.loadStatus = 'loading';
             const secret = this.lockStore.secret;
             fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, {
