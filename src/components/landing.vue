@@ -1,27 +1,28 @@
 <template>
-    <div class="relative">
-        <div class="absolute top-0 right-0 bg-white text-black p-2">
-            {{ $t('editor.landing.greeting') }} {{ userName }}!
-        </div>
+    <div class="relative mt-10">
+        <!-- <div class="absolute top-0 right-0 bg-white text-black p-2">
+            {{ $t('editor.landing.greeting') }}, {{ userName }}!
+        </div> -->
         <div class="flex flex-col items-center">
             <h1 class="text-2xl font-bold mt-4">{{ title }}</h1>
-            <div class="flex justify-center mt-12 mb-32">
-                <div class="lang-selector border-4 border-gray-400 border-solid mx-8">
+            <p class="text-md font-semibold">{{ $t('editor.landing.greeting') }}, {{ userName }}!</p>
+            <div class="flex flex-wrap gap-y-4 justify-center mt-12 mb-32">
+                <div class="lang-selector rounded-lg mx-8">
                     <router-link
                         :to="{ name: 'home', params: { lang: 'en' } }"
                         class="flex justify-center h-full w-full"
                         target
                     >
-                        <button class="text-2xl text-white font-bold">English</button>
+                        <div class="text-2xl text-white font-semibold self-center">English</div>
                     </router-link>
                 </div>
-                <div class="lang-selector border-4 border-gray-400 border-solid mx-8">
+                <div class="lang-selector rounded-lg mx-8">
                     <router-link
                         :to="{ name: 'home', params: { lang: 'fr' } }"
                         class="flex justify-center h-full w-full"
                         target
                     >
-                        <button class="text-2xl text-white font-bold">Français</button>
+                        <div class="text-2xl text-white font-semibold self-center">Français</div>
                     </router-link>
                 </div>
             </div>
@@ -57,7 +58,7 @@ export default class LandingV extends Vue {
 
 <style lang="scss">
 .lang-selector {
-    height: 18vh;
+    height: 15vh;
     width: 32vh;
     background-color: #26374a;
 }
