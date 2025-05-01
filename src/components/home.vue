@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex justify-between items-center p-8 border-b border-solid border-black">
-            <h1 class="text-4xl">{{ $t('editor.respectTitle') }}</h1>
+            <h1 class="text-2xl md:text-3xl font-semibold mt-4">{{ $t('editor.respectTitle') }}</h1>
             <router-link
                 :to="{ name: 'home', params: { lang: currLang === 'en' ? 'fr' : 'en' } }"
                 v-if="!sourceFile.includes('index-ca')"
@@ -9,7 +9,7 @@
                 <div class="underline">{{ `${currLang === 'en' ? 'Français' : 'English'}` }}</div>
             </router-link>
         </div>
-        <div class="relative" style="margin-right: 10%; margin-left: 10%">
+        <div class="relative px-7 md:px-32">
             <div v-if="showExpired" class="w-full rounded-md bg-red-100 p-2 mt-5">
                 <span class="flex flex-row items-center">
                     <svg
