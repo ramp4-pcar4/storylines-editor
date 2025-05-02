@@ -1,0 +1,1 @@
+function f(r,t,c){for(let n=0;n<c;++n)t[2*n]=r[n],t[2*n+1]=r[n]-t[2*n]}function l(r,t){const c=r.length;for(let n=0;n<c;++n)e[0]=r[n],t[n]=e[0];return t}function o(r,t){const c=r.length;for(let n=0;n<c;++n)e[0]=r[n],e[1]=r[n]-e[0],t[n]=e[1];return t}const e=new Float32Array(2);export{f,l,o as r};
