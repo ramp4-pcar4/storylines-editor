@@ -82,36 +82,8 @@
                         />
                         <span class="ml-auto"></span>
                     </div>
-                    <!-- Slide options -->
+                    <!-- Whole-slide options -->
                     <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
-                        <!-- Make the current panel the full slide -->
-                        <div
-                            class="flex flex-row"
-                            :class="{ 'items-center': !currentRoute.includes('index-ca') }"
-                            v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'"
-                        >
-                            <input
-                                type="checkbox"
-                                id="fullSlide"
-                                class="rounded-none cursor-pointer w-4 h-4"
-                                v-model="onePanelOnly"
-                                :disabled="onePanelOnly && determineEditorType(currentSlide.panel[0]) === 'dynamic'"
-                                @change.stop="
-                                    () => {
-                                        // if statement doesn't work properly (?), so had to use ternary
-                                        // sorry if you have to read this
-                                        currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])
-                                            ? $vfm.open(`one-panel-only-${slideIndex}`)
-                                            : currentSlide.panel.length === 1
-                                            ? $vfm.open(`one-to-two-panels-${slideIndex}`)
-                                            : toggleOnePanelOnly();
-                                    }
-                                "
-                            />
-                            <label class="ml-0" for="fullSlide">
-                                <span class="font-bold ml-0">{{ $t('editor.slides.makeFull') }}</span>
-                            </label>
-                        </div>
                         <!-- Center slide content -->
                         <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
                             <input
@@ -123,23 +95,10 @@
                                 @change.stop="toggleCenterSlide()"
                             />
                             <label class="ml-0" for="centerSlide">
-                                <span class="font-bold">{{ $t('editor.slides.centerSlide') }}</span>
+                                <span class="font-semibold">{{ $t('editor.slides.centerSlide') }}</span>
                             </label>
                         </div>
-                        <!-- Center panel content -->
-                        <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
-                            <input
-                                type="checkbox"
-                                id="centerPanel"
-                                class="rounded-none cursor-pointer w-4 h-4"
-                                v-model="centerPanel"
-                                :disabled="centerSlide"
-                                @change.stop="toggleCenterPanel()"
-                            />
-                            <label class="ml-0" for="centerPanel">
-                                <span class="font-bold">{{ $t('editor.slides.centerPanel') }}</span>
-                            </label>
-                        </div>
+
                         <!-- Include slide in ToC -->
                         <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
                             <input
@@ -150,7 +109,7 @@
                                 @change.stop="toggleIncludeInToc()"
                             />
                             <label class="ml-0" for="inToc">
-                                <span class="font-bold"> {{ $t('editor.slides.includeInToc') }}</span>
+                                <span class="font-semibold"> {{ $t('editor.slides.includeInToc') }}</span>
                             </label>
                         </div>
                     </div>
@@ -409,6 +368,52 @@
                                 {{ $t(`editor.slide.panel.type.${thing}`) }}
                             </option>
                         </select>
+                    </div>
+                </div>
+                <!-- Panel options -->
+                <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
+                    <!-- Make the current panel the full slide -->
+                    <div
+                        class="flex flex-row"
+                        :class="{ 'items-center': !currentRoute.includes('index-ca') }"
+                        v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'"
+                    >
+                        <input
+                            type="checkbox"
+                            id="fullSlide"
+                            class="rounded-none cursor-pointer w-4 h-4"
+                            v-model="onePanelOnly"
+                            :disabled="onePanelOnly && determineEditorType(currentSlide.panel[0]) === 'dynamic'"
+                            @change.stop="
+                                () => {
+                                    // if statement doesn't work properly (?), so had to use ternary
+                                    // sorry if you have to read this
+                                    currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])
+                                        ? $vfm.open(`one-panel-only-${slideIndex}`)
+                                        : currentSlide.panel.length === 1
+                                        ? $vfm.open(`one-to-two-panels-${slideIndex}`)
+                                        : toggleOnePanelOnly();
+                                }
+                            "
+                        />
+                        <label class="ml-0" for="fullSlide">
+                            <span class="font-semibold ml-0">{{ $t('editor.slides.makeFull') }}</span>
+                        </label>
+                    </div>
+
+                    <!-- Center panel content -->
+                    <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
+                        <input
+                            type="checkbox"
+                            id="centerPanel"
+                            class="rounded-none cursor-pointer w-4 h-4"
+                            v-model="centerPanel"
+                            :disabled="centerSlide"
+                            @change.stop="toggleCenterPanel()"
+                        />
+                        <label class="ml-0" for="centerPanel">
+                            <span class="font-semibold">{{ $t('editor.slides.centerPanel') }}</span>
+                        </label>
                     </div>
                 </div>
                 <custom-editor
