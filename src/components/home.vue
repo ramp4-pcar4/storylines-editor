@@ -545,6 +545,7 @@ export default class HomeV extends Vue {
                                                         this.lockStore.unlockStoryline();
                                                         this.closeModal();
                                                         this.loading = false;
+                                                        this.obtainUserProfile();
                                                     })
                                                     .catch((error) => {
                                                         console.error(error);
@@ -564,6 +565,7 @@ export default class HomeV extends Vue {
                                         this.lockStore.unlockStoryline();
                                         this.closeModal();
                                         this.loading = false;
+                                        this.obtainUserProfile();
                                     }
                                 })
                                 .catch(() => {
