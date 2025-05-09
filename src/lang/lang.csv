@@ -115,7 +115,7 @@ editor.warning.renameFailed,Failed to rename product.,1,Échec du renommage du p
 editor.warning.badChar,"Illegal character entered. You cannot use these characters in your UUID: {': / # ? & @ % +'}",1,"Caractère illégal saisi. Vous ne pouvez pas utiliser ces caractères dans votre UUID: {': / # ? & @ % +'}",0
 editor.changeUuid,Click here to change UUID,1,Cliquez ici pour changer,0
 editor.title,Title,1,Titre,1
-editor.respectTitle,RAMP Storylines Editor & Creation Tool,1,Éditeur et outil de création de scénarios RAMP,0
+editor.respectTitle,RAMP-Enhanced Storylines Product Editor & Creation Tool,1,Éditeur de produits et outil de création de scénarios améliorés par RAMP,0
 editor.logo,Logo,1,Logo,1
 editor.logoPreview,Logo preview,1,Aperçu du logo,1
 editor.logoPreviewAltText,Preview of product logo,1,Aperçu du logo du produit,0
