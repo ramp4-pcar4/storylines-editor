@@ -103,16 +103,15 @@
             defTop.outerHTML = wet.builder.top({
                 lngLinks: [
                     {
-                        lang: 'en',
-                        id: 'test',
-                        href: 'index-ca-fr#/fr/' + urlRoute,
+                        lang: 'fr',
+                        href: 'index-ca-fr.html#/fr/' + urlRoute,
                         text: 'Français'
                     }
                 ],
                 breadcrumbs: [
                     {
-                        title: 'Environnement et ressources naturelles',
-                        href: 'https://www.canada.ca/fr/services/environnement/meteo.html'
+                        title: 'Environment and natural resources',
+                        href: 'https://www.canada.ca/en/services/environment.html'
                     }
                 ]
             });
@@ -126,7 +125,7 @@
             langChange.addEventListener('click', (e) => {
                 e.preventDefault();
                 const urlRoute = getUrlRoute();
-                window.location.href = 'index-ca-fr#/fr/' + urlRoute;
+                window.location.href = 'index-ca-fr.html#/fr/' + urlRoute;
             });
         </script>
 
