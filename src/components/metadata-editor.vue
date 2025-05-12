@@ -2742,7 +2742,6 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
 
 .editor-mode {
     height: 100%;
-    overflow: hidden;
 }
 
 .storyramp-app,
