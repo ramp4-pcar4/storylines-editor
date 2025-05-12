@@ -5,41 +5,39 @@
             <div>
                 <!-- Main section: Page header -->
                 <header
-                    class="flex flex-col md:flex-row justify-between border-b-2 border-black px-7 md:px-20 pt-10 pb-5 mb-5"
+                    class="flex justify-between flex-wrap items-center pt-3 pb-2 border-b-2 border-solid border-black mb-5"
                 >
-                    <!-- Page title -->
-                    <div class="flex flex-1 my-2 mx-0 text-2xl md:text-3xl font-bold">
-                        {{ editExisting ? $t('editor.loadProduct') : $t('editor.createProduct') }}
+                    <div class="flex items-center gap-3 px-7 md:px-20">
+                        <!-- Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 36 36">
+                            <path
+                                fill="#DD2E44"
+                                d="M36 20.917c0-.688-2.895-.5-3.125-1s3.208-4.584 2.708-5.5s-5.086 1.167-5.375.708c-.288-.458.292-3.5-.208-3.875s-5.25 4.916-5.917 4.292s1.542-10.5 1.086-10.698s-3.419 1.365-3.793 1.282C21.002 6.042 18.682 0 18 0s-3.002 6.042-3.376 6.125s-3.337-1.48-3.793-1.282s1.752 10.073 1.085 10.698C11.25 16.166 6.5 10.875 6 11.25s.08 3.417-.208 3.875c-.289.458-4.875-1.625-5.375-.708s2.939 5 2.708 5.5s-3.125.312-3.125 1s8.438 5.235 9 5.771s-2.914 2.802-2.417 3.229c.576.496 3.839-.83 10.417-.957V35a1 1 0 1 0 2 0v-6.04c6.577.127 9.841 1.453 10.417.957c.496-.428-2.979-2.694-2.417-3.229s9-5.084 9-5.771"
+                            />
+                        </svg>
+                        <!-- Application title -->
+                        <h1 style="padding-top: 2px" class="text-xl font-semibold">
+                            {{ $t('editor.respectTitle') }}
+                        </h1>
                     </div>
-                    <!-- Header links -->
-                    <div
-                        class="flex flex-row md:flex-col gap-3 items-center md:items-stretch justify-between md:justify-around text-right"
+                    <!-- Language toggle -->
+                    <router-link
+                        class="px-7 md:px-20"
+                        v-if="!currentRoute.includes('index-ca')"
+                        :to="{
+                            name: editExisting ? 'metadataExisting' : 'metadataNew',
+                            params: { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
+                        }"
                     >
-                        <!-- ENG/FR page toggle -->
-                        <router-link
-                            v-if="!currentRoute.includes('index-ca')"
-                            :to="{
-                                name: editExisting ? 'metadataExisting' : 'metadataNew',
-                                params: { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
-                            }"
-                            class="sub-link"
-                        >
-                            <a>
-                                {{ currLang === 'en' ? 'Français' : 'English' }}
-                            </a>
-                        </router-link>
-                        <!-- ENG/FR config toggle -->
-                        <a class="sub-link" @click="swapLang()" tabindex="0">
-                            {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
-                        </a>
-                    </div>
+                        <div class="underline">{{ `${currLang === 'en' ? 'Français' : 'English'}` }}</div>
+                    </router-link>
                 </header>
                 <!-- Main section: Page body content -->
                 <section class="px-7 md:px-20 py-5">
                     <!-- Body heading and instructions -->
 
-                    <h1 v-if="editExisting" class="text-2xl font-semibold">
-                        {{ $t('editor.editMetadata.editExistingHeader') }}
+                    <h1 class="text-2xl font-bold" :class="[!editExisting ? 'pb-6' : '']">
+                        {{ editExisting ? $t('editor.loadProduct') : $t('editor.createProduct') }}
                     </h1>
 
                     <p v-if="editExisting" class="text-md mb-10">
@@ -188,12 +186,24 @@
                                          any history associated with the product that can be found -->
                                     <button
                                         @click="handleUuidLoad"
-                                        class="editor-button editor-forms-button bg-black text-white ml-3 mr-0"
+                                        style="padding-top: 7px; padding-bottom: 7px"
+                                        class="editor-button editor-forms-button bg-black text-white ml-3 mr-0 flex items-center gap-2 border border-black shadow-sm"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
                                         v-if="editExisting"
                                     >
-                                        {{ $t('editor.load') }}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                fill="currentColor"
+                                                d="M9.8 21.75q-3.425-.775-5.613-3.5T2 12t2.188-6.25T9.8 2.25q.475-.125.838.175t.362.8q0 .35-.2.625t-.55.35Q7.5 4.825 5.75 7T4 12t1.75 5t4.5 2.8q.35.075.55.35t.2.625q0 .5-.362.8t-.838.175m4.4 0q-.475.125-.837-.175t-.363-.8q0-.35.2-.625t.55-.35q.675-.15 1.313-.413t1.212-.637q.275-.2.613-.15t.587.3q.35.35.3.813t-.45.737q-.725.45-1.513.775t-1.612.525m4.7-4.25q-.25-.25-.3-.587t.15-.613q.375-.575.638-1.225t.412-1.325q.075-.35.35-.537t.625-.188q.5 0 .8.363t.175.837q-.2.825-.525 1.613t-.775 1.512q-.275.4-.737.45t-.813-.3m1.875-6.5q-.35 0-.625-.2t-.35-.55q-.15-.675-.413-1.312t-.637-1.213q-.2-.3-.15-.637t.3-.588q.35-.35.813-.3t.737.475q.45.725.775 1.513T21.75 9.8q.125.475-.175.838t-.8.362m-4.5-5.75q-.575-.375-1.212-.638T13.75 4.2q-.35-.075-.55-.35t-.2-.625q0-.5.363-.8t.837-.175q.825.2 1.613.525t1.512.775q.425.275.475.738t-.3.812q-.25.25-.587.3t-.638-.15m-3.3 7.875l1.85-1.85q.3-.3.725-.3t.725.3t.288.725t-.313.725L12.675 16.3q-.275.275-.7.275t-.7-.275L7.65 12.65q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3l1.875 1.9V8q0-.425.288-.712T11.975 7t.713.288t.287.712z"
+                                            />
+                                        </svg>
+                                        <div>{{ $t('editor.load') }}</div>
                                     </button>
                                 </div>
                             </div>
@@ -278,14 +288,33 @@
                             <div class="flex flex-col gap-5 pt-5" v-if="storylineHistory.length !== 0">
                                 <div class="flex">
                                     <button
-                                        class="editor-button editor-forms-button m-0 border border-black"
+                                        class="editor-button editor-forms-button m-0 border border-gray-300 flex items-center gap-2 shadow-sm"
                                         @click="() => (showHistory = !showHistory)"
                                     >
-                                        {{
-                                            showHistory
-                                                ? $t('editor.editMetadata.versionHistory.buttonHide')
-                                                : $t('editor.editMetadata.versionHistory.buttonShow')
-                                        }}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <g
+                                                fill="none"
+                                                stroke="#374151"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                            >
+                                                <path d="M3 12a9 9 0 1 0 9-9a9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                                <path d="M3 3v5h5m4-1v5l4 2" />
+                                            </g>
+                                        </svg>
+                                        <div>
+                                            {{
+                                                showHistory
+                                                    ? $t('editor.editMetadata.versionHistory.buttonHide')
+                                                    : $t('editor.editMetadata.versionHistory.buttonShow')
+                                            }}
+                                        </div>
                                     </button>
                                 </div>
 
@@ -365,11 +394,34 @@
                                 <button
                                     v-if="editExisting"
                                     @click="preview"
-                                    class="editor-button editor-forms-button m-0 border border-black"
+                                    class="editor-button editor-forms-button m-0 border py-1.5 shadow-sm border-gray-300 flex items-center gap-2"
                                 >
-                                    {{ $t('editor.editMetadata.previewProject') }}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        x="0px"
+                                        y="0px"
+                                        viewBox="0 0 122.88 83.78"
+                                        style="enable-background: new 0 0 122.88 83.78"
+                                        xml:space="preserve"
+                                        width="18px"
+                                        height="18px"
+                                        class="my-0 md:my-0.5 lg:my-0"
+                                    >
+                                        <g>
+                                            <path
+                                                class="fill-current"
+                                                d="M95.73,10.81c10.53,7.09,19.6,17.37,26.48,29.86l0.67,1.22l-0.67,1.21c-6.88,12.49-15.96,22.77-26.48,29.86 C85.46,79.88,73.8,83.78,61.44,83.78c-12.36,0-24.02-3.9-34.28-10.81C16.62,65.87,7.55,55.59,0.67,43.1L0,41.89l0.67-1.22 c6.88-12.49,15.95-22.77,26.48-29.86C37.42,3.9,49.08,0,61.44,0C73.8,0,85.45,3.9,95.73,10.81L95.73,10.81z M60.79,22.17l4.08,0.39 c-1.45,2.18-2.31,4.82-2.31,7.67c0,7.48,5.86,13.54,13.1,13.54c2.32,0,4.5-0.62,6.39-1.72c0.03,0.47,0.05,0.94,0.05,1.42 c0,11.77-9.54,21.31-21.31,21.31c-11.77,0-21.31-9.54-21.31-21.31C39.48,31.71,49.02,22.17,60.79,22.17L60.79,22.17L60.79,22.17z M109,41.89c-5.5-9.66-12.61-17.6-20.79-23.11c-8.05-5.42-17.15-8.48-26.77-8.48c-9.61,0-18.71,3.06-26.76,8.48 c-8.18,5.51-15.29,13.45-20.8,23.11c5.5,9.66,12.62,17.6,20.8,23.1c8.05,5.42,17.15,8.48,26.76,8.48c9.62,0,18.71-3.06,26.77-8.48 C96.39,59.49,103.5,51.55,109,41.89L109,41.89z"
+                                            />
+                                        </g>
+                                    </svg>
+                                    <div>{{ $t('editor.editMetadata.previewProject') }}</div>
                                 </button>
                             </section>
+                            <!-- ENG/FR config language toggle -->
+                            <a class="sub-link" @click="swapLang()" tabindex="0">
+                                {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                            </a>
                             <!-- Metadata form -->
                             <div class="px-4 md:px-8 py-5 border rounded-md">
                                 <!-- Edit form button (existing only) -->
@@ -377,7 +429,7 @@
                                 <button
                                     v-if="!editingMetadata"
                                     @click="editingMetadata = !editingMetadata"
-                                    class="editor-button editor-forms-button md:float-right flex items-center gap-2 text-md ml-0 mb-3 font-semibold px-3 py-2 border border-gray-300"
+                                    class="editor-button editor-forms-button md:float-right flex items-center shadow-sm gap-2 text-md ml-0 mb-3 font-semibold px-3 py-1.5 border border-gray-300"
                                 >
                                     <svg
                                         clip-rule="evenodd"
@@ -388,7 +440,6 @@
                                         stroke-miterlimit="2"
                                         viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg"
-                                        class="mx-1"
                                     >
                                         <path
                                             d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
@@ -417,15 +468,39 @@
                                         <!-- NOTE: Changes are saved to local copy automatically as you fill the form. To delete these changes, press the discard button -->
                                         <button
                                             @click="saveMetadata(true)"
-                                            class="editor-button editor-forms-button leading-snug ml-0 bg-black border border-black text-white hover:bg-gray-800"
+                                            class="editor-button editor-forms-button leading-snug ml-0 bg-black border border-black text-white hover:bg-gray-800 flex items-center gap-2 py-1.5"
                                         >
-                                            {{ $t('editor.saveChanges') }}
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                x="0px"
+                                                y="0px"
+                                                viewBox="0 0 122.73 122.88"
+                                                style="
+                                                    margin-top: 3px;
+                                                    margin-bottom: 3px;
+                                                    enable-background: new 0 0 122.73 122.88;
+                                                "
+                                                xml:space="preserve"
+                                                fill-rule="evenodd"
+                                                clip-rule="evenodd"
+                                                height="18px"
+                                                width="18px"
+                                            >
+                                                <g>
+                                                    <path
+                                                        class="st0 fill-current"
+                                                        d="M109.5,113.68L109.5,113.68l-6.09,0c-0.4,0-0.73-0.32-0.73-0.72V69.48l0-0.1c0-0.9-0.17-1.65-0.49-2.22 c-0.06-0.11-0.14-0.22-0.2-0.31c-0.06-0.09-0.16-0.18-0.23-0.27l-0.02-0.02c-0.3-0.3-0.68-0.53-1.12-0.69l-0.25-0.07l-0.04-0.01 l-0.01,0c-0.41-0.11-0.88-0.17-1.38-0.17h-0.05l-0.08,0H36.75c-0.89,0-1.62,0.17-2.18,0.49l-0.02,0.01l-0.27,0.17l-0.04,0.04 c-0.09,0.07-0.18,0.15-0.27,0.23l-0.02,0.02l-0.01,0.01c-0.62,0.63-0.92,1.57-0.92,2.82l0,0.04l0,43.54h0 c0,0.4-0.33,0.72-0.73,0.72l-9.85,0c0,0,0,0,0,0c-0.19,0-0.38-0.08-0.51-0.21L9.87,101.41c-0.18-0.14-0.29-0.36-0.29-0.59l0-87.91 l0-0.08c0-0.83,0.15-1.52,0.44-2.07l0,0c0.05-0.11,0.11-0.2,0.17-0.29l0.02-0.03c0.07-0.11,0.19-0.18,0.25-0.29l0.01-0.02 l0.02-0.02l0,0c0.25-0.25,0.57-0.45,0.92-0.59l0.04-0.02l0.02-0.01l0.02-0.01l0.18-0.06v0l0.01-0.01c0.42-0.14,0.9-0.2,1.44-0.21 l0.09-0.01l26.21,0c0.4,0,0.73,0.32,0.73,0.72v28.75c0,0.52,0.05,1.03,0.13,1.5c0.09,0.46,0.15,0.98,0.39,1.34l0.01,0.02l0,0.01v0 c0.18,0.44,0.42,0.87,0.67,1.25c0.24,0.37,0.56,0.77,0.9,1.13l0.02,0.02l0,0.01l0.01,0c0.48,0.5,0.94,1.15,1.62,1.27l0.01,0l0.01,0 l0.01,0.01l0.32,0.17l0,0l0.4,0.18v0l0.01,0l0,0l0,0v0c0.33,0.14,0.67,0.26,1,0.34l0.01,0l0.03,0l0.01,0l0.03,0l0.26,0.05v0 c0.45,0.09,0.93,0.14,1.42,0.14l0.02,0h47.8c1.03,0,1.98-0.18,2.85-0.53l0.01-0.01c0.87-0.36,1.67-0.9,2.39-1.61l0.03-0.03 c0.36-0.36,0.69-0.75,0.96-1.16c0.26-0.38,0.58-0.76,0.66-1.22l0-0.01l0.01-0.01l0.01-0.02c0.18-0.43,0.34-0.88,0.41-1.34l0-0.03 c0.09-0.47,0.13-0.97,0.13-1.49V9.92c0-0.4,0.33-0.73,0.73-0.73h6c0.58,0,1.09,0.07,1.54,0.21c0.48,0.15,0.89,0.39,1.2,0.7 c0.68,0.67,0.88,1.67,0.9,2.59l0.01,0.09v0.05l0,0.02v97.19c0,0.56-0.07,1.07-0.21,1.51l-0.01,0.03v0l0,0.02l-0.08,0.22l0,0 l-0.02,0.06l-0.09,0.2l-0.01,0.04l-0.02,0.04l0,0l-0.03,0.06l-0.15,0.22l0,0l-0.05,0.08l-0.14,0.17l-0.06,0.07 c-0.15,0.16-0.33,0.3-0.53,0.42c-0.17,0.1-0.36,0.19-0.55,0.26l-0.06,0.02c-0.16,0.05-0.34,0.1-0.53,0.14l-0.02,0l-0.01,0l-0.02,0 l-0.09,0.01l-0.02,0l0,0l-0.02,0c-0.22,0.03-0.49,0.05-0.76,0.06H109.5L109.5,113.68z M53.93,104.43c-1.66,0-3-1.34-3-3 c0-1.66,1.34-3,3-3h31.12c1.66,0,3,1.34,3,3c0,1.66-1.34,3-3,3H53.93L53.93,104.43z M53.93,89.03c-1.66,0-3-1.34-3-3s1.34-3,3-3 h31.12c1.66,0,3,1.34,3,3s-1.34,3-3,3H53.93L53.93,89.03z M94.03,9.39l-45.32-0.2v25.86H48.7c0,0.46,0.06,0.86,0.17,1.2 c0.03,0.06,0.04,0.1,0.07,0.15c0.09,0.23,0.22,0.44,0.4,0.61l0.03,0.03v0c0.06,0.06,0.11,0.1,0.17,0.15 c0.06,0.05,0.13,0.09,0.2,0.14c0.39,0.23,0.92,0.34,1.58,0.34v0l40.1,0.25v0l0,0v0c0.91,0,1.57-0.21,1.98-0.63 c0.42-0.43,0.63-1.1,0.63-2.02h0V9.39L94.03,9.39z M41.91,73.23h53.07v0c0.35,0,0.65,0.29,0.65,0.64l0,39.17 c0,0.35-0.29,0.65-0.65,0.65H41.91v0c-0.35,0-0.65-0.29-0.65-0.64l0-39.17C41.26,73.52,41.56,73.23,41.91,73.23L41.91,73.23 L41.91,73.23z M9.68,0h104.26c4.91,0,8.79,3.86,8.79,8.79V114c0,4.95-3.9,8.88-8.79,8.88l-96.61,0l-0.24-0.25L1.05,106.6L0,105.9 V8.76C0,3.28,4.81,0,9.68,0L9.68,0L9.68,0z"
+                                                    />
+                                                </g>
+                                            </svg>
+                                            <div>{{ $t('editor.saveChanges') }}</div>
                                         </button>
                                         <!-- Discard changes -->
                                         <!-- Reverts to state before you enabled edit mode -->
                                         <button
                                             @click="discardMetadataUpdates()"
-                                            class="editor-button editor-forms-button leading-snug"
+                                            class="editor-button editor-forms-button leading-snug py-1.5"
                                         >
                                             {{ $t('editor.discardChanges') }}
                                         </button>
@@ -442,8 +517,25 @@
                 <!-- Back button -->
                 <!-- Moves you to the dashboard again -->
                 <router-link :to="{ name: 'home' }" target tabindex="-1">
-                    <button class="editor-button editor-forms-button m-0 border border-black" tabindex="0">
-                        {{ $t('editor.back') }}
+                    <button
+                        class="editor-button editor-forms-button m-0 border border-gray-300 py-1.5 shadow-sm flex items-center gap-1"
+                        tabindex="0"
+                    >
+                        <svg
+                            style="margin-top: 1px"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                fill="currentColor"
+                                d="m7.85 13l2.85 2.85q.3.3.288.7t-.288.7q-.3.3-.712.313t-.713-.288L4.7 12.7q-.3-.3-.3-.7t.3-.7l4.575-4.575q.3-.3.713-.287t.712.312q.275.3.288.7t-.288.7L7.85 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"
+                            />
+                        </svg>
+                        <div class="flex items-center gap-1">
+                            {{ $t('editor.back') }}
+                        </div>
                     </button>
                 </router-link>
                 <!-- Continue button -->
@@ -460,9 +552,21 @@
                         <button
                             :disabled="loadingIntoEditor || !uuid || error || loadStatus === 'loading' || checkingUuid"
                             @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
-                            class="editor-button editor-forms-button m-0 bg-black text-white"
+                            class="editor-button editor-forms-button m-0 bg-black text-white border border-black py-1.5 shadow-sm flex items-center gap-1"
                         >
-                            {{ $t('editor.next') }}
+                            <div>{{ $t('editor.next') }}</div>
+                            <svg
+                                style="margin-top: 1px"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    class="fill-current"
+                                    d="M16.15 13H5q-.425 0-.712-.288T4 12t.288-.712T5 11h11.15L13.3 8.15q-.3-.3-.288-.7t.288-.7q.3-.3.713-.312t.712.287L19.3 11.3q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.575 4.575q-.3.3-.712.288t-.713-.313q-.275-.3-.288-.7t.288-.7z"
+                                />
+                            </svg>
                         </button>
                     </div>
 
