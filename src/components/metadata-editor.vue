@@ -693,6 +693,8 @@ import {
     MultiLanguageSlide,
     PanelType,
     Slide,
+    SlideshowChart,
+    SlideshowImage,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -1599,6 +1601,17 @@ export default class MetadataEditorV extends Vue {
                     this.panelSourceHelper(item);
                 });
                 break;
+            case PanelType.SlideshowImage:
+                (panel as SlideshowImage).items.forEach((item: ImagePanel) => {
+                    this.panelSourceHelper(item);
+                });
+                break;
+            case PanelType.SlideshowChart:
+                (panel as SlideshowChart).items.forEach((item: ChartPanel) => {
+                    this.panelSourceHelper(item);
+                });
+                break;
+
             case PanelType.Chart:
                 this.incrementSourceCount((panel as ChartPanel).src);
                 break;
@@ -2034,6 +2047,8 @@ export default class MetadataEditorV extends Vue {
         if (this.configs[this.configLang]) {
             this.useConfig(this.configs[this.configLang] as StoryRampConfig);
             this.findSources(this.configs); // increments source counts for all panels
+            console.log('source counts upon loading in project data');
+            console.log(JSON.parse(JSON.stringify(this.sourceCounts)));
             // Update router path
             if (this.reloadExisting) {
                 this.loadEditor = true;
@@ -2132,6 +2147,8 @@ export default class MetadataEditorV extends Vue {
      * with the new changes, and if `publish` is set to true, generates and submits the product file to the server.
      */
     generateConfig(publish = true): ConfigFileStructure {
+        console.log('source counts upon saving');
+        console.log(JSON.parse(JSON.stringify(this.sourceCounts)));
         this.lockStore.broadcast?.postMessage({ action: 'saving' });
         this.saving = true;
 
