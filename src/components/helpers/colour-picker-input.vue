@@ -1,13 +1,13 @@
 <template>
     <div class="flex flex-col items-start relative">
-        <div class="metadata-input flex flex-col p-0 w-full">
+        <div class="standard-input flex flex-col p-0 w-full">
             <div class="flex">
                 <div
                     @click="togglePicker"
                     @keypress.enter="togglePicker"
                     :style="{ 'background-color': selectedColour }"
                     :class="!disabled ? 'cursor-pointer' : ''"
-                    class="flex flex-1 rounded-l w-10"
+                    class="flex flex-1 rounded w-10"
                     :tabindex="!disabled ? 0 : -1"
                     v-tippy="{
                         delay: '200',

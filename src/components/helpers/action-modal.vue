@@ -4,19 +4,15 @@
             class="action-modal flex flex-col max-h-full overflow-y-auto mx-4 p-4 bg-white border rounded-xl space-y-2"
         >
             <div class="mx-5 my-2">
-                <h2 slot="header" class="text-2xl mb-3 text-pretty" style="font-weight: 700; line-height: 1.3">
+                <h2 slot="header" class="text-2xl mb-1 text-pretty" style="font-weight: 700; line-height: 1.3">
                     {{ title }}
                 </h2>
                 <p style="font-weight: 500" class="text-pretty">{{ message }}</p>
                 <div class="w-full flex items-center gap-3 justify-end mt-5">
-                    <button
-                        class="editor-button bg-black hover:bg-gray-800 text-white"
-                        style="margin: 0 !important"
-                        @click="onOk"
-                    >
+                    <button class="standard-button black-bg-button thin-button" @click="onOk">
                         {{ $t('editor.slides.continue') }}
                     </button>
-                    <button class="editor-button hover:bg-gray-800" style="margin: 0 !important" @click="onCancel">
+                    <button class="standard-button gray-border-button thin-button" @click="onCancel">
                         {{ $t('editor.cancel') }}
                     </button>
                 </div>
@@ -59,33 +55,9 @@ export default class MetadataEditorV extends Vue {
     max-width: 90%;
     border-radius: 0.75rem /* 12px */;
 }
+
 h2 {
     line-height: 1.3;
     border-bottom: 0px;
-}
-
-button {
-    border-radius: 3px;
-    padding: 5px 12px;
-    margin: 0px 10px;
-    font-weight: 600;
-    transition-duration: 0.2s;
-}
-
-.vfm__content button:hover:enabled {
-    background-color: #dbdbdb;
-    color: black;
-}
-
-.vfm__content button:focus {
-    outline: 2px solid royalblue;
-    outline-offset: 2px;
-    transition-duration: 0.075s;
-}
-
-.vfm__content button:disabled {
-    border: 1px solid gray;
-    color: gray;
-    cursor: not-allowed;
 }
 </style>

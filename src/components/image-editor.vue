@@ -9,7 +9,7 @@
             @drop.prevent="dropImages($event)"
             v-if="allowMany || (!allowMany && imagePreviews.length === 0)"
         >
-            <label class="editor-label flex drag-label cursor-pointer">
+            <label class="standard-label flex drag-label cursor-pointer">
                 <span class="align-middle inline-block pr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
                         <path
@@ -32,10 +32,10 @@
         </div>
 
         <div v-show="imagePreviews.length > 1" class="flex flex-col w-full text-left mb-4">
-            <label class="editor-label" for="imageSlideshowCaption">{{ $t('editor.image.slideshowCaption') }}</label>
+            <label class="standard-label" for="imageSlideshowCaption">{{ $t('editor.image.slideshowCaption') }}</label>
             <input
                 id="imageSlideshowCaption"
-                class="editor-input w-full lg:w-2/3"
+                class="standard-input w-full lg:w-2/3"
                 type="text"
                 v-model="slideshowCaption"
                 @change="onImagesEdited"
@@ -67,10 +67,12 @@
                 >
                     <div class="px-2 pb-2">
                         <div class="flex flex-col mt-4 w-full text-left self-center">
-                            <label class="editor-label" :for="'altTag' + index">{{ $t('editor.image.altTag') }}</label>
+                            <label class="standard-label" :for="'altTag' + index">{{
+                                $t('editor.image.altTag')
+                            }}</label>
                             <input
                                 :id="'altTag' + index"
-                                class="editor-input"
+                                class="standard-input"
                                 type="text"
                                 v-model="element.altText"
                                 @change="onImagesEdited"
@@ -78,12 +80,12 @@
                         </div>
 
                         <div class="flex flex-col mt-4 w-full text-left self-center">
-                            <label class="editor-label" :for="'imgCaption' + index">{{
+                            <label class="standard-label" :for="'imgCaption' + index">{{
                                 $t('editor.image.label.caption')
                             }}</label>
                             <input
                                 :id="'imgCaption' + index"
-                                class="editor-input"
+                                class="standard-input"
                                 type="text"
                                 v-model="element.caption"
                                 @change="onImagesEdited"
@@ -92,12 +94,12 @@
 
                         <div class="lg:flex gap-2 mt-4">
                             <div class="flex flex-col text-left self-center">
-                                <label class="editor-label" :for="'imgHeight' + index">{{
+                                <label class="standard-label" :for="'imgHeight' + index">{{
                                     $t('editor.image.label.height')
                                 }}</label>
                                 <input
                                     :id="'imgHeight' + index"
-                                    class="editor-input w-full"
+                                    class="standard-input w-full"
                                     type="text"
                                     v-model="element.height"
                                     @change="onImagesEdited"
@@ -106,7 +108,7 @@
 
                             <div class="flex flex-col mt-4 lg:mt-0 text-left self-center">
                                 <div class="flex flex-row gap-1.5 justify-start items-center">
-                                    <label class="editor-label" :for="'imgWidth' + index">{{
+                                    <label class="standard-label" :for="'imgWidth' + index">{{
                                         $t('editor.image.label.width')
                                     }}</label>
                                     <span
@@ -133,7 +135,7 @@
                                 </div>
                                 <input
                                     :id="'imgWidth' + index"
-                                    class="editor-input w-full"
+                                    class="standard-input w-full"
                                     type="text"
                                     v-model="element.width"
                                     @change="onImagesEdited"
