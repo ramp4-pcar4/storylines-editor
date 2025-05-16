@@ -2,10 +2,10 @@
     <div class="block">
         <!-- Upload video area -->
         <div class="flex flex-col mt-4 align-center w-full text-left">
-            <label class="editor-label text-label" for="videoTitle">{{ $t('editor.video.title') }}</label>
+            <label class="respected-standard-label text-label" for="videoTitle">{{ $t('editor.video.title') }}</label>
             <input
                 id="videoTitle"
-                class="editor-input w-full lg:w-3/5"
+                class="respected-standard-input w-full lg:w-3/5"
                 type="text"
                 v-model="videoPreview.title"
                 @change="onVideoEdited"
@@ -20,7 +20,7 @@
             @dragleave.prevent="() => (dragging = false)"
             @drop.prevent="dropVideo($event)"
         >
-            <label class="flex editor-label drag-label cursor-pointer">
+            <label class="flex respected-standard-label drag-label cursor-pointer">
                 <span class="align-middle inline-block pr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 -2 30 30">
                         <path
@@ -47,7 +47,7 @@
         <!-- Option 2: provide URL to external or YT link -->
         <div class="flex flex-col mt-4 w-full text-left">
             <div class="flex items-center gap-1.5">
-                <label class="editor-label" for="videoURL">{{
+                <label class="respected-standard-label" for="videoURL">{{
                     $t('editor.label.or') + ' ' + $t('editor.video.pasteUrl')
                 }}</label>
                 <span
@@ -77,16 +77,15 @@
                 <input
                     ref="videoUrl"
                     id="videoURL"
-                    class="editor-input flex-1"
+                    class="respected-standard-input flex-1"
                     type="search"
                     v-model="videoPreview.src"
                     v-if="videoPreview.videoType !== 'local'"
                 />
-                <input ref="videoUrl" id="videoURL" class="editor-input flex-1" type="search" v-else />
+                <input ref="videoUrl" id="videoURL" class="respected-standard-input flex-1" type="search" v-else />
                 <button
-                    style="margin-top: 3px; padding-top: 7px; padding-bottom: 7px"
                     @click="uploadVideoUrl"
-                    class="editor-button bg-white border border-black hover:bg-gray-100"
+                    class="respected-standard-button respected-black-bg-button respected-form-button"
                 >
                     {{ $t('editor.video.label.upload') }}
                 </button>

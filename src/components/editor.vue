@@ -9,7 +9,7 @@
                 class="editor-header-upper sticky top-0 bg-white border-b border-black max-h-full"
                 :class="{ 'border-t': currentRoute.includes('index-ca') }"
             >
-                <div class="flex flex-row justify-between items-center px-3 py-0.5 md:py-0">
+                <div class="flex flex-row justify-between items-center px-3 py-1">
                     <div class="flex flex-row items-center gap-2">
                         <!-- Back to landing page button -->
                         <router-link
@@ -19,7 +19,7 @@
                             tabindex="-1"
                         >
                             <button
-                                class="editor-button py-2 md:py-1.5 my-1 md:my-1.5 flex flex-row items-center md:gap-2 w-fit"
+                                class="respected-standard-button respected-transparent-button respected-dynamic-header-button"
                                 truncate-trigger
                                 tabindex="0"
                             >
@@ -28,6 +28,7 @@
                                     width="18"
                                     height="18.001"
                                     viewBox="0 0 18 18.001"
+                                    style="margin-top: 3px; margin-bottom: 3px"
                                 >
                                     <path
                                         id="logout-Icon-SVG-098767893"
@@ -59,7 +60,7 @@
                         <button
                             @click="openSidebar"
                             :aria-label="$t('editor.openSidebar')"
-                            class="editor-button self-center bg-transparent border border-gray-700 my-0 md:hidden"
+                            class="respected-standard-button respected-gray-border-button respected-dynamic-header-button md:hidden"
                             v-tippy="{
                                 delay: '200',
                                 placement: 'bottom',
@@ -78,7 +79,7 @@
                                 width="15"
                                 height="15"
                                 viewBox="0 0 122.88 95.95"
-                                style="enable-background: new 0 0 122.88 95.95"
+                                style="enable-background: new 0 0 122.88 95.95; margin-top: 3px; margin-bottom: 3px"
                                 xml:space="preserve"
                                 fill-rule="evenodd"
                                 clip-rule="evenodd"
@@ -132,7 +133,7 @@
                         <button
                             :disabled="!unsavedChanges"
                             @click="$vfm.open(`reload-config`)"
-                            class="editor-button flex flex-row border border-gray-700 text-gray-800 rounded my-0"
+                            class="respected-standard-button respected-gray-border-button respected-dynamic-header-button"
                             truncate-trigger
                         >
                             <svg
@@ -167,7 +168,7 @@
                         <!-- Save changes button -->
                         <button
                             @click="saveChanges"
-                            class="editor-button flex flex-row md:gap-1.5 items-center m-0 bg-black text-white hover:bg-gray-900 border border-black"
+                            class="respected-standard-button respected-black-bg-button respected-dynamic-header-button"
                             :disabled="!unsavedChanges || saving"
                             truncate-trigger
                         >
@@ -268,7 +269,7 @@
                         <div class="flex items-center flex-nowrap gap-1 justify-between md:justify-start">
                             <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
                             <!-- Preview dropdown -->
-                            <div class="dropdown editor-button">
+                            <div class="dropdown">
                                 <!-- The "Preview" button - hover over it to show the options -->
                                 <button class="dropbtn flex gap-2 items-center cursor-default">
                                     <svg
@@ -311,7 +312,7 @@
                                     </svg>
                                 </button>
                                 <!-- The two preview language config options: English and French -->
-                                <div class="dropdown-content w-full">
+                                <div class="dropdown-content w-full rounded-md">
                                     <!-- English config button -->
                                     <button @click.stop="preview('en')" class="border-b border-gray-400">
                                         {{ $t('editor.lang.en') }}
@@ -836,69 +837,13 @@ window.addEventListener('resize', () => {
         'main';
 }
 
-.editor-label {
-    font-weight: 600;
-    text-align: left;
-}
-
 .editor-h3 {
     font-size: larger;
-}
-
-.editor-input {
-    padding: 7px 10px;
-    margin-top: 3px;
-    border: 1px solid #a1a1a1;
-    //display: inline;
-    border-radius: 5px;
-    --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .editor-container .input-error {
     border: 1px solid red;
     outline-color: red;
-}
-
-.editor-button {
-    border-radius: 3px;
-    padding: 5px 12px;
-    font-weight: 600;
-    transition-duration: 0.2s;
-}
-
-.editor-forms-button {
-    padding: 8px 15px;
-    border-radius: 5px;
-}
-
-.editor-button:hover:enabled {
-    background-color: #dbdbdb;
-    color: black;
-}
-
-button:focus,
-.editor-button:focus,
-input:focus,
-select:focus {
-    outline: 2px solid royalblue;
-    z-index: 2;
-    outline-offset: 2px;
-    transition-duration: 0.075s;
-}
-
-.editor-button:disabled {
-    border: 1px solid gray;
-    color: gray;
-    cursor: not-allowed;
-}
-
-.editor-toc-button {
-    background-color: #f3f4f6;
-    color: black;
-    border: none;
-    transition-duration: 0.2s;
-    padding: 0.25 0.25em !important;
 }
 
 .editor-header-upper {
@@ -935,7 +880,7 @@ select:focus {
 .toc-popup-button {
     border: 1px solid rgb(135, 135, 135);
     background-color: rgb(243, 243, 243);
-    border-radius: 3px;
+    border-radius: 5px;
     padding: 3px 12px;
 }
 .toc-popup-button:hover {
@@ -969,7 +914,7 @@ select:focus {
     font-weight: 600;
     border: 1px solid black;
     transition: background-color 0.2s;
-    border-radius: 3px;
+    border-radius: 5px;
 }
 
 /* Main dropdown icon - required for positioning */

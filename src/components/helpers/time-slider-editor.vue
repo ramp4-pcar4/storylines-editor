@@ -1,16 +1,16 @@
 <template>
-    <div class="px-5">
+    <div class="px-5 pt-4">
         <div class="flex items-center">
-            <label class="editor-label">{{ $t('editor.map.timeslider.range') }}</label>
+            <label class="respected-standard-label">{{ $t('editor.map.timeslider.range') }}</label>
             <input
-                class="editor-input"
+                class="respected-standard-input"
                 type="number"
                 :value="config.range[0]"
                 @input="$emit('time-slider-changed', 'range', 0, ($event.target as HTMLInputElement).value)"
             />
             <span class="mx-3"> {{ $t('editor.map.timeslider.to') }} </span>
             <input
-                class="editor-input"
+                class="respected-standard-input"
                 type="number"
                 :value="config.range[1]"
                 @input="$emit('time-slider-changed', 'range', 1, ($event.target as HTMLInputElement).value)"
@@ -18,16 +18,16 @@
         </div>
         <br />
         <div class="flex items-center">
-            <label class="editor-label">{{ $t('editor.map.timeslider.start') }}</label>
+            <label class="respected-standard-label">{{ $t('editor.map.timeslider.start') }}</label>
             <input
-                class="editor-input ml-3"
+                class="respected-standard-input ml-3"
                 type="number"
                 :value="config.start[0]"
                 @input="$emit('time-slider-changed', 'start', 0, ($event.target as HTMLInputElement).value)"
             />
             <span class="mx-3"> {{ $t('editor.map.timeslider.to') }} </span>
             <input
-                class="editor-input"
+                class="respected-standard-input"
                 type="number"
                 :value="config.start[1]"
                 @input="$emit('time-slider-changed', 'start', 1, ($event.target as HTMLInputElement).value)"
@@ -35,7 +35,7 @@
         </div>
         <br />
         <div class="border-black border-2 p-3 w-2/3" v-if="error">
-            <label class="editor-label w-full">{{ $t('editor.map.timeslider.warning') }}</label>
+            <label class="respected-standard-label w-full">{{ $t('editor.map.timeslider.warning') }}</label>
             <br />
             <ul class="list-disc my-2 ml-8">
                 <li>{{ $t('editor.map.timeslider.warning.bullet1') }}</li>
@@ -45,19 +45,19 @@
         </div>
         <br v-if="error" />
         <div>
-            <label class="editor-label">{{ $t('editor.map.timeslider.attribute') }}</label>
+            <label class="respected-standard-label">{{ $t('editor.map.timeslider.attribute') }}</label>
             <input
-                class="editor-input"
+                class="respected-standard-input"
                 :value="config.attribute"
                 @input="$emit('time-slider-changed', 'attribute', undefined, ($event.target as HTMLInputElement).value)"
             />
         </div>
         <br />
         <div>
-            <label class="editor-label">{{ $t('editor.map.timeslider.layers') }}</label>
+            <label class="respected-standard-label">{{ $t('editor.map.timeslider.layers') }}</label>
             <br />
             <input
-                class="editor-input w-full"
+                class="respected-standard-input w-full"
                 :value="config.layers || ''"
                 @input="$emit('time-slider-changed', 'layers', undefined, ($event.target as HTMLInputElement).value)"
             />

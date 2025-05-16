@@ -76,7 +76,7 @@
                                 <label for="rename-input" class="mr-6"> {{ $t('editor.uuid.new') }}: </label>
                                 <input
                                     id="rename-input"
-                                    class="editor-input mt-0 flex-2"
+                                    class="respected-standard-input mt-0 flex-2"
                                     type="search"
                                     @input="
                                         error = false;
@@ -97,7 +97,8 @@
                                 />
                                 <button
                                     @click="renameProduct"
-                                    class="editor-button editor-forms-button bg-black text-white ml-3 mr-0"
+                                    style="margin-left: 0.75rem"
+                                    class="respected-standard-button respected-black-bg-button respected-form-button"
                                     :class="{ 'input-error': error }"
                                     :disabled="
                                         changeUuid.length === 0 ||
@@ -123,7 +124,7 @@
                                         <!-- Note: 'search'-type inputs will delete their inputted data if you press ESC. -->
                                         <input
                                             id="uuid-input"
-                                            class="editor-input w-full mt-0"
+                                            class="respected-standard-input mt-0"
                                             :disabled="loadStatus === 'loading'"
                                             type="search"
                                             @input="
@@ -186,8 +187,8 @@
                                          any history associated with the product that can be found -->
                                     <button
                                         @click="handleUuidLoad"
-                                        style="padding-top: 7px; padding-bottom: 7px"
-                                        class="editor-button editor-forms-button bg-black text-white ml-3 mr-0 flex items-center gap-2 border border-black shadow-sm"
+                                        style="margin-left: 0.75rem"
+                                        class="respected-standard-button respected-black-bg-button respected-form-button"
                                         :class="{ 'input-error': error }"
                                         :disabled="loadStatus === 'loading'"
                                         v-if="editExisting"
@@ -288,7 +289,7 @@
                             <div class="flex flex-col gap-5 pt-5" v-if="storylineHistory.length !== 0">
                                 <div class="flex">
                                     <button
-                                        class="editor-button editor-forms-button m-0 border border-gray-300 flex items-center gap-2 shadow-sm"
+                                        class="respected-standard-button respected-gray-border-button respected-mainline-button"
                                         @click="() => (showHistory = !showHistory)"
                                     >
                                         <svg
@@ -360,7 +361,7 @@
                                             "
                                         >
                                             <button
-                                                class="editor-button editor-forms-button m-0 border border-black"
+                                                class="respected-standard-button respected-gray-border-button respected-mainline-button"
                                                 @click="
                                                     () => {
                                                         selectHistory(historyItem);
@@ -394,7 +395,7 @@
                                 <button
                                     v-if="editExisting"
                                     @click="preview"
-                                    class="editor-button editor-forms-button m-0 border py-1.5 shadow-sm border-gray-300 flex items-center gap-2"
+                                    class="respected-standard-button respected-gray-border-button"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -429,7 +430,7 @@
                                 <button
                                     v-if="!editingMetadata"
                                     @click="editingMetadata = !editingMetadata"
-                                    class="editor-button editor-forms-button md:float-right flex items-center shadow-sm gap-2 text-md ml-0 mb-3 font-semibold px-3 py-1.5 border border-gray-300"
+                                    class="respected-standard-button respected-gray-border-button md:float-right mb-3"
                                 >
                                     <svg
                                         clip-rule="evenodd"
@@ -468,7 +469,7 @@
                                         <!-- NOTE: Changes are saved to local copy automatically as you fill the form. To delete these changes, press the discard button -->
                                         <button
                                             @click="saveMetadata(true)"
-                                            class="editor-button editor-forms-button leading-snug ml-0 bg-black border border-black text-white hover:bg-gray-800 flex items-center gap-2 py-1.5"
+                                            class="respected-standard-button respected-black-bg-button"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -500,7 +501,7 @@
                                         <!-- Reverts to state before you enabled edit mode -->
                                         <button
                                             @click="discardMetadataUpdates()"
-                                            class="editor-button editor-forms-button leading-snug py-1.5"
+                                            class="respected-standard-button respected-gray-border-button"
                                         >
                                             {{ $t('editor.discardChanges') }}
                                         </button>
@@ -517,10 +518,7 @@
                 <!-- Back button -->
                 <!-- Moves you to the dashboard again -->
                 <router-link :to="{ name: 'home' }" target tabindex="-1">
-                    <button
-                        class="editor-button editor-forms-button m-0 border border-gray-300 py-1.5 shadow-sm flex items-center gap-1"
-                        tabindex="0"
-                    >
+                    <button class="respected-standard-button respected-gray-border-button gap-1" tabindex="0">
                         <svg
                             style="margin-top: 1px"
                             xmlns="http://www.w3.org/2000/svg"
@@ -552,7 +550,7 @@
                         <button
                             :disabled="loadingIntoEditor || !uuid || error || loadStatus === 'loading' || checkingUuid"
                             @click="warning === 'none' ? continueToEditor() : $vfm.open(`confirm-uuid-overwrite`)"
-                            class="editor-button editor-forms-button m-0 bg-black text-white border border-black py-1.5 shadow-sm flex items-center gap-1"
+                            class="respected-standard-button respected-black-bg-button gap-1"
                         >
                             <div>{{ $t('editor.next') }}</div>
                             <svg
@@ -617,28 +615,47 @@
                     <vue-final-modal
                         @click="saveMetadata(false)"
                         modalId="metadata-edit-modal"
-                        content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
+                        content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl p-7 bg-white border rounded-lg"
                         class="flex justify-center items-center"
                     >
                         <div @click.stop class="flex flex-col space-y-2">
-                            <div class="sticky top-0 bg-white pt-5 pb-2 mb-2 border-b border-gray-300 z-50">
-                                <div class="flex justify-between items-center flex-wrap gap-y-1.5 gap-x-5 mb-2">
-                                    <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
+                            <div class="sticky top-0 bg-white pt-3 mb-2 border-b border-gray-300 z-50">
+                                <div class="flex justify-between items-center flex-wrap gap-y-1.5 gap-x-5 mb-2 mx-4">
+                                    <h2 slot="header" class="text-xl font-semibold">
+                                        {{ $t('editor.editMetadata') }}
+                                    </h2>
                                     <div class="flex flex-row gap-2">
                                         <!-- ENG/FR config toggle -->
                                         <button
-                                            class="editor-button editor-forms-button border border-gray-300"
+                                            class="respected-standard-button respected-gray-border-button respected-thin-button"
                                             @click="swapLang()"
                                             tabindex="0"
                                         >
-                                            {{
-                                                configLang === 'en'
-                                                    ? $t('editor.frenchConfig')
-                                                    : $t('editor.englishConfig')
-                                            }}
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="22"
+                                                height="22"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M2 5h14M9 2v3m4 0q-2 8-9 11m2-7q2 4 6 6m1 7l5-11l5 11m-1.4-3h-7.2"
+                                                />
+                                            </svg>
+                                            <p>
+                                                {{
+                                                    configLang === 'en'
+                                                        ? $t('editor.frenchConfig')
+                                                        : $t('editor.englishConfig')
+                                                }}
+                                            </p>
                                         </button>
                                         <button
-                                            class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
+                                            class="respected-standard-button respected-black-bg-button respected-thin-button"
                                             @click="saveMetadata(false)"
                                         >
                                             {{ $t('editor.done') }}
@@ -646,14 +663,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <metadata-content
-                                :metadata="metadata"
-                                @metadata-changed="updateMetadata"
-                                @image-changed="onFileChange"
-                                @image-source-changed="onImageSourceInput"
-                                @logo-removed="decrementSourceCount('Logo')"
-                                @background-removed="decrementSourceCount('Background')"
-                            ></metadata-content>
+                            <div class="mx-4">
+                                <metadata-content
+                                    :metadata="metadata"
+                                    @metadata-changed="updateMetadata"
+                                    @image-changed="onFileChange"
+                                    @image-source-changed="onImageSourceInput"
+                                    @logo-removed="decrementSourceCount('Logo')"
+                                    @background-removed="decrementSourceCount('Background')"
+                                ></metadata-content>
+                            </div>
                         </div>
                     </vue-final-modal>
                 </template>
@@ -2792,28 +2811,6 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     .editor-container .input-error {
         border: 1px solid red;
         outline-color: red;
-    }
-
-    .vfm__content button {
-        border-radius: 3px;
-        padding: 5px 12px;
-        font-weight: 600;
-        transition-duration: 0.2s;
-    }
-
-    .vfm__content button:focus {
-        transition-duration: 0.075s;
-    }
-
-    .vfm__content button:hover:enabled {
-        background-color: #dbdbdb;
-        color: black;
-    }
-
-    .vfm__content button:disabled {
-        border: 1px solid gray;
-        color: gray;
-        cursor: not-allowed;
     }
 
     .image-preview {
