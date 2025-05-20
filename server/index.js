@@ -160,7 +160,7 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
                 difference.forEach((file) => {
                     // TODO: remove this, but leaving it in for now just in case something was
                     // overlooked and files start randomly disappearing.
-                    if (!config_en?.includes(file) && !config_fr?.includes(file)) {
+                    if (config_en && config_fr && !config_en.includes(file) && !config_fr.includes(file)) {
                         logger('WARNING', `Removing ${file} because it no longer exists in the product.`);
                         fs.rm(fileName + '/' + file);
                     }
