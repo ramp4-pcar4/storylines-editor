@@ -3,7 +3,7 @@
     <section>
         <!-- Title -->
         <div class="metadata-item">
-            <label class="metadata-label" for="metaTitle">{{ $t('editor.title') }}</label>
+            <label class="standard-label" for="metaTitle">{{ $t('editor.title') }}</label>
             <!-- v-show prevents WAVE warning for orphaned form label -->
             <div v-show="editing">
                 <input
@@ -12,7 +12,7 @@
                     id="metaTitle"
                     :value="metadata.title"
                     @change="metadataChanged"
-                    class="metadata-input editor-input"
+                    class="standard-input"
                 />
                 <p class="metadata-subcaption">
                     {{ $t('editor.metadataForm.caption.title') }}
@@ -22,10 +22,10 @@
         </div>
         <!-- ToC orientation -->
         <div class="metadata-item">
-            <label class="metadata-label" for="toc">{{ $t('editor.tocOrientation') }}</label>
+            <label class="standard-label" for="toc">{{ $t('editor.tocOrientation') }}</label>
             <div v-show="editing">
                 <select
-                    class="metadata-select"
+                    class="standard-select"
                     name="tocOrientation"
                     id="toc"
                     @change="metadataChanged"
@@ -47,11 +47,11 @@
                     v-show="editing"
                     type="checkbox"
                     id="returnToTop"
-                    class="editor-input rounded-none cursor-pointer w-4 h-4"
+                    class="self-center rounded-none cursor-pointer w-4 h-4"
                     v-model="metadata.returnTop"
                     @change="metadataChanged"
                 />
-                <label class="metadata-label" for="returnToTop">{{ $t('editor.returnTop') }}</label>
+                <label class="standard-label" for="returnToTop">{{ $t('editor.returnTop') }}</label>
             </div>
             <p v-show="editing" class="metadata-subcaption">
                 {{ $t('editor.tocOrientation.info') }}
@@ -71,7 +71,7 @@
         <section class="flex gap-2 flex-wrap">
             <!-- Intro title -->
             <div class="metadata-item w-full md:w-5/12 flex-1">
-                <label class="metadata-label" for="introTitle">{{ $t('editor.slides.title') }}</label>
+                <label class="standard-label" for="introTitle">{{ $t('editor.slides.title') }}</label>
                 <div v-show="editing">
                     <input
                         type="text"
@@ -79,7 +79,7 @@
                         :value="metadata.introTitle"
                         @change="metadataChanged"
                         id="introTitle"
-                        class="metadata-input editor-input"
+                        class="standard-input"
                     />
                     <p class="metadata-subcaption">
                         {{ $t('editor.metadataForm.caption.introTitle') }}
@@ -89,7 +89,7 @@
             </div>
             <!-- Intro subtitle -->
             <div class="metadata-item w-full md:w-5/12 flex-1">
-                <label class="metadata-label" for="introSubtitle">{{ $t('editor.slides.intro') }}</label>
+                <label class="standard-label" for="introSubtitle">{{ $t('editor.slides.intro') }}</label>
                 <div v-show="editing">
                     <input
                         type="text"
@@ -97,7 +97,7 @@
                         id="introSubtitle"
                         :value="metadata.introSubtitle"
                         @change="metadataChanged"
-                        class="metadata-input editor-input"
+                        class="standard-input"
                     />
                     <p class="metadata-subcaption">
                         {{ $t('editor.metadataForm.caption.introSubtitle') }}
@@ -109,7 +109,7 @@
         <!-- Subsection: Logo stuff -->
         <section>
             <div class="metadata-item">
-                <label class="metadata-label" for="metaLogo">{{ $t('editor.logo') }}</label>
+                <label class="standard-label" for="metaLogo">{{ $t('editor.logo') }}</label>
                 <div v-show="editing" class="flex flex-wrap gap-2 items-center">
                     <!-- Logo URL -->
                     <input
@@ -117,13 +117,12 @@
                         id="metaLogo"
                         @change="$emit('image-source-changed', $event, 'logo')"
                         :value="metadata.logoName"
-                        class="metadata-input editor-input w-full lg:w-1/2"
+                        class="standard-input lg:w-1/2"
                     />
                     <!-- Upload button -->
                     <button
-                        style="padding-top: 6.5px; padding-bottom: 6.5px"
                         @click.stop="openFileSelector('logoUpload')"
-                        class="editor-button editor-forms-button mb-0.5 bg-black border border-black text-white hover:bg-gray-800 flex items-center gap-2 shadow-sm"
+                        class="standard-button black-bg-button form-button"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                             <path
@@ -137,7 +136,7 @@
                     <button
                         v-if="metadata.logoName || metadata.logoPreview"
                         @click.stop="removeLogo"
-                        class="editor-button py-1.5 border border-black"
+                        class="standard-button gray-border-button form-button"
                     >
                         {{ $t('editor.remove') }}
                     </button>
@@ -146,7 +145,7 @@
             </div>
             <!-- Logo Preview -->
             <div v-if="!!metadata.logoPreview" class="metadata-item">
-                <div class="metadata-label">{{ $t('editor.logoPreview') }}:</div>
+                <div class="standard-label">{{ $t('editor.logoPreview') }}:</div>
                 <img
                     :src="metadata.logoPreview"
                     v-if="!!metadata.logoPreview && metadata.logoPreview != 'error'"
@@ -163,12 +162,12 @@
                 type="file"
                 id="logoUpload"
                 @change="$emit('image-changed', $event, 'logo')"
-                class="editor-input w-1/4"
+                class="standard-input w-1/4"
                 style="display: none"
             />
             <!-- Logo alt text -->
             <div class="metadata-item">
-                <label class="metadata-label" for="logoAltText">{{ $t('editor.logoAltText') }}</label>
+                <label class="standard-label" for="logoAltText">{{ $t('editor.logoAltText') }}</label>
                 <div v-show="editing">
                     <input
                         type="text"
@@ -176,7 +175,7 @@
                         id="logoAltText"
                         :value="metadata.logoAltText"
                         @change="metadataChanged"
-                        class="metadata-input editor-input"
+                        class="standard-input"
                     />
                     <p class="metadata-subcaption">
                         {{ $t('editor.metadataForm.caption.logoAltText') }}
@@ -186,7 +185,7 @@
             </div>
             <div class="flex flex-wrap gap-4">
                 <div class="metadata-item">
-                    <span class="metadata-label">{{ $t('editor.introTitleColour') }}</span>
+                    <span class="standard-label">{{ $t('editor.introTitleColour') }}</span>
                     <ColourPickerInput
                         name="titleColour"
                         :value="metadata.titleColour"
@@ -195,7 +194,7 @@
                     />
                 </div>
                 <div class="metadata-item">
-                    <span class="metadata-label">{{ $t('editor.introSubtitleColour') }}</span>
+                    <span class="standard-label">{{ $t('editor.introSubtitleColour') }}</span>
                     <ColourPickerInput
                         name="subtitleColour"
                         :value="metadata.subtitleColour"
@@ -205,7 +204,7 @@
                 </div>
                 <div class="metadata-item">
                     <div class="flex gap-2 items-center">
-                        <span class="metadata-label">{{ $t('editor.introButtonColour') }}</span>
+                        <span class="standard-label">{{ $t('editor.introButtonColour') }}</span>
                         <span
                             :content="$t('editor.colourPicker.label.buttonLabel')"
                             v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
@@ -240,7 +239,7 @@
         <!-- Subsection: Intro background stuff -->
         <section>
             <div class="metadata-item">
-                <label class="metadata-label" for="metaIntroBg">{{ $t('editor.introBackground') }}</label>
+                <label class="standard-label" for="metaIntroBg">{{ $t('editor.introBackground') }}</label>
                 <div v-show="editing">
                     <!-- Intro slide background URL -->
                     <div class="flex flex-wrap gap-2 items-center">
@@ -249,13 +248,13 @@
                             id="metaIntroBg"
                             @change="$emit('image-source-changed', $event, 'introBg')"
                             :value="metadata.introBgName"
-                            class="metadata-input editor-input w-full lg:w-1/2"
+                            class="standard-input lg:w-1/2"
                         />
                         <!-- Upload button -->
                         <button
                             style="padding-top: 6.5px; padding-bottom: 6.5px"
                             @click.stop="openFileSelector('backgroundUpload')"
-                            class="editor-button editor-forms-button mb-0.5 bg-black border border-black text-white hover:bg-gray-800 flex items-center gap-2 shadow-sm"
+                            class="standard-button black-bg-button form-button"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path
@@ -269,7 +268,7 @@
                         <button
                             v-if="metadata.introBgName || metadata.introBgPreview"
                             @click.stop="removeIntroBackground"
-                            class="editor-button border mb-0.5 border-black"
+                            class="standard-button gray-border-button form-button"
                         >
                             {{ $t('editor.remove') }}
                         </button>
@@ -283,7 +282,7 @@
             </div>
             <!-- Logo Preview -->
             <div v-if="!!metadata.introBgPreview" class="metadata-item">
-                <div class="metadata-label">{{ $t('editor.introBackgroundPreview') }}:</div>
+                <div class="standard-label">{{ $t('editor.introBackgroundPreview') }}:</div>
                 <img
                     :src="metadata.introBgPreview"
                     v-if="!!metadata.introBgPreview && metadata.introBgPreview != 'error'"
@@ -300,7 +299,7 @@
                 type="file"
                 id="backgroundUpload"
                 @change="$emit('image-changed', $event, 'introBg')"
-                class="editor-input w-1/4"
+                class="standard-input w-1/4"
                 style="display: none"
             />
         </section>
@@ -311,7 +310,7 @@
         <p class="mb-5">{{ $t('editor.metadataForm.endOfPage.explanation') }}</p>
         <!-- Context link -->
         <div class="metadata-item">
-            <label class="metadata-label" for="contextLink">{{ $t('editor.contextLink') }}</label>
+            <label class="standard-label" for="contextLink">{{ $t('editor.contextLink') }}</label>
             <div v-show="editing">
                 <input
                     type="text"
@@ -319,7 +318,7 @@
                     id="contextLink"
                     :value="metadata.contextLink"
                     @change="metadataChanged"
-                    class="metadata-input editor-input"
+                    class="standard-input"
                 />
                 <p class="metadata-subcaption">
                     {{ $t('editor.metadataForm.caption.contextLink') }}
@@ -329,7 +328,7 @@
         </div>
         <!-- Context label -->
         <div class="metadata-item">
-            <label class="metadata-label" for="contextLabel">{{ $t('editor.contextLabel') }}</label>
+            <label class="standard-label" for="contextLabel">{{ $t('editor.contextLabel') }}</label>
             <div v-show="editing">
                 <input
                     type="text"
@@ -337,7 +336,7 @@
                     id="contextLabel"
                     :value="metadata.contextLabel"
                     @change="metadataChanged"
-                    class="metadata-input editor-input"
+                    class="standard-input"
                 />
                 <p class="metadata-subcaption">
                     {{ $t('editor.metadataForm.caption.contextLabel') }}
@@ -347,10 +346,10 @@
         </div>
         <!-- Date modified -->
         <div class="metadata-item">
-            <label class="metadata-label" for="dateModified">{{ $t('editor.dateModified') }}</label>
+            <label class="standard-label" for="dateModified">{{ $t('editor.dateModified') }}</label>
             <div v-show="editing">
                 <input
-                    class="metadata-input editor-input w-full md:w-1/3"
+                    class="standard-input w-full md:w-1/3"
                     type="date"
                     name="dateModified"
                     id="dateModified"
@@ -408,45 +407,12 @@ h2 {
     line-height: 80%;
 }
 
-.metadata-label {
-    font-weight: bold;
-    text-align: left;
-}
-
 .metadata-item {
     margin-bottom: 20px;
-}
-
-.metadata-input {
-    //padding: 8px 10px;
-    border: 1px solid lightgray !important;
-    // outline: 1px solid lightgray;
-    display: block;
-    border-radius: 5px;
-    margin-top: 0.15rem;
-    margin-bottom: 0.25rem;
-    max-width: 100%;
-    width: 1200px;
-    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 
 .metadata-subcaption {
     color: rgb(106, 106, 106);
     font-size: small;
-}
-
-.metadata-select {
-    padding: 8px 10px;
-    border: 1px solid lightgray;
-    background-color: white;
-    display: block;
-    border-radius: 5px;
-    margin-top: 0.15rem;
-    margin-bottom: 0.25rem;
-    max-width: 100%;
-    width: 300px;
-    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 </style>
