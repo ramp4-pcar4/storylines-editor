@@ -1224,6 +1224,8 @@ export default class MetadataEditorV extends Vue {
                 signal: this.controller.signal
             })
                 .then((res: Response) => {
+                    console.log('res from /retrieve endpoint');
+                    console.log(res);
                     if (res.status === 404) {
                         // Version not found.
                         if (version === 'latest') {
@@ -1242,7 +1244,11 @@ export default class MetadataEditorV extends Vue {
                         const configZip = new JSZip();
                         // Files retrieved. Convert them into a JSZip object.
                         res.blob().then((file: Blob) => {
+                            console.log('res.blob()');
+                            console.log(file);
                             configZip.loadAsync(file).then(() => {
+                                console.log('configZip');
+                                console.log(configZip);
                                 this.configFileStructureHelper(configZip);
                                 // Extend the session on load
                                 this.extendSession();
@@ -1257,6 +1263,8 @@ export default class MetadataEditorV extends Vue {
                     // Right now we run for both.
                     fetch(this.apiUrl + `/retrieveMessages`)
                         .then((res: any) => {
+                            console.log('res from /retrieveMessages');
+                            console.log(res);
                             if (res.ok) return res.json();
                         })
                         .then((data) => {
