@@ -1077,8 +1077,7 @@ export default class MetadataEditorV extends Vue {
                             });
                         }
                     })
-                    .catch((error) => {
-                        console.error(error.message || error);
+                    .catch(() => {
                         res(); // resolve on fetch failure so that loadStatus gets set to loaded
                     });
             }
