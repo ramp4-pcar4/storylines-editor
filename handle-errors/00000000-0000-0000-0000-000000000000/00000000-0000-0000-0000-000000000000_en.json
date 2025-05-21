@@ -1,0 +1,460 @@
+{
+    "title": "Test StoryRAMP",
+    "introSlide": {
+        "logo": {
+            "src": "https://raw.githubusercontent.com/ramp4-pcar4/ramp4-pcar4/master/assets/logo.svg",
+            "altText": "Logo"
+        },
+        "title": "Test StoryRAMP",
+        "subtitle": "Where all your wildest dreams can come true."
+    },
+    "slides": [
+        {
+            "title": "Overview",
+            "backgroundImage": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-516166467__1554821531978__w1920.jpg",
+            "panel": [
+                {
+                    "title": "Overview",
+                    "content": "**Oil Sands Extraction** is part of the National Pollutant Release Inventory's (NPRI) Sector Overview series. This sector overview explores NPRI substances released, disposed, and transferred by this industry. It also summarizes what steps facilities in this sector take to mitigate their environmental impacts.\n\nBusinesses, institutions and other facilities across Canada must report their releases, transfers and disposals of pollutants to air, water and land annually to the Government of Canada's NPRI. The information collected is public, helps governments set environmental priorities and monitor environmental performance, and provides Canadians with an opportunity to learn about pollution in their surroundings.",
+                    "type": "text"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/NPRIpictogramme-2016data-EN__1553797637582__w1430.jpg",
+                    "type": "image",
+                    "caption": "This is a caption for the image."
+                }
+            ]
+        },
+        {
+            "title": "Default RAMP4 Sample",
+            "backgroundImage": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
+            "panel": [
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsDeposits.json",
+                    "type": "map",
+                    "scrollguard": true
+                },
+                {
+                    "title": "RAMP4 Test",
+                    "content": "The default RAMP4 sample.",
+                    "type": "text"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Dynamic Panel Test",
+            "panel": [
+                {
+                    "title": "This Slide Is Dynamic!",
+                    "type": "dynamic",
+                    "content": "You can click on one of the following links to change the right panel.\n\n- <a panel='panel-1'>Text Panel</a>\n- <a panel='panel-2'>Image Panel</a>\n- <a panel='panel-3'>Charts Panel</a>\n- <a panel='panel-4'>Map Panel</a>\n- <a panel='panel-5'>Longer text section with table</a>\n- <a href='#/en/00000000-0000-0000-0000-000000000000#2-oil-sands-deposits' target='_self'>Self target link</a>\n- <a panel='panel-6'>Video externally hosted</a>\n- <a panel='panel-7'>Video locally hosted</a>\n\nFun stuff.",
+                    "children": [
+                        {
+                            "id": "panel-1",
+                            "panel": {
+                                "title": "Hello World",
+                                "content": "I am a text panel. I am a child of the dynamic panel config.",
+                                "type": "text"
+                            }
+                        },
+                        {
+                            "id": "panel-2",
+                            "panel": {
+                                "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
+                                "type": "image"
+                            }
+                        },
+                        {
+                            "id": "panel-3",
+                            "panel": {
+                                "type": "slideshow",
+                                "items": [
+                                    {
+                                        "type": "chart",
+                                        "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json"
+                                    },
+                                    {
+                                        "type": "chart",
+                                        "src": "00000000-0000-0000-0000-000000000000/charts/en/1 Mount royal.csv",
+                                        "options": {
+                                            "title": "Selenium releases and disposals in 2019",
+                                            "subtitle": "",
+                                            "type": "pie"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": "panel-4",
+                            "panel": {
+                                "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json",
+                                "type": "map",
+                                "scrollguard": true
+                            }
+                        },
+                        {
+                            "id": "panel-5",
+                            "panel": {
+                                "type": "text",
+                                "title": "Longer-form text content with table",
+                                "content": "Barren-ground Caribou\n=====================\n\nSpecies' Status\n---------------\n\n*Dolphin and Union population*\n\n- Special concern in Northwest Territories (2015) and under the *Species at Risk Act* (SARA; 2011)\n\n- Not currently listed under Nunavut legislation\n\n- [The Committee on the Status of Endangered Wildlife in Canada (COSEWIC) assessed as endangered (2017)](https://species-registry.canada.ca/index-en.html#/documents/3366)\n\n*Barren-ground population*\n\n- No species at risk legislation in Yukon\n\n- Threatened in Northwest Territories (2018)\n\n- Accidental/Vagrant in Alberta (2015)\n\n- Migratory in Saskatchewan (2020)\n\n- Not listed under Manitoba and Nunavut legislation, or under SARA\n\n- [COSEWIC assessed as threatened (2016)](https://species-registry.canada.ca/index-en.html#/documents/3189)\n\nConservation Approach\n---------------------\n\n- All partners to facilitate trust-building and cooperation with Indigenous peoples through engagement and collaboration\n\n- Pursue and continue multi-partner venues to collaborate on the recovery of each population, including those that are regional-based (for example, Advisory Committee for Cooperation on Wildlife Management; Bathurst Caribou Advisory Committee; Beverly and Qamanirjuaq Caribou Management Board; Conference of Management Authorities (Northwest Territories)) and international (International Porcupine Caribou Board; Porcupine Caribou Management Board; Porcupine Caribou Technical Committee)\n\n- Pursue on-the-ground collaborative projects led by Indigenous communities, Wildlife Management Boards and other co-management partners, ENGOs, industry, local governments\n\nRecovery Goals\n--------------\n\n*Dolphin and Union population*\n\n- Adaptively co-manage using a community-based approach and fill knowledge gaps using Inuit Qaujimajatuqangit and Indigenous knowledge, community monitoring and scientific methods. Minimize habitat disturbance and preserve sea ice, and allow for local population levels sufficient to sustain traditional Indigenous harvesting activities\n\n*Barren-ground population*\n\n- Promote the conditions needed for recovery, and maintain or restore self-sustaining, resilient populations. Support and maintain the caribou-people relationship, and promote conditions that allow caribou to move and migrate across their historic ranges without barriers\n\nRecovery Planning\n-----------------\n\n*Dolphin and Union population*\n\n- [Dolphin and Union Caribou (*Rangifer tarandus groenlandicus*): Management Plan (2018)](https://species-registry.canada.ca/index-en.html#/consultations/3144); adopted under SARA\n\n*Barren-ground population*\n\nTerritorial and co-management partner recovery and policy documents:\n\n- A Management Plan for the Bathurst Caribou Herd (2004); update ongoing\n\n- [Bathurst Caribou Range Plan (2019)](https://www.enr.gov.nt.ca/en/services/caribou-de-la-toundra/bathurst-caribou-range-plan)\n\n- Belarewı́le Gots'ę́ Ɂekwę́ Caribou for All Time - A Délı̨nę Got'ı̨nę Plan of Action (2015)\n\n- Beverly and Qamanirjuaq Caribou Management Plan 2013-2022 (2014)\n\n- Łutsël K'é Dene Fırst Nation's Yúnethé X́á Ɂetthën Hádı (Caribou Stewardship Plan) (2020)\n\n- [Recovery Strategy for Barren-ground Caribou in the Northwest Territories (2020)](https://www.nwtspeciesatrisk.ca/sites/enr-species-at-risk/files/barren-ground_caribou_recovery_strategy_final_8april2020.pdf); all Northwest Territories herds minus Porcupine herd (English only)\n\n- [Consensus Agreement on Accepting the Recovery Strategy for Barren-ground Caribou in the Northwest Territories (2020)](https://www.nwtspeciesatrisk.ca/sites/enr-species-at-risk/files/consensus_agreement_bgc_recovery_strategy_signed_8apr2020.pdf) (English only)\n\n- [Taking Care of Caribou: The Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds Management Plan (2014)](https://www.enr.gov.nt.ca/sites/enr/files/rev_bluenose_caribou_herds_draft_management_plan_v10_final_signed_-_nov_4_2014_0.pdf) (English only)\n\n- [Technical Report on the Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds (2016)](https://www.enr.gov.nt.ca/sites/enr/files/150_file.pdf) (English only)\n\n- We have been Living with the Caribou all our Lives: a report on information recorded during community meetings for 'Taking Care of Caribou -- the Cape Bathurst, Bluenose-West, and Bluenose-East Barren-ground Caribou Herds Management Plan' (2014)\n\n- 2020/2021 Action Plan: Bluenose-East (2020)\n\n- 2020/2021 Action Plan: Bluenose-West (2020)\n\n- 2020/2021 Action Plan: Cape Bathurst (2020)\n\n- Porcupine herd:         \n\n- Conservation Plan under development\n\n- [Harvest Management Plan for the Porcupine Caribou Herd in Canada (2010)](https://pcmb.ca/wp-content/uploads/2020/06/Harvest-Management-Plan-2010.pdf) (English only)\n\n- [Implementation Plan (2016)](https://pcmb.ca/wp-content/uploads/2020/06/Implementation-Plan-%E2%80%93-Revised-2016.pdf) (English only)\n\n- [Porcupine Caribou Herd Canadian Range-wide Native User Agreement (2019)](https://pcmb.ca/wp-content/uploads/2020/06/PCH-Range-Wide-Native-User-Agreement.pdf) (English only)\n\nProgress Indicators\n-------------------\n\n*Barren-ground caribou*\n\n- Over 27 million hectares (~12%) of barren-ground caribou range covered by protected areas\n\n*Dolphin and Union caribou*\n\n- Over 2.1 million hectares (~5.5%) of Dolphin and Union caribou range covered by protected areas\n\n- 100% of Dolphin and Union caribou sea-ice crossings covered by mitigation measures against ice-breaking activity through Transport Canada's Pro-active Vessel Management program\n\nAchievements and Future Milestones\n----------------------------------\n\n||Achievements|Ongoing Efforts and Planned Milestones|\n|-|-|-|\n|**Recovery**|*Dolphin and Union population*<p><ul><li>Initiated [Transport Canada's Pro-active Vessel Management program](https://tc.canada.ca/en/marine-transportation/navigation-marine-conditions/proactive-vessel-management) to mitigate shipping/ icebreaking impacts on sea ice crossings</li></ul></p>*Barren-ground population*<p><ul><li>On-the-ground actions for Northwest Territories, Nunavut and Yukon herds through management boards and Indigenous/territorial governments</li><li>On-the-ground partner-led projects, including Indigenous Protected and Conserved Areas initiatives relevant to barren-ground caribou</li></ul></p>|*Dolphin and Union population*<p><ul><li>Continue conservation planning to complete herd-specific plans</li><li>Continue engagement with Indigenous peoples on the Pan-Canadian Approach</li></ul></p>*Barren-ground population*<p><ul><li>Protection of freshwater crossings, access corridors, and calving/post-calving grounds in Nunavut</li><li>Continue conservation planning to complete herd-specific plans</li><li>Continue engagement with Indigenous peoples on the Pan-Canadian Approach</li></ul></p>|\n|**Knowledge**|*Dolphin and Union population*<p><ul><li>Identification of knowledge gaps in the national Management Plan and respectful inclusion of Indigenous knowledge in addressing these gaps through negotiated contribution agreementsBarren-ground population</li></ul></p><p><ul><li>Identification of knowledge gaps in herd management plans and respectful inclusion of Indigenous knowledge in addressing these gaps through negotiated contribution agreements</li></ul></p>|*Dolphin and Union population*<p><ul><li>Continue collaborative monitoring programs</li><li>Build on recovery actions identified in the national Management Plan to address additional knowledge gaps and priorities with key partners</li><li>Participate in the North American Caribou Workshop to facilitate knowledge sharing</li></ul></p>*Barren-ground population*<p><ul><li>Continue collaborative monitoring programs</li><li>Address and identify additional knowledge gaps and priorities with key partners</li><li>Participate in the North American Caribou Workshop to facilitate knowledge sharing</li></ul></p>|\n|**Reporting**|*Dolphin and Union population*<p><ul><li>Federal and territorial reporting on recovery implementation, including through various agreements’ annual reporting mechanisms and priority species dedicated web pages to communicate progress to Canadians</li></ul></p>*Barren-ground population*<p><ul><li>Federal, provincial, and territorial reporting on recovery implementation, including through various agreements’ annual reporting mechanisms and priority species dedicated web pages to communicate progress to Canadians</li><ul></p>|<ul><li>Ongoing reporting through existing mechanisms and priority species dedicated web pages</li></ul>|",
+                                "customStyles": "border: 2px solid black;"
+                            }
+                        },
+                        {
+                            "id": "panel-6",
+                            "panel": {
+                                "type": "video",
+                                "title": "Overtime job",
+                                "videoType": "external",
+                                "caption": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4.vtt",
+                                "src": "https://wet-boew.github.io/wet-boew-attachments/videos/video1-en.mp4"
+                            }
+                        },
+                        {
+                            "id": "panel-7",
+                            "panel": {
+                                "type": "video",
+                                "title": "Overtime job",
+                                "videoType": "local",
+                                "src": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4",
+                                "caption": "00000000-0000-0000-0000-000000000000/assets/en/video1-en.mp4.vtt",
+                                "transcript": "00000000-0000-0000-0000-000000000000/assets/en/cpts-lg-en.html"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Video Panel",
+            "panel": [
+                {
+                    "title": "Video Test for YoutTube content",
+                    "content": "Are you ready for the ultimate revelation, the key to unlocking the secrets of the universe? Brace yourself for mind-blowing knowledge, the kind that will reshape your existence. Picture this: an extraordinary video awaits, a masterpiece of epic proportions. Click that link below, and you'll embark on an unforgettable journey of enlightenment and wisdom. Prepare to have your world turned upside down, as the profound truths of the cosmos are unveiled... Never gonna give you up, never gonna let you down!",
+                    "type": "text"
+                },
+                {
+                    "type": "video",
+                    "title": "Special YouTube video",
+                    "videoType": "YouTube",
+                    "src": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                    "height": 700
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Oil sands deposits",
+            "panel": [
+                {
+                    "title": "Oil sands deposits",
+                    "content": "There are three large oil sands deposits in Canada:\n\n- The Athabasca;\n- Peace River; and\n- Cold Lake.\n\nAll three of the deposits are located in northern Alberta except for a small portion of the Cold Lake deposit, which extends into Saskatchewan. Together, these deposits cover [142,000 square kilometres](https://www.nrcan.gc.ca/our-natural-resources/energy-sources-distribution/clean-fossil-fuels/technical-overview/5851?_ga=2.92936030.219303224.1637701004-1958057264.1607712157) and are estimated to contain 166.3 billion barrels.\n\nThe oil sands extraction sector is a major contributor to Canada’s economy, with more than 528,000 people deriving direct, indirect and induced employment from the oil sands and its supporting sectors. To date, an estimated $325 billion of capital expenditures has been invested in the oil sands industry, and the sector produces 2.95 million barrels of oil per day.\n\nThis map shows a generalized potential extent of the three oil sands areas. The actual geological deposits themselves cover larger areas.",
+                    "type": "text"
+                },
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsDeposits.json",
+                    "type": "map",
+                    "scrollguard": true
+                }
+            ],
+            "includeInToc": true
+        },
+        {
+            "title": "Oil sands extraction",
+            "panel": [
+                {
+                    "title": "Oil sands extraction",
+                    "content": "The oil found in oil sands deposits is primarily bitumen, a very heavy and viscous oil. Bitumen does not flow easily at room temperature and requires unconventional methods to extract. Bitumen is extracted either from surface mining or in-situ using a variety of methods.\n\nThe choice between surface mining and thermal in-situ is solely determined by the depth of the oil deposit. Surface mining is used to reach deposits to a maximum depth of 70 meters below the surface; thermal in-situ wells extract bitumen at greater depths.\n\nSurface mining involves digging up large areas with large excavators. The resulting bitumen and sand mixture is mixed with hot water and sodium hydroxide (NaOH) to separate the bitumen. During this process, the bitumen rises to the top of large separation vessels as a froth. This froth bitumen is further processed in a froth treatment unit to extract the bitumen. Most of the material dug up in an oil sands surface mine is clay and sand. The bitumen extracted makes up about 10% of this material.",
+                    "type": "text"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
+                    "type": "image",
+                    "fullscreen": false
+                }
+            ]
+        },
+        {
+            "title": "In-situ extraction",
+            "backgroundImage": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-187242601__1554821467033__w1920.jpg",
+
+            "panel": [
+                {
+                    "title": "In-situ extraction",
+                    "content": "In-situ extraction generally involves pumping high-pressure steam deep underground. This heats the bitumen to the point that it flows and can be brought up to the surface. If the bitumen has a low enough viscosity that it can be extracted using conventional methods, the in-situ operations do not need to use thermal methods to promote extraction. This sector overview addresses only those sites using thermal extraction methods, as they are much more energy-intensive.\n\nThermal in-situ facilities have a much smaller physical footprint than surface mining operations, and they do not produce tailings that need to be stored on-site. They also use significantly less water as compared to surface mining facilities. Thermal in-situ facilities are more energy intensive than mines, due to the production of steam. However, new technologies and industry research are focused on [reducing in-situ energy intensity](https://www.cosia.ca/initiatives/greenhouse-gases).",
+                    "type": "text"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 3 - mine vs insitu.jpg",
+                    "type": "image"
+                }
+            ]
+        },
+        {
+            "title": "Where are facilities located?",
+            "panel": [
+                {
+                    "title": "Where are facilities located?",
+                    "content": "Oil sands extraction facilities that report to the NPRI are located exclusively in northern Alberta, particularly around the municipality of Fort McMurray. Of the facilities that reported in 2019, 1 of them are in the Peace River deposit, 5 in the Cold Lake deposit and 30 in the Athabasca deposit. Also included in this map is an upgrader facility in Fort Saskatchewan, Alberta, that upgrades oil from the Canadian Natural Resources’ Muskeg River oil sands surface mining facility. Of the facilities that reported to the NPRI, seven of them are surface mining operations, one was an [upgrader facility](https://www.nrcan.gc.ca/energy/energy-sources-distribution/crude-oil/upgrading-oil-sands-and-heavy-oil/5875) and the remaining 30 were in-situ facilities.\n#### Oil sands facilities reporting to the NPRI - 2019\n| **Facility location** | **Thermal in-situ** | **Surface mining** | **Upgrader** | **Total** |\n| ----------------------| ------------------- | ------------------ | --------- | --------- |\n| Athabasca             | 23                  | 7                  | 0         | **30**    |\n| Peace River           | 1                   | 0                  | 0         | **1**     |\n| Cold Lake             | 5                   | 0                  | 0         | **5**     |\n| Other                 | 1                   | 0                  | 1         | **2**     |\n| Total                 | 30                  | 7                  | 1         | **38**    |\n",
+                    "type": "text"
+                },
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/OilSandsFacilityLocations2019.json",
+                    "type": "map",
+                    "title": "Map Title Test"
+                }
+            ]
+        },
+        {
+            "title": "NPRI substances reported for oil sands mining facilities",
+            "panel": [
+                {
+                    "title": "NPRI substances reported for oil sands mining facilities",
+                    "content": "Seven oil sands surface mining facilities reported to the NPRI in 2019. These facilities reported information on 70 different substances and substance groups for 2019, representing a total of 319,888 tonnes of pollutants released, disposed of and transferred. Almost 76% of this amount, 242,395 tonnes, is the release of criteria air contaminants (CACs) such as particulate matter (PM), nitrogen oxides (NOx), sulphur dioxide (SO<sub>2</sub>), carbon monoxide (CO) and volatile organic compounds (VOCs). CACs are precursors to smog and contribute to poor air quality.\n\nThe seven oil sands surface mining facilities that reported to the NPRI are listed below. Click on the facility names to see a breakdown of what each facility reported.\n\n- Canadian Natural Resources' Muskeg River and Jackpine Mines and Horizon Processing Plant and Mine;\n- Fort Hills Oil Sands Mine;\n- Imperial Oil Kearl Processing Plant and Mine;\n- Suncor Energy Inc. Oil Sands; and\n- Syncrude Canada Aurora North Mine Site, and Mildred Lake.\n",
+                    "type": "text"
+                },
+                {
+                    "items": [
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/1_AuroraNorth_RelDisp.PNG",
+                            "type": "image"
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/2_FortHills_RelDisp.PNG",
+                            "type": "image"
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/3_Horizon_RelDisp.PNG",
+                            "type": "image"
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/4_Kearl_RelDisp.PNG",
+                            "type": "image"
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/5_MuskegJackpine_R5_RelDisp.PNG",
+                            "type": "image"
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/6_Suncor_RelDisp.PNG",
+                            "type": "image"
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/substances/7_Syncrude_RelDisp.PNG",
+                            "type": "image"
+                        }
+                    ],
+                    "loop": true,
+                    "caption": "NPRI substances reported for oil sands mining facilities",
+                    "type": "slideshow"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "NPRI substances reported for oil sands mining facilities",
+            "panel": [
+                {
+                    "title": "NPRI substances reported for oil sands mining facilities",
+                    "content": "For more information on the use and interpretation of NPRI data, please see our [guide](https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/using-interpreting-data.html).\nNote that even though the Muskeg River and Jackpine Mines are stand alone mines, for the purposes of NPRI reporting, Canadian Natural Resources reports information for them as one facility.\n\nIt can be challenging to make direct comparisons between these facilities. While all of the facilities are involved in the extraction and processing of bitumen, their operations differ. Some facilities, such as the Kearl and Fort Hills mines, are primarily mines and do not upgrade their bitumen on-site. These facilities generally have particulate matter (PM) as a much larger proportion of their reported releases. Facilities that have upgraders on-site generally report larger amounts of sulphur dioxide (SO<sub>2</sub>) releases.\n\nYou can explore each facility using satellite imagery.",
+                    "type": "text"
+                },
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
+                    "type": "map"
+                }
+            ]
+        },
+        {
+            "title": "Criteria air contaminant releases from oil sands mines",
+            "panel": [
+                {
+                    "title": "Criteria air contaminant releases from oil sands mines",
+                    "content": "Reported Criteria Air Contaminant (CAC) emissions from oil sands surface mining operations have increased since 2010, ranging between 225,080 (2010) tonnes and 243,000 (2019) tonnes released per year. At the same time, production from these facilities has increased significantly, going from 357 million barrels produced in 2010 to 587 million barrels produced in 2019, an increase of over 60%. As a result, the amount of releases per barrel of oil produced from these operations has gone down steadily and significantly, decreasing 24% between 2010 and 2019.",
+                    "type": "text"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/slide 6 - mining trends.jpg",
+                    "type": "image"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Reported mine tailings from oil sands surface mining facilities",
+            "panel": [
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/AuroraNorth_Tailings.PNG",
+                    "type": "image"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/tailings/FortHills_Tailings.PNG",
+                    "type": "image"
+                }
+            ]
+        },
+        {
+            "title": "Reported mine tailings from oil sands surface mining facilities",
+            "panel": [
+                {
+                    "title": "Reported mine tailings from oil sands surface mining facilities",
+                    "content": "The facility with the most tailings disposed of in 2019 was Canadian Natural Resources Muskeg River and Jackpine Mine sites accounting for 35% of all tailings reported by the seven oil sands surface mining operations. Manganese made up the largest amount of tailings for four of the reporting facilities.\n\nYou can explore each facility using satellite imagery.",
+                    "type": "text"
+                },
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
+                    "type": "map"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Trends in mine tailings reported from surface mining facilities",
+            "panel": [
+                {
+                    "title": "Trends in mine tailings reported from surface mining facilities",
+                    "content": "Total reported tailings from oil sands surface mining facilities have increased by 56% between 2010 and 2019, an increase of 24,517 tonnes. Five of these facilities have been in production and have reported to the NPRI since before 2010. Of these facilities, four reported increases in their total tailings disposals between 2018 and 2019 and three reported decreases.",
+                    "type": "text"
+                },
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/TailingsfromMiningFacilities2010to2019(timeslider).json",
+                    "timeSlider": {
+                        "range": [2010, 2019],
+                        "start": [2010, 2010],
+                        "attribute": "Reporting_Year___Année"
+                    },
+                    "type": "map"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "In situ facilities",
+            "panel": [
+                {
+                    "title": "Thermal in situ facilities",
+                    "content": "The other main method used for extracting bitumen from the oil sands is in-situ. Bitumen is usually too heavy and viscous to be pumped out from deep underground using conventional means and must be heated up before extraction. This heat is provided by injecting high pressure steam deep underground to heat up the bitumen so it can be pumped out of the ground.\n\nThere are various different methods for steam injection. Two of the primary methods used for in-situ extraction are Cyclic Steam Stimulation (CSS) and Steam Assisted Gravity Drainage (SAGD). CSS uses one pipe drilled into the ground. Steam is injected and then the heated bitumen is pumped back up the same pipe. In this way, the well is cycled between injection and production. SAGD uses two drill holes that run horizontal after reaching the appropriate depth. Steam is injected into one pipe and the heated bitumen flows into and is pumped out of the other pipe. SAGD wells are able to continuously produce instead of being cycled between injection and production like CSS.\n\nCompared to surface mining, in-situ operations are much more energy intensive, as energy is required to create the steam that is injected. On the other hand, in-situ methods are much less disruptive to the natural habitat, as the operation has a much smaller footprint and the land does not have to be cleared to access the bitumen. In-situ facilities also do not produce tailings that need to be impounded and managed.",
+                    "type": "text"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/Slide 10 - SAGD vs CSS.jpg",
+                    "type": "image"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "NPRI releases from in-situ facilities",
+            "panel": [
+                {
+                    "title": "NPRI releases from thermal in-situ facilities",
+                    "content": "There were 30 in-situ facilities that reported to the NPRI in 2019. The primary emission sources from these facilities are the combustion equipment used to generate steam and the compression equipment, which runs on fossil fuel, used to inject the steam underground.\n\nIn-situ facilities reported 70,500 tonnes of releases to air in 2019 and very little else. As discussed, the process does not produce tailings. Recovered water from the injected steam is generally treated on-site and reused.\n\nThe air releases reported by in-situ facilities is almost entirely (98%) criteria air contaminants (CACs), which was mostly carbon monoxide (CO) (23,000 tonnes) and nitrogen oxides (NOx) (24,000 tonnes). Other CACs reported were sulphur dioxide (SO<sub>2</sub>) (17,000 tonnes), volatile organic compounds (VOCs) (2,800 tonnes) and fine particulate matter (PM) (2,000 tonnes). Non-CAC substances reported, albeit in very small amounts, included the following:\n\n- Ammonia (NH<sub>3</sub>);\n- Benzene (C<sub>6</sub>H<sub>6</sub>);\n- Hexanes (C<sub>6</sub>H<sub>14</sub>); and\n- Chlorine (Cl<sub>2</sub>)",
+                    "type": "text"
+                },
+                {
+                    "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasestoAirbyInSituFacilitiesforAllSubstancesin2019.json",
+                    "type": "map"
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Chart Gallery",
+            "panel": [
+                {
+                    "title": "Highcharts Demo (╯°□°)╯︵ ┻━┻",
+                    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris rhoncus, magna in pulvinar tincidunt, magna velit feugiat sem, nec rhoncus lectus tortor quis turpis. Vivamus erat velit, feugiat at nisl lacinia, pulvinar tempus nunc. Nulla suscipit vulputate dapibus. Fusce tincidunt neque nunc, sed porta lacus elementum vitae. Suspendisse imperdiet interdum ipsum, id aliquet lectus aliquet sit amet. Aliquam erat volutpat. Nulla convallis nisl sodales nunc ullamcorper pulvinar. Nulla ornare justo id sapien porta gravida. Cras condimentum, felis id pretium malesuada, lorem lorem viverra nisi, sit amet molestie mi nulla nec velit. Integer semper lorem scelerisque tellus iaculis finibus. Aliquam efficitur sodales elit nec sodales. Sed vitae ipsum quis eros vulputate luctus.",
+                    "type": "text"
+                },
+                {
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "type": "chart",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/chartConfig.json"
+                        },
+                        {
+                            "type": "chart",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/Total releases of ethylene glycol for 2019, by province_en.csv",
+                            "options": {
+                                "title": "Figure 2: Total releases of ethylene glycol for 2019, by province",
+                                "xAxisLabel": "Quantity (tonnes)",
+                                "subtitle": "",
+                                "type": "bar"
+                            }
+                        },
+                        {
+                            "type": "chart",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/EG_releases_2019_en.csv",
+                            "options": {
+                                "title": "Figure 1: Percentage of total ethylene glycol releases for 2019, by sector",
+                                "subtitle": "",
+                                "type": "pie"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Hybrid chart with bar and line",
+            "panel": [
+                {
+                    "title": "Dynamic slideshow with hybrid chart",
+                    "content": "Demo of a dynamic slideshow featuring hybrid chart consisting of both a bar and line chart using a custom configured highcharts json file.",
+                    "type": "text"
+                },
+                {
+                    "type": "slideshow",
+                    "items": [
+                        {
+                            "type": "chart",
+                            "src": "00000000-0000-0000-0000-000000000000/charts/en/hybridChartConfig.json"
+                        },
+                        {
+                            "title": "NPRI data",
+                            "content": "We have packaged the data in different ways for different uses. You can search the entire database, download subsets of data, or view the data on maps.\n\n### Search NPRI data\n\n[Search our database](https://pollution-waste.canada.ca/national-release-inventory/archives/index.cfm?lang=En) for 1994 to 2017 pollutant releases in your area, as well as information about the facility(s).\n\n### Download NPRI data\n\nThese easy-to-use files let you dig deeper into the data in a variety of ways\n\n- [Single year tables](https://open.canada.ca/data/en/dataset/1fb7d8d4-7713-4ec6-b957-4a882a84fed3 'Single year tables'),\n\t- annual tables of our most popular data fields. One table for each of the last 3 years\n- [Five year summaries](https://open.canada.ca/data/en/dataset/ea0dc8ae-d93c-4e24-9f61-946f1736a26f 'Five year summaries')\n\t- summaries by air, water or land releases grouped by province, industry type or substance\n- [All years datasets](https://open.canada.ca/data/en/dataset/40e01423-7728-429c-ac9d-2954385ccdfb 'All years datasets')\n\t- annual data since 1994 on pollutant quantities, comments and geolocations\n- [Complete reported datasets](https://open.canada.ca/data/en/dataset/06022cc0-a31e-4b4c-850d-d4dccda5f3ac 'Complete reported datasets')\n\t- comprehensive datasets going back to 1994",
+                            "type": "text",
+                            "customStyles": "border: 2px solid black;"
+                        },
+                        {
+                            "config": "00000000-0000-0000-0000-000000000000/ramp-config/en/ReleasesandDisposalsbyMiningFacilitiesin2019(satellite).json",
+                            "type": "map",
+                            "scrollguard": true
+                        },
+                        {
+                            "src": "00000000-0000-0000-0000-000000000000/assets/en/Top10SubstancesTailings2019.png",
+                            "type": "image"
+                        }
+                    ]
+                }
+            ],
+            "includeInToc": false
+        },
+        {
+            "title": "Managing environmental impacts",
+            "panel": [
+                {
+                    "title": "Managing environmental impacts",
+                    "content": "The Government of Canada’s policy towards oil sands development is that private companies make business decisions given regulations that protect current and future Canadian interests. The provinces have jurisdiction over oil and gas development within their provincial boundaries, and environmental protection is a shared responsibility by the Government of Canada and the provinces. The federal government participates in the environmental assessment process through the Joint Review Panel for proposed surface mine developments, while the Government of Alberta is responsible for the assessment of proposed in-situ developments.\n\nGovernments at all levels are committed to balancing economic benefits and environmental stewardship from the development of this sector. Oil sands projects undergo significant environmental assessments before they are approved and they are subject to extensive environmental monitoring throughout the project’s life. Please visit the **[Canada-Alberta Oil Sands Monitoring Program](https://www.canada.ca/en/environment-climate-change/services/oil-sands-monitoring.html)** for more information.\n\nWhile emissions of pollutants have risen from this sector as it has grown, the oil sands industry has been very successful in reducing its emissions per barrel of oil produced.\n\nOil sands surface mining facilities in Alberta take much of their water from the Athabasca River. The provincial government sets limits on how much water can be drawn, based on the season, through the **[Surface Water Quantity Management Framework for the Lower Athabasca River](https://open.alberta.ca/publications/9781460121733)**, which insures that annual withdrawals never exceed 3% of the river’s flow.",
+                    "type": "text"
+                },
+                {
+                    "src": "00000000-0000-0000-0000-000000000000/assets/en/GettyImages-516166467__1554821531978__w1920.jpg",
+                    "type": "image"
+                }
+            ],
+            "includeInToc": false
+        }
+    ],
+    "tocOrientation": "horizontal",
+    "returnTop": false,
+    "contextLink": "https://www.canada.ca/en/environment-climate-change/services/national-pollutant-release-inventory/tools-resources-data/exploredata.html",
+    "contextLabel": "Explore National Pollutant Release Inventory data",
+    "lang": "en",
+    "dateModified": "2024-09-09"
+}
