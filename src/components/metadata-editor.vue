@@ -1246,16 +1246,27 @@ export default class MetadataEditorV extends Vue {
                         res.blob().then((file: Blob) => {
                             console.log('res.blob()');
                             console.log(file);
-                            configZip.loadAsync(file).then(() => {
-                                console.log('configZip');
-                                console.log(configZip);
-                                this.configFileStructureHelper(configZip);
-                                // Extend the session on load
-                                this.extendSession();
-                                this.error = false;
-                                this.warning = 'none';
-                                this.loadStatus = 'loaded';
-                            });
+                            configZip
+                                .loadAsync(file)
+                                .then(() => {
+                                    console.log('configZip');
+                                    console.log(configZip);
+                                    this.configFileStructureHelper(configZip);
+                                    // Extend the session on load
+                                    this.extendSession();
+                                    this.error = false;
+                                    this.warning = 'none';
+                                    this.loadStatus = 'loaded';
+                                })
+                                // Need to ensure we fail gracefully
+                                .catch((error) => {
+                                    Message.error(this.$t('editor.warning.retrievalFailed'));
+                                    console.log(error.response || error);
+                                    this.error = true;
+                                    this.loadStatus = 'waiting';
+                                    this.lockStore.unlockStoryline();
+                                    reject();
+                                });
                         });
                     }
 

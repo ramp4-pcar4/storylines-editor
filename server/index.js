@@ -220,13 +220,7 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
     const PRODUCT_PATH = `${TARGET_PATH}/${req.params.id}`;
     const uploadLocation = `${UPLOAD_PATH}/${req.params.id}-outgoing.zip`;
     const commitHash = req.params.hash;
-    let isRequestAborted = false;
 
-    req.on('error', (err) => {
-        if (err.message === 'aborted') {
-            isRequestAborted = true;
-        }
-    });
     // Check if the product exists.
     if (
         fs.access(PRODUCT_PATH, async (error) => {
@@ -268,30 +262,26 @@ app.route(ROUTE_PREFIX + '/retrieve/:id/:hash').get(function (req, res, next) {
                 // ZIP file to the client.
 
                 output.on('close', () => {
-                    // Delete the zip file if the product load was cancelled by the user
-                    if (isRequestAborted) {
+                    res.writeHead(200, {
+                        'Content-Type': 'application/zip',
+                        'Content-disposition': `attachment; filename=${req.params.id}.zip`,
+                        'Content-Length': archive.pointer()
+                    });
+
+                    // Reading the zip from the /files folder and putting the results into the response body
+                    const result = fs.createReadStream(uploadLocation).pipe(res);
+
+                    // When the piping is finished, delete the stream and perform any git cleanup.
+                    result.on('finish', async () => {
                         fs.rm(uploadLocation);
-                    } else {
-                        res.writeHead(200, {
-                            'Content-Type': 'application/zip',
-                            'Content-disposition': `attachment; filename=${req.params.id}.zip`,
-                            'Content-Length': archive.pointer()
-                        });
 
-                        const result = fs.createReadStream(uploadLocation).pipe(res);
-
-                        // When the piping is finished, delete the stream and perform any git cleanup.
-                        result.on('finish', async () => {
-                            fs.rm(uploadLocation);
-
-                            if (commitHash !== 'latest') {
-                                // Since the user has not asked for the latest commit, we need to clean up.
-                                // Go back to the main branch and delete the newly created branch.
-                                await git.checkout(currBranch);
-                                await git.deleteLocalBranch(`version-${commitHash}`);
-                            }
-                        });
-                    }
+                        if (commitHash !== 'latest') {
+                            // Since the user has not asked for the latest commit, we need to clean up.
+                            // Go back to the main branch and delete the newly created branch.
+                            await git.checkout(currBranch);
+                            await git.deleteLocalBranch(`version-${commitHash}`);
+                        }
+                    });
                 });
 
                 // Write the product data to the ZIP file.
