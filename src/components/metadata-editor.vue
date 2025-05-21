@@ -1065,17 +1065,22 @@ export default class MetadataEditorV extends Vue {
                 }
             } else {
                 // If it doesn't exist, maybe it's a remote file?
-                fetch(assetPath).then((data: Response) => {
-                    if (data.status !== 404) {
-                        data.blob().then((blob: Blob) => {
-                            res({
-                                file: new File([blob], name),
-                                preview: assetPath,
-                                external: true // indicates that this is an external asset
+                fetch(assetPath)
+                    .then((data: Response) => {
+                        if (data.status !== 404) {
+                            data.blob().then((blob: Blob) => {
+                                res({
+                                    file: new File([blob], name),
+                                    preview: assetPath,
+                                    external: true // indicates that this is an external asset
+                                });
                             });
-                        });
-                    }
-                });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error.message || error);
+                        res(); // resolve on fetch failure so that loadStatus gets set to loaded
+                    });
             }
         });
     }
