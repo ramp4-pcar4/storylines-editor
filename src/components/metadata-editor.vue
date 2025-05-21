@@ -1068,6 +1068,7 @@ export default class MetadataEditorV extends Vue {
                 fetch(assetPath)
                     .then((data: Response) => {
                         if (data.status !== 404) {
+                            console.log('remote file found');
                             data.blob().then((blob: Blob) => {
                                 res({
                                     file: new File([blob], name),
@@ -1075,9 +1076,13 @@ export default class MetadataEditorV extends Vue {
                                     external: true // indicates that this is an external asset
                                 });
                             });
+                        } else {
+                            console.log('404 returned, resolving promise');
+                            res();
                         }
                     })
                     .catch(() => {
+                        console.log('catching error from failed fetch');
                         res(); // resolve on fetch failure so that loadStatus gets set to loaded
                     });
             }
