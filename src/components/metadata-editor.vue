@@ -1074,6 +1074,8 @@ export default class MetadataEditorV extends Vue {
                                 external: true // indicates that this is an external asset
                             });
                         });
+                    } else {
+                        res(); // resolve on 404 error, so that loadStatus gets set to loaded
                     }
                 });
             }
@@ -1242,14 +1244,25 @@ export default class MetadataEditorV extends Vue {
                         const configZip = new JSZip();
                         // Files retrieved. Convert them into a JSZip object.
                         res.blob().then((file: Blob) => {
-                            configZip.loadAsync(file).then(() => {
-                                this.configFileStructureHelper(configZip);
-                                // Extend the session on load
-                                this.extendSession();
-                                this.error = false;
-                                this.warning = 'none';
-                                this.loadStatus = 'loaded';
-                            });
+                            configZip
+                                .loadAsync(file)
+                                .then(() => {
+                                    this.configFileStructureHelper(configZip);
+                                    // Extend the session on load
+                                    this.extendSession();
+                                    this.error = false;
+                                    this.warning = 'none';
+                                    this.loadStatus = 'loaded';
+                                })
+                                // Need to ensure we fail gracefully
+                                .catch((error) => {
+                                    Message.error(this.$t('editor.warning.serverError'));
+                                    console.log(error.response || error);
+                                    this.error = true;
+                                    this.loadStatus = 'waiting';
+                                    this.lockStore.unlockStoryline();
+                                    reject();
+                                });
                         });
                     }
 
