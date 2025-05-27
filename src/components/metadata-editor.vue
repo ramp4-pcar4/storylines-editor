@@ -2175,6 +2175,9 @@ export default class MetadataEditorV extends Vue {
         this.configFileStructure?.zip.file(engFileName, engFormattedConfigFile);
         this.configFileStructure?.zip.file(frFileName, frFormattedConfigFile);
 
+        console.log('configFileStructure');
+        console.log(JSON.parse(JSON.stringify(this.configFileStructure)));
+
         // Upload the ZIP file.
         if (publish) {
             this.unsavedChanges = false;
@@ -2187,6 +2190,8 @@ export default class MetadataEditorV extends Vue {
                     secret: this.lockStore.secret
                 };
                 Message.warning(this.$t('editor.editMetadata.message.wait'));
+                console.log('form data');
+                console.log(formData);
 
                 axios
                     .post(this.apiUrl + `/upload/${this.uuid}`, formData, { headers })
@@ -2283,7 +2288,8 @@ export default class MetadataEditorV extends Vue {
                             this.onSaveFinish();
                         }
                     })
-                    .catch(() => {
+                    .catch((error) => {
+                        console.log(error);
                         Message.error(this.$t('editor.editMetadata.message.error.failedSave'));
                         this.handleSessionTimeout();
                         this.lockStore.broadcast?.postMessage({ action: 'saved' });

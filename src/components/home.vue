@@ -122,7 +122,7 @@
                     class="home-btn-container border border-gray-400 border-solid home-buttons flex justify-center h-full"
                     target
                     @click="$vfm.open('admin-upload-modal')"
-                    v-if="profile.role === 'Admin'"
+                    v-if="profile.role !== 'Admin'"
                 >
                     <button
                         class="dashboard-option-button flex items-center justify-center text-xl font-bold w-full"
