@@ -259,8 +259,8 @@ export default class SlideTocV extends Vue {
             [PanelType.Video]: this.videoEditorIcon,
             [PanelType.Audio]: this.audioEditorIcon,
             [PanelType.Slideshow]: this.slideshowEditorIcon,
-            [PanelType.SlideshowImage]: this.slideshowEditorIcon,
-            [PanelType.SlideshowChart]: this.slideshowEditorIcon,
+            [PanelType.SlideshowImage]: this.imageEditorIcon,
+            [PanelType.SlideshowChart]: this.chartEditorIcon,
             [PanelType.Dynamic]: this.dynamicEditorIcon,
             [PanelType.Loading]: ''
         };
