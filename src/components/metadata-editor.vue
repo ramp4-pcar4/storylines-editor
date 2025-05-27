@@ -2196,6 +2196,8 @@ export default class MetadataEditorV extends Vue {
                         responseData.status; // HTTP status
                         const commitHash = responseData.commitHash; // commit hash of the git commit
                         this.loadExisting = true; // if editExisting was false, we can now set it to true
+                        console.log('responseData');
+                        console.log(responseData);
 
                         if (import.meta.env.VITE_APP_CURR_ENV) {
                             if (responseData.new) {
@@ -2230,7 +2232,11 @@ export default class MetadataEditorV extends Vue {
                             } else {
                                 fetch(this.apiUrl + `/retrieveMessages`)
                                     .then((res: any) => {
-                                        if (res.ok) return res.json();
+                                        if (res.ok) {
+                                            console.log('response from /retrieveMessages');
+                                            console.log(res);
+                                            return res.json();
+                                        }
                                     })
                                     .then((data) => {
                                         axios
