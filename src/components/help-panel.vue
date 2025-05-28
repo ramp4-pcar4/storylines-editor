@@ -11,7 +11,7 @@
             <div class="h-26 mb-8 mx-8">
                 <input
                     type="search"
-                    class="rv-help-search-bar border-b w-full text-base py-8 outline-none focus:shadow-outline border-gray-600 h-full min-w-0"
+                    class="rv-help-search-bar border-b w-full text-base py-2 outline-none focus:shadow-outline border-gray-600 h-full min-w-0"
                     :placeholder="$t('help.search')"
                     v-model="searchTerm"
                     :aria-label="$t('help.search')"
