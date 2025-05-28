@@ -39,7 +39,7 @@ const routes = [
         meta: { title: 'editor.window.title' }
     },
     {
-        path: '/:lang/editor-metadata',
+        path: '/:lang/editor-metadata-new',
         name: 'metadataNew',
         component: MetadataEditorV,
         props: { editExisting: false },
