@@ -62,7 +62,7 @@
 
                 // In this case there is no product id in the url. The url param before this one will be the lang, 
                 // which we should not include
-                if (latestParam === 'editor' || latestParam === 'editor-metadata') {
+                if (latestParam === 'editor' || latestParam === 'editor-metadata' || latestParam === 'editor-metadata-new') {
                     newURLRoute = latestParam;
                 } else {
                     productID = latestParam;
