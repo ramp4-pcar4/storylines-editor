@@ -621,7 +621,7 @@
                         class="flex justify-center items-center"
                     >
                         <div @click.stop class="flex flex-col space-y-2">
-                            <div class="sticky top-0 bg-white pt-5 pb-2 mb-2 border-b border-gray-300">
+                            <div class="sticky top-0 bg-white pt-5 pb-2 mb-2 border-b border-gray-300 z-50">
                                 <div class="flex justify-between items-center flex-wrap gap-y-1.5 gap-x-5 mb-2">
                                     <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
                                     <div class="flex flex-row gap-2">
