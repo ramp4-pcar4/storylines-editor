@@ -292,6 +292,8 @@ editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slide.panel.type.text,Text,1,Texte,1
 editor.slide.panel.type.image,Image,1,Image,1
 editor.slide.panel.type.slideshow,Slideshow,1,Diaporama,1
+editor.slide.panel.type.slideshowImage,Image,1,Image,1
+editor.slide.panel.type.slideshowChart,Chart,1,Graphique,1
 editor.slide.panel.type.chart,Chart,1,Graphique,1
 editor.slide.panel.type.map,Map,1,Carte,1
 editor.slide.panel.type.video,Video,1,Vidéo,1
