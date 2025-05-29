@@ -84,7 +84,7 @@
             >
                 <template #item="{ element, index }">
                     <li
-                        class="toc-slide select-none border-t flex px-3 py-2 cursor-pointer hover:bg-gray-50"
+                        class="toc-slide select-none border-t flex px-3 py-2 hover:bg-gray-50"
                         :class="slideIndex === index ? 'bg-gray-100 border-gray-300' : ''"
                         :id="(isMobileSidebar ? 'mobile' : '') + 'slide' + index"
                         :key="'slide' + index"
@@ -720,6 +720,10 @@ window.addEventListener('resize', () => {
     grid-area: slide-list;
     flex: 1 1 0%;
     overflow: auto;
+}
+
+.toc-slide {
+  cursor: grab;
 }
 
 .toc-slide-button {
