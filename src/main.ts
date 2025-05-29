@@ -75,7 +75,7 @@ app.use(pinia)
         directive: 'tippy',
         component: 'tippy'
     })
-    .use(HighchartsVue, { tagName: 'charts' })
+    .use(HighchartsVue, { tagName: 'highchart' })
     .use(Message)
     .use(StorylinesViewer)
     .use(VueMarkdownEditor)
