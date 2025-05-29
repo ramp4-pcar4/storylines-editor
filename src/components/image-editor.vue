@@ -452,6 +452,8 @@ export default class ImageEditorV extends Vue {
             this.imagePreviews.push(...files);
             this.onImagesEdited();
         });
+        //reset input value
+        (e.target as HTMLInputElement).value = '';
     }
 
     dropImages(e: DragEvent): void {
