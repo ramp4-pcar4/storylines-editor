@@ -17,7 +17,7 @@
                         <span class="font-semibold text-lg m-1">{{ config.title }}</span>
                     </div>
 
-                    <button @click="changeLang" class="editor-button bg-black text-white hover:bg-gray-900">
+                    <button @click="changeLang" class="standard-button black-bg-button">
                         <span class="inline-block">{{
                             lang === 'en' ? $t('editor.lang.fr') : $t('editor.lang.en')
                         }}</span>

@@ -16,7 +16,7 @@
                 <div class="w-full flex items-center gap-3 justify-end mt-5">
                     <button
                         v-for="option in options"
-                        class="editor-button bg-black text-white hover:bg-gray-800"
+                        class="standard-button black-bg-button thin-button"
                         style="margin: 0 !important"
                         @click="
                             () => {
@@ -29,7 +29,7 @@
                     </button>
                     <button
                         v-if="cancelAllowed"
-                        class="editor-button hover:bg-gray-800"
+                        class="standard-button gray-border-button thin-button"
                         style="margin: 0 !important"
                         @click="onCancel"
                     >
@@ -80,30 +80,5 @@ export default class MetadataEditorV extends Vue {
 h2 {
     line-height: 1.3;
     border-bottom: 0px;
-}
-
-button {
-    border-radius: 3px;
-    padding: 5px 12px;
-    margin: 0px 10px;
-    font-weight: 600;
-    transition-duration: 0.2s;
-}
-
-.vfm__content button:hover:enabled {
-    background-color: #dbdbdb;
-    color: black;
-}
-
-.vfm__content button:focus {
-    outline: 2px solid royalblue;
-    outline-offset: 2px;
-    transition-duration: 0.075s;
-}
-
-.vfm__content button:disabled {
-    border: 1px solid gray;
-    color: gray;
-    cursor: not-allowed;
 }
 </style>

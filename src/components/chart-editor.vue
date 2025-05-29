@@ -1,21 +1,27 @@
 <template>
-    <div class="block mt-3">
+    <div class="block mt-6">
         <!-- Menu with option to add a new chart -->
         <div class="flex items-center">
-            <span class="font-bold px-4">{{
+            <span class="font-semibold text-lg pr-4">{{
                 $t('editor.chart.label.info', {
                     num: chartConfigs.length
                 })
             }}</span>
             <!-- add chart button -->
             <button
-                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
+                class="standard-button black-bg-button thin-button"
                 id="modal-btn"
                 @click="clearEditor()"
                 :disabled="!allowMany && chartConfigs.length > 0"
             >
                 <div class="flex items-center">
-                    <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                        fill="currentColor"
+                        height="18px"
+                        width="18px"
+                        viewBox="0 0 23 21"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
                     <span class="px-2">
@@ -55,17 +61,19 @@
                 </template>
             </draggable>
         </ul>
-        <confirmation-modal
+        <action-modal
             v-for="(chart, idx) in chartConfigs"
             :key="`${chart.name}-${idx}`"
             :name="`${chart.name}-${idx}`"
+            :title="$t('editor.chart.delete.confirm.header')"
             :message="$t('editor.chart.delete.confirm', { name: chart.name })"
             @ok="deleteChart(chart)"
-        ></confirmation-modal>
+        ></action-modal>
     </div>
 </template>
 
 <script lang="ts">
+import ActionModal from '@/components/helpers/action-modal.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     ChartConfig,
@@ -82,6 +90,7 @@ import draggable from 'vuedraggable';
 
 @Options({
     components: {
+        ActionModal,
         ChartPreview: ChartPreviewV,
         'confirmation-modal': ConfirmationModalV,
         draggable
@@ -306,9 +315,6 @@ export default class ChartEditorV extends Vue {
 <style lang="scss">
 .name-label {
     text-align: left !important;
-}
-.chart-btn {
-    border: none !important;
 }
 
 .highed-chart-frame-body {
