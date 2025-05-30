@@ -1,0 +1,328 @@
+{
+    "en": {
+        "sections": [
+            {
+                "section": "Alerts",
+                "children": [
+                    {
+                        "name": "Information Alert (Header)",
+                        "html": "<div class='alert alert-info'><h3>Header</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Success Alert (Header)",
+                        "html": "<div class='alert alert-success'><h3>Header</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Warning Alert (Header)",
+                        "html": "<div class='alert alert-warning'><h3>Header</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Danger Alert (Header)",
+                        "html": "<div class='alert alert-danger'><h3>Header</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Information Alert (Text)",
+                        "html": "<div class='alert alert-info'><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Success Alert (Text)",
+                        "html": "<div class='alert alert-success'><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Warning Alert (Text)",
+                        "html": "<div class='alert alert-warning'><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Danger Alert (Text)",
+                        "html": "<div class='alert alert-danger'><p>$$$selected$$$</p></div>"
+                    }
+                ]
+            },
+            {
+                "section": "Buttons",
+                "children": [
+                    {
+                        "name": "Button (Default)",
+                        "html": "<button type='button' class='btn btn-default'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Primary)",
+                        "html": "<button type='button' class='btn btn-primary'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Success)",
+                        "html": "<button type='button' class='btn btn-success'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Info)",
+                        "html": "<button type='button' class='btn btn-info'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Warning)",
+                        "html": "<button type='button' class='btn btn-warning'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Danger)",
+                        "html": "<button type='button' class='btn btn-danger'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Link)",
+                        "html": "<button type='button' class='btn btn-link'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Group)",
+                        "html": "<div class='btn-group'><button class='btn btn-default' type='button'>Item 1</button><button class='btn btn-default' type='button'>Item 2</button><button class='btn btn-default' type='button'>Item 3</button></div>"
+                    }
+                ]
+            },
+            {
+                "section": "Panels",
+                "children": [
+                    {
+                        "name": "Panel (Default)",
+                        "html": "<section class='panel panel-default'><header class='panel-heading'><h5 class='panel-title'>Title</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panel (Primary)",
+                        "html": "<section class='panel panel-primary'><header class='panel-heading'><h5 class='panel-title'>Title</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panel (Success)",
+                        "html": "<section class='panel panel-success'><header class='panel-heading'><h5 class='panel-title'>Title</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panel (Info)",
+                        "html": "<section class='panel panel-info'><header class='panel-heading'><h5 class='panel-title'>Title</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panel (Warning)",
+                        "html": "<section class='panel panel-warning'><header class='panel-heading'><h5 class='panel-title'>Title</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panel (Danger)",
+                        "html": "<section class='panel panel-danger'><header class='panel-heading'><h5 class='panel-title'>Title</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    }
+                ]
+            },
+            {
+                "section": "Labels",
+                "children": [
+                    {
+                        "name": "Label (Default)",
+                        "html": "<span class='label label-default'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Label (Primary)",
+                        "html": "<span class='label label-primary'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Label (Success)",
+                        "html": "<span class='label label-success'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Label (Info)",
+                        "html": "<span class='label label-info'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Label (Warning)",
+                        "html": "<span class='label label-warning'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Label (Danger)",
+                        "html": "<span class='label label-danger'>$$$selected$$$</span>"
+                    }
+                ]
+            },
+            {
+                "section": "Other Components",
+                "children": [
+                    {
+                        "name": "Collapsible Content (closed)",
+                        "html": "<ul class='list-unstyled'><li><details><summary>Collapsible Content</summary>$$$selected$$$</details></li></ul>"
+                    },
+                    {
+                        "name": "Collapsible Content (open)",
+                        "html": "<ul class='list-unstyled'><li><details open><summary>Collapsible Content</summary>$$$selected$$$</details></li></ul>"
+                    },
+                    {
+                        "name": "Footnote",
+                        "html": "<aside class='wb-fnote' role='note'><dl><dt>Footnote 1</dt><dd id='fn1'><p>Footnote</p><p class='fn-rtn'><a href='#fn1-rf'><span class='wb-inv'>Return to footnote </span>1<span class='wb-inv'> referrer</span></a></p></dd></dl></aside>"
+                    },
+                    {
+                        "name": "Badge",
+                        "html": "Badge <span class='badge'>00</span>"
+                    },
+                    {
+                        "name": "Well",
+                        "html": "<div class='well'>$$$selected$$$</div>"
+                    },
+                    {
+                        "name": "Keyboard Keys",
+                        "html": "<kbd>$$$selected$$$</kbd>"
+                    }
+                ]
+            }
+        ]
+    },
+    "fr": {
+        "sections": [
+            {
+                "section": "Alertes",
+                "children": [
+                    {
+                        "name": "Alerte d'information (Titre)",
+                        "html": "<div class='alert alert-info'><h3>Titre</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte de réussite (Titre)",
+                        "html": "<div class='alert alert-success'><h3>Titre</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte d'avertissement (Titre)",
+                        "html": "<div class='alert alert-warning'><h3>Titre</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte de danger (Titre)",
+                        "html": "<div class='alert alert-danger'><h3>Titre</h3><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte d'information (Texte)",
+                        "html": "<div class='alert alert-info'><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte de réussite (Texte)",
+                        "html": "<div class='alert alert-success'><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte d'avertissement (Texte)",
+                        "html": "<div class='alert alert-warning'><p>$$$selected$$$</p></div>"
+                    },
+                    {
+                        "name": "Alerte de danger (Texte)",
+                        "html": "<div class='alert alert-danger'><p>$$$selected$$$</p></div>"
+                    }
+                ]
+            },
+            {
+                "section": "Boutons",
+                "children": [
+                    {
+                        "name": "Bouton (Par défaut)",
+                        "html": "<button type='button' class='btn btn-default'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Bouton (Primaire)",
+                        "html": "<button type='button' class='btn btn-primary'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Bouton (Succès)",
+                        "html": "<button type='button' class='btn btn-success'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Bouton (Info)",
+                        "html": "<button type='button' class='btn btn-info'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Bouton (Avertissement)",
+                        "html": "<button type='button' class='btn btn-warning'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Bouton (Danger)",
+                        "html": "<button type='button' class='btn btn-danger'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Bouton (Lien)",
+                        "html": "<button type='button' class='btn btn-link'>$$$selected$$$</button>"
+                    },
+                    {
+                        "name": "Button (Groupe)",
+                        "html": "<div class='btn-group'><button class='btn btn-default' type='button'>Article 1</button><button class='btn btn-default' type='button'>Article 2</button><button class='btn btn-default' type='button'>Article 3</button></div>"
+                    }
+                ]
+            },
+            {
+                "section": "Panneaux",
+                "children": [
+                    {
+                        "name": "Panneau (Par défaut)",
+                        "html": "<section class='panel panel-default'><header class='panel-heading'><h5 class='panel-title'>Titre</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panneau (Primaire)",
+                        "html": "<section class='panel panel-primary'><header class='panel-heading'><h5 class='panel-title'>Titre</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panneau (Succès)",
+                        "html": "<section class='panel panel-success'><header class='panel-heading'><h5 class='panel-title'>Titre</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panneau (Information)",
+                        "html": "<section class='panel panel-info'><header class='panel-heading'><h5 class='panel-title'>Titre</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panneau (Avertissement)",
+                        "html": "<section class='panel panel-warning'><header class='panel-heading'><h5 class='panel-title'>Titre</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    },
+                    {
+                        "name": "Panneau (Danger)",
+                        "html": "<section class='panel panel-danger'><header class='panel-heading'><h5 class='panel-title'>Titre</h5></header><div class='panel-body'><p>$$$selected$$$</p></div></section>"
+                    }
+                ]
+            },
+            {
+                "section": "Étiquettes",
+                "children": [
+                    {
+                        "name": "Étiquette (Par défaut)",
+                        "html": "<span class='label label-default'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Étiquette (Primaire)",
+                        "html": "<span class='label label-primary'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Étiquette (Succès)",
+                        "html": "<span class='label label-success'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Étiquette (Renseignements)",
+                        "html": "<span class='label label-info'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Étiquette (Avertissement)",
+                        "html": "<span class='label label-warning'>$$$selected$$$</span>"
+                    },
+                    {
+                        "name": "Étiquette (Danger)",
+                        "html": "<span class='label label-danger'>$$$selected$$$</span>"
+                    }
+                ]
+            },
+            {
+                "section": "Autres Composants",
+                "children": [
+                    {
+                        "name": "Contenu Affichable",
+                        "html": "<ul class='list-unstyled'><li><details><summary>Contenu Affichable</summary>$$$selected$$$</details></li></ul>"
+                    },
+                    {
+                        "name": "Contenu Masquable",
+                        "html": "<ul class='list-unstyled'><li><details open><summary>Contenu Masquable</summary>$$$selected$$$</details></li></ul>"
+                    },
+                    {
+                        "name": "Notes de bas de page",
+                        "html": "<aside class='wb-fnote' role='note'><dl><dt>Texte 1</dt><dd id='fn1'><p>Notes de bas de page</p><p class='fn-rtn'><a href='#fn1-rf'><span class='wb-inv'>Texte </span>1</a></p></dd></dl></aside>"
+                    },
+                    {
+                        "name": "Badge",
+                        "html": "Badge <span class='badge'>00</span>"
+                    },
+                    {
+                        "name": "Boîte grisonné",
+                        "html": "<div class='well'>$$$selected$$$</div>"
+                    }
+                ]
+            }
+        ]
+    }
+}
