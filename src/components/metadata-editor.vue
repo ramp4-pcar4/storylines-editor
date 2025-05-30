@@ -2339,6 +2339,14 @@ export default class MetadataEditorV extends Vue {
             config.returnTop = this.metadata.returnTop;
             config.dateModified = this.metadata.dateModified;
 
+            // Changing ToC orientation and return-to-top navigation for one language also changes for other language.
+            const otherLang = this.configLang === 'en' ? 'fr' : 'en';
+            const otherConfig = this.configs[otherLang];
+            if (otherConfig !== undefined) {
+                otherConfig.tocOrientation = this.metadata.tocOrientation;
+                otherConfig.returnTop = this.metadata.returnTop;
+            }
+
             // If the logo section is missing, create it here before overwriting values.
             if (config.introSlide.logo === undefined) {
                 config.introSlide.logo = { src: '', altText: '' };
