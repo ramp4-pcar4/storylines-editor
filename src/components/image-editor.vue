@@ -148,15 +148,16 @@
 </template>
 
 <script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
+    BaseStartingConfig,
     ConfigFileStructure,
     ImageFile,
     ImagePanel,
     PanelType,
-    SlideshowImagePanel,
+    SlideshowPanel,
     SourceCounts
 } from '@/definitions';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 import ImagePreviewV from './helpers/image-preview.vue';
 import JSZip from 'jszip';
@@ -544,7 +545,8 @@ export default class ImageEditorV extends Vue {
 
     onImagesEdited(): void {
         this.edited = true;
-        this.$emit('slide-edit');
+        this.saveChanges();
+        this.$emit('slide-edit', 'Image editor');
     }
 }
 </script>

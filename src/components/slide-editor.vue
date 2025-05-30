@@ -447,8 +447,9 @@
                 ></component>
             </div>
         </div>
-        <div v-else class="flex h-fit mt-4 justify-center text-gray-600 text-xl">
-            <span>{{ $t('editor.slides.select') }}</span>
+        <div v-else class="h-fit mt-4 text-center">
+            <h4 class="text-lg font-bold">{{ $t('editor.slides.selectHeader') }}</h4>
+            <p class="text-sm font-semibold text-gray-500">{{ $t('editor.slides.select') }}.</p>
         </div>
         <action-modal
             :name="`change-slide-${slideIndex}`"
