@@ -212,7 +212,7 @@ export default class SlideTocV extends Vue {
         const maxLength = 130;
 
         return `<p style="justify-self: left; text-align: left"><strong>${
-            element.en?.panel.length > 1
+            element[this.lang]?.panel.length > 1
                 ? this.$t('editor.slides.panelNumber', { num: panelIndex + 1 })
                 : this.$t('editor.slides.fullscreenPanel')
         }: ${this.$t(`editor.slide.panel.type.${panel?.type}`)}</strong><br/>${
@@ -228,7 +228,7 @@ export default class SlideTocV extends Vue {
     updateContent(): void {
         if (this.element[this.lang]?.title) {
             this.content = this.element[this.lang]?.title;
-        } else if (this.element[this.lang]?.title === '') {
+        } else if (this.element[this.lang]) {
             this.content =
                 this.lang === 'en'
                     ? this.$t('editor.slides.toc.newENGSlideText')
