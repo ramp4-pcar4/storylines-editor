@@ -688,6 +688,25 @@ export default class SlideTocV extends Vue {
     getSlideId(slide: MultiLanguageSlide): string {
         return 'slide' + this.slides.indexOf(slide);
     }
+
+    resizeMobile(): void {
+        let overlayElement = document.getElementById('overlay');
+        let sidebarElement = document.getElementById('sidebar-mobile');
+        
+        if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
+            overlayElement.style.display = 'none';
+        } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
+            overlayElement.style.display = 'block';
+        }
+    }
+    mounted() {
+        window.addEventListener('resize', this.resizeMobile);
+    }
+
+    beforeDestroy() {
+        window.removeEventListener('resize', this.resizeMobile);
+    }
+    
 }
 
 // More accurate page height for mobile
@@ -753,6 +772,7 @@ window.addEventListener('resize', () => {
     border-radius: 3px;
     padding: 2px;
 }
+
 .slide-toc-button:hover {
     background-color: rgb(209, 213, 219);
 }
@@ -765,6 +785,7 @@ window.addEventListener('resize', () => {
     border-radius: 3px;
     padding: 2px;
 }
+
 .slide-toc-button:hover {
     background-color: rgb(209, 213, 219);
 }
