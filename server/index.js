@@ -139,10 +139,9 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
             const existingFiles = recursiveRead(fileName).then((existing) => {
                 return existing
                     .map((item) => {
-                        item = item.replace(/\\/g, '/');
-                        return item.substring(item.indexOf('/', item.indexOf('/', 2) + 1) + 1);
+                        return path.relative(fileName, item).replace(/\\/g, '/');
                     })
-                    .filter((item) => item.split('/')[0] !== '.git');
+                    .filter((item) => !item.includes('.git'));
             });
 
             // Once the existing files are retrieved, parse the new files being uploaded
@@ -160,9 +159,14 @@ app.route(ROUTE_PREFIX + '/upload/:id').post(function (req, res, next) {
                 difference.forEach((file) => {
                     // TODO: remove this, but leaving it in for now just in case something was
                     // overlooked and files start randomly disappearing.
-                    if (!config_en?.includes(file) && !config_fr?.includes(file)) {
+                    if (config_en && config_fr && !config_en.includes(file) && !config_fr.includes(file)) {
+                        const fullPath = path.join(fileName, file);
                         logger('WARNING', `Removing ${file} because it no longer exists in the product.`);
-                        fs.rm(fileName + '/' + file);
+                        try {
+                            fs.rm(fullPath);
+                        } catch (err) {
+                            logger('WARNING', `Failed to remove file with path: ${fullPath}`);
+                        }
                     }
                 });
             });
