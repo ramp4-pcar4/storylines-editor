@@ -60,6 +60,30 @@ module.exports = {
                             '&:active': {
                                 color: 'blue'
                             }
+                        },
+                        p: {
+                            whiteSpace: 'pre-line !important'
+                        },
+                        code: {
+                            margin: '0',
+                            padding: '0.2em 0.4em',
+                            borderRadius: '3px',
+                            fontWeight: '100',
+                            fontSize: '85%',
+                            backgroundColor: '#edeff0'
+                        },
+                        '#wb-cont & code': {
+                            color: '#c7254e !important'
+                        },
+                        '#wb-cont & pre code': {
+                            color: 'inherit',
+                            backgroundColor: 'inherit'
+                        },
+                        'code::before': {
+                            content: '""'
+                        },
+                        'code::after': {
+                            content: '""'
                         }
                     }
                 },
