@@ -760,6 +760,27 @@ export default class EditorV extends Vue {
     }
 
     /**
+     * Helper function to format panel content text for preview.
+     * Replaces newlines in 'content' fields with <br> tags recursively.
+     */
+    formatPanelContent(panel) {
+        if (!panel) return panel;
+
+        for (const key in panel) {
+            if (!panel.hasOwnProperty(key)) continue;
+            const val = panel[key];
+            if (typeof val === 'string' && key === 'content') {
+                panel[key] = val.replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+            } else if (Array.isArray(val)) {
+                panel[key] = val.map((item) => this.formatPanelContent(item));
+            } else if (typeof val === 'object' && val !== null) {
+                panel[key] = this.formatPanelContent(val);
+            }
+        }
+        return panel;
+    }
+
+    /**
      * Open current editor config as a new Storylines product in new tab.
      * @param language The config language to preview (either 'en' or 'fr')
      */
@@ -769,13 +790,25 @@ export default class EditorV extends Vue {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
-        const previewConfigs = this.configs;
+        const previewConfigs = JSON.parse(JSON.stringify(this.configs));
         // Replace undefined slides with empty slides, just like in final save
         previewConfigs.en!.slides = previewConfigs.en!.slides.map((slide) => {
-            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+            if (!slide) {
+                return JSON.parse(JSON.stringify(this.defaultBlankSlide));
+            }
+            if (slide.panel) {
+                slide.panel = slide.panel.map((panel) => this.formatPanelContent(panel));
+            }
+            return slide;
         });
         previewConfigs.fr!.slides = previewConfigs.fr!.slides.map((slide) => {
-            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+            if (!slide) {
+                return JSON.parse(JSON.stringify(this.defaultBlankSlide));
+            }
+            if (slide.panel) {
+                slide.panel = slide.panel.map((panel) => this.formatPanelContent(panel));
+            }
+            return slide;
         });
         const lockStore = useLockStore();
 
