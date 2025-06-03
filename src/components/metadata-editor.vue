@@ -454,6 +454,7 @@
                                     <!-- New projects can only be in edit mode; existing projects can be in both -->
                                     <metadata-content
                                         :metadata="metadata"
+                                        :createNew="true && !editExisting"
                                         :editing="editingMetadata"
                                         @metadata-changed="updateMetadata"
                                         @image-changed="onFileChange"
@@ -648,6 +649,7 @@
                             </div>
                             <metadata-content
                                 :metadata="metadata"
+                                :createNew="false"
                                 @metadata-changed="updateMetadata"
                                 @image-changed="onFileChange"
                                 @image-source-changed="onImageSourceInput"
@@ -811,6 +813,7 @@ export default class MetadataEditorV extends Vue {
         contextLabel: '',
         tocOrientation: '',
         returnTop: true,
+        sameConfig: true,
         dateModified: '',
         schemaVersion: ''
     };
@@ -832,6 +835,7 @@ export default class MetadataEditorV extends Vue {
         contextLabel: '',
         tocOrientation: '',
         returnTop: true,
+        sameConfig: true,
         dateModified: '',
         schemaVersion: ''
     };
@@ -912,6 +916,7 @@ export default class MetadataEditorV extends Vue {
             // set vertical as the default table of contents orientation
             this.metadata.tocOrientation = 'vertical';
             this.metadata.returnTop = true;
+            this.metadata.sameConfig = true;
         }
         // Find which view to render based on route
         if (this.$route.name === 'editor') {
@@ -1201,6 +1206,7 @@ export default class MetadataEditorV extends Vue {
             contextLink: this.metadata.contextLink,
             tocOrientation: this.metadata.tocOrientation,
             returnTop: this.metadata.returnTop,
+            sameConfig: this.metadata.sameConfig,
             dateModified: this.metadata.dateModified
         };
     }
@@ -2070,6 +2076,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.contextLabel = config.contextLabel;
         this.metadata.tocOrientation = config.tocOrientation;
         this.metadata.returnTop = config.returnTop ?? true;
+        this.metadata.sameConfig = config.sameConfig ?? true;
         this.metadata.dateModified = config.dateModified;
         this.metadata.schemaVersion = config.schemaVersion;
 
@@ -2337,7 +2344,21 @@ export default class MetadataEditorV extends Vue {
             config.contextLabel = this.metadata.contextLabel;
             config.tocOrientation = this.metadata.tocOrientation;
             config.returnTop = this.metadata.returnTop;
+            config.sameConfig = this.metadata.sameConfig;
             config.dateModified = this.metadata.dateModified;
+
+            // Changing TOC orientation and return-to-top navigation for one language also changes for other language.
+            // Changes only if the 'Same across configurations' toggle is true.
+            const otherLang = this.configLang === 'en' ? 'fr' : 'en';
+            const otherConfig = this.configs[otherLang];
+            if (otherConfig) {
+                otherConfig.sameConfig = this.metadata.sameConfig;
+
+                if (this.metadata.sameConfig) {
+                    otherConfig.tocOrientation = this.metadata.tocOrientation;
+                    otherConfig.returnTop = this.metadata.returnTop;
+                }
+            }
 
             // If the logo section is missing, create it here before overwriting values.
             if (config.introSlide.logo === undefined) {
@@ -2395,7 +2416,8 @@ export default class MetadataEditorV extends Vue {
             logoName: '',
             logoAltText: '',
             tocOrientation: '',
-            returnTop: true
+            returnTop: true,
+            sameConfig: true
         };
         this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
         this.configs = { en: undefined, fr: undefined };
