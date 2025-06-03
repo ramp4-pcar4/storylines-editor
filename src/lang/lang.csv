@@ -88,6 +88,7 @@ editor.metadataForm.caption.logoAltText,"For accessibility purposes, provide des
 editor.metadataForm.caption.introBackground,"The background image is displayed on the first slide of the storyline product, behind the intro title and subtitle.",1,"L'image d'arrière-plan est affichée sur la première diapositive du produit scénarisé, derrière le titre et le sous-titre de l'introduction.",1
 editor.metadataForm.caption.contextLink,"Context link shows up at the bottom of the page to provide additional resources for interested users.",1,"Le lien contextuel apparaît au bas de la page pour fournir des ressources supplémentaires aux utilisateurs intéressés.",0
 editor.metadataForm.caption.contextLabel,"Context label shows up as text. When users click the context link, the linked site appears in a new tab for the user.",1,"L'étiquette de contexte s'affiche sous forme de texte. Lorsque les utilisateurs cliquent sur le lien contextuel, le site lié apparaît dans un nouvel onglet pour l'utilisateur.",0
+editor.metadataForm.layoutAndNav.heading,Layout and Navigation,1,Mise en page et Navigation,0
 editor.metadataForm.introPage.heading,Introduction page details,1,Détails de la page d'introduction,0
 editor.metadataForm.introPage.explanation,"The introduction page of the storylines product is displayed to users at the beginning of the storyline product, before any content slides.",1,"La page d'introduction du produit Storylines est affichée aux utilisateurs au début du produit Storylines, avant toute diapositive de contenu.",0
 editor.metadataForm.endOfPage.heading,End of page information,1,Informations de fin de page,0
@@ -322,6 +323,9 @@ editor.tocOrientation.info,The table of contents orientation will be set to vert
 editor.tocOrientation.vertical,Vertical,1,Verticale,0
 editor.tocOrientation.horizontal,Horizontal,1,Horizontale,0
 editor.returnTop,Include return to top navigation,1,Inclure le retour en haut de la navigation,0
+editor.sameConfig,Same across configurations,1,Idem dans toutes les configurations,0
+editor.sameConfig.info,Determines whether the table of contents orientation and return-to-top navigation are shared across English and French configurations.,1,Détermine si l'orientation de la table des matières et la navigation de retour en haut sont partagées entre les configurations anglaise et française.,0
+editor.sameConfig.tooltip,Navigation and layout settings are currently synchronized. They can be customized per language on the next page in the metadata editor.,1,Les paramètres de navigation et de mise en page sont actuellement synchronisés. Ils peuvent être personnalisés par langue sur la page suivante de l'éditeur de métadonnées.,0
 editor.landing.greeting,Hello,1,Bonjour,1
 editor.month.january,January,1,Janvier,0
 editor.month.february,February,1,Février,0
