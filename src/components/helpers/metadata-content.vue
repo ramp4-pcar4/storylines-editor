@@ -20,49 +20,84 @@
             </div>
             <p v-if="!editing">{{ metadata.title || $t('editor.metadataForm.na') }}</p>
         </div>
-        <!-- ToC orientation -->
-        <div class="metadata-item">
-            <label class="metadata-label" for="toc">{{ $t('editor.tocOrientation') }}</label>
-            <div v-show="editing">
-                <select
-                    class="metadata-select"
-                    name="tocOrientation"
-                    id="toc"
-                    @change="metadataChanged"
-                    v-model="metadata.tocOrientation"
+        <!-- Layout and Navigation Section -->
+        <section class="border mt-5 rounded-md px-4 md:px-5 py-3">
+            <h2 class="text-xl font-bold">{{ $t('editor.metadataForm.layoutAndNav.heading') }}</h2>
+            <!-- Same TOC orientation and return-to-top values across both ENG/FR configs -->
+            <div class="metadata-item">
+                <div
+                    class="inline-flex gap-2 pt-2"
+                    v-tippy="{
+                        delay: '200',
+                        placement: 'bottom',
+                        content: createNew ? $t('editor.sameConfig.tooltip') : null,
+                        animateFill: true,
+                        touch: ['hold', 500],
+                        offset: [10, 2]
+                    }"
                 >
-                    <option value="vertical">{{ $t('editor.tocOrientation.vertical') }}</option>
-                    <option value="horizontal">{{ $t('editor.tocOrientation.horizontal') }}</option>
-                </select>
-                <p class="metadata-subcaption">
-                    {{ $t('editor.metadataForm.caption.tocOrientation') }}
+                    <input
+                        v-show="editing"
+                        type="checkbox"
+                        id="sameConfig"
+                        class="editor-input rounded-none cursor-pointer w-4 h-4"
+                        v-model="metadata.sameConfig"
+                        :disabled="createNew"
+                        @change="metadataChanged"
+                    />
+                    <label class="metadata-label" for="sameConfig">{{ $t('editor.sameConfig') }}</label>
+                </div>
+                <p v-show="editing" class="metadata-subcaption">
+                    {{ $t('editor.sameConfig.info') }}
+                </p>
+                <p v-if="!editing">
+                    {{ metadata.sameConfig ? $t('editor.metadataForm.enabled') : $t('editor.metadataForm.disabled') }}
                 </p>
             </div>
-            <p v-if="!editing">{{ metadata.tocOrientation || $t('editor.metadataForm.na') }}</p>
-        </div>
-        <!-- Include return to top navigation -->
-        <div class="metadata-item">
-            <div class="flex gap-2">
-                <input
-                    v-show="editing"
-                    type="checkbox"
-                    id="returnToTop"
-                    class="editor-input rounded-none cursor-pointer w-4 h-4"
-                    v-model="metadata.returnTop"
-                    @change="metadataChanged"
-                />
-                <label class="metadata-label" for="returnToTop">{{ $t('editor.returnTop') }}</label>
+            <!-- ToC orientation -->
+            <div class="metadata-item">
+                <label class="metadata-label" for="toc">{{ $t('editor.tocOrientation') }}</label>
+                <div v-show="editing">
+                    <select
+                        class="metadata-select"
+                        name="tocOrientation"
+                        id="toc"
+                        @change="metadataChanged"
+                        v-model="metadata.tocOrientation"
+                    >
+                        <option value="vertical">{{ $t('editor.tocOrientation.vertical') }}</option>
+                        <option value="horizontal">{{ $t('editor.tocOrientation.horizontal') }}</option>
+                    </select>
+                    <p class="metadata-subcaption">
+                        {{ $t('editor.metadataForm.caption.tocOrientation') }}
+                    </p>
+                </div>
+                <p v-if="!editing">{{ metadata.tocOrientation || $t('editor.metadataForm.na') }}</p>
             </div>
-            <p v-show="editing" class="metadata-subcaption">
-                {{ $t('editor.tocOrientation.info') }}
-            </p>
-            <p v-if="!editing">
-                {{ metadata.returnTop ? $t('editor.metadataForm.enabled') : $t('editor.metadataForm.disabled') }}
-            </p>
-        </div>
+            <!-- Include return to top navigation -->
+            <div class="metadata-item">
+                <div class="flex gap-2">
+                    <input
+                        v-show="editing"
+                        type="checkbox"
+                        id="returnToTop"
+                        class="editor-input rounded-none cursor-pointer w-4 h-4"
+                        v-model="metadata.returnTop"
+                        @change="metadataChanged"
+                    />
+                    <label class="metadata-label" for="returnToTop">{{ $t('editor.returnTop') }}</label>
+                </div>
+                <p v-show="editing" class="metadata-subcaption">
+                    {{ $t('editor.tocOrientation.info') }}
+                </p>
+                <p v-if="!editing">
+                    {{ metadata.returnTop ? $t('editor.metadataForm.enabled') : $t('editor.metadataForm.disabled') }}
+                </p>
+            </div>
+        </section>
     </section>
     <!-- Section: Introduction page details -->
-    <section class="border rounded-md px-4 md:px-5 py-3">
+    <section class="border mt-5 rounded-md px-4 md:px-5 py-3">
         <h2 class="text-xl font-bold">{{ $t('editor.metadataForm.introPage.heading') }}</h2>
         <p class="mb-5">
             {{ $t('editor.metadataForm.introPage.explanation') }}
@@ -376,6 +411,7 @@ import ColourPickerInput from './colour-picker-input.vue';
 export default class MetadataEditorV extends Vue {
     @Prop() metadata!: MetadataContent;
     @Prop({ default: true }) editing!: boolean;
+    @Prop({ default: true }) createNew!: boolean;
 
     openFileSelector(where: string = 'logoUpload'): void {
         document.getElementById(where)?.click();
