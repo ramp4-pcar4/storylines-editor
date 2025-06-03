@@ -1,6 +1,6 @@
 import LandingV from '@/components/landing.vue';
 import HomeV from '@/components/home.vue';
-import MetadataEditorV from '@/components/metadata-editor.vue';
+import MetadataEditorV from '@/components/metadata/metadata-editor.vue';
 import StoryPreviewV from '@/components/preview.vue';
 import { createRouter, createWebHashHistory, RouteLocationNormalized } from 'vue-router';
 

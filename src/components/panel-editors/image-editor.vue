@@ -177,7 +177,7 @@ import {
 } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
-import ImagePreviewV from './helpers/image-preview.vue';
+import ImagePreviewV from '../support/image-preview.vue';
 import JSZip from 'jszip';
 import Message from 'vue-m-message';
 
