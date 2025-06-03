@@ -619,70 +619,17 @@
                 <!-- Metadata editing modal inside the editor -->
                 <!-- Click Done or outside the modal to save changes LOCALLY. -->
                 <template v-slot:metadataModal>
-                    <vue-final-modal
-                        @click="saveMetadata(false)"
-                        modalId="metadata-edit-modal"
-                        content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl p-7 bg-white border rounded-lg"
-                        class="flex justify-center items-center"
-                    >
-                        <div @click.stop class="flex flex-col space-y-2">
-                            <div class="sticky top-0 bg-white pt-3 mb-2 border-b border-gray-300 z-50">
-                                <div class="flex justify-between items-center flex-wrap gap-y-1.5 gap-x-5 mb-2 mx-4">
-                                    <h2 slot="header" class="text-xl font-semibold">
-                                        {{ $t('editor.editMetadata') }}
-                                    </h2>
-                                    <div class="flex flex-row gap-2">
-                                        <!-- ENG/FR config toggle -->
-                                        <button
-                                            class="respected-standard-button respected-gray-border-button respected-thin-button"
-                                            @click="swapLang()"
-                                            tabindex="0"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="22"
-                                                height="22"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M2 5h14M9 2v3m4 0q-2 8-9 11m2-7q2 4 6 6m1 7l5-11l5 11m-1.4-3h-7.2"
-                                                />
-                                            </svg>
-                                            <p>
-                                                {{
-                                                    configLang === 'en'
-                                                        ? $t('editor.frenchConfig')
-                                                        : $t('editor.englishConfig')
-                                                }}
-                                            </p>
-                                        </button>
-                                        <button
-                                            class="respected-standard-button respected-black-bg-button respected-thin-button"
-                                            @click="saveMetadata(false)"
-                                        >
-                                            {{ $t('editor.done') }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mx-4">
-                                <metadata-content
-                                    :metadata="metadata"
-                                    :createNew="false"
-                                    @metadata-changed="updateMetadata"
-                                    @image-changed="onFileChange"
-                                    @image-source-changed="onImageSourceInput"
-                                    @logo-removed="decrementSourceCount('Logo')"
-                                    @background-removed="decrementSourceCount('Background')"
-                                ></metadata-content>
-                            </div>
-                        </div>
-                    </vue-final-modal>
+                    <metadata-modal
+                        :metadata="metadata"
+                        :configLang="configLang"
+                        @save-changes="saveMetadata(false)"
+                        @lang-change="swapLang()"
+                        @logo-removed="decrementSourceCount('Logo')"
+                        @background-removed="decrementSourceCount('Background')"
+                        @metadata-changed="updateMetadata"
+                        @image-changed="onFileChange"
+                        @image-source-changed="onImageSourceInput"
+                    ></metadata-modal>
                 </template>
             </editor>
         </template>
@@ -702,7 +649,7 @@
 </template>
 
 <script lang="ts">
-import ActionModal from '@/components/helpers/action-modal.vue';
+import ActionModal from '@/components/support/action-modal.vue';
 import { Save, useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
@@ -730,8 +677,7 @@ import {
     VideoPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
-import { VueFinalModal } from 'vue-final-modal';
-import { useUserStore } from '../stores/userStore';
+import { useUserStore } from '../../stores/userStore';
 import { computed } from 'vue';
 
 import JSZip from 'jszip';
@@ -740,11 +686,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { saveAs } from 'file-saver';
 
 import Message from 'vue-m-message';
-import SlideEditorV from './slide-editor.vue';
-import SlideTocV from './slide-toc.vue';
-import MetadataContentV from './helpers/metadata-content.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
-import EditorV from './editor.vue';
+import SlideEditorV from '../slide-editor.vue';
+import SlideTocV from '../slide-toc/slide-toc.vue';
+import MetadataContentV from './metadata-content.vue';
+import MetadataModalV from './metadata-modal.vue';
+import ConfirmationModalV from '../support/confirmation-modal.vue';
+import EditorV from '../editor.vue';
 
 import cloneDeep from 'clone-deep';
 import { useLockStore } from '@/stores/lockStore';
@@ -775,10 +722,10 @@ interface History {
         Editor: EditorV,
         'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
+        'metadata-modal': MetadataModalV,
         spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV,
-        'vue-final-modal': VueFinalModal
+        'slide-toc': SlideTocV
     }
 })
 export default class MetadataEditorV extends Vue {
@@ -902,7 +849,7 @@ export default class MetadataEditorV extends Vue {
     };
     slides: MultiLanguageSlide[] = [];
     sourceCounts: SourceCounts = {};
-    sessionExpired: boolean = false;
+    sessionExpired = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     // Debounce timer used for updateSaveStatus only.
@@ -1718,10 +1665,6 @@ export default class MetadataEditorV extends Vue {
         }
 
         if (src) {
-            const srcSplit = src.split('/');
-            const folder = srcSplit.slice(1, 3).join('/');
-            const assetName = srcSplit.slice(3).join('/');
-
             if (this.sourceCounts[src]) {
                 this.sourceCounts[src] -= 1;
             }
