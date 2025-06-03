@@ -614,48 +614,17 @@
                 <!-- Metadata editing modal inside the editor -->
                 <!-- Click Done or outside the modal to save changes LOCALLY. -->
                 <template v-slot:metadataModal>
-                    <vue-final-modal
-                        @click="saveMetadata(false)"
-                        modalId="metadata-edit-modal"
-                        content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
-                        class="flex justify-center items-center"
-                    >
-                        <div @click.stop class="flex flex-col space-y-2">
-                            <div class="sticky top-0 bg-white pt-5 pb-2 mb-2 border-b border-gray-300 z-50">
-                                <div class="flex justify-between items-center flex-wrap gap-y-1.5 gap-x-5 mb-2">
-                                    <h2 slot="header" class="text-2xl font-bold">{{ $t('editor.editMetadata') }}</h2>
-                                    <div class="flex flex-row gap-2">
-                                        <!-- ENG/FR config toggle -->
-                                        <button
-                                            class="editor-button editor-forms-button border border-gray-300"
-                                            @click="swapLang()"
-                                            tabindex="0"
-                                        >
-                                            {{
-                                                configLang === 'en'
-                                                    ? $t('editor.frenchConfig')
-                                                    : $t('editor.englishConfig')
-                                            }}
-                                        </button>
-                                        <button
-                                            class="editor-button editor-forms-button bg-black text-white hover:bg-gray-800"
-                                            @click="saveMetadata(false)"
-                                        >
-                                            {{ $t('editor.done') }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <metadata-content
-                                :metadata="metadata"
-                                @metadata-changed="updateMetadata"
-                                @image-changed="onFileChange"
-                                @image-source-changed="onImageSourceInput"
-                                @logo-removed="decrementSourceCount('Logo')"
-                                @background-removed="decrementSourceCount('Background')"
-                            ></metadata-content>
-                        </div>
-                    </vue-final-modal>
+                    <metadata-modal
+                        :metadata="metadata"
+                        :configLang="configLang"
+                        @save-changes="saveMetadata(false)"
+                        @lang-change="swapLang()"
+                        @logo-removed="decrementSourceCount('Logo')"
+                        @background-removed="decrementSourceCount('Background')"
+                        @metadata-changed="updateMetadata"
+                        @image-changed="onFileChange"
+                        @image-source-changed="onImageSourceInput"
+                    ></metadata-modal>
                 </template>
             </editor>
         </template>
@@ -675,7 +644,7 @@
 </template>
 
 <script lang="ts">
-import ActionModal from '@/components/helpers/action-modal.vue';
+import ActionModal from '@/components/support/action-modal.vue';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
@@ -700,8 +669,7 @@ import {
     VideoPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
-import { VueFinalModal } from 'vue-final-modal';
-import { useUserStore } from '../stores/userStore';
+import { useUserStore } from '../../stores/userStore';
 import { computed } from 'vue';
 
 import JSZip from 'jszip';
@@ -710,11 +678,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { saveAs } from 'file-saver';
 
 import Message from 'vue-m-message';
-import SlideEditorV from './slide-editor.vue';
-import SlideTocV from './slide-toc.vue';
-import MetadataContentV from './helpers/metadata-content.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
-import EditorV from './editor.vue';
+import SlideEditorV from '../slide-editor.vue';
+import SlideTocV from '../slide-toc/slide-toc.vue';
+import MetadataContentV from './metadata-content.vue';
+import MetadataModalV from './metadata-modal.vue';
+import ConfirmationModalV from '../support/confirmation-modal.vue';
+import EditorV from '../editor.vue';
 
 import cloneDeep from 'clone-deep';
 import { useLockStore } from '@/stores/lockStore';
@@ -745,10 +714,10 @@ interface History {
         Editor: EditorV,
         'confirmation-modal': ConfirmationModalV,
         'metadata-content': MetadataContentV,
+        'metadata-modal': MetadataModalV,
         spinner: VueSpinnerOval,
         'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV,
-        'vue-final-modal': VueFinalModal
+        'slide-toc': SlideTocV
     }
 })
 export default class MetadataEditorV extends Vue {
@@ -856,7 +825,7 @@ export default class MetadataEditorV extends Vue {
     };
     slides: MultiLanguageSlide[] = [];
     sourceCounts: SourceCounts = {};
-    sessionExpired: boolean = false;
+    sessionExpired = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     @Watch('loadEditor')
@@ -1654,10 +1623,6 @@ export default class MetadataEditorV extends Vue {
         }
 
         if (src) {
-            const srcSplit = src.split('/');
-            const folder = srcSplit.slice(1, 3).join('/');
-            const assetName = srcSplit.slice(3).join('/');
-
             if (this.sourceCounts[src]) {
                 this.sourceCounts[src] -= 1;
             }

@@ -37,7 +37,7 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { VueFinalModal } from 'vue-final-modal';
 import { HelpSection } from '@/definitions';
-import HelpSectionV from './helpers/help-section.vue';
+import HelpSectionV from './help-section.vue';
 @Options({
     components: {
         'vue-final-modal': VueFinalModal,

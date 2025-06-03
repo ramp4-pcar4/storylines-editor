@@ -492,8 +492,8 @@
 </template>
 
 <script lang="ts">
-import ActionModal from '@/components/helpers/action-modal.vue';
-import MultiOptionModal from '@/components/helpers/multi-option-modal.vue';
+import ActionModal from '@/components/support/action-modal.vue';
+import MultiOptionModal from '@/components/support/multi-option-modal.vue';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -517,16 +517,15 @@ import {
     VideoPanel
 } from '@/definitions';
 
-import ChartEditorV from './chart-editor.vue';
-import CustomEditorV from './helpers/custom-editor.vue';
-import ImageEditorV from './image-editor.vue';
-import TextEditorV from './text-editor.vue';
-import MapEditorV from './map-editor.vue';
-import VideoEditorV from './video-editor.vue';
-import SlideshowEditorV from './slideshow-editor.vue';
-import LoadingPageV from './helpers/loading-page.vue';
-import DynamicEditorV from './dynamic-editor.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ChartEditorV from './panel-editors/chart-editor.vue';
+import CustomEditorV from './panel-editors/custom-editor.vue';
+import ImageEditorV from './panel-editors/image-editor.vue';
+import TextEditorV from './panel-editors/text-editor.vue';
+import MapEditorV from './panel-editors/map-editor.vue';
+import VideoEditorV from './panel-editors/video-editor.vue';
+import SlideshowEditorV from './panel-editors/slideshow-editor.vue';
+import LoadingPageV from './support/loading-page.vue';
+import DynamicEditorV from './panel-editors/dynamic-editor.vue';
 import { toRaw } from 'vue';
 
 @Options({
@@ -541,8 +540,7 @@ import { toRaw } from 'vue';
         'video-editor': VideoEditorV,
         'slideshow-editor': SlideshowEditorV,
         'loading-page': LoadingPageV,
-        'dynamic-editor': DynamicEditorV,
-        'confirmation-modal': ConfirmationModalV
+        'dynamic-editor': DynamicEditorV
     }
 })
 export default class SlideEditorV extends Vue {

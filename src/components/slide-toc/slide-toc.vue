@@ -365,8 +365,8 @@
 </template>
 
 <script lang="ts">
-import ActionModal from '@/components/helpers/action-modal.vue';
-import SlideTocButton from '@/components/helpers/slide-toc-button.vue';
+import ActionModal from '@/components/support/action-modal.vue';
+import SlideTocButton from './slide-toc-button.vue';
 import {
     BasePanel,
     ChartPanel,
@@ -388,9 +388,9 @@ import { VueFinalModal } from 'vue-final-modal';
 import Message from 'vue-m-message';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from '../support/confirmation-modal.vue';
 
-import SlideEditorV from './slide-editor.vue';
+import SlideEditorV from '../slide-editor.vue';
 
 @Options({
     components: {
@@ -692,7 +692,7 @@ export default class SlideTocV extends Vue {
     resizeMobile(): void {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
-        
+
         if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
         } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
@@ -706,7 +706,6 @@ export default class SlideTocV extends Vue {
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeMobile);
     }
-    
 }
 
 // More accurate page height for mobile
@@ -720,7 +719,6 @@ window.addEventListener('resize', () => {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -742,7 +740,7 @@ window.addEventListener('resize', () => {
 }
 
 .toc-slide {
-  cursor: grab;
+    cursor: grab;
 }
 
 .toc-slide-button {

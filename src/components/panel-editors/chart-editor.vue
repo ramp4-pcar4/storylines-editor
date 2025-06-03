@@ -76,8 +76,8 @@ import {
     SlideshowChartPanel,
     SourceCounts
 } from '@/definitions';
-import ChartPreviewV from './helpers/chart-preview.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ChartPreviewV from '../support/chart-preview.vue';
+import ConfirmationModalV from '../support/confirmation-modal.vue';
 import draggable from 'vuedraggable';
 
 @Options({
