@@ -98,7 +98,7 @@ import JSZip from 'jszip';
 import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
 import { useLockStore } from '@/stores/lockStore';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from './support/confirmation-modal.vue';
 
 @Options({
     components: {

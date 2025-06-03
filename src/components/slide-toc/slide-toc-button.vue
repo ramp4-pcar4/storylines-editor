@@ -44,6 +44,7 @@
                 <button
                     :aria-label="panel?.type"
                     v-for="(panel, panelIndex) in element[lang]?.panel"
+                    :key="panel.id || panelIndex"
                     class="flex gap-0.5 border rounded w-min py-0.5 px-0.5 cursor-default"
                     :class="[
                         panel?.type === 'map' && panel.shared
@@ -159,7 +160,7 @@
 <script lang="ts">
 import { BasePanel, PanelType, Slide } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import TocOptions from '@/components/helpers/toc-options.vue';
+import TocOptions from './toc-options.vue';
 
 import TextEditorIcon from '@/assets/text-editor.svg?raw';
 import ImageEditorIcon from '@/assets/image-editor.svg?raw';

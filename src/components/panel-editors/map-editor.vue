@@ -75,8 +75,8 @@ import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
-import defaultConfig from '../../ramp-default.json';
-import TimeSliderEditorV from './helpers/time-slider-editor.vue';
+import defaultConfig from '../../../ramp-default.json';
+import TimeSliderEditorV from '../support/time-slider-editor.vue';
 import { createInstance as createRampEditorInstance } from 'ramp-config-editor_editeur-config-pcar';
 import 'ramp-config-editor_editeur-config-pcar/style.css';
 
