@@ -492,8 +492,9 @@ export default class SlideTocV extends Vue {
         // in the shared folder (in which case we do nothing), and if an asset with the same name and different
         // contents already exists in the shared folder (in which case we give the asset uploaded to the shared
         // asset folder a unique name)
-        const oppositeToSharedFolder = (panel: ImagePanel | VideoPanel, oppositeLang: string): void => {
-            if (panel.src) {
+        //TODO: include charts as well
+        const oppositeToSharedFolder = (panel: ImagePanel | VideoPanel | ChartPanel, oppositeLang: string): void => {
+            if (panel.src && panel.type !== 'chart') {
                 const assetSrc = panel.src.split('/');
                 const fileName = assetSrc.at(-1);
                 const assetType = fileName.split('.').at(-1);
@@ -534,6 +535,8 @@ export default class SlideTocV extends Vue {
                     });
                 }
                 this.sourceCounts[sharedFileSource] += 1;
+            } else {
+                this.sourceCounts[panel.src] += 1;
             }
         };
 
@@ -572,7 +575,7 @@ export default class SlideTocV extends Vue {
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
 
         // increment source count of each asset in this slide
-        const incrementSourceCounts = (panel: ImagePanel | VideoPanel) => {
+        const incrementSourceCounts = (panel: ImagePanel | VideoPanel | ChartPanel) => {
             if (panel.src) {
                 this.sourceCounts[panel.src] += 1;
             }
@@ -692,7 +695,7 @@ export default class SlideTocV extends Vue {
     resizeMobile(): void {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
-        
+
         if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
         } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
@@ -706,7 +709,6 @@ export default class SlideTocV extends Vue {
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeMobile);
     }
-    
 }
 
 // More accurate page height for mobile
@@ -720,7 +722,6 @@ window.addEventListener('resize', () => {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -742,7 +743,7 @@ window.addEventListener('resize', () => {
 }
 
 .toc-slide {
-  cursor: grab;
+    cursor: grab;
 }
 
 .toc-slide-button {
