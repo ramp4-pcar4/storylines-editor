@@ -492,8 +492,9 @@ export default class SlideTocV extends Vue {
         // in the shared folder (in which case we do nothing), and if an asset with the same name and different
         // contents already exists in the shared folder (in which case we give the asset uploaded to the shared
         // asset folder a unique name)
-        const oppositeToSharedFolder = (panel: ImagePanel | VideoPanel, oppositeLang: string): void => {
-            if (panel.src) {
+        //TODO: include charts as well
+        const oppositeToSharedFolder = (panel: ImagePanel | VideoPanel | ChartPanel, oppositeLang: string): void => {
+            if (panel.src && panel.type !== 'chart') {
                 const assetSrc = panel.src.split('/');
                 const fileName = assetSrc.at(-1);
                 const assetType = fileName.split('.').at(-1);
@@ -534,6 +535,8 @@ export default class SlideTocV extends Vue {
                     });
                 }
                 this.sourceCounts[sharedFileSource] += 1;
+            } else {
+                this.sourceCounts[panel.src] += 1;
             }
         };
 
@@ -569,10 +572,12 @@ export default class SlideTocV extends Vue {
      * @param index Index of the slide to copy.
      */
     copySlide(index: number): void {
-        this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
+        // First switch to the slide for which the copy button was pressed. In the case where a new slide is created
+        // and copied right away, this will save changes for it
+        this.selectSlide(index, this.lang);
 
         // increment source count of each asset in this slide
-        const incrementSourceCounts = (panel: ImagePanel | VideoPanel) => {
+        const incrementSourceCounts = (panel: ImagePanel | VideoPanel | ChartPanel) => {
             if (panel.src) {
                 this.sourceCounts[panel.src] += 1;
             }
@@ -580,6 +585,8 @@ export default class SlideTocV extends Vue {
         this.slides[index].en.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts));
         this.slides[index].fr.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts));
 
+        // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
+        this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
         this.$emit('slides-updated', this.slides);
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
@@ -692,7 +699,7 @@ export default class SlideTocV extends Vue {
     resizeMobile(): void {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
-        
+
         if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
         } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
@@ -706,7 +713,6 @@ export default class SlideTocV extends Vue {
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeMobile);
     }
-    
 }
 
 // More accurate page height for mobile
@@ -720,7 +726,6 @@ window.addEventListener('resize', () => {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -742,7 +747,7 @@ window.addEventListener('resize', () => {
 }
 
 .toc-slide {
-  cursor: grab;
+    cursor: grab;
 }
 
 .toc-slide-button {
