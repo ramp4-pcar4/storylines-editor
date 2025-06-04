@@ -301,13 +301,15 @@ export default class StoryPreviewV extends Vue {
     // reload preview page with FR config
     changeLang(): void {
         this.broadcast?.close();
+        document.onmousemove = () => undefined;
+        document.onkeydown = () => undefined;
         const newLang = this.lang === 'en' ? 'fr' : 'en';
         const routeData = this.$router.resolve({
             name: 'preview',
             params: { lang: newLang, uid: this.uid }
         });
-        const secret = window.props.secret;
-        const timeRemaining = window.props.timeRemaining;
+        const secret = window.props?.secret;
+        const timeRemaining = window.props?.timeRemaining;
 
         // update window props on refresh (to prevent having to fetch from server again)
         const refreshTab = window.open(routeData.href, '_self');
