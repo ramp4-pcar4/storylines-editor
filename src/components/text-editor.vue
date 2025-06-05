@@ -3,7 +3,7 @@
         <label class="editor-label" for="panelTitle">{{ $t('editor.slides.panel.title') }}</label>
         <input class="editor-input" type="text" id="panelTitle" v-model="panel.title" />
         <div class="editor-label text-left mt-4 mb-1">{{ $t('editor.slides.panel.body') }}</div>
-        <div style="border: 1px solid #a1a1a1; z-index: 150" class="text-editor-container rounded-md p-1 shadow-md">
+        <div style="border: 1px solid #a1a1a1; z-index: 0" class="text-editor-container rounded-md p-1 shadow-md">
             <v-md-editor
                 v-model="panel.content"
                 height="400px"
