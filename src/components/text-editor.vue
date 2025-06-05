@@ -3,12 +3,16 @@
         <label class="editor-label" for="panelTitle">{{ $t('editor.slides.panel.title') }}</label>
         <input class="editor-input" type="text" id="panelTitle" v-model="panel.title" />
         <div class="editor-label text-left mt-4 mb-1">{{ $t('editor.slides.panel.body') }}</div>
-        <div style="border: 1px solid #a1a1a1; z-index: 150" class="text-editor-container rounded-md p-1 shadow-md">
+        <div
+            :style="{ border: '1px solid #a1a1a1', zIndex: isFullScreen ? 150 : 0 }"
+            class="text-editor-container rounded-md p-1 shadow-md"
+        >
             <v-md-editor
                 v-model="panel.content"
                 height="400px"
                 left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
                 :toolbar="toolbar"
+                @fullscreen-change="onFullscreenChange"
             ></v-md-editor>
         </div>
     </div>
@@ -30,6 +34,12 @@ export default class TextEditorV extends Vue {
     @Watch('panel.content', { deep: true })
     onContentChanged() {
         this.$emit('slide-edit');
+    }
+
+    // Detecting whether the text editor is in fullscreen mode
+    isFullScreen: boolean = false;
+    onFullscreenChange(isFullScreen: boolean) {
+        this.isFullScreen = isFullScreen;
     }
 
     // A ridiculous workaround to make the toolbar buttons (and the preview) in the md-editor tabbable.
