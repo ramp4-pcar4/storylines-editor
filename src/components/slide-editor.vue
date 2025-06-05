@@ -475,7 +475,7 @@
             :title="$t('editor.slides.changeToOnePanel.title')"
             :message="$t('editor.slides.changeToOnePanel.message')"
             @ok="toggleOnePanelOnly()"
-            @Cancel="onePanelOnly = !onePanelOnly"
+            @Cancel="onePanelOnly = false"
         />
         <multi-option-modal
             :name="`one-to-two-panels-${slideIndex}`"
@@ -485,7 +485,7 @@
                 { label: $t('editor.slides.addBlankPanel.left'), action: () => toggleOnePanelOnly('left') },
                 { label: $t('editor.slides.addBlankPanel.right'), action: () => toggleOnePanelOnly('right') }
             ]"
-            @cancel="onePanelOnly = !onePanelOnly"
+            @cancel="onePanelOnly = true"
             :cancelAllowed="true"
         />
     </div>
