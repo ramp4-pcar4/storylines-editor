@@ -692,7 +692,7 @@ export default class SlideTocV extends Vue {
     resizeMobile(): void {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
-        
+
         if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
         } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
@@ -706,7 +706,6 @@ export default class SlideTocV extends Vue {
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeMobile);
     }
-    
 }
 
 // More accurate page height for mobile
@@ -720,7 +719,6 @@ window.addEventListener('resize', () => {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -742,7 +740,7 @@ window.addEventListener('resize', () => {
 }
 
 .toc-slide {
-  cursor: grab;
+    cursor: grab;
 }
 
 .toc-slide-button {
