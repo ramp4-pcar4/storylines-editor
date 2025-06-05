@@ -11,13 +11,25 @@
             <div class="storyramp-app bg-white" v-if="config !== undefined">
                 <header
                     id="story-header"
-                    class="story-header sticky top-0 flex border-b border-black bg-gray-200 py-2 px-2 justify-between"
+                    class="story-header sticky top-0 flex border-b border-black bg-gray-200 py-2 px-2 justify-between h-16"
                 >
+                    <storylines-mobile-toc
+                        class="mobile-menu"
+                        :active-chapter-index="activeChapterIndex"
+                        :return-to-top="config.returnTop ?? true"
+                        :plugin="true"
+                        :customToc="config.tableOfContents"
+                        :lang="lang"
+                        :slides="config.slides"
+                    />
                     <div class="w-mobile-full truncate">
                         <span class="font-semibold text-lg m-1">{{ config.title }}</span>
                     </div>
-
-                    <button @click="changeLang" class="editor-button bg-black text-white hover:bg-gray-900">
+                    <button
+                        @click="changeLang"
+                        :style="{ 'max-height': '40px' }"
+                        class="editor-button bg-black text-white hover:bg-gray-900 max-h-[40px]"
+                    >
                         <span class="inline-block">{{
                             lang === 'en' ? $t('editor.lang.fr') : $t('editor.lang.en')
                         }}</span>
@@ -381,6 +393,12 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
 @media screen and (max-width: 640px) {
     .w-mobile-full {
         width: 100% !important;
+    }
+}
+
+@media screen and (min-width: 640px) {
+    .mobile-menu {
+        display: none !important;
     }
 }
 </style>
