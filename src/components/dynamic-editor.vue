@@ -91,7 +91,7 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
-                    @slide-edit="$emit('slide-edit')"
+                    @slide-edit="$emit('slide-edit', 'Dynamic editor')"
                     @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
                         $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
                     }"

@@ -9,6 +9,7 @@
         "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
     },
     "dependencies": {
+        "@fastify/deepmerge": "^2.0.2",
         "@kangc/v-md-editor": "^2.3.17",
         "@rollup/plugin-dsv": "^3.0.4",
         "@tailwindcss/typography": "^0.4.0",
@@ -16,6 +17,7 @@
         "@types/marked": "^4.0.1",
         "axios": "^1.2.0",
         "clone-deep": "^4.0.1",
+        "deep-object-diff": "^1.1.9",
         "file-saver": "^2.0.5",
         "highcharts": "^9.3.2",
         "highcharts-vue": "^1.4.3",

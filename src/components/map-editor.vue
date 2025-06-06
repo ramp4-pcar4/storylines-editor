@@ -34,7 +34,12 @@
                 />
             </div>
 
-            <div class="ramp-editor mt-5" ref="editor" style="width: 70vw; height: 80vh"></div>
+            <div
+                class="ramp-editor mt-5"
+                ref="editor"
+                style="width: 70vw; height: 80vh"
+                @input="stateStore.overrideChangeState(true)"
+            ></div>
         </div>
         <vue-final-modal
             modalId="time-slider-edit-modal"
@@ -62,6 +67,7 @@
 </template>
 
 <script lang="ts">
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
@@ -83,6 +89,8 @@ export default class MapEditorV extends Vue {
     @Prop() sourceCounts!: SourceCounts;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    stateStore = useStateStore();
 
     // config editor
     rampEditorApi: any = '';
@@ -123,6 +131,10 @@ export default class MapEditorV extends Vue {
         }
 
         this.openEditor();
+    }
+
+    beforeUnmount(): void {
+        this.$emit('slide-edit', 'Kill map editor');
     }
 
     beforeDestroy(): void {
@@ -187,7 +199,7 @@ export default class MapEditorV extends Vue {
         if (!this.timeSliderError || !this.usingTimeSlider) {
             this.panel.timeSlider = this.usingTimeSlider ? this.timeSliderConf : undefined;
         }
-        this.$emit('slide-edit');
+        this.$emit('slide-edit', 'Map editor time slider');
         this.$vfm.close('time-slider-edit-modal');
     }
 
@@ -200,7 +212,7 @@ export default class MapEditorV extends Vue {
     }
 
     onConfigEdit(): void {
-        this.$emit('slide-edit');
+        this.$emit('slide-edit', 'Map editor');
     }
 
     onTimeSliderInput(property: 'range' | 'start' | 'attribute' | 'layers', index: number, value: string): void {

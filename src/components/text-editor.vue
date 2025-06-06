@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Prop, Vue, Watch } from 'vue-property-decorator';
 import { TextPanel } from '@/definitions';
 
 interface MDEditor {
@@ -26,6 +26,11 @@ export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    @Watch('panel.content', { deep: true })
+    onContentChanged() {
+        this.$emit('slide-edit');
+    }
 
     // A ridiculous workaround to make the toolbar buttons (and the preview) in the md-editor tabbable.
     // Hopefully a better solution can be found eventually.
