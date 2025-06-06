@@ -4,10 +4,12 @@
 
         <!-- Slideshow caption -->
         <div class="mt-5 mb-8">
-            <label class="editor-label" for="slideshowCaption">{{ $t('editor.image.slideshowCaption') }}</label>
+            <label class="respected-standard-label" for="slideshowCaption">{{
+                $t('editor.image.slideshowCaption')
+            }}</label>
             <input
                 id="slideshowCaption"
-                class="editor-input block w-full lg:w-1/2"
+                class="respected-standard-input block w-full lg:w-1/2"
                 type="text"
                 :placeholder="$t('editor.slideshow.addSlideTitle')"
                 v-model="panel.caption"
@@ -55,12 +57,15 @@
                                 editingStatus !== 'none' && editingStatus !== 'create' && editingIdx === idx
                         }"
                     >
-                        <td class="space-y-1" :class="{ 'rounded-bl': idx === panel.items.length - 1 }">
+                        <td
+                            class="px-0.5 flex flex-col lg:flex-row gap-0.5 justify-center items-center"
+                            :class="{ 'rounded-bl': idx === panel.items.length - 1 }"
+                        >
                             <button
                                 :disabled="idx === 0 || editingStatus === 'edit'"
                                 @click="moveSlideUp(idx)"
-                                style="border: none !important"
-                                class="editor-button py-1 px-1.5"
+                                style="border: none !important; padding-left: 0.375rem; padding-right: 0.375rem"
+                                class="respected-standard-button respected-transparent-button"
                                 v-tippy="{
                                     delay: '200',
                                     placement: 'top',
@@ -90,8 +95,8 @@
                             <button
                                 :disabled="idx === panel.items.length - 1 || editingStatus === 'edit'"
                                 @click="moveSlideDown(idx)"
-                                style="border: none !important"
-                                class="editor-button py-1 px-1.5 rotate-180 transform"
+                                style="border: none !important; padding-left: 0.375rem; padding-right: 0.375rem"
+                                class="respected-standard-button respected-transparent-button rotate-180 transform"
                                 v-tippy="{
                                     delay: '200',
                                     placement: 'top',
@@ -151,7 +156,8 @@
         </div>
         <!-- add item button -->
         <button
-            class="editor-button w-full lg:w-4/5 mt-5 border max-h-96 bg-gray-100 border-gray-400 rounded-md cursor-pointer hover:bg-gray-200 flex items-center"
+            class="respected-standard-button w-full lg:w-4/5 max-h-96 bg-gray-100 border border-gray-400 hover:bg-gray-200"
+            style="margin-top: 1.25rem; justify-content: start !important"
             @click="this.changeEditStatus()"
         >
             <svg
@@ -184,11 +190,11 @@
         <div
             id="create-and-edit-area"
             v-if="editingStatus !== 'none'"
-            class="border-2 rounded-lg p-4"
+            class="border rounded-md p-4"
             :class="[editingStatus !== 'create' ? 'border-blue-300' : 'border-gray-300']"
         >
             <div class="flex w-full justify-between items-center">
-                <h2 class="text-xl font-bold">
+                <h2 class="text-xl font-semibold">
                     {{
                         $t(`editor.slideshow.label.${editingStatus}`) +
                         (editingStatus === 'edit' ? ` (#${editingIdx + 1})` : '')
@@ -198,19 +204,59 @@
                 <button
                     v-if="editingStatus === 'create'"
                     id="add-new-item"
-                    class="editor-button bg-black text-white hover:bg-gray-800"
+                    class="respected-standard-button respected-black-bg-button respected-thin-button"
                     @click="saveItem(true)"
                 >
-                    {{ $t('editor.slideshow.label.add') }}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 122.73 122.88"
+                        style="enable-background: new 0 0 122.73 122.88"
+                        xml:space="preserve"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        height="16px"
+                        width="16px"
+                    >
+                        <g>
+                            <path
+                                class="st0 fill-current"
+                                d="M109.5,113.68L109.5,113.68l-6.09,0c-0.4,0-0.73-0.32-0.73-0.72V69.48l0-0.1c0-0.9-0.17-1.65-0.49-2.22 c-0.06-0.11-0.14-0.22-0.2-0.31c-0.06-0.09-0.16-0.18-0.23-0.27l-0.02-0.02c-0.3-0.3-0.68-0.53-1.12-0.69l-0.25-0.07l-0.04-0.01 l-0.01,0c-0.41-0.11-0.88-0.17-1.38-0.17h-0.05l-0.08,0H36.75c-0.89,0-1.62,0.17-2.18,0.49l-0.02,0.01l-0.27,0.17l-0.04,0.04 c-0.09,0.07-0.18,0.15-0.27,0.23l-0.02,0.02l-0.01,0.01c-0.62,0.63-0.92,1.57-0.92,2.82l0,0.04l0,43.54h0 c0,0.4-0.33,0.72-0.73,0.72l-9.85,0c0,0,0,0,0,0c-0.19,0-0.38-0.08-0.51-0.21L9.87,101.41c-0.18-0.14-0.29-0.36-0.29-0.59l0-87.91 l0-0.08c0-0.83,0.15-1.52,0.44-2.07l0,0c0.05-0.11,0.11-0.2,0.17-0.29l0.02-0.03c0.07-0.11,0.19-0.18,0.25-0.29l0.01-0.02 l0.02-0.02l0,0c0.25-0.25,0.57-0.45,0.92-0.59l0.04-0.02l0.02-0.01l0.02-0.01l0.18-0.06v0l0.01-0.01c0.42-0.14,0.9-0.2,1.44-0.21 l0.09-0.01l26.21,0c0.4,0,0.73,0.32,0.73,0.72v28.75c0,0.52,0.05,1.03,0.13,1.5c0.09,0.46,0.15,0.98,0.39,1.34l0.01,0.02l0,0.01v0 c0.18,0.44,0.42,0.87,0.67,1.25c0.24,0.37,0.56,0.77,0.9,1.13l0.02,0.02l0,0.01l0.01,0c0.48,0.5,0.94,1.15,1.62,1.27l0.01,0l0.01,0 l0.01,0.01l0.32,0.17l0,0l0.4,0.18v0l0.01,0l0,0l0,0v0c0.33,0.14,0.67,0.26,1,0.34l0.01,0l0.03,0l0.01,0l0.03,0l0.26,0.05v0 c0.45,0.09,0.93,0.14,1.42,0.14l0.02,0h47.8c1.03,0,1.98-0.18,2.85-0.53l0.01-0.01c0.87-0.36,1.67-0.9,2.39-1.61l0.03-0.03 c0.36-0.36,0.69-0.75,0.96-1.16c0.26-0.38,0.58-0.76,0.66-1.22l0-0.01l0.01-0.01l0.01-0.02c0.18-0.43,0.34-0.88,0.41-1.34l0-0.03 c0.09-0.47,0.13-0.97,0.13-1.49V9.92c0-0.4,0.33-0.73,0.73-0.73h6c0.58,0,1.09,0.07,1.54,0.21c0.48,0.15,0.89,0.39,1.2,0.7 c0.68,0.67,0.88,1.67,0.9,2.59l0.01,0.09v0.05l0,0.02v97.19c0,0.56-0.07,1.07-0.21,1.51l-0.01,0.03v0l0,0.02l-0.08,0.22l0,0 l-0.02,0.06l-0.09,0.2l-0.01,0.04l-0.02,0.04l0,0l-0.03,0.06l-0.15,0.22l0,0l-0.05,0.08l-0.14,0.17l-0.06,0.07 c-0.15,0.16-0.33,0.3-0.53,0.42c-0.17,0.1-0.36,0.19-0.55,0.26l-0.06,0.02c-0.16,0.05-0.34,0.1-0.53,0.14l-0.02,0l-0.01,0l-0.02,0 l-0.09,0.01l-0.02,0l0,0l-0.02,0c-0.22,0.03-0.49,0.05-0.76,0.06H109.5L109.5,113.68z M53.93,104.43c-1.66,0-3-1.34-3-3 c0-1.66,1.34-3,3-3h31.12c1.66,0,3,1.34,3,3c0,1.66-1.34,3-3,3H53.93L53.93,104.43z M53.93,89.03c-1.66,0-3-1.34-3-3s1.34-3,3-3 h31.12c1.66,0,3,1.34,3,3s-1.34,3-3,3H53.93L53.93,89.03z M94.03,9.39l-45.32-0.2v25.86H48.7c0,0.46,0.06,0.86,0.17,1.2 c0.03,0.06,0.04,0.1,0.07,0.15c0.09,0.23,0.22,0.44,0.4,0.61l0.03,0.03v0c0.06,0.06,0.11,0.1,0.17,0.15 c0.06,0.05,0.13,0.09,0.2,0.14c0.39,0.23,0.92,0.34,1.58,0.34v0l40.1,0.25v0l0,0v0c0.91,0,1.57-0.21,1.98-0.63 c0.42-0.43,0.63-1.1,0.63-2.02h0V9.39L94.03,9.39z M41.91,73.23h53.07v0c0.35,0,0.65,0.29,0.65,0.64l0,39.17 c0,0.35-0.29,0.65-0.65,0.65H41.91v0c-0.35,0-0.65-0.29-0.65-0.64l0-39.17C41.26,73.52,41.56,73.23,41.91,73.23L41.91,73.23 L41.91,73.23z M9.68,0h104.26c4.91,0,8.79,3.86,8.79,8.79V114c0,4.95-3.9,8.88-8.79,8.88l-96.61,0l-0.24-0.25L1.05,106.6L0,105.9 V8.76C0,3.28,4.81,0,9.68,0L9.68,0L9.68,0z"
+                            />
+                        </g>
+                    </svg>
+                    <div>{{ $t('editor.slideshow.label.add') }}</div>
                 </button>
                 <!-- Save changes to existing slide -->
                 <button
                     v-else
                     id="edit-existing-item"
-                    class="editor-button bg-black text-white hover:bg-gray-800"
+                    class="respected-standard-button respected-black-bg-button respected-thin-button"
                     @click="saveItem()"
                 >
-                    {{ $t('editor.saveChanges') }}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 122.73 122.88"
+                        style="enable-background: new 0 0 122.73 122.88"
+                        xml:space="preserve"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        height="16px"
+                        width="16px"
+                    >
+                        <g>
+                            <path
+                                class="st0 fill-current"
+                                d="M109.5,113.68L109.5,113.68l-6.09,0c-0.4,0-0.73-0.32-0.73-0.72V69.48l0-0.1c0-0.9-0.17-1.65-0.49-2.22 c-0.06-0.11-0.14-0.22-0.2-0.31c-0.06-0.09-0.16-0.18-0.23-0.27l-0.02-0.02c-0.3-0.3-0.68-0.53-1.12-0.69l-0.25-0.07l-0.04-0.01 l-0.01,0c-0.41-0.11-0.88-0.17-1.38-0.17h-0.05l-0.08,0H36.75c-0.89,0-1.62,0.17-2.18,0.49l-0.02,0.01l-0.27,0.17l-0.04,0.04 c-0.09,0.07-0.18,0.15-0.27,0.23l-0.02,0.02l-0.01,0.01c-0.62,0.63-0.92,1.57-0.92,2.82l0,0.04l0,43.54h0 c0,0.4-0.33,0.72-0.73,0.72l-9.85,0c0,0,0,0,0,0c-0.19,0-0.38-0.08-0.51-0.21L9.87,101.41c-0.18-0.14-0.29-0.36-0.29-0.59l0-87.91 l0-0.08c0-0.83,0.15-1.52,0.44-2.07l0,0c0.05-0.11,0.11-0.2,0.17-0.29l0.02-0.03c0.07-0.11,0.19-0.18,0.25-0.29l0.01-0.02 l0.02-0.02l0,0c0.25-0.25,0.57-0.45,0.92-0.59l0.04-0.02l0.02-0.01l0.02-0.01l0.18-0.06v0l0.01-0.01c0.42-0.14,0.9-0.2,1.44-0.21 l0.09-0.01l26.21,0c0.4,0,0.73,0.32,0.73,0.72v28.75c0,0.52,0.05,1.03,0.13,1.5c0.09,0.46,0.15,0.98,0.39,1.34l0.01,0.02l0,0.01v0 c0.18,0.44,0.42,0.87,0.67,1.25c0.24,0.37,0.56,0.77,0.9,1.13l0.02,0.02l0,0.01l0.01,0c0.48,0.5,0.94,1.15,1.62,1.27l0.01,0l0.01,0 l0.01,0.01l0.32,0.17l0,0l0.4,0.18v0l0.01,0l0,0l0,0v0c0.33,0.14,0.67,0.26,1,0.34l0.01,0l0.03,0l0.01,0l0.03,0l0.26,0.05v0 c0.45,0.09,0.93,0.14,1.42,0.14l0.02,0h47.8c1.03,0,1.98-0.18,2.85-0.53l0.01-0.01c0.87-0.36,1.67-0.9,2.39-1.61l0.03-0.03 c0.36-0.36,0.69-0.75,0.96-1.16c0.26-0.38,0.58-0.76,0.66-1.22l0-0.01l0.01-0.01l0.01-0.02c0.18-0.43,0.34-0.88,0.41-1.34l0-0.03 c0.09-0.47,0.13-0.97,0.13-1.49V9.92c0-0.4,0.33-0.73,0.73-0.73h6c0.58,0,1.09,0.07,1.54,0.21c0.48,0.15,0.89,0.39,1.2,0.7 c0.68,0.67,0.88,1.67,0.9,2.59l0.01,0.09v0.05l0,0.02v97.19c0,0.56-0.07,1.07-0.21,1.51l-0.01,0.03v0l0,0.02l-0.08,0.22l0,0 l-0.02,0.06l-0.09,0.2l-0.01,0.04l-0.02,0.04l0,0l-0.03,0.06l-0.15,0.22l0,0l-0.05,0.08l-0.14,0.17l-0.06,0.07 c-0.15,0.16-0.33,0.3-0.53,0.42c-0.17,0.1-0.36,0.19-0.55,0.26l-0.06,0.02c-0.16,0.05-0.34,0.1-0.53,0.14l-0.02,0l-0.01,0l-0.02,0 l-0.09,0.01l-0.02,0l0,0l-0.02,0c-0.22,0.03-0.49,0.05-0.76,0.06H109.5L109.5,113.68z M53.93,104.43c-1.66,0-3-1.34-3-3 c0-1.66,1.34-3,3-3h31.12c1.66,0,3,1.34,3,3c0,1.66-1.34,3-3,3H53.93L53.93,104.43z M53.93,89.03c-1.66,0-3-1.34-3-3s1.34-3,3-3 h31.12c1.66,0,3,1.34,3,3s-1.34,3-3,3H53.93L53.93,89.03z M94.03,9.39l-45.32-0.2v25.86H48.7c0,0.46,0.06,0.86,0.17,1.2 c0.03,0.06,0.04,0.1,0.07,0.15c0.09,0.23,0.22,0.44,0.4,0.61l0.03,0.03v0c0.06,0.06,0.11,0.1,0.17,0.15 c0.06,0.05,0.13,0.09,0.2,0.14c0.39,0.23,0.92,0.34,1.58,0.34v0l40.1,0.25v0l0,0v0c0.91,0,1.57-0.21,1.98-0.63 c0.42-0.43,0.63-1.1,0.63-2.02h0V9.39L94.03,9.39z M41.91,73.23h53.07v0c0.35,0,0.65,0.29,0.65,0.64l0,39.17 c0,0.35-0.29,0.65-0.65,0.65H41.91v0c-0.35,0-0.65-0.29-0.65-0.64l0-39.17C41.26,73.52,41.56,73.23,41.91,73.23L41.91,73.23 L41.91,73.23z M9.68,0h104.26c4.91,0,8.79,3.86,8.79,8.79V114c0,4.95-3.9,8.88-8.79,8.88l-96.61,0l-0.24-0.25L1.05,106.6L0,105.9 V8.76C0,3.28,4.81,0,9.68,0L9.68,0L9.68,0z"
+                            />
+                        </g>
+                    </svg>
+                    <div>{{ $t('editor.saveChanges') }}</div>
                 </button>
             </div>
 
@@ -218,7 +264,9 @@
             <div>
                 <div class="mt-3" v-if="editingStatus === 'create'">
                     <!-- Creating new slide -->
-                    <label class="editor-label mb-5 text-left">{{ $t('editor.slideshow.label.type') }}</label>
+                    <label class="respected-standard-label mb-5 text-left">{{
+                        $t('editor.slideshow.label.type')
+                    }}</label>
                     <br />
                     <select class="rounded shadow w-48" @input="onTypeInput" :value="newSlideType">
                         <option v-for="thing in Object.keys(editors)" :key="thing" :value="thing">

@@ -2,7 +2,8 @@
     <li class="chart-item items-center mt-8 mx-5 overflow-hidden">
         <div class="relative border-solid border-2 items-center justify-center text-center w-full">
             <button
-                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full top-2 left-2 p-0 z-10 cursor-pointer"
+                class="respected-standard-button respected-transparent-button close-button"
+                style="top: 0.5rem; left: 0.5rem"
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
@@ -15,7 +16,8 @@
                 </svg>
             </button>
             <button
-                class="editor-button bg-white absolute h-6 w-6 leading-5 rounded-full bottom-2 right-2 p-0 z-10 handle"
+                style="bottom: 0.5rem; right: 0.5rem"
+                class="respected-standard-button respected-transparent-button close-button handle"
                 :aria-label="$t('editor.chart.delete')"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22px" height="22px" viewBox="0 0 24 24">
@@ -38,17 +40,17 @@
         <!-- chart description and edit  -->
         <div class="flex flex-col-reverse lg:flex-row mt-4 items-start flex-wrap gap-2 gap-x-2 px-1 pb-1">
             <div class="flex-1 flex flex-col w-full">
-                <label class="editor-label"> {{ $t('editor.chart.label.name') }}</label>
+                <label class="respected-standard-label"> {{ $t('editor.chart.label.name') }}</label>
                 <label class="name-label font-bold">
                     <span class="font-normal break-all">{{ chartName }}</span>
                 </label>
 
-                <label :for="'chartPreviewCaption' + index" class="editor-label mt-2">
+                <label :for="'chartPreviewCaption' + index" class="respected-standard-label mt-2">
                     {{ $t('editor.image.label.caption') }}
                 </label>
                 <input
                     :id="'chartPreviewCaption' + index"
-                    class="editor-input w-full"
+                    class="respected-standard-input w-full"
                     type="text"
                     v-model="chart.caption"
                     :placeholder="$t('editor.caption.placeholder')"
@@ -58,7 +60,7 @@
 
             <!-- edit button -->
             <button
-                class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
+                class="respected-standard-button respected-gray-border-button respected-thin-button"
                 :id="`edit-${chart.name}-btn`"
             >
                 <div class="flex items-center">
@@ -228,5 +230,18 @@ export default class ChartPreviewV extends Vue {
         cursor: -moz-grab;
         cursor: -webkit-grab;
     }
+}
+
+.close-button {
+    background-color: white;
+    position: absolute;
+    height: 1.5rem;
+    width: 1.5rem;
+    line-height: 1.25rem;
+    border-radius: 9999px;
+
+    padding: 0;
+    z-index: 10;
+    cursor: pointer;
 }
 </style>
