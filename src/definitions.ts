@@ -11,6 +11,7 @@ export interface StoryRampConfig {
     contextLabel: string;
     tocOrientation: string;
     returnTop: boolean;
+    sameConfig: boolean;
     stylesheets?: string[];
     dateModified: string;
 }
@@ -48,6 +49,7 @@ export interface MetadataContent {
     contextLabel: string;
     tocOrientation: string;
     returnTop: boolean;
+    sameConfig: boolean;
     dateModified: string;
     schemaVersion: string;
 }
