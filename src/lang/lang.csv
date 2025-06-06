@@ -8,6 +8,9 @@ story.window.title,RAMP Storylines,1,Scénarios de la PCAR,1
 story.date,Date modified:,1,Date de modification:,1
 story.error,An error occurred while loading this Storylines product. See developer console for more information.,1,Une erreur est survenue pendant le chargement ce scénarios produit. Voir la console du promoteur pour obtenir de plus amples renseignements.,1
 image.fullscreen,Full Screen,1,Plein Écran,1
+audio.transcript.show,View Transcript,1,Afficher la transcription,0
+audio.transcript.hide,Hide Transcript,1,Cacher la transcription,0
+audio.transcript.none,No transcript available,1,Aucune transcription disponible,0
 dynamic.back,Back,1,Retour,0
 dynamic.textSection,Text Section,1,Section de texte,1
 dynamic.panel.collection,Panel Collection,1,Collection de panneaux,1
