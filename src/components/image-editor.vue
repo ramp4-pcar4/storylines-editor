@@ -19,7 +19,7 @@
                 </span>
                 <span class="align-middle inline-block">
                     <span>
-                        <div>{{ $t('editor.image.label.drag', { fileType: 'images' }) }}</div>
+                        <div>{{ $t('editor.image.label.drag') }}</div>
                         <div>
                             {{ $t('editor.label.or') }}
                             <span class="text-blue-700 font-bold">{{ $t('editor.label.browse') }}</span>
