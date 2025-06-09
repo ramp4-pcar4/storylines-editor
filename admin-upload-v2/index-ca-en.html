@@ -25,8 +25,8 @@
         <script type="text/javascript">
             document.write(wet.builder.refTop({}));
         </script>
-      <script type="module" crossorigin src="./assets/main-w3-JcoKZ.js"></script>
-      <link rel="stylesheet" crossorigin href="./assets/main-D-JNxpuM.css">
+      <script type="module" crossorigin src="./assets/main-S06LyM9H.js"></script>
+      <link rel="stylesheet" crossorigin href="./assets/main-yeU6xY1c.css">
     </head>
     <body>
         <!-- template top and no-script fallback -->
@@ -64,7 +64,7 @@
 
                 // In this case there is no product id in the url. The url param before this one will be the lang, 
                 // which we should not include
-                if (latestParam === 'editor' || latestParam === 'editor-metadata') {
+                if (latestParam === 'editor' || latestParam === 'editor-metadata' || latestParam === 'editor-metadata-new') {
                     newURLRoute = latestParam;
                 } else {
                     productID = latestParam;
@@ -103,16 +103,15 @@
             defTop.outerHTML = wet.builder.top({
                 lngLinks: [
                     {
-                        lang: 'en',
-                        id: 'test',
-                        href: 'index-ca-fr#/fr/' + urlRoute,
+                        lang: 'fr',
+                        href: 'index-ca-fr.html#/fr/' + urlRoute,
                         text: 'Français'
                     }
                 ],
                 breadcrumbs: [
                     {
-                        title: 'Environnement et ressources naturelles',
-                        href: 'https://www.canada.ca/fr/services/environnement/meteo.html'
+                        title: 'Environment and natural resources',
+                        href: 'https://www.canada.ca/en/services/environment.html'
                     }
                 ]
             });
@@ -126,7 +125,7 @@
             langChange.addEventListener('click', (e) => {
                 e.preventDefault();
                 const urlRoute = getUrlRoute();
-                window.location.href = 'index-ca-fr#/fr/' + urlRoute;
+                window.location.href = 'index-ca-fr.html#/fr/' + urlRoute;
             });
         </script>
 
