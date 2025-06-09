@@ -98,7 +98,7 @@
                                 <input
                                     :id="'imgHeight' + index"
                                     class="editor-input w-full"
-                                    type="text"
+                                    type="number"
                                     v-model="element.height"
                                     @change="onImagesEdited"
                                 />
@@ -134,7 +134,7 @@
                                 <input
                                     :id="'imgWidth' + index"
                                     class="editor-input w-full"
-                                    type="text"
+                                    type="number"
                                     v-model="element.width"
                                     @change="onImagesEdited"
                                 />
