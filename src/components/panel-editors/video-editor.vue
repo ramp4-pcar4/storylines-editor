@@ -127,7 +127,7 @@ import { ConfigFileStructure, SourceCounts, VideoFile, VideoPanel } from '@/defi
 
 import Message from 'vue-m-message';
 import draggable from 'vuedraggable';
-import VideoPreviewV from './helpers/video-preview.vue';
+import VideoPreviewV from '../support/video-preview.vue';
 import JSZip from 'jszip';
 
 @Options({
