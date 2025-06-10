@@ -985,6 +985,7 @@ export default class MetadataEditorV extends Vue {
                     // session was extended from the preview tab, need to handle in editor tab
                     const msg = e.data;
                     if (msg.action === 'extend') {
+                        console.log('extending session');
                         this.$vfm.close('confirm-extend-session-editor');
                         this.extendSession(msg.showPopup);
                     }
@@ -1342,6 +1343,7 @@ export default class MetadataEditorV extends Vue {
                         // session was extended from the preview tab, need to handle in editor tab
                         const msg = e.data;
                         if (msg.action === 'extend') {
+                            console.log('extending session');
                             this.$vfm.close('confirm-extend-session-editor');
                             this.extendSession(msg.showPopup);
                         }
