@@ -7,25 +7,61 @@
             <v-md-editor
                 v-model="panel.content"
                 height="400px"
-                left-toolbar="undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code | save"
+                :left-toolbar="toolbarOptions"
                 :toolbar="toolbar"
             ></v-md-editor>
+        </div>
+        <!-- WET Component Dashboard. Only accessible if using the Canada.ca template. -->
+        <div id="WETDashboard" class="WETDashboard relative p-2 my-10 rounded-sm" v-if="wetComponentsVisible">
+            <span class="font-bold text-2xl">{{ $t('editor.wetDashboard.title') }}</span>
+            <section class="my-2">
+                <p v-html="$t('editor.wetDashboard.info')"></p>
+            </section>
+
+            <ul class="list-unstyled p-5">
+                <li v-for="(section, idx) in components[pageLang].sections">
+                    <details>
+                        <summary class="font-bold text-xl">{{ section.section }}</summary>
+                        <div class="flex flex-row flex-wrap">
+                            <wet-item v-for="component in section.children" :component="component" :editor="editor" />
+                        </div>
+                    </details>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Prop, Vue, Watch } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TextPanel } from '@/definitions';
+import WETDashboardItemV from './helpers/wet-dashboard-item.vue';
+import WETComponents from './helpers/wet-component-templates.json';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;
 }
+interface WETComponentsObject {
+    [key: string]: {
+        sections: { section: string; children: { name: string; html: string }[] }[];
+    };
+}
 
+@Options({
+    components: {
+        'wet-item': WETDashboardItemV
+    }
+})
 export default class TextEditorV extends Vue {
     @Prop() panel!: TextPanel;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+    @Prop() lang!: string;
+
+    wetComponentsVisible = false;
+    editor: MDEditor = {} as MDEditor;
+    components: WETComponentsObject = WETComponents;
+    pageLang = window.location.href.includes('index-ca-en') ? 'en' : 'fr'; // this is only used if `index-ca` is already in the URL.
 
     @Watch('panel.content', { deep: true })
     onContentChanged() {
@@ -308,11 +344,35 @@ export default class TextEditorV extends Vue {
                     }
                 }
             ]
+        },
+        wetToolbar: {
+            title: 'WET Components',
+            text: this.pageLang === 'en' ? 'Components' : 'Composantes',
+            action: (editor: MDEditor): void => {
+                this.wetComponentsVisible = !this.wetComponentsVisible;
+
+                if (this.wetComponentsVisible) {
+                    // Hate using setTimeout, but it seems to be necessary for this scroll to work.
+                    setTimeout(() => {
+                        document
+                            .getElementById('WETDashboard')
+                            ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }, 100);
+                }
+
+                if (editor !== undefined) {
+                    this.editor = editor;
+                }
+            }
         }
     };
 
+    toolbarOptions = `undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code ${
+        window.location.href.includes('index-ca') ? '| wetToolbar' : ''
+    } | save`;
+
     toolbarTooltipAdjust(toggle): void {
-        const slideEditor = document.querySelector('#slideEditor');
+        const slideEditor = document.querySelector('#slideEditor') as HTMLElement;
         const scrollbarVisible =
             slideEditor.scrollHeight > slideEditor.clientHeight ||
             document.documentElement.scrollHeight > document.documentElement.clientHeight;
@@ -394,9 +454,15 @@ export default class TextEditorV extends Vue {
 label {
     text-align: left !important;
 }
+
+.WETDashboard {
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
 :deep(.v-md-icon-link::before) {
     content: '\1F517';
 }
+
 :deep(.v-md-editor__tooltip) {
     text-wrap: wrap;
     overflow-wrap: break-word;
@@ -408,5 +474,9 @@ label {
 
 :deep(.v-md-icon-preview) {
     margin-left: 4px;
+}
+
+:deep(.v-md-editor-preview) {
+    position: relative;
 }
 </style>
