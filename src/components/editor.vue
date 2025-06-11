@@ -269,58 +269,73 @@
                         <div class="flex items-center flex-nowrap gap-1 justify-between md:justify-start">
                             <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
                             <!-- Preview dropdown -->
-                            <div class="dropdown editor-button">
-                                <!-- The "Preview" button - hover over it to show the options -->
-                                <button class="dropbtn flex gap-2 items-center cursor-default">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        x="0px"
-                                        y="0px"
-                                        viewBox="0 0 122.88 83.78"
-                                        style="enable-background: new 0 0 122.88 83.78"
-                                        xml:space="preserve"
-                                        width="18px"
-                                        height="18px"
-                                        class="my-0 md:my-0.5 lg:my-0"
-                                    >
-                                        <g>
-                                            <path
-                                                class="fill-current"
-                                                d="M95.73,10.81c10.53,7.09,19.6,17.37,26.48,29.86l0.67,1.22l-0.67,1.21c-6.88,12.49-15.96,22.77-26.48,29.86 C85.46,79.88,73.8,83.78,61.44,83.78c-12.36,0-24.02-3.9-34.28-10.81C16.62,65.87,7.55,55.59,0.67,43.1L0,41.89l0.67-1.22 c6.88-12.49,15.95-22.77,26.48-29.86C37.42,3.9,49.08,0,61.44,0C73.8,0,85.45,3.9,95.73,10.81L95.73,10.81z M60.79,22.17l4.08,0.39 c-1.45,2.18-2.31,4.82-2.31,7.67c0,7.48,5.86,13.54,13.1,13.54c2.32,0,4.5-0.62,6.39-1.72c0.03,0.47,0.05,0.94,0.05,1.42 c0,11.77-9.54,21.31-21.31,21.31c-11.77,0-21.31-9.54-21.31-21.31C39.48,31.71,49.02,22.17,60.79,22.17L60.79,22.17L60.79,22.17z M109,41.89c-5.5-9.66-12.61-17.6-20.79-23.11c-8.05-5.42-17.15-8.48-26.77-8.48c-9.61,0-18.71,3.06-26.76,8.48 c-8.18,5.51-15.29,13.45-20.8,23.11c5.5,9.66,12.62,17.6,20.8,23.1c8.05,5.42,17.15,8.48,26.76,8.48c9.62,0,18.71-3.06,26.77-8.48 C96.39,59.49,103.5,51.55,109,41.89L109,41.89z"
-                                            />
-                                        </g>
-                                    </svg>
-                                    <p class="truncate">{{ $t('editor.preview') }}</p>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        x="0px"
-                                        y="0px"
-                                        viewBox="0 0 122.88 66.91"
-                                        style="enable-background: new 0 0 122.88 66.91"
-                                        xml:space="preserve"
-                                        height="12"
-                                        width="12"
-                                        class="fill-current transform rotate-180"
-                                    >
-                                        <g>
-                                            <path
-                                                d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
-                                            />
-                                        </g>
-                                    </svg>
+                            <dropdown-menu
+                                class="flex-shrink-0"
+                                position="bottom-start"
+                                :tooltip="$t('editor.slides.toc.dropdownTooltip')"
+                                tooltipPlacement="bottom"
+                                tooltipPlacementAlt="left"
+                            >
+                                <template #header>
+                                    <div class="dropbtn flex gap-2 items-center cursor-default" ref="dropdownButton">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            x="0px"
+                                            y="0px"
+                                            viewBox="0 0 122.88 83.78"
+                                            style="enable-background: new 0 0 122.88 83.78"
+                                            xml:space="preserve"
+                                            width="18px"
+                                            height="18px"
+                                            class="my-0 md:my-0.5 lg:my-0"
+                                        >
+                                            <g>
+                                                <path
+                                                    class="fill-current"
+                                                    d="M95.73,10.81c10.53,7.09,19.6,17.37,26.48,29.86l0.67,1.22l-0.67,1.21c-6.88,12.49-15.96,22.77-26.48,29.86 C85.46,79.88,73.8,83.78,61.44,83.78c-12.36,0-24.02-3.9-34.28-10.81C16.62,65.87,7.55,55.59,0.67,43.1L0,41.89l0.67-1.22 c6.88-12.49,15.95-22.77,26.48-29.86C37.42,3.9,49.08,0,61.44,0C73.8,0,85.45,3.9,95.73,10.81L95.73,10.81z M60.79,22.17l4.08,0.39 c-1.45,2.18-2.31,4.82-2.31,7.67c0,7.48,5.86,13.54,13.1,13.54c2.32,0,4.5-0.62,6.39-1.72c0.03,0.47,0.05,0.94,0.05,1.42 c0,11.77-9.54,21.31-21.31,21.31c-11.77,0-21.31-9.54-21.31-21.31C39.48,31.71,49.02,22.17,60.79,22.17L60.79,22.17L60.79,22.17z M109,41.89c-5.5-9.66-12.61-17.6-20.79-23.11c-8.05-5.42-17.15-8.48-26.77-8.48c-9.61,0-18.71,3.06-26.76,8.48 c-8.18,5.51-15.29,13.45-20.8,23.11c5.5,9.66,12.62,17.6,20.8,23.1c8.05,5.42,17.15,8.48,26.76,8.48c9.62,0,18.71-3.06,26.77-8.48 C96.39,59.49,103.5,51.55,109,41.89L109,41.89z"
+                                                />
+                                            </g>
+                                        </svg>
+                                        <p class="truncate">{{ $t('editor.preview') }}</p>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            x="0px"
+                                            y="0px"
+                                            viewBox="0 0 122.88 66.91"
+                                            style="enable-background: new 0 0 122.88 66.91"
+                                            xml:space="preserve"
+                                            height="12"
+                                            width="12"
+                                            class="fill-current transform rotate-180"
+                                        >
+                                            <g>
+                                                <path
+                                                    d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
+                                                />
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </template>
+                                <!-- English config button -->
+                                <button
+                                    @click.stop="preview('en')"
+                                    class="border-b border-gray-400 dropdown-content"
+                                    :style="{ width: dropdownButtonWidth + 'px' }"
+                                >
+                                    {{ $t('editor.lang.en') }}
                                 </button>
-                                <!-- The two preview language config options: English and French -->
-                                <div class="dropdown-content w-full">
-                                    <!-- English config button -->
-                                    <button @click.stop="preview('en')" class="border-b border-gray-400">
-                                        {{ $t('editor.lang.en') }}
-                                    </button>
-                                    <!-- French config button -->
-                                    <button @click.stop="preview('fr')">{{ $t('editor.lang.fr') }}</button>
-                                </div>
-                            </div>
+                                <!-- French config button -->
+                                <button
+                                    class="dropdown-content"
+                                    @click.stop="preview('fr')"
+                                    :style="{ width: dropdownButtonWidth + 'px' }"
+                                >
+                                    {{ $t('editor.lang.fr') }}
+                                </button>
+                            </dropdown-menu>
+
                             <div class="flex flex-row gap-1">
                                 <!-- Export button -->
                                 <button
@@ -549,6 +564,7 @@ import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import HelpPanelV from './help-panel.vue';
 import HelpSectionV from './helpers/help-section.vue';
 import { useLockStore } from '@/stores/lockStore';
+import DropdownMenu from '@/components/helpers/dropdown-menu.vue';
 
 @Options({
     components: {
@@ -558,7 +574,8 @@ import { useLockStore } from '@/stores/lockStore';
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV,
         'help-panel': HelpPanelV,
-        'help-section': HelpSectionV
+        'help-section': HelpSectionV,
+        'dropdown-menu': DropdownMenu
     }
 })
 export default class EditorV extends Vue {
@@ -585,6 +602,7 @@ export default class EditorV extends Vue {
     helpSections: HelpSection[] = [];
     helpMd = '';
     originalTextArray: string[] = [];
+    dropdownButtonWidth = 0;
 
     defaultBlankSlide: Slide = {
         title: '',
@@ -628,6 +646,7 @@ export default class EditorV extends Vue {
         });
 
         observer.observe(document.querySelector('.editor-header') as Element);
+        this.dropdownButtonWidth = this.$refs.dropdownButton.offsetWidth ?? 0;
     }
 
     beforeDestroy(): void {
@@ -976,26 +995,8 @@ select:focus {
     border-radius: 3px;
 }
 
-/* Main dropdown icon - required for positioning */
-.dropdown {
-    position: relative;
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-}
-
 /* The dropdown box with the links */
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    border: 1px solid lightgray;
-}
-
-/* Links inside the dropdown */
-.dropdown-content button {
     color: black;
     padding: 7px 10px;
     text-decoration: none;
@@ -1006,18 +1007,12 @@ select:focus {
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content button:hover {
+.dropdown-content:hover {
     background-color: #e6e5e5;
 }
 
-/* Show the dropdown menu on hover or focus */
-.dropdown:hover .dropdown-content,
-.dropdown:focus-within .dropdown-content {
-    display: block;
-}
-
 /* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {
+.dropbtn:hover {
     background-color: #dbdbdb;
 }
 
