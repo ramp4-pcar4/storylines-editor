@@ -38,8 +38,8 @@
                     <td>{{ item.id }}</td>
                     <td>{{ determineEditorType(item.panel) }}</td>
                     <td>
-                        <span @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</span> |
-                        <span @click="$vfm.open(`delete-item-${idx}`)">{{ $t('editor.remove') }}</span>
+                        <button @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</button> |
+                        <button @click="$vfm.open(`delete-item-${idx}`)">{{ $t('editor.remove') }}</button>
                     </td>
 
                     <confirmation-modal
