@@ -97,6 +97,7 @@
                 <template #item="{ element, index }">
                     <li
                         class="toc-slide select-none border-t flex px-3 py-2 hover:bg-gray-50"
+                        :style="{ 'margin-inline': !isMobileSidebar ? '2px' : '0px' }"
                         :class="slideIndex === index ? 'bg-gray-100 border-gray-300' : ''"
                         :id="(isMobileSidebar ? 'mobile' : '') + 'slide' + index"
                         :key="'slide' + index"
