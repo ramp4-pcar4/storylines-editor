@@ -623,6 +623,7 @@
                 @refresh-config="refreshConfig"
                 @export-product="exportProduct"
                 @lang-change="productStore.changeLang"
+                @reconciliation-metadata-edited="onMetadataEdited"
                 ref="mainEditor"
             >
                 <!-- Metadata editing modal inside the editor -->
@@ -751,20 +752,41 @@ export default class MetadataEditorV extends Vue {
 
     // Saving properties.
     saving = false;
-    unsavedChanges = this.stateStore.isChanged;
+    unsavedChanges = this.stateStore.getIsChanged();
 
     @Watch('stateStore.isChanged')
     onChanged() {
-        this.unsavedChanges = this.stateStore.isChanged;
+        this.unsavedChanges = this.stateStore.getIsChanged();
     }
 
-    @Watch('stateStore.reconcileToggler')
-    onReconciliationRequest() {
-        const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-
-        this.productStore.configs.en = newConfigs.en;
-        this.productStore.configs.fr = newConfigs.fr;
+    onMetadataEdited(): void {
+        if (this.configs[this.configLang]) {
+            this.useConfig(this.configs[this.configLang] as StoryRampConfig, false);
+        }
+        this.updateSaveStatus(true);
+        this.stateStore.updateUndoRedoAbility();
     }
+
+    // @Watch('stateStore.reconcileToggler')
+    // onReconciliationRequest() {
+    //     const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
+    //     console.log('RECONCILED SAVE', newConfigs);
+    //
+    //     if (newConfigs?.en) {
+    //         this.configs.en = newConfigs?.en;
+    //     }
+    //
+    //     if (newConfigs?.fr) {
+    //         this.configs.fr = newConfigs?.fr;
+    //     }
+    //     // this.configs.en = newConfigs?.en ?? this.configs.en;
+    //     // this.configs.fr = newConfigs?.fr ?? this.configs.fr;
+    //     console.log('UPDATED SAVE', JSON.parse(JSON.stringify(this.configs)));
+    //
+    //     this.loadSlides(this.configs);
+    //
+    //     this.updateSaveStatus(true);
+    // }
 
     controller = new AbortController();
 
@@ -1743,7 +1765,7 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    useConfig(config: StoryRampConfig): void {
+    useConfig(config: StoryRampConfig, loadSlides?: boolean): void {
         this.metadata.title = config.title;
         this.metadata.introTitle = config.introSlide.title;
         this.metadata.introSubtitle = config.introSlide.subtitle;
@@ -1761,7 +1783,9 @@ export default class MetadataEditorV extends Vue {
         // TODO: check schema version in the config, and if it doesn't match the current version in the schema (stored in
         // this.latestSchemaVersion), the product's local repo should be re-initialized
 
-        this.loadSlides(this.productStore.configs);
+        if (loadSlides === undefined || loadSlides) {
+            this.loadSlides(this.productStore.configs);
+        }
 
         // Load product logo and the introduction slide background image (if provided).
         const logoAsset = config.introSlide.logo?.src;
