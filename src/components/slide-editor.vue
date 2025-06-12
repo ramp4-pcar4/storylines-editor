@@ -587,6 +587,7 @@ export default class SlideEditorV extends Vue {
 
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
+        console.log('SLIDECHANGED');
         this.onePanelOnly = this.currentSlide?.panel.length === 1;
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
         this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
