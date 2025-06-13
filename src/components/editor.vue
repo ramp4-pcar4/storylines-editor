@@ -456,20 +456,10 @@
                     :slideIndex="slideIndex"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
-                    @slide-edit="$emit('save-status', undefined, 'ToC')"
+                    @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
-                    @process-panel="
-                        (panel, callback, ...args) => {
-                            $emit('process-panel', panel, callback, ...args);
-                        }
-                    "
-                    :configFileStructure="configFileStructure"
-                    :lang="configLang"
-                    :sourceCounts="sourceCounts"
+                    :lang="productStore.configLang"
                 ></slide-toc>
             </div>
             <!-- Sidebar, mobile version -->
@@ -484,17 +474,7 @@
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
                     @close-sidebar="closeSidebar"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
-                    @process-panel="
-                        (panel, callback, ...args) => {
-                            $emit('process-panel', panel, callback, ...args);
-                        }
-                    "
-                    :configFileStructure="configFileStructure"
-                    :lang="configLang"
-                    :sourceCounts="sourceCounts"
+                    :lang="productStore.configLang"
                     :closeSidebar="closeSidebar"
                     :isMobileSidebar="true"
                 ></slide-toc>
@@ -505,7 +485,6 @@
                 <slide-editor
                     class="editor-area w-full"
                     ref="slide"
-                    :configFileStructure="configFileStructure"
                     :currentSlide="currentSlide"
                     :otherLangSlide="
                         slides[slideIndex]?.[slides.find((slide) => slide.fr === currentSlide) ? 'en' : 'fr']
@@ -514,14 +493,10 @@
                     :slideIndex="slideIndex"
                     :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slide-edit="onSlidesEdited"
                     @custom-slide-updated="updateCustomSlide"
-                    :sourceCounts="sourceCounts"
                 ></slide-editor>
             </div>
         </div>
@@ -541,19 +516,7 @@
 
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
-import {
-    BasePanel,
-    ConfigFileStructure,
-    HelpSection,
-    ImagePanel,
-    MetadataContent,
-    MultiLanguageSlide,
-    Slide,
-    SourceCounts,
-    StoryRampConfig,
-    SupportedLanguages,
-    TextPanel
-} from '@/definitions';
+import { HelpSection, MetadataContent, MultiLanguageSlide, Slide, SupportedLanguages, TextPanel } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import axios from 'axios';
 import { marked } from 'marked';
@@ -565,6 +528,7 @@ import ConfirmationModalV from './support/confirmation-modal.vue';
 import HelpPanelV from './help/help-panel.vue';
 import { useLockStore } from '@/stores/lockStore';
 import DropdownMenu from '@/components/support/dropdown-menu.vue';
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -578,20 +542,14 @@ import DropdownMenu from '@/components/support/dropdown-menu.vue';
     }
 })
 export default class EditorV extends Vue {
-    @Prop() configs!: {
-        [key: string]: StoryRampConfig | undefined;
-    };
-    @Prop() configFileStructure!: ConfigFileStructure | undefined;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop() metadata!: MetadataContent;
-
     @Prop() slides!: MultiLanguageSlide[];
-    @Prop() configLang!: string;
     @Prop() saving!: boolean;
     @Prop() unsavedChanges!: boolean;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     currentRoute = window.location.href;
+    productStore = useProductStore();
 
     // Form properties.
     uuid = '';
@@ -622,12 +580,12 @@ export default class EditorV extends Vue {
 
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
-        this.$emit('save-status', true);
+        this.productStore.updateSaveStatus(true);
     }
 
     @Watch('metadata', { deep: true })
     onMetadataEdited(): void {
-        this.$emit('save-status', true);
+        this.productStore.updateSaveStatus(true);
     }
 
     created(): void {
@@ -675,6 +633,8 @@ export default class EditorV extends Vue {
      * Change current slide to selected slide.
      */
     selectSlide(index: number, lang?: SupportedLanguages): void {
+        const configLang = this.productStore.configLang;
+
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();
@@ -686,8 +646,8 @@ export default class EditorV extends Vue {
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
-        const newLang = lang || this.configLang || 'en';
-        if (this.configLang !== newLang) {
+        const newLang = lang || configLang || 'en';
+        if (configLang !== newLang) {
             this.$emit('lang-change', newLang);
         }
 
@@ -712,10 +672,13 @@ export default class EditorV extends Vue {
      * Update slide for a custom config made through advanced editor.
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
-        this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? this.configLang) as keyof MultiLanguageSlide] = slideConfig;
+        const configLang = this.productStore.configLang;
 
-        this.configs[(lang ?? this.configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] = slideConfig;
+        this.currentSlide = slideConfig;
+        this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+
+        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
+            slideConfig;
 
         // save changes emitted from advanced editor
         if (save) {
@@ -732,10 +695,10 @@ export default class EditorV extends Vue {
             (bothSlides) =>
                 (this.currentSlide as Slide) === bothSlides['en'] || (this.currentSlide as Slide) === bothSlides['fr']
         );
-        this.configs.en!.slides = this.slides.map((slides) => slides.en!);
-        this.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
+        this.productStore.configs.en!.slides = this.slides.map((slides) => slides.en!);
+        this.productStore.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
 
-        this.$emit('save-status', undefined, 'Slide updated');
+        this.productStore.updateSaveStatus(undefined, 'Slide updated');
     }
 
     /**
@@ -800,7 +763,7 @@ export default class EditorV extends Vue {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
-        const previewConfigs = this.configs;
+        const previewConfigs = this.productStore.configs;
         // Replace undefined slides with empty slides, just like in final save
         previewConfigs.en!.slides = previewConfigs.en!.slides.map((slide) => {
             return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
@@ -818,7 +781,7 @@ export default class EditorV extends Vue {
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
                 configs: previewConfigs,
-                configFileStructure: this.configFileStructure,
+                configFileStructure: this.productStore.configFileStructure,
                 secret: lockStore.secret,
                 timeRemaining: lockStore.timeRemaining
             };

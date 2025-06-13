@@ -27,7 +27,11 @@
                                 />
                             </svg>
                             <p>
-                                {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                                {{
+                                    productStore.configLang === 'en'
+                                        ? $t('editor.frenchConfig')
+                                        : $t('editor.englishConfig')
+                                }}
                             </p>
                         </button>
                         <button
@@ -46,8 +50,8 @@
                     @metadata-changed="(key, value) => $emit('metadata-changed', key, value)"
                     @image-changed="(event, type) => $emit('image-changed', event, type)"
                     @image-source-changed="(event, type) => $emit('image-source-changed', event, type)"
-                    @logo-removed="$emit('logo-removed')"
-                    @background-removed="$emit('background-removed')"
+                    @logo-removed="productStore.decrementSourceCount('Logo')"
+                    @background-removed="productStore.decrementSourceCount('Background')"
                 ></metadata-content>
             </div>
         </div>
@@ -59,6 +63,7 @@ import MetadataContentV from './metadata-content.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { MetadataContent } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -77,7 +82,8 @@ import { VueFinalModal } from 'vue-final-modal';
 })
 export default class MetadataModalV extends Vue {
     @Prop() metadata!: MetadataContent;
-    @Prop() configLang: 'en' | 'fr';
+
+    productStore = useProductStore();
 }
 </script>
 
