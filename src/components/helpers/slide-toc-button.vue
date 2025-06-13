@@ -2,13 +2,13 @@
     <button
         :aria-label="content"
         class="flex gap-2 px-2 rounded-md bg-transparent hover:bg-gray-200"
-        :disabled="!element[lang]"
+        :disabled="!element[selectedLang]"
         :class="{
-            'selected-toc-config-item': element[lang] === currentSlide,
+            'selected-toc-config-item': element[selectedLang] === currentSlide,
             'py-1': !isMobileSidebar,
             'py-2': isMobileSidebar,
-            'border-2 border-blue-500': isMobileSidebar && element[lang] === currentSlide,
-            'cursor-not-allowed border-2 border-red-400': !element[lang]
+            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === currentSlide,
+            'cursor-not-allowed border-2 border-red-400': !element[selectedLang]
         }"
         @click.stop="
             $emit('select-slide');
@@ -17,14 +17,14 @@
     >
         <!-- ::lang:: text -->
         <p class="font-bold italic text-gray-500 select-none" :class="{ 'text-gray-700': isActiveSlide }">
-            {{ lang === 'en' ? 'EN' : 'FR' }}
+            {{ selectedLang === 'en' ? 'EN' : 'FR' }}
         </p>
         <!-- Config title -->
         <div class="flex flex-col gap-0.5">
             <p
                 class="text-left select-none truncate-multiline"
                 :class="{
-                    italic: !element[lang]?.title
+                    italic: !element[selectedLang]?.title
                 }"
                 v-truncate="{
                     options: {
@@ -43,7 +43,7 @@
             <div class="flex gap-0.5">
                 <button
                     :aria-label="panel?.type"
-                    v-for="(panel, panelIndex) in element[lang]?.panel"
+                    v-for="(panel, panelIndex) in element[selectedLang]?.panel"
                     class="flex gap-0.5 border rounded w-min py-0.5 px-0.5 cursor-default"
                     :class="[
                         panel?.type === 'map' && panel.shared
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Options for ::lang:: items with missing configs (e.g. one language has config, other doesn't) -->
-        <div v-if="!element[lang]" class="ml-auto flex my-auto">
+        <div v-if="!element[selectedLang]" class="ml-auto flex my-auto">
             <!-- Create a new blank config -->
             <button
                 :aria-label="$t('editor.slides.toc.newBlankConfig')"
@@ -126,7 +126,9 @@
             <!-- Only available if the slide's ::lang:: config is undefined -->
             <button
                 :aria-label="
-                    lang === 'en' ? $t('editor.slides.toc.newConfigFromFR') : $t('editor.slides.toc.newConfigFromEng')
+                    selectedLang === 'en'
+                        ? $t('editor.slides.toc.newConfigFromFR')
+                        : $t('editor.slides.toc.newConfigFromEng')
                 "
                 v-if="element[oppositeLang]"
                 class="slide-toc-button"
@@ -134,7 +136,7 @@
                     delay: '200',
                     placement: 'top-start',
                     content:
-                        lang === 'en'
+                        selectedLang === 'en'
                             ? $t('editor.slides.toc.newConfigFromFR')
                             : $t('editor.slides.toc.newConfigFromEng'),
                     animateFill: false,
@@ -157,7 +159,7 @@
 </template>
 
 <script lang="ts">
-import { BasePanel, PanelType, Slide } from '@/definitions';
+import { BasePanel, PanelType, Slide, MultiLanguageSlide } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from '@/components/helpers/toc-options.vue';
 
@@ -176,14 +178,14 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
     }
 })
 export default class SlideTocV extends Vue {
-    @Prop() lang!: string;
-    @Prop() element: Slide;
+    @Prop() selectedLang!: 'en' | 'fr';
+    @Prop() element!: MultiLanguageSlide;
     @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
-    @Prop() isActiveSlide: boolean;
+    @Prop() isActiveSlide!: boolean;
 
     oppositeLang = '';
-    content = '';
+    content: string | undefined = '';
 
     textEditorIcon = TextEditorIcon;
     imageEditorIcon = ImageEditorIcon;
@@ -212,7 +214,7 @@ export default class SlideTocV extends Vue {
         const maxLength = 130;
 
         return `<p style="justify-self: left; text-align: left"><strong>${
-            element[this.lang]?.panel.length > 1
+            element[this.selectedLang]?.panel.length > 1
                 ? this.$t('editor.slides.panelNumber', { num: panelIndex + 1 })
                 : this.$t('editor.slides.fullscreenPanel')
         }: ${this.$t(`editor.slide.panel.type.${panel?.type}`)}</strong><br/>${
@@ -226,21 +228,23 @@ export default class SlideTocV extends Vue {
     }
 
     updateContent(): void {
-        if (this.element[this.lang]?.title) {
-            this.content = this.element[this.lang]?.title;
-        } else if (this.element[this.lang]) {
+        if (this.element[this.selectedLang]?.title) {
+            this.content = this.element[this.selectedLang]?.title;
+        } else if (this.element[this.selectedLang]?.title === '') {
             this.content =
-                this.lang === 'en'
+                this.selectedLang === 'en'
                     ? this.$t('editor.slides.toc.newENGSlideText')
                     : this.$t('editor.slides.toc.newFRSlideText');
         } else {
             this.content =
-                this.lang === 'en' ? this.$t('editor.slide.toc.noENGslide') : this.$t('editor.slide.toc.noFRSlide');
+                this.selectedLang === 'en'
+                    ? this.$t('editor.slide.toc.noENGslide')
+                    : this.$t('editor.slide.toc.noFRSlide');
         }
     }
 
     mounted(): void {
-        this.oppositeLang = this.lang === 'en' ? 'fr' : 'en';
+        this.oppositeLang = this.selectedLang === 'en' ? 'fr' : 'en';
         this.updateContent();
     }
 

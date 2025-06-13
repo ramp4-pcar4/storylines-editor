@@ -69,12 +69,13 @@
 <script lang="ts">
 import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
+import { MapPanel, TimeSliderConfig } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import defaultConfig from '../../ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
 import { createInstance as createRampEditorInstance } from 'ramp-config-editor_editeur-config-pcar';
 import 'ramp-config-editor_editeur-config-pcar/style.css';
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -84,13 +85,12 @@ import 'ramp-config-editor_editeur-config-pcar/style.css';
 })
 export default class MapEditorV extends Vue {
     @Prop() panel!: MapPanel;
-    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
 
     stateStore = useStateStore();
+    productStore = useProductStore();
 
     // config editor
     rampEditorApi: any = '';
@@ -143,20 +143,14 @@ export default class MapEditorV extends Vue {
 
     createNewConfig(): void {
         // Update the path to the new file.
-        // TODO: ensure that this is not a name already in use?
-        this.panel.config = `${this.configFileStructure.uuid}/ramp-config/${this.configFileStructure.uuid}-map-${
-            this.getNumberOfMaps() + 1
-        }.json`;
+        const uuid = this.productStore.configFileStructure.uuid;
+        this.panel.config = `${uuid}/ramp-config/${uuid}-map-${this.getNumberOfMaps() + 1}.json`;
         this.strippedFileName = this.panel.config.split('/')[2].split('.')[0];
 
-        if (this.sourceCounts[this.panel.config]) {
-            this.sourceCounts[this.panel.config] += 1;
-        } else {
-            this.sourceCounts[this.panel.config] = 1;
-        }
+        this.productStore.incrementSourceCount(this.panel.config);
 
         // Create the new map configuration file in the ZIP folder. Copies the `config-default.json` file from the `ramp-editor` folder and renames it.
-        this.configFileStructure.rampConfig.file(
+        this.productStore.configFileStructure.rampConfig.file(
             `${this.strippedFileName}.json`,
             JSON.stringify(defaultConfig, null, 4)
         );
@@ -175,7 +169,7 @@ export default class MapEditorV extends Vue {
         if (this.panel.config) {
             // Check if the config file exists in the ZIP folder first.
             const assetSrc = `${this.panel.config.substring(this.panel.config.indexOf('/') + 1)}`;
-            const configFile = this.configFileStructure.zip.file(assetSrc);
+            const configFile = this.productStore.configFileStructure.zip.file(assetSrc);
 
             if (configFile) {
                 configFile.async('string').then((res: string) => {
@@ -205,7 +199,7 @@ export default class MapEditorV extends Vue {
 
     saveChanges(): void {
         // Add map config to ZIP file.
-        this.configFileStructure.rampConfig.file(
+        this.productStore.configFileStructure.rampConfig.file(
             `${this.strippedFileName}.json`,
             JSON.stringify(this.rampEditorApi.getConfig(), null, 4)
         );
@@ -242,7 +236,7 @@ export default class MapEditorV extends Vue {
 
     getNumberOfMaps(): number {
         let n = 0;
-        this.configFileStructure.rampConfig.forEach((f) => {
+        this.productStore.configFileStructure.rampConfig.forEach((f) => {
             n += 1;
         });
         return n;
