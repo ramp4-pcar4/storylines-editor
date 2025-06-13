@@ -3,6 +3,7 @@ import JSZip from 'jszip';
 export type SupportedLanguages = 'en' | 'fr';
 
 export interface StoryRampConfig {
+    schemaVersion: string;
     title: string;
     lang: string;
     introSlide: Intro;
@@ -144,7 +145,6 @@ export interface Intro {
     title: string;
     subtitle: string;
     blurb?: string;
-    backgroundImage?: string;
     backgroundImage: string;
     titleColour?: string;
     subtitleColour?: string;

@@ -21,13 +21,7 @@
         </div>
         <!-- Text Section -->
         <div v-if="editingStatus === 'text'">
-            <component
-                :is="'text-editor'"
-                key="text"
-                :panel="panel"
-                :configFileStructure="configFileStructure"
-                :lang="lang"
-            ></component>
+            <component :is="'text-editor'" key="text" :panel="panel" :lang="lang"></component>
         </div>
         <div v-if="editingStatus === 'panels'">
             <table class="w-2/3 mt-5">
@@ -47,7 +41,7 @@
                     <confirmation-modal
                         :name="`delete-item-${idx}`"
                         :message="$t('dynamic.panel.remove')"
-                        @ok="() => removeSlide(item as any, idx)"
+                        @ok="() => removeSlide(item.panel as any, idx)"
                     />
                 </tr>
                 <tr class="table-add-row">
@@ -92,15 +86,10 @@
                     :is="editors[determineEditorType(panel.children[editingSlide].panel)]"
                     :key="editingSlide + determineEditorType(panel.children[editingSlide].panel)"
                     :panel="panel.children[editingSlide].panel"
-                    :configFileStructure="configFileStructure"
                     :lang="lang"
-                    :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit', 'Dynamic editor')"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
                 ></component>
             </div>
         </div>
@@ -112,18 +101,10 @@ import { Options, Prop, Vue } from 'vue-property-decorator';
 import {
     BasePanel,
     BaseStartingConfig,
-    ChartPanel,
-    ConfigFileStructure,
     DefaultConfigs,
     DynamicChildItem,
     DynamicPanel,
-    ImagePanel,
-    MapPanel,
-    PanelType,
-    SlideshowPanel,
-    SourceCounts,
-    TextPanel,
-    VideoPanel
+    PanelType
 } from '@/definitions';
 
 import ChartEditorV from './chart-editor.vue';
@@ -133,6 +114,7 @@ import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
 import SlideshowEditorV from './slideshow-editor.vue';
 import ConfirmationModalV from '../support/confirmation-modal.vue';
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -148,11 +130,11 @@ import ConfirmationModalV from '../support/confirmation-modal.vue';
 })
 export default class DynamicEditorV extends Vue {
     @Prop() panel!: DynamicPanel;
-    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop() centerSlide!: boolean;
     @Prop() dynamicSelected!: boolean;
+
+    productStore = useProductStore();
 
     editors: Record<string, string> = {
         text: 'text-editor',
@@ -190,58 +172,7 @@ export default class DynamicEditorV extends Vue {
 
     removeSlide(panel: BasePanel, index?: number): void {
         // Update source counts based on which panel is removed.
-        switch (panel?.type) {
-            case 'map': {
-                const mapPanel = panel as MapPanel;
-                this.sourceCounts[mapPanel.config] -= 1;
-                if (this.sourceCounts[mapPanel.config] === 0) {
-                    this.configFileStructure.zip.remove(
-                        `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
-                    );
-                }
-                break;
-            }
-
-            case 'chart': {
-                const chartPanel = panel as ChartPanel;
-                this.sourceCounts[chartPanel.src] -= 1;
-                if (this.sourceCounts[chartPanel.src] === 0) {
-                    this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
-                }
-                break;
-            }
-
-            case 'image': {
-                const imagePanel = panel as ImagePanel;
-
-                this.sourceCounts[imagePanel.src] -= 1;
-                if (this.sourceCounts[imagePanel.src] === 0) {
-                    this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
-                }
-                break;
-            }
-
-            case 'slideshow': {
-                const slideshowPanel = panel as SlideshowPanel;
-                slideshowPanel.items.forEach((item: TextPanel | ImagePanel | MapPanel | ChartPanel) => {
-                    this.removeSlide(item);
-                });
-                break;
-            }
-
-            case 'video': {
-                const videoPanel = panel as VideoPanel;
-                if (videoPanel.videoType === 'local') {
-                    this.sourceCounts[videoPanel.src] -= 1;
-                    if (this.sourceCounts[videoPanel.src] === 0) {
-                        this.configFileStructure.zip.remove(
-                            `${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`
-                        );
-                    }
-                }
-                break;
-            }
-        }
+        this.productStore.removeSourceCounts(panel);
 
         if (index !== undefined) {
             // Remove the panel itself.
