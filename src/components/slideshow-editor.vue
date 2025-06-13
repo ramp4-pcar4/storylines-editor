@@ -230,13 +230,8 @@
                         ref="slideEditor"
                         :is="editors[newSlideType]"
                         :panel="JSON.parse(JSON.stringify(startingConfig[newSlideType]))"
-                        :configFileStructure="configFileStructure"
                         :lang="lang"
-                        :sourceCounts="sourceCounts"
                         :allowMany="false"
-                        @shared-asset="(oppositeAssetPath: string, sharedAssetName: string, oppositeLang: string) => {
-                            $emit('shared-asset', oppositeAssetPath, sharedAssetName, oppositeLang);
-                        }"
                     ></component>
                 </div>
                 <div v-else>
@@ -245,14 +240,9 @@
                         ref="slideEditor"
                         :is="editors[panel.items[editingIdx].type]"
                         :panel="panel.items[editingIdx]"
-                        :configFileStructure="configFileStructure"
                         :lang="lang"
-                        :sourceCounts="sourceCounts"
                         :key="editingIdx + panel.items[editingIdx].type"
                         :allowMany="false"
-                        @shared-asset="(oppositeAssetPath: string, sharedAssetName: string, oppositeLang: string) => {
-                            $emit('shared-asset', oppositeAssetPath, sharedAssetName, oppositeLang);
-                        }"
                     ></component>
                 </div>
             </div>
@@ -262,24 +252,15 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import {
-    BasePanel,
-    BaseStartingConfig,
-    ChartPanel,
-    ConfigFileStructure,
-    DefaultConfigs,
-    ImagePanel,
-    MapPanel,
-    PanelType,
-    SlideshowPanel,
-    SourceCounts
-} from '@/definitions';
+import { BasePanel, BaseStartingConfig, DefaultConfigs, PanelType, SlideshowPanel } from '@/definitions';
 
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
+
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -292,9 +273,9 @@ import VideoEditorV from './video-editor.vue';
 })
 export default class SlideshowEditorV extends Vue {
     @Prop() panel!: SlideshowPanel;
-    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: SourceCounts;
+
+    productStore = useProductStore();
 
     editors: Record<string, string> = {
         text: 'text-editor',
@@ -344,40 +325,7 @@ export default class SlideshowEditorV extends Vue {
         const panel = this.panel.items.find((panel: BasePanel, idx: number) => idx === item);
 
         // Update source counts based on which panel is removed.
-        switch (panel?.type) {
-            case 'map': {
-                const mapPanel = panel as MapPanel;
-                this.sourceCounts[mapPanel.config] -= 1;
-                if (this.sourceCounts[mapPanel.config] === 0) {
-                    this.configFileStructure.zip.remove(
-                        `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
-                    );
-                }
-                break;
-            }
-
-            case 'chart': {
-                const chartPanel = panel as ChartPanel;
-                this.sourceCounts[chartPanel.src] -= 1;
-                if (this.sourceCounts[chartPanel.src] === 0) {
-                    this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
-                }
-                break;
-            }
-
-            case 'image': {
-                const imagePanel = panel as ImagePanel;
-                this.sourceCounts[imagePanel.src] -= 1;
-                if (this.sourceCounts[imagePanel.src] === 0) {
-                    this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
-                }
-                break;
-            }
-
-            case 'text': {
-                break;
-            }
-        }
+        this.productStore.removeSourceCounts(panel as BasePanel);
 
         // Remove the panel itself.
         this.panel.items = this.panel.items.filter((panel: BasePanel, idx: number) => idx !== item);

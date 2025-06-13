@@ -44,8 +44,6 @@
                     <ChartPreview
                         :key="`${element.name}-${index}`"
                         :chart="element"
-                        :configFileStructure="configFileStructure"
-                        :sourceCounts="sourceCounts"
                         :lang="lang"
                         :index="index"
                         @edit="editChart"
@@ -67,18 +65,12 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import {
-    ChartConfig,
-    ChartPanel,
-    ConfigFileStructure,
-    Highchart,
-    PanelType,
-    SlideshowChartPanel,
-    SourceCounts
-} from '@/definitions';
+import { ChartConfig, ChartPanel, Highchart, PanelType, SlideshowChartPanel } from '@/definitions';
 import ChartPreviewV from './helpers/chart-preview.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
+
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -89,12 +81,12 @@ import draggable from 'vuedraggable';
 })
 export default class ChartEditorV extends Vue {
     @Prop() panel!: ChartPanel | SlideshowChartPanel;
-    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop({ default: true }) allowMany!: boolean;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    productStore = useProductStore();
 
     edited = false;
 
@@ -181,17 +173,17 @@ export default class ChartEditorV extends Vue {
 
     createNewChart(chartInfo: string): void {
         const chart = JSON.parse(chartInfo);
-        const chartSrc = `${this.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
+        const chartSrc = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
 
         // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
-        if (this.sourceCounts[chartSrc] > 0) {
+        if (this.productStore.sourceExists(chartSrc)) {
             alert(
                 this.$t('editor.chart.label.nameExists', {
                     name: chart.title.text
                 })
             );
 
-            // Re-open the editor the the issue can be fixed.
+            // Re-open the editor.
             setTimeout(() => this.modalEditor.show(), 100);
         } else {
             const chartConfig = {
@@ -199,41 +191,41 @@ export default class ChartEditorV extends Vue {
                 src: chartSrc
             };
 
-            if (this.sourceCounts[chartSrc]) {
-                this.sourceCounts[chartSrc] += 1;
-            } else {
-                this.sourceCounts[chartSrc] = 1;
-            }
+            this.productStore.incrementSourceCount(chartSrc);
 
             // Add chart config to ZIP file.
-            this.configFileStructure.charts[this.lang].file(`${chart.title.text}.json`, JSON.stringify(chart, null, 4));
+            this.productStore.configFileStructure.charts[this.lang].file(
+                `${chart.title.text}.json`,
+                JSON.stringify(chart, null, 4)
+            );
             this.chartConfigs.push(chartConfig);
         }
         this.onChartsEdited();
     }
 
     editChart(chartInfo: { oldChart: ChartConfig; newChart: ChartConfig }): void {
+        const uuid = this.productStore.configFileStructure.uuid;
         const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chartInfo.oldChart.name);
-        if (idx !== -1) {
-            // Remove old chart config from ZIP file and add in new one.
-            const oldName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.oldChart.name}.json`;
-            this.sourceCounts[oldName] -= 1;
-            if (this.sourceCounts[oldName] === 0) {
-                this.configFileStructure.charts[this.lang].remove(`${chartInfo.oldChart.name}.json`);
-            }
 
-            const newName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.newChart.name}.json`;
-            if (this.sourceCounts[newName]) {
-                this.sourceCounts[newName] += 1;
-            } else {
-                this.sourceCounts[newName] = 1;
-            }
-            this.configFileStructure.charts[this.lang].file(
+        if (idx !== -1) {
+            const chartPath = `${uuid}/charts/${this.lang}/`;
+
+            // Remove old chart config from ZIP file.
+            const oldName = `${chartPath}/${chartInfo.oldChart.name}.json`;
+            this.productStore.decrementSourceCount(oldName);
+
+            // Add the new chart config to the ZIP file and increment the source count.
+            const newName = `${chartPath}/${chartInfo.newChart.name}.json`;
+            this.productStore.incrementSourceCount(newName);
+
+            this.productStore.configFileStructure.charts[this.lang].file(
                 `${chartInfo.newChart.name}.json`,
                 JSON.stringify(chartInfo.newChart.config, null, 4)
             );
 
-            chartInfo.newChart.src = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.newChart.name}.json`;
+            const newChartPath = `${uuid}/charts/${this.lang}/${chartInfo.newChart.name}.json`;
+
+            chartInfo.newChart.src = newChartPath;
             this.chartConfigs[idx] = {
                 name: chartInfo.newChart.name,
                 src: chartInfo.newChart.src
@@ -245,11 +237,9 @@ export default class ChartEditorV extends Vue {
     deleteChart(chart: ChartConfig): void {
         const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
         if (idx !== -1) {
+            const filePath = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`;
             // Remove the chart from the config file.
-            this.sourceCounts[`${this.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] -= 1;
-            if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] === 0) {
-                this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
-            }
+            this.productStore.decrementSourceCount(filePath);
             this.chartConfigs.splice(idx, 1);
         }
         this.onChartsEdited();

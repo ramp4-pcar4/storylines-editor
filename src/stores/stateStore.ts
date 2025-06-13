@@ -60,6 +60,7 @@ export interface Save {
 }
 
 const MAX_STATE_CHANGES = 30;
+const REQUIRED_PROPS = ['type', 'title', 'src', 'content'];
 
 // @ts-ignore
 function replaceByClonedSource(options) {
@@ -76,7 +77,7 @@ function purgeFalses(obj: any): any {
     }
 
     return Object.entries(obj).reduce((acc, [key, value]) => {
-        if (value !== null && value !== undefined && value) {
+        if ((value !== null && value !== undefined && value) || REQUIRED_PROPS.includes(key)) {
             acc[key] = typeof value === 'object' ? purgeFalses(value) : value;
         }
         return acc;
