@@ -466,7 +466,7 @@ export default class SlideTocV extends Vue {
         });
         this.selectSlide(this.slides.length - 1, this.lang);
         this.$emit('slides-updated', this.slides);
-        this.scrollToElement(this.slides.length - 1);
+        this.$emit('scroll-to-element', this.slides.length - 1);
     }
 
     /**
@@ -479,19 +479,7 @@ export default class SlideTocV extends Vue {
         slides[currLang] = undefined;
         this.$emit('slides-updated', this.slides);
     }
-
-    /**
-     * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
-     * @param index The index of the slide to scroll to.
-     */
-    scrollToElement(index: number): void {
-        setTimeout(() => {
-            document
-                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 10);
-    }
-
+    
     // Assumes that you've already checked that the other lang DOES have a config.
     copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
         const oppositeLang = currLang === 'en' ? 'fr' : 'en';
@@ -592,8 +580,7 @@ export default class SlideTocV extends Vue {
         this.$emit('slides-updated', this.slides);
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
-        this.scrollToElement(index + 1);
-    }
+        this.$emit('scroll-to-element', index + 1)}
 
     removeSlide(index: number): void {
         if (index === this.slideIndex) {
@@ -688,11 +675,12 @@ export default class SlideTocV extends Vue {
 
     moveUp(index: number): void {
         this.moveDown(index - 1);
+        this.$emit('scroll-to-element', index - 1);
     }
 
     moveDown(index: number): void {
         this.slides.splice(index + 1, 0, this.slides.splice(index, 1)[0]);
-        this.scrollToElement(index + 1);
+        this.$emit('scroll-to-element', index + 1);
         this.$emit('slides-updated', this.slides);
     }
 
