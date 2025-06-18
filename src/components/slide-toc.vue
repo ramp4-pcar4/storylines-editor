@@ -466,7 +466,7 @@ export default class SlideTocV extends Vue {
         });
         this.selectSlide(this.slides.length - 1, this.lang);
         this.$emit('slides-updated', this.slides);
-        this.scrollToElement(this.slides.length - 1);
+        this.$emit('scroll-to-element', this.slides.length - 1)
     }
 
     /**
@@ -479,19 +479,7 @@ export default class SlideTocV extends Vue {
         slides[currLang] = undefined;
         this.$emit('slides-updated', this.slides);
     }
-
-    /**
-     * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
-     * @param index The index of the slide to scroll to.
-     */
-    scrollToElement(index: number): void {
-        setTimeout(() => {
-            document
-                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 10);
-    }
-
+    
     // Assumes that you've already checked that the other lang DOES have a config.
     copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
         const oppositeLang = currLang === 'en' ? 'fr' : 'en';

@@ -758,6 +758,7 @@ export default class SlideEditorV extends Vue {
 
     selectSlide(index: number, lang?: SupportedLanguages): void {
         this.$emit('slide-change', index, lang);
+        this.$emit('scroll-to-element', index);
     }
 
     cancelTypeChange(): void {
