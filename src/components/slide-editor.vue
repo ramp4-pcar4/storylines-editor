@@ -556,6 +556,7 @@ export default class SlideEditorV extends Vue {
     @Prop() isLast!: boolean;
     @Prop() sourceCounts!: SourceCounts;
     @Prop() otherLangSlide!: Slide;
+    @Prop({ default: false }) isMobileSidebar!: boolean;
 
     panelIndex = 0;
     advancedEditorView = false;
@@ -758,6 +759,19 @@ export default class SlideEditorV extends Vue {
 
     selectSlide(index: number, lang?: SupportedLanguages): void {
         this.$emit('slide-change', index, lang);
+        this.scrollToElement(index);
+    }
+
+        /**
+     * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
+     * @param index The index of the slide to scroll to.
+     */
+    scrollToElement(index: number): void {
+        setTimeout(() => {
+            document
+                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 10);
     }
 
     cancelTypeChange(): void {
