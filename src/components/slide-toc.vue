@@ -466,7 +466,7 @@ export default class SlideTocV extends Vue {
         });
         this.selectSlide(this.slides.length - 1, this.lang);
         this.$emit('slides-updated', this.slides);
-        this.scrollToElement(this.slides.length - 1);
+        this.$emit('scroll-to-element', this.slides.length - 1);
     }
 
     /**
@@ -478,18 +478,6 @@ export default class SlideTocV extends Vue {
         slides[currLang].panels.forEach((panel: BasePanel) => this.removeSourceHelper(panel));
         slides[currLang] = undefined;
         this.$emit('slides-updated', this.slides);
-    }
-
-    /**
-     * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
-     * @param index The index of the slide to scroll to.
-     */
-    scrollToElement(index: number): void {
-        setTimeout(() => {
-            document
-                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 10);
     }
 
     // Assumes that you've already checked that the other lang DOES have a config.
@@ -592,7 +580,7 @@ export default class SlideTocV extends Vue {
         this.$emit('slides-updated', this.slides);
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
-        this.scrollToElement(index + 1);
+        this.$emit('scroll-to-element', index + 1);
     }
 
     removeSlide(index: number): void {
@@ -688,11 +676,12 @@ export default class SlideTocV extends Vue {
 
     moveUp(index: number): void {
         this.moveDown(index - 1);
+        this.$emit('scroll-to-element', index - 1);
     }
 
     moveDown(index: number): void {
         this.slides.splice(index + 1, 0, this.slides.splice(index, 1)[0]);
-        this.scrollToElement(index + 1);
+        this.$emit('scroll-to-element', index + 1);
         this.$emit('slides-updated', this.slides);
     }
 
@@ -703,7 +692,7 @@ export default class SlideTocV extends Vue {
     resizeMobile(): void {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
-        
+
         if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
         } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
@@ -717,7 +706,6 @@ export default class SlideTocV extends Vue {
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeMobile);
     }
-    
 }
 
 // More accurate page height for mobile
@@ -731,7 +719,6 @@ window.addEventListener('resize', () => {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -753,7 +740,7 @@ window.addEventListener('resize', () => {
 }
 
 .toc-slide {
-  cursor: grab;
+    cursor: grab;
 }
 
 .toc-slide-button {
