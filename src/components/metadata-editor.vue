@@ -694,6 +694,8 @@ import {
     MultiLanguageSlide,
     PanelType,
     Slide,
+    SlideshowChart,
+    SlideshowImage,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -1632,6 +1634,17 @@ export default class MetadataEditorV extends Vue {
                     this.panelSourceHelper(item);
                 });
                 break;
+            case PanelType.SlideshowImage:
+                (panel as SlideshowImage).items.forEach((item: ImagePanel) => {
+                    this.panelSourceHelper(item);
+                });
+                break;
+            case PanelType.SlideshowChart:
+                (panel as SlideshowChart).items.forEach((item: ChartPanel) => {
+                    this.panelSourceHelper(item);
+                });
+                break;
+
             case PanelType.Chart:
                 this.incrementSourceCount((panel as ChartPanel).src);
                 break;
@@ -2089,7 +2102,6 @@ export default class MetadataEditorV extends Vue {
         if (this.configs[this.configLang]) {
             this.useConfig(this.configs[this.configLang] as StoryRampConfig);
             this.findSources(this.configs); // increments source counts for all panels
-
             // Update router path
             if (this.reloadExisting) {
                 this.loadEditor = true;
