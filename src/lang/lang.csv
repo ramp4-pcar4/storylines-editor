@@ -167,6 +167,9 @@ editor.confirmOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,A
 editor.resetChanges,Reset Changes,1,Annuler,1
 editor.refreshChanges.modal,"Are you sure you want to reload the product? All unsaved changes will be lost.",1,"Voulez-vous vraiment recharger ce produit? Toute modification non enregistrée sera perdue.",1
 editor.changeLang.modal,"Are you sure you want to switch languages? Unsaved changes may be lost.",1,"Voulez-vous vraiment changer de langue? Toute modification non enregistrée sera perdue.",1
+editor.wetDashboard.title,WET Component Dashboard,1,Tableau de bord des composants WET,0
+editor.wetDashboard.info,"Please check the <a class='font-bold alert-link' target='_NEW' href='https://wet-boew.github.io/wet-boew-styleguide/index-en.html'>WET design documentation</a> to ensure that you are following the specified accessibility guidelines.",1,"Veuillez consulter la <a class='font-bold alert-link' target='_NEW' href='https://wet-boew.github.io/wet-boew-styleguide/index-fr.html'>documentation de conception WET</a> pour vous assurer que vous suivez les directives d'accessibilité spécifiées.",0
+editor.enterText,Enter Text,1,Entrez le texte,0
 editor.frenchConfig,View French Config,1,Afficher la configuration en français,1
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,1
 editor.returnToLanding,Return to Landing,1,Retour à la page d’accueil,1
