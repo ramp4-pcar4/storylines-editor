@@ -98,9 +98,16 @@
                                 <input
                                     :id="'imgHeight' + index"
                                     class="editor-input w-full"
-                                    type="text"
+                                    type="number"
                                     v-model="element.height"
                                     @change="onImagesEdited"
+                                    @keydown="
+                                        (e) => {
+                                            if (isNaN(Number(e.key)) && e.key !== 'Backspace' && e.key !== 'Tab') {
+                                                e.preventDefault();
+                                            }
+                                        }
+                                    "
                                 />
                             </div>
 
@@ -134,9 +141,16 @@
                                 <input
                                     :id="'imgWidth' + index"
                                     class="editor-input w-full"
-                                    type="text"
+                                    type="number"
                                     v-model="element.width"
                                     @change="onImagesEdited"
+                                    @keydown="
+                                        (e) => {
+                                            if (isNaN(Number(e.key)) && e.key !== 'Backspace' && e.key !== 'Tab') {
+                                                e.preventDefault();
+                                            }
+                                        }
+                                    "
                                 />
                             </div>
                         </div>
