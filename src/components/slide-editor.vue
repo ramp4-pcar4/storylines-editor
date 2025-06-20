@@ -1,6 +1,6 @@
 <template>
     <div id="slideEditor" class="p-5">
-        <div v-if="!!currentSlide">
+        <div v-if="!!currentSlide && slideIndex !== -1">
             <div class="flex">
                 <div class="flex flex-col w-full">
                     <div class="flex justify-between flex-wrap gap-3 gap-y-1 items-center">
@@ -146,6 +146,7 @@
                     @click="
                         () => {
                             panelIndex = 0;
+                            stateStore.selectedPanelIndex = 0;
                             advancedEditorView = false;
                             saveChanges();
                         }
@@ -210,6 +211,7 @@
                 <button
                     @click="
                         () => {
+                            stateStore.selectedPanelIndex = 1;
                             panelIndex = 1;
                             advancedEditorView = false;
                             saveChanges();
@@ -291,6 +293,7 @@
                 <button
                     @click="
                         () => {
+                            stateStore.selectedPanelIndex = 0;
                             advancedEditorView = false;
                             saveChanges();
                         }
@@ -527,6 +530,7 @@
 <script lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
 import MultiOptionModal from '@/components/support/multi-option-modal.vue';
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -595,6 +599,8 @@ export default class SlideEditorV extends Vue {
     centerPanel = false;
     includeInToc = true;
     dynamicSelected = false;
+
+    stateStore = useStateStore();
 
     currentRoute = window.location.href;
 

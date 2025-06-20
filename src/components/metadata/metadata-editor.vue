@@ -427,7 +427,11 @@
                             </section>
                             <!-- ENG/FR config language toggle -->
                             <a class="sub-link" @click="swapLang()" tabindex="0">
-                                {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                                {{
+                                    stateStore.configLang === 'en'
+                                        ? $t('editor.frenchConfig')
+                                        : $t('editor.englishConfig')
+                                }}
                             </a>
                             <!-- Metadata form -->
                             <div class="px-4 md:px-8 py-5 border rounded-md">
@@ -604,7 +608,6 @@
                 :sourceCounts="sourceCounts"
                 :metadata="metadata"
                 :slides="slides"
-                :configLang="configLang"
                 :saving="saving"
                 :unsavedChanges="unsavedChanges"
                 @shared-asset="updateToSharedAsset"
@@ -613,7 +616,6 @@
                 @save-status="updateSaveStatus"
                 @refresh-config="refreshConfig"
                 @export-product="exportProduct"
-                @lang-change="changeLang"
                 @reconciliation-metadata-edited="onMetadataEdited"
                 ref="mainEditor"
             >
@@ -622,7 +624,6 @@
                 <template v-slot:metadataModal>
                     <metadata-modal
                         :metadata="metadata"
-                        :configLang="configLang"
                         @save-changes="saveMetadata(false)"
                         @lang-change="swapLang()"
                         @logo-removed="decrementSourceCount('Logo')"
@@ -674,11 +675,13 @@ import {
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
+    SupportedLanguages,
     TextPanel,
     VideoPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
-import { useUserStore } from '../../stores/userStore';
+import { VueFinalModal } from 'vue-final-modal';
+import { useUserStore } from '@/stores/userStore';
 import { computed } from 'vue';
 
 import JSZip from 'jszip';
@@ -746,7 +749,6 @@ export default class MetadataEditorV extends Vue {
     loadEditor = false;
     error = false; // whether an error has occurred
     warning: 'none' | 'uuid' | 'rename' | 'blank' | 'badChar' | 'uuidNotFound' = 'none'; // used for duplicate uuid warning
-    configLang = 'en';
     currLang = 'en'; // page language
     showDropdown = false;
     highlightedIndex = -1;
@@ -768,33 +770,17 @@ export default class MetadataEditorV extends Vue {
     }
 
     onMetadataEdited(): void {
-        if (this.configs[this.configLang]) {
-            this.useConfig(this.configs[this.configLang] as StoryRampConfig, false);
+        // Reload both metadata languages. Start with the other and then the current.
+        const otherLang = this.stateStore.configLang === 'en' ? 'fr' : 'en';
+        if (this.configs[otherLang]) {
+            this.useConfig(this.configs[otherLang] as StoryRampConfig, true);
+        }
+        if (this.configs[this.stateStore.configLang]) {
+            this.useConfig(this.configs[this.stateStore.configLang] as StoryRampConfig, true);
         }
         this.updateSaveStatus(true);
         this.stateStore.updateUndoRedoAbility();
     }
-
-    // @Watch('stateStore.reconcileToggler')
-    // onReconciliationRequest() {
-    //     const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-    //     console.log('RECONCILED SAVE', newConfigs);
-    //
-    //     if (newConfigs?.en) {
-    //         this.configs.en = newConfigs?.en;
-    //     }
-    //
-    //     if (newConfigs?.fr) {
-    //         this.configs.fr = newConfigs?.fr;
-    //     }
-    //     // this.configs.en = newConfigs?.en ?? this.configs.en;
-    //     // this.configs.fr = newConfigs?.fr ?? this.configs.fr;
-    //     console.log('UPDATED SAVE', JSON.parse(JSON.stringify(this.configs)));
-    //
-    //     this.loadSlides(this.configs);
-    //
-    //     this.updateSaveStatus(true);
-    // }
 
     controller = new AbortController();
 
@@ -915,7 +901,7 @@ export default class MetadataEditorV extends Vue {
         this.loadExisting = this.editExisting;
         // Generate UUID for new product
         this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
-        this.configLang = (this.$route.params.lang as string) || 'en';
+        this.stateStore.configLang = (this.$route.params.lang as SupportedLanguages) || 'en';
 
         // Initialize Storylines config and the configuration structure.
         this.configs = { en: undefined, fr: undefined };
@@ -942,7 +928,7 @@ export default class MetadataEditorV extends Vue {
             // Properties already passed in props and storyline is locked, load editor view (could use a refactor to clean up this workflow process)
             if (props && props.configs && props.configFileStructure && this.lockStore.uuid) {
                 this.configs = props.configs;
-                this.configLang = props.configLang;
+                this.stateStore.configLang = props.configLang as SupportedLanguages;
                 this.configFileStructure = props.configFileStructure;
                 this.metadata = props.metadata;
                 // this.slides = props.slides;
@@ -953,8 +939,8 @@ export default class MetadataEditorV extends Vue {
                 this.loadSlides(props.configs);
 
                 // Load product logo and the introduction slide background image (if provided).
-                const logoAsset = this.configs[this.configLang]?.introSlide.logo?.src;
-                const introBgAsset = this.configs[this.configLang]?.introSlide.backgroundImage;
+                const logoAsset = this.configs[this.stateStore.configLang]?.introSlide.logo?.src;
+                const introBgAsset = this.configs[this.stateStore.configLang]?.introSlide.backgroundImage;
 
                 Promise.all([
                     this.processAsset(logoAsset, this.metadata.logoName),
@@ -1103,10 +1089,6 @@ export default class MetadataEditorV extends Vue {
         });
     }
 
-    changeLang(lang: string): void {
-        this.configLang = lang;
-    }
-
     /**
      * Open current editor config as a new Storylines product in new tab.
      * Note: Preview button on metadata editor will only show when editing an existing product, not when creating a new one
@@ -1118,7 +1100,7 @@ export default class MetadataEditorV extends Vue {
         setTimeout(() => {
             const routeData = this.$router.resolve({
                 name: 'preview',
-                params: { lang: this.configLang, uid: this.uuid }
+                params: { lang: this.stateStore.configLang, uid: this.uuid }
             });
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
@@ -1162,8 +1144,8 @@ export default class MetadataEditorV extends Vue {
     generateNewConfig(): void {
         const configZip = new JSZip();
         // Generate a new configuration file and populate required fields.
-        this.configs[this.configLang] = this.configHelper();
-        const config = this.configs[this.configLang] as StoryRampConfig;
+        this.configs[this.stateStore.configLang] = this.configHelper();
+        const config = this.configs[this.stateStore.configLang] as StoryRampConfig;
         config.introSlide.logo.altText = this.metadata.logoAltText ?? '';
         config.schemaVersion = this.latestSchemaVersion;
 
@@ -1187,13 +1169,13 @@ export default class MetadataEditorV extends Vue {
 
         config.slides = [];
 
-        const otherLang = this.configLang === 'en' ? 'fr' : 'en';
+        const otherLang = this.stateStore.configLang === 'en' ? 'fr' : 'en';
         this.configs[otherLang] = cloneDeep(config);
         (this.configs[otherLang] as StoryRampConfig).lang = otherLang;
         const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
 
         // Add the newly generated Storylines configuration file to the ZIP file.
-        const fileName = `${this.uuid}_${this.configLang}.json`;
+        const fileName = `${this.uuid}_${this.stateStore.configLang}.json`;
         const formattedConfigFile = JSON.stringify(config, null, 4);
 
         configZip.file(fileName, formattedConfigFile);
@@ -1206,7 +1188,7 @@ export default class MetadataEditorV extends Vue {
     configHelper(): StoryRampConfig {
         return {
             title: this.metadata.title,
-            lang: this.configLang,
+            lang: this.stateStore.configLang,
             introSlide: {
                 logo: {
                     src: ''
@@ -1679,11 +1661,11 @@ export default class MetadataEditorV extends Vue {
 
     decrementSourceCount(src: string | 'Logo' | 'Background'): void {
         if (src === 'Logo') {
-            src = this.configs[this.configLang].introSlide.logo.src;
+            src = this.configs[this.stateStore.configLang].introSlide.logo.src;
         }
 
         if (src === 'Background') {
-            src = this.configs[this.configLang].introSlide.backgroundImage;
+            src = this.configs[this.stateStore.configLang].introSlide.backgroundImage;
         }
 
         if (src) {
@@ -1851,7 +1833,7 @@ export default class MetadataEditorV extends Vue {
      * @param type The type of asset being uploaded (either a logo or background image)
      */
     async uploadAsset(asset: File, config: StoryRampConfig, type: 'logo' | 'backgroundImage'): Promise<void> {
-        const oppositeLang = this.configLang === 'en' ? 'fr' : 'en';
+        const oppositeLang = this.stateStore.configLang === 'en' ? 'fr' : 'en';
         const sharedAssetPaths = await Promise.all(this.filesInAssetFolder(asset, 'shared', false));
         let inSharedAsset = false;
         let oppositeSourceCount = 0;
@@ -1887,7 +1869,7 @@ export default class MetadataEditorV extends Vue {
                             if (i > 2) {
                                 const filesEqual = await this.compareFiles(
                                     asset,
-                                    this.configFileStructure.assets[this.configLang].file(newAssetName),
+                                    this.configFileStructure.assets[this.stateStore.configLang].file(newAssetName),
                                     newAssetName
                                 );
                                 if (filesEqual) break;
@@ -1906,21 +1888,21 @@ export default class MetadataEditorV extends Vue {
 
         // If the asset uploaded is in the shared asset folder, then no need to upload to the current langs assets folder
         if (!inSharedAsset) {
-            const currAssetPaths = await Promise.all(this.filesInAssetFolder(asset, this.configLang, false));
+            const currAssetPaths = await Promise.all(this.filesInAssetFolder(asset, this.stateStore.configLang, false));
             // Should contain either 0 or 1 promise.
             for (const currAssetPath of currAssetPaths) {
                 // If asset w/ same name but different contents is in curr lang asset folder, set name in curr lang
                 // asset folder to a unique name, to avoid overwriting an existing file.
                 if (currAssetPath === 'N/A') {
                     let i = 2;
-                    while (this.configFileStructure.assets[this.configLang].file(newAssetName)) {
+                    while (this.configFileStructure.assets[this.stateStore.configLang].file(newAssetName)) {
                         // If the updated name is the same as a file that already exists in the current langs asset folder,
                         // we must compare that file with the uploaded file, since they wouldnt have been compared
                         // on the first run due to having different names
                         if (i > 2) {
                             const filesEqual = await this.compareFiles(
                                 asset,
-                                this.configFileStructure.assets[this.configLang].file(newAssetName),
+                                this.configFileStructure.assets[this.stateStore.configLang].file(newAssetName),
                                 newAssetName
                             );
                             if (filesEqual) break;
@@ -1930,8 +1912,8 @@ export default class MetadataEditorV extends Vue {
                     }
                 }
             }
-            uploadSource = `${this.configFileStructure.uuid}/assets/${this.configLang}/${newAssetName}`;
-            this.configFileStructure.assets[this.configLang].file(newAssetName, asset);
+            uploadSource = `${this.configFileStructure.uuid}/assets/${this.stateStore.configLang}/${newAssetName}`;
+            this.configFileStructure.assets[this.stateStore.configLang].file(newAssetName, asset);
         }
 
         // Notify user of the change in the name of their uploaded asset, to avoid any confusion
@@ -2133,8 +2115,8 @@ export default class MetadataEditorV extends Vue {
         }
 
         // Load in project data.
-        if (this.configs[this.configLang]) {
-            this.useConfig(this.configs[this.configLang] as StoryRampConfig);
+        if (this.configs[this.stateStore.configLang]) {
+            this.useConfig(this.configs[this.stateStore.configLang] as StoryRampConfig);
             this.findSources(this.configs); // increments source counts for all panels
             // Update router path
             if (this.reloadExisting) {
@@ -2148,7 +2130,7 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    useConfig(config: StoryRampConfig, loadSlides?: boolean): void {
+    useConfig(config: StoryRampConfig, isReconciliation?: boolean): void {
         this.metadata.title = config.title;
         this.metadata.introTitle = config.introSlide.title;
         this.metadata.introSubtitle = config.introSlide.subtitle;
@@ -2166,10 +2148,10 @@ export default class MetadataEditorV extends Vue {
         // TODO: check schema version in the config, and if it doesn't match the current version in the schema (stored in
         // this.latestSchemaVersion), the product's local repo should be re-initialized
 
-        if (loadSlides === undefined || loadSlides) {
+        if (!isReconciliation) {
             this.loadSlides(this.configs);
         }
-        
+
         // Load product logo and the introduction slide background image (if provided).
         const logoAsset = config.introSlide.logo?.src;
         const introBgAsset = config.introSlide.backgroundImage;
@@ -2431,7 +2413,7 @@ export default class MetadataEditorV extends Vue {
      */
     async saveMetadata(publish = false, swapLang = false): Promise<void> {
         // update metadata content to existing config only if it has been successfully loaded
-        const config = this.configs[this.configLang];
+        const config = this.configs[this.stateStore.configLang];
         if (config !== undefined) {
             config.title = this.metadata.title;
             config.introSlide.title = this.metadata.introTitle;
@@ -2534,11 +2516,11 @@ export default class MetadataEditorV extends Vue {
      */
     swapLang(): void {
         this.saveMetadata(false, true);
-        this.configLang = this.configLang === 'en' ? 'fr' : 'en';
-        if (!this.configs[this.configLang]) {
+        this.stateStore.configLang = this.stateStore.configLang === 'en' ? 'fr' : 'en';
+        if (!this.configs[this.stateStore.configLang]) {
             return;
         }
-        this.loadConfig(this.configs[this.configLang]);
+        this.loadConfig(this.configs[this.stateStore.configLang]);
     }
 
     checkUuid = throttle(300, (rename?: boolean): void => {
@@ -2686,7 +2668,7 @@ export default class MetadataEditorV extends Vue {
             this.$router.beforeEach((to: RouteLocationNormalized) => {
                 if (to.name === 'editor') {
                     to.meta.data = {
-                        configLang: this.configLang,
+                        configLang: this.stateStore.configLang,
                         configs: this.configs,
                         configFileStructure: this.configFileStructure,
                         sourceCounts: this.sourceCounts,
@@ -2725,7 +2707,10 @@ export default class MetadataEditorV extends Vue {
                 return;
             }
             if (this.loadExisting) {
-                if (this.configs[this.configLang] !== undefined && this.uuid === this.configFileStructure?.uuid) {
+                if (
+                    this.configs[this.stateStore.configLang] !== undefined &&
+                    this.uuid === this.configFileStructure?.uuid
+                ) {
                     this.loadEditor = true;
                     this.saveMetadata(false).then(() => {
                         this.updateEditorPath();
@@ -2876,7 +2861,7 @@ export default class MetadataEditorV extends Vue {
     }
 
     getTitle(storyline: { titleEN: string; titleFR: string }): string {
-        return this.configLang === 'en' ? storyline.titleEN : storyline.titleFR;
+        return this.stateStore.configLang === 'en' ? storyline.titleEN : storyline.titleFR;
     }
 
     selectUuid(uuid: string): void {
