@@ -559,7 +559,6 @@ import VideoEditorV from './video-editor.vue';
 import SlideshowEditorV from './slideshow-editor.vue';
 import LoadingPageV from './helpers/loading-page.vue';
 import DynamicEditorV from './dynamic-editor.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import { toRaw } from 'vue';
 
 @Options({
@@ -574,8 +573,7 @@ import { toRaw } from 'vue';
         'video-editor': VideoEditorV,
         'slideshow-editor': SlideshowEditorV,
         'loading-page': LoadingPageV,
-        'dynamic-editor': DynamicEditorV,
-        'confirmation-modal': ConfirmationModalV
+        'dynamic-editor': DynamicEditorV
     }
 })
 export default class SlideEditorV extends Vue {

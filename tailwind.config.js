@@ -10,7 +10,8 @@ module.exports = {
         './index.html',
         './src/**/*.{vue,js,ts,jsx,tsx}',
         './node_modules/ramp-storylines_demo-scenarios-pcar/**/*.{vue,js,ts,jsx,tsx}',
-        './node_modules/ramp-config-editor_editeur-config-pcar/**/*.{vue,js,ts,jsx,tsx}'
+        './node_modules/ramp-config-editor_editeur-config-pcar/**/*.{vue,js,ts,jsx,tsx}',
+        './node_modules/highcharts-accessible-configuration-kit/**/*.{vue,js,ts,jsx,tsx}'
     ],
     darkMode: false, // or 'media' or 'class'
     theme: {
