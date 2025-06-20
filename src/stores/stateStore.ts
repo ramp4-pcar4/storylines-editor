@@ -43,7 +43,7 @@
  *   to refresh its config variables).
  */
 
-import { ConfigFileStructure, MultiLanguageSlide, StoryRampConfig } from '@/definitions';
+import { ConfigFileStructure, MultiLanguageSlide, StoryRampConfig, SupportedLanguages } from '@/definitions';
 import { DetailedDiff, detailedDiff, diff } from 'deep-object-diff';
 import { defineStore } from 'pinia';
 import { deepmerge } from '@fastify/deepmerge';
@@ -52,6 +52,7 @@ interface StateChange {
     timestamp: number;
     origin: string | 'unknown';
     changes: DetailedDiff | 'external';
+    differentFromBase: boolean; // If the change to that point is different from the latestSavedState
 }
 
 export interface Save {
@@ -73,13 +74,22 @@ function replaceByClonedSource(options) {
 
 function purgeFalses(obj: any): any {
     if (Array.isArray(obj)) {
-        return obj.map((item) => purgeFalses(item));
+        return obj.flatMap((item) => {
+            if (item === null) {
+                return [];
+            } else {
+                return [purgeFalses(item)];
+            }
+        });
     }
 
     return Object.entries(obj).reduce(
         (acc, [key, value]) => {
             // We don't want to delete a prop if it has a value, or if it's a required prop
-            if ((value !== null && value !== undefined && value) || REQUIRED_PROPS.includes(key)) {
+            if (
+                (value !== null && value !== undefined && (value || (typeof value === 'boolean' && !value))) ||
+                REQUIRED_PROPS.includes(key)
+            ) {
                 acc[key] = typeof value === 'object' ? purgeFalses(value) : value;
             }
             return acc;
@@ -128,7 +138,18 @@ export const useStateStore = defineStore('state', {
          */
         reconcileToggler: false,
 
+        // UNDO/REDO INDICATOR VARIABLES
+
+        /**
+         * Boolean indicating whether there is valid state to undo, and whether the state system can undo it
+         * ("whether undo is possible").
+         */
         canUndo: false,
+
+        /**
+         * Boolean indicating whether there is valid state to redo, and whether the state system can redo it
+         * ("whether redo is possible").
+         */
         canRedo: false
     }),
     actions: {
@@ -175,23 +196,28 @@ export const useStateStore = defineStore('state', {
             // Determine all differences between the latest config and the latest save
             const newDiff = detailedDiff(this.latestSavedState, newConfigs);
 
-            console.log("NEWCONFIGS", newConfigs);
-            if (
-                this.currentLoc != this.stateChangesList.length - 1 &&
-                !Object.keys(diff(combinedPreviousDiffs !== 'external' ? combinedPreviousDiffs : {}, newDiff)).length
-            ) {
-                console.log("NO CHANGE?");
+            // ======================
+            // Handling the cases
+
+            // If changes are the same as the ones already added to the list (at that position), don't bother re-listing them
+            // Notably prevents "redo" operations from being detected as new changes and mucking things up
+            if (this.isDiffEmpty(diff(combinedPreviousDiffs !== 'external' ? combinedPreviousDiffs : {}, newDiff))) {
                 return false;
             }
-
             // There are no changes whatsoever from the last save. Set stuff accordingly.
-            if (this.isDiffEmpty(newDiff) && this.currentLoc != this.stateChangesList.length - 1) {
+            else if (this.isDiffEmpty(newDiff)) {
+                // Currently still at the base save. No need to add an 'empty diff'!
+                if (this.currentLoc === -1) {
+                    return false;
+                }
+
                 // Add an 'empty diff' to the list, indicating past changes have been erased.
                 // Doing this allows the erasing to be undone too (bring back past changes).
                 this.recordNewChange({
                     timestamp: Date.now(),
                     origin: origin ?? 'unknown',
-                    changes: newDiff
+                    changes: newDiff,
+                    differentFromBase: false
                 });
 
                 this.isChanged = false;
@@ -204,7 +230,7 @@ export const useStateStore = defineStore('state', {
                 return false;
             }
 
-            // Save new diff to stateChangesList
+            // "Fail" cases have all been checked and failed. Save the new diff to stateChangesList
             this.recordNewChange({
                 timestamp: Date.now(),
                 origin: origin ?? 'unknown',
@@ -213,7 +239,8 @@ export const useStateStore = defineStore('state', {
                 // new changes (we'd need to merge all preceding entries in stateChangesList every
                 // single time) in exchange for a negligible decrease in memory usage.
                 // If anyone disagrees, feel free to @ me.
-                changes: newDiff
+                changes: newDiff,
+                differentFromBase: true
             });
             this.isChanged = true;
             return true;
@@ -233,33 +260,40 @@ export const useStateStore = defineStore('state', {
             }
         },
 
-        // Reverts the diff at currentLoc. currentLoc will be placed at currentLoc - 1.
-        // TODO: Proper implementation
+        /**
+         * Undoes the last operation (in the list of operations), if there is one.
+         * Technically: Reverts the diff at currentLoc. currentLoc will be placed at currentLoc - 1.
+         */
         undo(): void {
             if (this.currentLoc === -1) return;
-
             this.currentLoc--;
             this.updateUndoRedoAbility();
-            console.log('CURRENT LOC', this.currentLoc);
             this.reconcileAppState();
+            if (this.currentLoc === -1) {
+                this.isChanged = false;
+            } else {
+                this.isChanged = this.stateChangesList[this.currentLoc]?.differentFromBase ?? false;
+            }
         },
 
-        // Re-applies the diff at currentLoc + 1, and sets currentLoc to that.
-        // TODO: Proper implementation
+        /**
+         * Redoes the last undone operation (in the list of operations), if there is one.
+         * Technically: Re-applies the diff at currentLoc + 1, and sets currentLoc to that.
+         */
         redo(): void {
             if (this.currentLoc === this.getNumberOfChanges() - 1) return;
+
+            if (this.currentLoc === -1) this.isChanged = true;
 
             this.currentLoc++;
             this.updateUndoRedoAbility();
             this.reconcileAppState();
+            this.isChanged = this.stateChangesList[this.currentLoc]?.differentFromBase ?? false;
         },
 
         updateUndoRedoAbility(): void {
             this.canUndo = this.currentLoc > -1;
             this.canRedo = this.currentLoc !== this.getNumberOfChanges() - 1;
-
-            console.log('CANUNDO CURRENTLOC', this.canUndo, this.currentLoc);
-            console.log('CANREDO CURRENTLOC', this.canRedo, this.currentLoc);
         },
 
         /**
@@ -296,7 +330,6 @@ export const useStateStore = defineStore('state', {
                 // Erase all changes after currentLoc
                 this.eraseSubsequentChanges();
             }
-
             this.reconcileToggler = !this.reconcileToggler;
         },
 
@@ -338,7 +371,7 @@ export const useStateStore = defineStore('state', {
          * Determines if a diff is empty. Also returns true if the diff has keys but all the values are empty (e.g. something like {a:{b:{}}} returns true).
          * @param diff The diff to check.
          */
-        isDiffEmpty(diff: DetailedDiff): boolean {
+        isDiffEmpty(diff: any): boolean {
             if (typeof diff !== 'object' || diff === null) {
                 return false; // Non-object values won't be treated as "empty"
             }
@@ -367,6 +400,22 @@ export const useStateStore = defineStore('state', {
             let newSave: Save = JSON.parse(JSON.stringify(this.latestSavedState));
 
             newSave = this.createSaveFromDiff(newSave, changesToAdd);
+
+            newSave.en!.slides = newSave.en!.slides.map((slide) => {
+                if (slide && Object.keys(slide)?.length) {
+                    return purgeFalses(slide);
+                } else {
+                    return {};
+                }
+            });
+
+            newSave.fr!.slides = newSave.fr!.slides.map((slide) => {
+                if (slide && Object.keys(slide)?.length) {
+                    return purgeFalses(slide);
+                } else {
+                    return {};
+                }
+            });
 
             return newSave;
         },

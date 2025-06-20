@@ -97,7 +97,7 @@
                     <div class="space-x-2 flex flex-row items-center">
                         <!-- Unsaved changes indicator -->
                         <div
-                            v-if="unsavedChanges"
+                            v-if="stateStore.isChanged"
                             class="text-red-700 flex flex-row items-center w-auto"
                             v-tippy="{
                                 delay: '200',
@@ -131,8 +131,10 @@
                         </div>
 
                         <div class="flex">
+                            <!-- Undo last change button -->
                             <button
                                 @click.stop="stateStore.undo"
+                                :aria-label="$t('editor.undo')"
                                 :disabled="!canUndo"
                                 v-tippy="{
                                     delay: '200',
@@ -159,9 +161,11 @@
                                     />
                                 </svg>
                             </button>
+                            <!-- Redo last change button -->
                             <button
                                 @click.stop="stateStore.redo"
                                 :disabled="!canRedo"
+                                :aria-label="$t('editor.redo')"
                                 v-tippy="{
                                     delay: '200',
                                     placement: 'bottom',
@@ -190,7 +194,7 @@
 
                         <!-- Reset changes button -->
                         <button
-                            :disabled="!unsavedChanges"
+                            :disabled="!stateStore.isChanged"
                             @click="$vfm.open(`reload-config`)"
                             class="respected-standard-button respected-gray-border-button respected-dynamic-header-button"
                             truncate-trigger
@@ -228,7 +232,7 @@
                         <button
                             @click="saveChanges"
                             class="respected-standard-button respected-black-bg-button respected-dynamic-header-button"
-                            :disabled="!unsavedChanges || saving"
+                            :disabled="!stateStore.isChanged || saving"
                             truncate-trigger
                         >
                             <svg
@@ -327,7 +331,7 @@
                         </div>
                         <span class="ml-auto"></span>
                         <div class="flex items-center flex-nowrap gap-2 justify-between md:justify-start">
-                            <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
+                            <slot name="langModal" v-bind="{ unsavedChanges: stateStore.isChanged }"></slot>
                             <!-- Preview dropdown -->
                             <dropdown-menu
                                 class="flex-shrink-0"
@@ -510,9 +514,6 @@
                 <!-- ToC -->
                 <slide-toc
                     class="flex-1"
-                    :slides="slides"
-                    :currentSlide="currentSlide"
-                    :slideIndex="slideIndex"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
@@ -526,9 +527,6 @@
                 <!-- Mobile ToC -->
                 <!-- Bigger buttons, more visual dividers, more colors -->
                 <slide-toc
-                    :slides="slides"
-                    :currentSlide="currentSlide"
-                    :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
@@ -544,13 +542,14 @@
                 <slide-editor
                     class="editor-area w-full"
                     ref="slide"
-                    :currentSlide="currentSlide"
                     :otherLangSlide="
-                        slides[slideIndex]?.[slides.find((slide) => slide.fr === currentSlide) ? 'en' : 'fr']
+                        productStore.slidesWorkingCopy[productStore.selectedSlideIndex]?.[
+                            productStore.slidesWorkingCopy.find((slide) => slide.fr === productStore.currentSlide)
+                                ? 'en'
+                                : 'fr'
+                        ]
                     "
-                    :lang="slides.find((slide) => slide.fr === currentSlide) ? 'fr' : 'en'"
-                    :slideIndex="slideIndex"
-                    :isLast="slideIndex === slides.length - 1"
+                    :isLast="productStore.selectedSlideIndex === productStore.slidesWorkingCopy.length - 1"
                     :uid="uuid"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
@@ -611,9 +610,7 @@ import { useProductStore } from '@/stores/productStore';
 })
 export default class EditorV extends Vue {
     @Prop() metadata!: MetadataContent;
-    @Prop() slides!: MultiLanguageSlide[];
     @Prop() saving!: boolean;
-    @Prop() unsavedChanges!: boolean;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     currentRoute = window.location.href;
@@ -625,8 +622,6 @@ export default class EditorV extends Vue {
     uuid = '';
     logoImage: undefined | File = undefined;
     loadSlides: undefined | MultiLanguageSlide[] = undefined;
-    currentSlide: Slide | string = '';
-    slideIndex = -1;
     helpSections: HelpSection[] = [];
     helpMd = '';
     originalTextArray: string[] = [];
@@ -661,7 +656,7 @@ export default class EditorV extends Vue {
         this.canRedo = this.stateStore.canRedo;
     }
 
-    @Watch('slides', { deep: true })
+    @Watch('productStore.slidesWorkingCopy', { deep: true })
     onSlidesEdited(): void {
         this.productStore.updateSaveStatus(true);
     }
@@ -673,26 +668,19 @@ export default class EditorV extends Vue {
     @Watch('stateStore.reconcileToggler')
     onReconciliationRequest(): void {
         const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-        console.log('RECONCILED SAVE', newConfigs);
 
-        if (newConfigs?.en) {
-            deepMerge(this.configs.en, newConfigs.en);
-        }
-
-        if (newConfigs?.fr) {
-            deepMerge(this.configs.fr, newConfigs.fr);
-        }
-        console.log('UPDATED SAVE', JSON.parse(JSON.stringify(this.configs)));
+        this.productStore.configs.en = newConfigs?.en;
+        this.productStore.configs.fr = newConfigs?.fr;
 
         const engSlides =
-            this.configs.en?.slides.map((engSlide) => {
+            this.productStore.configs.en?.slides.map((engSlide) => {
                 return {
                     // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
                     en: engSlide && Object.keys(engSlide).length ? (engSlide as Slide) : undefined
                 };
             }) ?? [];
         const frSlides =
-            this.configs.fr?.slides.map((frSlide) => {
+            this.productStore.configs.fr?.slides.map((frSlide) => {
                 return {
                     // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
                     fr: frSlide && Object.keys(frSlide).length ? (frSlide as Slide) : undefined
@@ -703,7 +691,26 @@ export default class EditorV extends Vue {
         const newSlides = Array.from({ length: maxLength }, (_, index) =>
             Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
         );
-        deepMerge(this.loadSlides, newSlides);
+
+        this.productStore.slidesWorkingCopy = newSlides;
+
+        this.updateSlides(this.productStore.slidesWorkingCopy, false, true);
+
+        if (this.productStore.selectedSlideIndex > this.productStore.slidesWorkingCopy.length - 1) {
+            this.selectSlide(-1);
+        } else if (
+            this.productStore.slidesWorkingCopy[this.productStore.selectedSlideIndex]?.[
+                this.productStore.selectedSlideLang
+            ]?.panel.length === 1
+        ) {
+            this.selectSlide(this.productStore.selectedSlideIndex, this.productStore.selectedSlideLang, 0);
+        } else {
+            this.selectSlide(
+                this.productStore.selectedSlideIndex,
+                this.productStore.selectedSlideLang,
+                this.productStore.selectedPanelIndex
+            );
+        }
 
         // Also runs updateSaveStatus, so we don't need to emit save-status
         // TODO: This is janky, throwing stuff around like hot potato. Refactor once the core variable refactor PR is merged.
@@ -717,7 +724,7 @@ export default class EditorV extends Vue {
     }
 
     created(): void {
-        this.loadSlides = this.slides;
+        this.loadSlides = this.productStore.slidesWorkingCopy;
         this.uuid = this.$route.params.uid as string;
 
         window.addEventListener('beforeunload', this.beforeWindowUnload);
@@ -760,7 +767,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number, lang?: SupportedLanguages): void {
+    selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number): void {
         const configLang = this.productStore.configLang;
 
         // save changes to current slide before changing slides
@@ -769,7 +776,7 @@ export default class EditorV extends Vue {
         }
 
         // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
-        this.currentSlide = {
+        this.productStore.currentSlide = {
             title: '',
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
@@ -780,18 +787,22 @@ export default class EditorV extends Vue {
         }
 
         setTimeout(() => {
-            if (index === -1 || !this.loadSlides) {
-                this.currentSlide = '';
+            if (index === -1 || !this.loadSlides || !this.loadSlides[index]) {
+                this.productStore.currentSlide = '';
             } else {
                 const selectedLang = newLang as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
 
                 // If the requested language config for a slide doesn't exist, open the other language
                 // This edge case should ONLY pop up while using the "Next/Previous Slide" buttons
-                this.currentSlide = selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
+                this.productStore.currentSlide =
+                    selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
             }
-            this.slideIndex = index;
-            (this.$refs.slide as SlideEditorV).panelIndex = 0;
+            this.productStore.selectedSlideIndex = index;
+            (this.$refs.slide as SlideEditorV).panelIndex = panelIndex ?? 0;
+            this.productStore.selectedPanelIndex = panelIndex ?? 0;
+            this.productStore.selectedSlideLang = newLang;
+
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
         }, 5);
     }
@@ -800,13 +811,16 @@ export default class EditorV extends Vue {
      * Update slide for a custom config made through advanced editor.
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
-        const configLang = this.productStore.configLang;
+        const currentLang = this.productStore.selectedSlideLang;
 
-        this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+        this.productStore.currentSlide = slideConfig;
+        this.productStore.slidesWorkingCopy[this.productStore.selectedSlideIndex][
+            (lang ?? currentLang) as keyof MultiLanguageSlide
+        ] = slideConfig;
 
-        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
-            slideConfig;
+        this.productStore.configs[(lang ?? currentLang) as keyof MultiLanguageSlide]!.slides[
+            this.productStore.selectedSlideIndex
+        ] = slideConfig;
 
         // save changes emitted from advanced editor
         if (save) {
@@ -817,16 +831,22 @@ export default class EditorV extends Vue {
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(slides: MultiLanguageSlide[]): void {
+    updateSlides(slides: MultiLanguageSlide[], dontEmitEvent?: boolean, dontChangeIndex?: boolean): void {
         this.loadSlides = slides;
-        this.slideIndex = this.loadSlides.findIndex(
-            (bothSlides) =>
-                (this.currentSlide as Slide) === bothSlides['en'] || (this.currentSlide as Slide) === bothSlides['fr']
-        );
-        this.productStore.configs.en!.slides = this.slides.map((slides) => slides.en!);
-        this.productStore.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
+        if (!dontChangeIndex && this.productStore.currentSlide !== '') {
+            this.productStore.selectedSlideIndex = this.loadSlides.findIndex(
+                (bothSlides) =>
+                    (this.productStore.currentSlide as Slide) === bothSlides['en'] ||
+                    (this.productStore.currentSlide as Slide) === bothSlides['fr']
+            );
+        }
 
-        this.productStore.updateSaveStatus(undefined, 'Slide updated');
+        this.productStore.configs.en!.slides = this.productStore.slidesWorkingCopy.map((slides) => slides.en!);
+        this.productStore.configs.fr!.slides = this.productStore.slidesWorkingCopy.map((slides) => slides.fr!);
+
+        if (!dontEmitEvent) {
+            this.productStore.updateSaveStatus(undefined, 'Slide updated');
+        }
     }
 
     /**
@@ -874,7 +894,7 @@ export default class EditorV extends Vue {
     }
 
     exportProduct(): void {
-        if (this.$refs.slide != null && this.currentSlide !== '') {
+        if (this.$refs.slide != null && this.productStore.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
@@ -887,7 +907,7 @@ export default class EditorV extends Vue {
      */
     preview(language: string): void {
         // save current slide final changes before previewing product
-        if (this.$refs.slide != null && this.currentSlide !== '') {
+        if (this.$refs.slide != null && this.productStore.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
@@ -928,7 +948,7 @@ export default class EditorV extends Vue {
 
     beforeWindowUnload(e: BeforeUnloadEvent): void {
         // show popup if when leaving page with unsaved changes
-        if (this.unsavedChanges && !window.confirm()) {
+        if (this.stateStore.isChanged && !window.confirm()) {
             e.preventDefault();
         }
     }
