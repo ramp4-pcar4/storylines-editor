@@ -43,7 +43,7 @@
  *   to refresh its config variables).
  */
 
-import { ConfigFileStructure, MultiLanguageSlide, StoryRampConfig } from '@/definitions';
+import { ConfigFileStructure, MultiLanguageSlide, StoryRampConfig, SupportedLanguages } from '@/definitions';
 import { DetailedDiff, detailedDiff, diff } from 'deep-object-diff';
 import { defineStore } from 'pinia';
 import { deepmerge } from '@fastify/deepmerge';
@@ -52,6 +52,7 @@ interface StateChange {
     timestamp: number;
     origin: string | 'unknown';
     changes: DetailedDiff | 'external';
+    differentFromBase: boolean; // If the change to that point is different from the latestSavedState
 }
 
 export interface Save {
@@ -89,6 +90,12 @@ const deepMerge = deepmerge({ all: true, mergeArray: replaceByClonedSource });
 
 export const useStateStore = defineStore('state', {
     state: () => ({
+        // ========== EXTRA STUFF ==========================
+        // TODO: Move somewhere more appropriate later
+        selectedPanelIndex: 0 as number,
+        activeSlideLang: 'en' as SupportedLanguages,
+        configLang: 'en' as SupportedLanguages,
+
         // ========== STATE MANAGEMENT VARIABLES ===========
 
         /**
@@ -171,24 +178,23 @@ export const useStateStore = defineStore('state', {
 
             // Determine all differences between the latest config and the latest save
             const newDiff = detailedDiff(this.latestSavedState, newConfigs);
-            
-            console.log("NEWCONFIGS", newConfigs);
+
             if (
-                this.currentLoc != this.stateChangesList.length - 1 &&
+                this.currentLoc !== this.stateChangesList.length - 1 &&
                 !Object.keys(diff(combinedPreviousDiffs !== 'external' ? combinedPreviousDiffs : {}, newDiff)).length
             ) {
-                console.log("NO CHANGE?");
                 return false;
             }
 
             // There are no changes whatsoever from the last save. Set stuff accordingly.
-            if (this.isDiffEmpty(newDiff) && this.currentLoc != this.stateChangesList.length - 1) {
+            if (this.isDiffEmpty(newDiff)) {
                 // Add an 'empty diff' to the list, indicating past changes have been erased.
                 // Doing this allows the erasing to be undone too (bring back past changes).
                 this.recordNewChange({
                     timestamp: Date.now(),
                     origin: origin ?? 'unknown',
-                    changes: newDiff
+                    changes: newDiff,
+                    differentFromBase: false
                 });
 
                 this.isChanged = false;
@@ -210,7 +216,8 @@ export const useStateStore = defineStore('state', {
                 // new changes (we'd need to merge all preceding entries in stateChangesList every
                 // single time) in exchange for a negligible decrease in memory usage.
                 // If anyone disagrees, feel free to @ me.
-                changes: newDiff
+                changes: newDiff,
+                differentFromBase: true
             });
             this.isChanged = true;
             return true;
@@ -237,8 +244,9 @@ export const useStateStore = defineStore('state', {
 
             this.currentLoc--;
             this.updateUndoRedoAbility();
-            console.log('CURRENT LOC', this.currentLoc);
+            if (this.currentLoc === -1) this.isChanged = false;
             this.reconcileAppState();
+            this.isChanged = this.stateChangesList[this.currentLoc].differentFromBase;
         },
 
         // Re-applies the diff at currentLoc + 1, and sets currentLoc to that.
@@ -246,17 +254,17 @@ export const useStateStore = defineStore('state', {
         redo(): void {
             if (this.currentLoc === this.getNumberOfChanges() - 1) return;
 
+            if (this.currentLoc === -1) this.isChanged = true;
+
             this.currentLoc++;
             this.updateUndoRedoAbility();
             this.reconcileAppState();
+            this.isChanged = this.stateChangesList[this.currentLoc].differentFromBase;
         },
 
         updateUndoRedoAbility(): void {
             this.canUndo = this.currentLoc > -1;
             this.canRedo = this.currentLoc !== this.getNumberOfChanges() - 1;
-
-            console.log('CANUNDO CURRENTLOC', this.canUndo, this.currentLoc);
-            console.log('CANREDO CURRENTLOC', this.canRedo, this.currentLoc);
         },
 
         /**
@@ -293,7 +301,6 @@ export const useStateStore = defineStore('state', {
                 // Erase all changes after currentLoc
                 this.eraseSubsequentChanges();
             }
-
             this.reconcileToggler = !this.reconcileToggler;
         },
 
