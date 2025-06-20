@@ -49,9 +49,21 @@
                     :class="[
                         panel?.type === 'map' && (panel as MapPanel).shared
                             ? 'border-yellow-800 bg-yellow-200 hover:border-yellow-400'
-                            : 'border-transparent hover:border-gray-400 hover:bg-gray-300'
+                            : 'border-transparent hover:border-gray-400 hover:bg-gray-300',
+                        element[selectedLang] === currentSlide && this.productStore.selectedPanelIndex === panelIndex
+                            ? ''
+                            : ''
                     ]"
-                    @click.stop
+                    :style="[
+                        element[selectedLang] === currentSlide && this.productStore.selectedPanelIndex === panelIndex
+                            ? 'background-color: #c1c1c5 !important;'
+                            : ''
+                    ]"
+                    @click.stop="
+                        () => {
+                            $emit('select-slide', panelIndex);
+                        }
+                    "
                     v-tippy="{
                         theme: 'left-align',
                         delay: '200',
@@ -160,7 +172,9 @@
 </template>
 
 <script lang="ts">
-import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
+import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide, SupportedLanguages } from '@/definitions';
+import { useProductStore } from '@/stores/productStore';
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from './toc-options.vue';
 
@@ -179,11 +193,13 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
     }
 })
 export default class SlideTocV extends Vue {
-    @Prop() selectedLang!: 'en' | 'fr';
+    @Prop() selectedLang!: SupportedLanguages;
     @Prop() element!: MultiLanguageSlide;
     @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
     @Prop() isActiveSlide!: boolean;
+
+    productStore = useProductStore();
 
     oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
