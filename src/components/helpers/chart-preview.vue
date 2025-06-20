@@ -122,7 +122,7 @@ export default class ChartPreviewV extends Vue {
      * Save initial set of chart options used to create chart.
      */
     loadChart(chartOptions: DQVChartConfig): void {
-        // initialize higcharts editor and link to edit summoner node
+        // initialize highcharts editor and link to edit summoner node
         if (this.modalEditor) {
             return;
         }
