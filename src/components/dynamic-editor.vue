@@ -1,18 +1,20 @@
 <template>
-    <div class="block mt-2">
+    <div class="block mt-6">
         <!-- left and right panel buttons for dynamic panels -->
-        <div class="flex">
+        <div class="flex gap-2 border-b pb-1 px-1.5" style="border-color: rgba(209, 213, 219, 1)">
             <button
                 @click="() => changePanel('text')"
-                class="editor-button rounded-none rounded-l border hover:bg-gray-100"
-                :class="editingStatus === 'text' ? 'border-black font-bold' : 'border-gray-300'"
+                class="respected-standard-button respected-transparent-button respected-thin-button"
+                :class="editingStatus === 'text' ? 'bg-gray-200' : ''"
+                :style="editingStatus === 'text' ? 'font-weight: bold' : ''"
             >
                 {{ $t('dynamic.textSection') }}
             </button>
             <button
                 @click="() => changePanel('panels')"
-                class="editor-button rounded-none rounded-r border hover:bg-gray-100"
-                :class="editingStatus !== 'text' ? 'border-black font-bold' : 'border-gray-300'"
+                class="respected-standard-button respected-transparent-button respected-thin-button"
+                :class="editingStatus !== 'text' ? 'bg-gray-200' : ''"
+                :style="editingStatus !== 'text' ? 'font-weight: bold' : ''"
             >
                 {{ $t('dynamic.panel.collection') }}
             </button>
@@ -52,7 +54,7 @@
                     <td class="flex flex-col items-center">
                         <input
                             id="panelId"
-                            class="editor-input"
+                            class="respected-standard-input"
                             type="text"
                             :placeholder="$t('dynamic.panel.enterID')"
                             v-model="newSlideName"
@@ -61,14 +63,18 @@
                         <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
                     </td>
                     <td>
-                        <select v-model="newSlideType" class="editor-input rounded shadow">
+                        <select v-model="newSlideType" class="respected-standard-select justify-self-center">
                             <option v-for="thing in Object.keys(editors)" :key="thing">
                                 {{ thing }}
                             </option>
                         </select>
                     </td>
                     <td>
-                        <button class="editor-button" @click="createNewSlide" :disabled="idUsed || !newSlideName">
+                        <button
+                            class="respected-standard-button respected-gray-border-button respected-thin-button justify-self-center"
+                            @click="createNewSlide"
+                            :disabled="idUsed || !newSlideName"
+                        >
                             {{ $t('dynamic.panel.add') }}
                         </button>
                     </td>

@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col mt-4">
-        <label class="editor-label text-left" for="mapTitle">{{ $t('editor.map.title') }}</label>
-        <input class="editor-input" type="text" id="mapTitle" v-model="panel.title" />
+        <label class="respected-standard-label text-left" for="mapTitle">{{ $t('editor.map.title') }}</label>
+        <input class="respected-standard-input" type="text" id="mapTitle" v-model="panel.title" />
 
         <div>
             <div class="flex items-center gap-2 mt-2">
@@ -12,22 +12,26 @@
                     @change="saveTimeSlider"
                     v-model="usingTimeSlider"
                 />
-                <label class="editor-label" for="timeSliderToggle">{{ $t('editor.map.timeslider.enable') }}</label>
+                <label class="respected-standard-label" for="timeSliderToggle">{{
+                    $t('editor.map.timeslider.enable')
+                }}</label>
                 <!-- Use invisible instead of v-if to reserve space for button (so checkbox doesn't move around) -->
                 <button
                     :class="{ 'hidden md:invisible': !usingTimeSlider }"
                     @click="$vfm.open('time-slider-edit-modal')"
-                    class="editor-button block md:inline-block ml-0 text-sm py-1 bg-black text-white hover:bg-gray-800"
+                    class="respected-standard-button respected-black-bg-button respected-thin-button block md:inline-block ml-0 text-sm"
                 >
                     {{ $t('editor.map.timeslider.edit') }}
                 </button>
             </div>
 
             <div class="flex flex-col w-full text-left mt-5 mb-1">
-                <label class="editor-label" for="rampMapCaption"> {{ $t('editor.image.label.caption') }}</label>
+                <label class="respected-standard-label" for="rampMapCaption">
+                    {{ $t('editor.image.label.caption') }}</label
+                >
                 <input
                     id="rampMapCaption"
-                    class="editor-input w-full lg:w-2/5"
+                    class="respected-standard-input w-full lg:w-2/5"
                     type="text"
                     v-model="panel.caption"
                     :placeholder="$t('editor.caption.placeholder')"
@@ -46,7 +50,7 @@
             content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
             class="flex justify-center items-center"
         >
-            <h2 slot="header" class="text-lg font-bold">{{ $t('editor.map.timeslider.edit') }}</h2>
+            <h2 slot="header" class="text-xl font-bold">{{ $t('editor.map.timeslider.edit') }}</h2>
             <time-slider-editor
                 :config="timeSliderConf"
                 :error="timeSliderError"
@@ -54,7 +58,7 @@
             ></time-slider-editor>
             <div class="w-full flex justify-end">
                 <button
-                    class="editor-button"
+                    class="respected-standard-button respected-black-bg-button"
                     :class="timeSliderError ? '' : 'bg-black text-white hover:bg-gray-800'"
                     :disabled="timeSliderError"
                     @click="saveTimeSlider"

@@ -5,6 +5,7 @@ import { createPinia } from 'pinia';
 import './router/componentHooks';
 import router from './router';
 import './style.css';
+import './standard-components.css';
 import { i18n } from './lang';
 
 import 'ramp-pcar/dist/ramp.css';

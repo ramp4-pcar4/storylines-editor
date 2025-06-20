@@ -46,7 +46,8 @@
                                 showExpired = false;
                             }
                         "
-                        class="editor-button bg-black text-white hover:bg-gray-800 ml-auto"
+                        style="margin-left: auto"
+                        class="respected-standard-button respected-black-bg-button"
                     >
                         {{ $t('editor.ok') }}
                     </button>
@@ -153,7 +154,7 @@
                             type="text"
                             name="uuid"
                             id="product-uuid"
-                            class="editor-input w-5/6 text-center"
+                            class="respected-standard-input w-5/6 text-center"
                             v-model="productUuid"
                             @input="checkUuid"
                             placeholder="4523ae53-5d58-4a0e-8b01-54d9824871f5"
@@ -242,12 +243,13 @@
                         <button
                             type="submit"
                             @click="uploadZip"
-                            class="editor-button editor-forms-button bg-black text-white hover:bg-gray-80 mr-2"
+                            style="margin-right: 0.5rem"
+                            class="respected-standard-button respected-black-bg-button"
                             :disabled="error"
                         >
                             {{ $t('editor.video.label.upload') }}
                         </button>
-                        <button @click="closeModal" class="editor-button editor-forms-button border border-gray-300">
+                        <button @click="closeModal" class="respected-standard-button respected-gray-border-button">
                             {{ $t('editor.cancel') }}
                         </button>
                     </div>
@@ -662,23 +664,6 @@ input[type='file']:not(:focus-visible) {
 .dragging {
     background-color: #fffaf0 !important;
     border-color: #fff !important;
-}
-
-.editor-button {
-    border-radius: 3px;
-    padding: 5px 12px;
-    font-weight: 600;
-    transition-duration: 0.2s;
-}
-
-.editor-forms-button {
-    padding: 8px 15px;
-    border-radius: 5px;
-}
-
-.editor-button:hover:enabled {
-    background-color: #dbdbdb;
-    color: black;
 }
 
 .input-error {

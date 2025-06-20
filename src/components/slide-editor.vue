@@ -15,7 +15,8 @@
                                     selectSlide(slideIndex, (lang === 'en' ? 'fr' : 'en') as SupportedLanguages)
                                 "
                                 :disabled="!otherLangSlide"
-                                class="editor-button flex gap-1 items-center rounded border border-black mr-2"
+                                style="margin-right: 0.5rem"
+                                class="respected-standard-button respected-gray-border-button"
                                 v-tippy="{
                                     delay: '200',
                                     placement: 'bottom',
@@ -34,8 +35,15 @@
                             <button
                                 @click.stop="selectSlide(slideIndex - 1, lang as SupportedLanguages)"
                                 :disabled="slideIndex === 0"
-                                class="editor-button flex gap-1 items-center rounded-l rounded-r-none border border-black"
-                                style="border-right-width: 0"
+                                class="respected-standard-button respected-gray-border-button"
+                                style="
+                                    gap: 0.25rem;
+                                    border-top-left-radius: 0.25rem;
+                                    border-bottom-left-radius: 0.25rem;
+                                    border-top-right-radius: 0px;
+                                    border-bottom-right-radius: 0px;
+                                    border-right-width: 0;
+                                "
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path
@@ -45,12 +53,23 @@
                                 </svg>
                                 {{ $t('editor.slides.previousSlide') }}
                             </button>
-                            <span class="border-l border-black" style="margin: 0; padding: 0; line-height: 0"> </span>
+                            <span
+                                class="border-l"
+                                style="border-color: rgba(209, 213, 219, 1); margin: 0; padding: 0; line-height: 0"
+                            >
+                            </span>
                             <button
                                 @click.stop="selectSlide(slideIndex + 1, lang as SupportedLanguages)"
                                 :disabled="isLast"
-                                class="editor-button flex gap-1 items-center rounded-l-none rounded-r border border-black border-l-0"
-                                style="border-left-width: 0"
+                                class="respected-standard-button respected-gray-border-button gap-1"
+                                style="
+                                    gap: 0.25rem;
+                                    border-left-width: 0;
+                                    border-top-left-radius: 0px;
+                                    border-bottom-left-radius: 0px;
+                                    border-top-right-radius: 0.25rem;
+                                    border-bottom-right-radius: 0.25rem;
+                                "
                             >
                                 <svg
                                     class="transform rotate-180"
@@ -69,7 +88,7 @@
                         </div>
                     </div>
                     <!-- Slide title -->
-                    <label style="margin-left: 0" class="editor-label mt-4" for="slideTitle">{{
+                    <label style="margin-left: 0" class="respected-standard-label mt-4" for="slideTitle">{{
                         $t('editor.slides.slideTitle')
                     }}</label>
                     <div class="flex">
@@ -78,7 +97,7 @@
                             id="slideTitle"
                             v-model="currentSlide.title"
                             :placeholder="$t('editor.slides.addSlideTitle')"
-                            class="editor-input w-full lg:w-2/3"
+                            class="respected-standard-input w-full lg:w-2/3"
                         />
                         <span class="ml-auto"></span>
                     </div>
@@ -117,7 +136,11 @@
             </div>
             <br />
             <!-- Panel select -->
-            <div class="flex gap-3 border-b border-black pl-2" v-if="currentSlide.panel.length === 2">
+            <div
+                class="flex gap-3 border-b pl-2"
+                style="border-color: rgba(209, 213, 219, 1)"
+                v-if="currentSlide.panel.length === 2"
+            >
                 <!-- Left panel -->
                 <button
                     @click="
@@ -127,8 +150,12 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button flex items-center"
-                    :class="panelIndex == 0 && !advancedEditorView ? 'border-black' : 'border-white'"
+                    class="respected-standard-button panel-select-button"
+                    :style="[
+                        panelIndex == 0 && !advancedEditorView
+                            ? 'border-color: rgba(209, 213, 219, 1)'
+                            : 'border-color: white'
+                    ]"
                 >
                     <div class="align-middle inline-block">
                         <svg
@@ -188,8 +215,12 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button flex items-center"
-                    :class="panelIndex == 1 && !advancedEditorView ? 'border-black' : 'border-white'"
+                    class="respected-standard-button panel-select-button"
+                    :style="[
+                        panelIndex == 1 && !advancedEditorView
+                            ? 'border-color: rgba(209, 213, 219, 1)'
+                            : 'border-color: white'
+                    ]"
                 >
                     <div class="align-middle inline-block">
                         <svg
@@ -249,13 +280,13 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button"
-                    :class="advancedEditorView ? 'border-black' : 'border-white'"
+                    class="respected-standard-button panel-select-button"
+                    :style="[advancedEditorView ? 'border-color: rgba(209, 213, 219, 1)' : 'border-color: white']"
                 >
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
                 </button>
             </div>
-            <div v-else class="border-b border-black space-x-3 pl-2 flex">
+            <div v-else class="border-b space-x-3 pl-2 flex" style="border-color: rgba(209, 213, 219, 1)">
                 <!-- Fullscreen (Loner panel) -->
                 <button
                     @click="
@@ -264,8 +295,8 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button flex items-center"
-                    :class="!advancedEditorView ? 'border-black' : 'border-white'"
+                    class="respected-standard-button panel-select-button"
+                    :style="[!advancedEditorView ? 'border-color: rgba(209, 213, 219, 1)' : 'border-color: white']"
                 >
                     <div class="align-middle inline-block">
                         <svg
@@ -324,8 +355,8 @@
                             saveChanges();
                         }
                     "
-                    class="editor-button panel-select-button"
-                    :class="advancedEditorView ? 'border-black' : 'border-white'"
+                    class="respected-standard-button panel-select-button"
+                    :style="[advancedEditorView ? 'border-color: rgba(209, 213, 219, 1)' : 'border-color: white']"
                 >
                     <span class="align-middle inline-block pl-1">{{ $t('editor.slides.advanced') }}</span>
                 </button>
@@ -336,13 +367,14 @@
                     <div v-if="!advancedEditorView" class="flex flex-col mr-3">
                         <label
                             style="margin-left: 0"
-                            class="editor-label text-left text-md font-semibold"
+                            class="respected-standard-label text-left text-md font-semibold"
                             for="contentTypeSelect"
                             >{{ $t('editor.slides.contentType') }}</label
                         >
                         <select
                             id="contentTypeSelect"
-                            class="rounded shadow w-48"
+                            style="width: 12rem"
+                            class="respected-standard-select"
                             ref="typeSelector"
                             @input="
                                 newType = ($event.target as HTMLInputElement).value;
@@ -371,7 +403,7 @@
                     </div>
                 </div>
                 <!-- Panel options -->
-                <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
+                <div v-if="!advancedEditorView" class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
                     <!-- Make the current panel the full slide -->
                     <div
                         class="flex flex-row"
@@ -883,6 +915,8 @@ export default class SlideEditorV extends Vue {
 
 <style lang="scss" scoped>
 .panel-select-button {
+    gap: 0;
+    box-shadow: none;
     border-top-width: 1px;
     border-left-width: 1px;
     border-right-width: 1px;
