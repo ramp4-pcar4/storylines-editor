@@ -512,7 +512,6 @@
                         }
                     "
                     :configFileStructure="configFileStructure"
-                    :lang="configLang"
                     :sourceCounts="sourceCounts"
                 ></slide-toc>
             </div>
@@ -537,7 +536,6 @@
                         }
                     "
                     :configFileStructure="configFileStructure"
-                    :lang="configLang"
                     :sourceCounts="sourceCounts"
                     :closeSidebar="closeSidebar"
                     :isMobileSidebar="true"
@@ -631,15 +629,12 @@ export default class EditorV extends Vue {
     @Prop() metadata!: MetadataContent;
 
     @Prop() slides!: MultiLanguageSlide[];
-    @Prop() configLang!: string;
     @Prop() saving!: boolean;
     @Prop() unsavedChanges!: boolean;
 
     currentRoute = window.location.href;
 
     stateStore = useStateStore();
-
-    
 
     // Form properties.
     uuid = '';
@@ -692,7 +687,6 @@ export default class EditorV extends Vue {
     @Watch('stateStore.reconcileToggler')
     onReconciliationRequest(): void {
         const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-        console.log('RECONCILED SAVE', newConfigs);
 
         if (newConfigs?.en) {
             deepMerge(this.configs.en, newConfigs.en);
@@ -701,7 +695,6 @@ export default class EditorV extends Vue {
         if (newConfigs?.fr) {
             deepMerge(this.configs.fr, newConfigs.fr);
         }
-        console.log('UPDATED SAVE', JSON.parse(JSON.stringify(this.configs)));
 
         const engSlides =
             this.configs.en?.slides.map((engSlide) => {
@@ -722,7 +715,11 @@ export default class EditorV extends Vue {
         const newSlides = Array.from({ length: maxLength }, (_, index) =>
             Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
         );
-        deepMerge(this.loadSlides, newSlides);
+        // deepMerge(this.loadSlides, newSlides);
+        deepMerge(this.slides, newSlides);
+
+        this.updateSlides(this.slides);
+        this.selectSlide(this.slideIndex, this.stateStore.activeSlideLang, this.stateStore.selectedPanelIndex);
 
         // Also runs updateSaveStatus, so we don't need to emit save-status
         // TODO: This is janky, throwing stuff around like hot potato. Refactor once the core variable refactor PR is merged.
@@ -778,7 +775,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number, lang?: SupportedLanguages): void {
+    selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();
@@ -790,9 +787,9 @@ export default class EditorV extends Vue {
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
-        const newLang = lang || this.configLang || 'en';
-        if (this.configLang !== newLang) {
-            this.$emit('lang-change', newLang);
+        const newLang = lang || this.stateStore.activeSlideLang || 'en';
+        if (this.stateStore.activeSlideLang !== newLang) {
+            this.stateStore.activeSlideLang = newLang;
         }
 
         setTimeout(() => {
@@ -807,7 +804,9 @@ export default class EditorV extends Vue {
                 this.currentSlide = selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
             }
             this.slideIndex = index;
-            (this.$refs.slide as SlideEditorV).panelIndex = 0;
+            (this.$refs.slide as SlideEditorV).panelIndex = panelIndex ?? 0;
+            this.stateStore.selectedPanelIndex = panelIndex ?? 0;
+
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
         }, 5);
     }
@@ -817,9 +816,11 @@ export default class EditorV extends Vue {
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? this.configLang) as keyof MultiLanguageSlide] = slideConfig;
+        this.slides[this.slideIndex][(lang ?? this.stateStore.activeSlideLang) as keyof MultiLanguageSlide] =
+            slideConfig;
 
-        this.configs[(lang ?? this.configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] = slideConfig;
+        this.configs[(lang ?? this.stateStore.activeSlideLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
+            slideConfig;
 
         // save changes emitted from advanced editor
         if (save) {

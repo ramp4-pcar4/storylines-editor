@@ -48,9 +48,19 @@
                     :class="[
                         panel?.type === 'map' && panel.shared
                             ? 'border-yellow-800 bg-yellow-200 hover:border-yellow-400'
-                            : 'border-transparent hover:border-gray-400 hover:bg-gray-300'
+                            : 'border-transparent hover:border-gray-400 hover:bg-gray-300',
+                        element[lang] === currentSlide && this.stateStore.selectedPanelIndex === panelIndex ? '' : ''
                     ]"
-                    @click.stop
+                    :style="[
+                        element[lang] === currentSlide && this.stateStore.selectedPanelIndex === panelIndex
+                            ? 'background-color: #c1c1c5 !important;'
+                            : ''
+                    ]"
+                    @click.stop="
+                        () => {
+                            $emit('select-slide', panelIndex);
+                        }
+                    "
                     v-tippy="{
                         theme: 'left-align',
                         delay: '200',
@@ -158,6 +168,7 @@
 
 <script lang="ts">
 import { BasePanel, PanelType, Slide } from '@/definitions';
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from '@/components/helpers/toc-options.vue';
 
@@ -177,10 +188,12 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
 })
 export default class SlideTocV extends Vue {
     @Prop() lang!: string;
-    @Prop() element: Slide;
+    @Prop() element!: Slide;
     @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
-    @Prop() isActiveSlide: boolean;
+    @Prop() isActiveSlide!: boolean;
+
+    stateStore = useStateStore();
 
     oppositeLang = '';
     content = '';

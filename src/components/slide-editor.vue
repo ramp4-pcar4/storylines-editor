@@ -1,6 +1,6 @@
 <template>
     <div id="slideEditor" class="p-5">
-        <div v-if="!!currentSlide">
+        <div v-if="!!currentSlide && slideIndex !== -1">
             <div class="flex">
                 <div class="flex flex-col w-full">
                     <div class="flex justify-between flex-wrap gap-3 gap-y-1 items-center">
@@ -123,6 +123,7 @@
                     @click="
                         () => {
                             panelIndex = 0;
+                            stateStore.selectedPanelIndex = 0;
                             advancedEditorView = false;
                             saveChanges();
                         }
@@ -183,6 +184,7 @@
                 <button
                     @click="
                         () => {
+                            stateStore.selectedPanelIndex = 1;
                             panelIndex = 1;
                             advancedEditorView = false;
                             saveChanges();
@@ -260,6 +262,7 @@
                 <button
                     @click="
                         () => {
+                            stateStore.selectedPanelIndex = 0;
                             advancedEditorView = false;
                             saveChanges();
                         }
@@ -495,6 +498,7 @@
 <script lang="ts">
 import ActionModal from '@/components/helpers/action-modal.vue';
 import MultiOptionModal from '@/components/helpers/multi-option-modal.vue';
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -566,6 +570,8 @@ export default class SlideEditorV extends Vue {
     includeInToc = true;
     dynamicSelected = false;
 
+    stateStore = useStateStore();
+
     currentRoute = window.location.href;
 
     langTranslate = '';
@@ -587,7 +593,6 @@ export default class SlideEditorV extends Vue {
 
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
-        console.log('SLIDECHANGED');
         this.onePanelOnly = this.currentSlide?.panel.length === 1;
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
         this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;

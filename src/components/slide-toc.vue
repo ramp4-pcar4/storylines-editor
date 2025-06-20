@@ -170,7 +170,7 @@
                                         :currentSlide="currentSlide"
                                         :isMobileSidebar="isMobileSidebar"
                                         :isActiveSlide="slideIndex === index"
-                                        @selectSlide="selectSlide(index, 'en')"
+                                        @selectSlide="(panelIndex?: number) => selectSlide(index, 'en', panelIndex)"
                                         @closeSidebar="closeSidebar()"
                                         @copyConfig="copyConfigFromOtherLang(index, 'en')"
                                         @copy="
@@ -222,7 +222,7 @@
                                         :currentSlide="currentSlide"
                                         :isMobileSidebar="isMobileSidebar"
                                         :isActiveSlide="slideIndex === index"
-                                        @selectSlide="selectSlide(index, 'fr')"
+                                        @selectSlide="(panelIndex?: number) => selectSlide(index, 'fr', panelIndex)"
                                         @closeSidebar="closeSidebar()"
                                         @copyConfig="copyConfigFromOtherLang(index, 'fr')"
                                         @copy="
@@ -390,6 +390,7 @@ import {
     TextPanel,
     VideoPanel
 } from '@/definitions';
+import { useStateStore } from '@/stores/stateStore';
 import cloneDeep from 'clone-deep';
 import { VueFinalModal } from 'vue-final-modal';
 
@@ -415,10 +416,11 @@ export default class SlideTocV extends Vue {
     @Prop() currentSlide!: Slide | string;
     @Prop() slideIndex!: number;
     @Prop() configFileStructure!: ConfigFileStructure;
-    @Prop() lang!: string;
     @Prop() sourceCounts!: SourceCounts;
     @Prop() closeSidebar!: () => void;
     @Prop({ default: false }) isMobileSidebar!: boolean;
+
+    stateStore = useStateStore();
 
     defaultBlankSlide: Slide = {
         title: '',
@@ -451,8 +453,8 @@ export default class SlideTocV extends Vue {
      * @param index Index of slide to select (usually slide number [in UI] - 1)
      * @param lang Specific config in slide to select ('en' or 'fr')
      */
-    selectSlide(index: number, lang: string): void {
-        this.$emit('slide-change', index, lang);
+    selectSlide(index: number, lang: string, panelIndex?: number): void {
+        this.$emit('slide-change', index, lang, panelIndex);
     }
 
     /**
@@ -464,7 +466,7 @@ export default class SlideTocV extends Vue {
             en: JSON.parse(JSON.stringify(this.defaultBlankSlide)),
             fr: JSON.parse(JSON.stringify(this.defaultBlankSlide))
         });
-        this.selectSlide(this.slides.length - 1, this.lang);
+        this.selectSlide(this.slides.length - 1, this.stateStore.activeSlideLang);
         this.$emit('slides-updated', this.slides);
         this.scrollToElement(this.slides.length - 1);
     }
@@ -590,22 +592,21 @@ export default class SlideTocV extends Vue {
         this.slides[index].fr.panel.forEach((panel) => this.$emit('process-panel', panel, incrementSourceCounts));
 
         this.$emit('slides-updated', this.slides);
-        this.selectSlide(index + 1, this.lang);
+        this.selectSlide(index + 1, this.stateStore.activeSlideLang);
         Message.success(this.$t('editor.slide.copy.success'));
         this.scrollToElement(index + 1);
     }
 
     removeSlide(index: number): void {
         if (index === this.slideIndex) {
-            this.selectSlide(-1, this.lang);
-            // this.$emit('slide-change', -1);
+            this.selectSlide(-1, this.stateStore.activeSlideLang);
         }
 
         // Before removing the slide, updated the sources for the panels.
         this.removeSourceCounts(index);
 
         this.slides.splice(index, 1);
-        this.selectSlide(this.slides.length - 1, this.lang);
+        this.selectSlide(this.slides.length - 1, this.stateStore.activeSlideLang);
         this.$emit('slides-updated', this.slides);
     }
 
@@ -703,7 +704,7 @@ export default class SlideTocV extends Vue {
     resizeMobile(): void {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
-        
+
         if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
         } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
@@ -717,7 +718,6 @@ export default class SlideTocV extends Vue {
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeMobile);
     }
-    
 }
 
 // More accurate page height for mobile
@@ -731,7 +731,6 @@ window.addEventListener('resize', () => {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -753,7 +752,7 @@ window.addEventListener('resize', () => {
 }
 
 .toc-slide {
-  cursor: grab;
+    cursor: grab;
 }
 
 .toc-slide-button {
