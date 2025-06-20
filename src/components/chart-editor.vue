@@ -4,15 +4,15 @@
         <div class="flex items-center">
             <span class="font-bold px-4">{{
                 $t('editor.chart.label.info', {
-                    num: chartConfigs.length
+                    num: storylinesChartConfigs.length
                 })
             }}</span>
             <!-- add chart button -->
             <button
                 class="editor-button chart-btn bg-gray-100 cursor-pointer hover:bg-gray-200"
                 id="modal-btn"
-                @click="clearEditor()"
-                :disabled="!allowMany && chartConfigs.length > 0"
+                :disabled="!allowMany && storylinesChartConfigs.length > 0"
+                @click="() => (creatingChart = true)"
             >
                 <div class="flex items-center">
                     <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
@@ -27,14 +27,14 @@
         <hr class="border-solid border-t-2 border-gray-300 my-2" />
 
         <!-- No charts to display -->
-        <div class="m-4" v-if="chartConfigs.length === 0">
+        <div class="m-4" v-if="storylinesChartConfigs.length === 0 && !creatingChart">
             <span class="italic text-gray-400">{{ $t('editor.chart.label.empty') }}</span>
         </div>
 
         <!-- Gallery preview of all charts -->
-        <ul class="flex flex-wrap list-none" v-show="chartConfigs.length">
+        <ul class="flex flex-wrap list-none" v-show="storylinesChartConfigs.length && !creatingChart && !editorOpen">
             <draggable
-                v-model="chartConfigs"
+                v-model="storylinesChartConfigs"
                 handle=".handle"
                 @update="onChartsEdited"
                 class="w-full flex flex-wrap list-none"
@@ -44,11 +44,14 @@
                     <ChartPreview
                         :key="`${element.name}-${index}`"
                         :chart="element"
+                        :highchartConfig="highchartsChartConfigs[index]"
                         :configFileStructure="configFileStructure"
                         :sourceCounts="sourceCounts"
                         :lang="lang"
                         :index="index"
-                        @edit="editChart"
+                        @edit="(chart: ChartConfig) => {
+                            openEditor(chart.name as string)
+                        }"
                         @delete="$vfm.open(`${element.name}-${index}`)"
                         @captionEdit="onChartsEdited"
                     ></ChartPreview>
@@ -56,12 +59,35 @@
             </draggable>
         </ul>
         <confirmation-modal
-            v-for="(chart, idx) in chartConfigs"
+            v-for="(chart, idx) in storylinesChartConfigs"
             :key="`${chart.name}-${idx}`"
             :name="`${chart.name}-${idx}`"
             :message="$t('editor.chart.delete.confirm', { name: chart.name })"
             @ok="deleteChart(chart)"
         ></confirmation-modal>
+
+        <div v-for="config in highchartsChartConfigs">
+            <highcharts-accessible-configuration-kit
+                v-if="editorsOpen[config.title.text as string]"
+                :key="config.title.text"
+                :plugin="true"
+                :lang="lang"
+                :config="config"
+                @cancel="() => closeEditor(config.title.text as string)"
+                @saved="(updatedConfig: HighchartsConfig) => saveChart(config.title.text as string, updatedConfig)"
+            ></highcharts-accessible-configuration-kit>
+        </div>
+
+        <highcharts-accessible-configuration-kit
+            v-if="creatingChart"
+            :id="`new-editor-${chartIdx}`"
+            :key="`new-editor-${chartIdx}`"
+            :plugin="true"
+            :lang="lang"
+            :title="$t('editor.chart.label.newTitle', { num: chartIdx })"
+            @cancel="() => (creatingChart = false)"
+            @saved="createNewChart"
+        />
     </div>
 </template>
 
@@ -71,7 +97,7 @@ import {
     ChartConfig,
     ChartPanel,
     ConfigFileStructure,
-    Highchart,
+    HighchartsConfig,
     PanelType,
     SlideshowChartPanel,
     SourceCounts
@@ -79,6 +105,11 @@ import {
 import ChartPreviewV from './helpers/chart-preview.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
+
+import Highcharts from 'highcharts';
+import dataModule from 'highcharts/modules/data';
+
+dataModule(Highcharts);
 
 @Options({
     components: {
@@ -97,28 +128,19 @@ export default class ChartEditorV extends Vue {
     @Prop({ default: false }) dynamicSelected!: boolean;
 
     edited = false;
+    creatingChart = false;
+    oldChartName = '';
+    chartIdx = 1;
 
-    chartConfigs = [] as Array<ChartConfig>;
-    modalEditor = {} as typeof highed.ModalEditor;
+    storylinesChartConfigs = [] as Array<ChartConfig>;
+    highchartsChartConfigs = [] as Array<HighchartsConfig>;
+    editorsOpen = {} as Record<string, boolean>;
+
+    get editorOpen(): boolean {
+        return Object.values(this.editorsOpen).some((open) => open);
+    }
 
     mounted(): void {
-        // attach highcharts modal editor to summoner node
-        highed.ready(() => {
-            this.modalEditor = highed.ModalEditor(
-                'modal-btn',
-                {
-                    allowDone: true,
-                    features: 'import templates customize done',
-                    importer: {
-                        options: 'plugins csv json'
-                    }
-                },
-                (chart: Highchart) => {
-                    this.createNewChart(chart.toString());
-                }
-            );
-        });
-
         // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
         const charts =
             this.panel.type === PanelType.SlideshowChart
@@ -126,6 +148,20 @@ export default class ChartEditorV extends Vue {
                 : this.panel.src
                 ? [this.panel]
                 : [];
+
+        // fetch single existing chart config from ZIP
+        if (this.panel.type === PanelType.Chart && this.panel.src) {
+            const chartSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
+            const highchartsJson = this.configFileStructure.zip.file(chartSrc);
+            if (highchartsJson) {
+                highchartsJson.async('string').then((res: string) => {
+                    this.highchartsChartConfigs.push(JSON.parse(res));
+                });
+            }
+
+            this.extractStorylinesChartConfig(this.panel as ChartPanel);
+            this.chartIdx += 1;
+        }
 
         if (this.centerSlide && this.dynamicSelected) {
             for (const c in charts) {
@@ -137,65 +173,49 @@ export default class ChartEditorV extends Vue {
             }
         }
 
-        // load charts from existing storylines product
-        if (charts !== undefined && charts.length) {
-            this.chartConfigs = charts.map((chart: ChartPanel) => {
-                let chartName = '';
-                // extract chart name
-                if (chart.options && chart.options.title) {
-                    chartName = chart.options.title;
-                } else {
-                    const path = chart.src.match(/.*\/(.*)$/);
-                    chartName = path ? path[1].replace(/\.[^/.]+$/, '').replace(/\./g, ' ') : chart.src;
+        // fetch multiple existing chart configs from ZIP
+        if (this.panel.type === PanelType.SlideshowChart) {
+            charts.forEach((chart: ChartPanel) => {
+                this.extractStorylinesChartConfig(chart);
+
+                // extract actual highcharts config from
+                const chartSrc = `${chart.src.substring(chart.src.indexOf('/') + 1)}`;
+                const highchartsJson = this.configFileStructure.zip.file(chartSrc);
+                if (highchartsJson) {
+                    highchartsJson.async('string').then((res: string) => {
+                        this.highchartsChartConfigs.push(JSON.parse(res));
+                    });
                 }
-                return {
-                    name: chartName,
-                    ...chart
-                };
+                this.chartIdx += 1;
             });
         }
     }
 
-    clearEditor(): void {
-        // reset to clear modal editor options
-        let chart_options = {
-            title: {
-                text: `Chart ${this.chartConfigs.length + 1}`
-            },
-            subtitle: {
-                text: ''
-            },
-            credits: {
-                enabled: false
-            }
-        };
-        chart_options =
-            this.lang === 'en'
-                ? Object.assign({}, chart_options, { lang: { thousandsSep: ',' } })
-                : Object.assign({}, chart_options, { lang: { thousandsSep: ' ' } });
-        this.modalEditor.editor.chart.options.setAll(chart_options);
-        // resets and clears datatable section
-        const defaultTableData = `"Column 1";"Column 2"\n" "";" "`;
-        this.modalEditor.editor.dataTable.loadCSV({ csv: defaultTableData });
+    openEditor(name: string) {
+        this.editorsOpen[name] = true;
+        this.oldChartName = name;
     }
 
-    createNewChart(chartInfo: string): void {
-        const chart = JSON.parse(chartInfo);
-        const chartSrc = `${this.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
+    closeEditor(name: string) {
+        this.editorsOpen[name] = false;
+    }
+
+    createNewChart(newConfig: HighchartsConfig): void {
+        const chartSrc = `${this.configFileStructure.uuid}/charts/${this.lang}/${newConfig.title?.text}.json`;
 
         // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
         if (this.sourceCounts[chartSrc] > 0) {
             alert(
                 this.$t('editor.chart.label.nameExists', {
-                    name: chart.title.text
+                    name: newConfig.title?.text
                 })
             );
+            return;
 
-            // Re-open the editor the the issue can be fixed.
-            setTimeout(() => this.modalEditor.show(), 100);
         } else {
             const chartConfig = {
-                name: chart.title.text,
+                name: newConfig.title?.text,
+                chartIdx: 0,
                 src: chartSrc
             };
 
@@ -206,51 +226,92 @@ export default class ChartEditorV extends Vue {
             }
 
             // Add chart config to ZIP file.
-            this.configFileStructure.charts[this.lang].file(`${chart.title.text}.json`, JSON.stringify(chart, null, 4));
-            this.chartConfigs.push(chartConfig);
+            this.configFileStructure.charts[this.lang].file(
+                `${newConfig.title?.text}.json`,
+                JSON.stringify(newConfig, null, 4)
+            );
+            this.storylinesChartConfigs.push(chartConfig);
+            this.highchartsChartConfigs.push(newConfig);
         }
         this.onChartsEdited();
+        this.creatingChart = false;
+        this.chartIdx += 1;
     }
 
-    editChart(chartInfo: { oldChart: ChartConfig; newChart: ChartConfig }): void {
-        const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chartInfo.oldChart.name);
-        if (idx !== -1) {
-            // Remove old chart config from ZIP file and add in new one.
-            const oldName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.oldChart.name}.json`;
-            this.sourceCounts[oldName] -= 1;
-            if (this.sourceCounts[oldName] === 0) {
-                this.configFileStructure.charts[this.lang].remove(`${chartInfo.oldChart.name}.json`);
-            }
+    extractStorylinesChartConfig(chart: ChartPanel): void {
+        let chartName = '';
+        // extract chart name
+        if (chart.options && chart.options.title) {
+            chartName = chart.options.title;
+        } else {
+            const path = chart.src.match(/.*\/(.*)$/);
+            chartName = path ? path[1].replace(/\.[^/.]+$/, '').replace(/\./g, ' ') : chart.src;
+        }
+        // save storylines chart config
+        this.storylinesChartConfigs.push({
+            name: chartName,
+            chartIdx: 0,
+            ...chart
+        });
+    }
 
-            const newName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.newChart.name}.json`;
-            if (this.sourceCounts[newName]) {
-                this.sourceCounts[newName] += 1;
-            } else {
-                this.sourceCounts[newName] = 1;
+    saveChart(name: string, updatedConfig: HighchartsConfig): void {
+        const idx = this.storylinesChartConfigs.findIndex((c) => c.name === name);
+        if (idx !== -1) {
+            if (updatedConfig.title?.text !== this.oldChartName) {
+                // Remove old chart config from ZIP file and add in new one.
+                const oldName = `${this.configFileStructure.uuid}/charts/${this.lang}/${this.oldChartName}.json`;
+                this.sourceCounts[oldName] -= 1;
+                if (this.sourceCounts[oldName] === 0) {
+                    this.configFileStructure.charts[this.lang].remove(`${this.oldChartName}.json`);
+                }
+
+                // Check to ensure chart does not rename to an existing chart title
+                const newName = `${this.configFileStructure.uuid}/charts/${this.lang}/${updatedConfig.title?.text}.json`;
+                if (this.sourceCounts[newName] > 0) {
+                    alert(
+                        this.$t('editor.chart.label.nameExists', {
+                            name: updatedConfig.title?.text
+                        })
+                    );
+                    return;
+                }
+
+                if (this.sourceCounts[newName]) {
+                    this.sourceCounts[newName] += 1;
+                } else {
+                    this.sourceCounts[newName] = 1;
+                }
             }
+            // Add updated chart config to ZIP
             this.configFileStructure.charts[this.lang].file(
-                `${chartInfo.newChart.name}.json`,
-                JSON.stringify(chartInfo.newChart.config, null, 4)
+                `${updatedConfig.title.text}.json`,
+                JSON.stringify(updatedConfig, null, 4)
             );
 
-            chartInfo.newChart.src = `${this.configFileStructure.uuid}/charts/${this.lang}/${chartInfo.newChart.name}.json`;
-            this.chartConfigs[idx] = {
-                name: chartInfo.newChart.name,
-                src: chartInfo.newChart.src
+            // Update local copies of Highcharts + Storylines chart configs
+            this.storylinesChartConfigs[idx] = {
+                name: updatedConfig.title?.text,
+                config: updatedConfig,
+                chartIdx: this.storylinesChartConfigs[idx].chartIdx! + 1,
+                src: `${this.configFileStructure.uuid}/charts/${this.lang}/${updatedConfig.title.text}.json`
             };
+            this.highchartsChartConfigs[idx] = updatedConfig;
         }
         this.onChartsEdited();
+        this.editorsOpen[name] = false;
     }
 
     deleteChart(chart: ChartConfig): void {
-        const idx = this.chartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
+        const idx = this.storylinesChartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
         if (idx !== -1) {
             // Remove the chart from the config file.
             this.sourceCounts[`${this.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] -= 1;
             if (this.sourceCounts[`${this.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] === 0) {
                 this.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
             }
-            this.chartConfigs.splice(idx, 1);
+            this.storylinesChartConfigs.splice(idx, 1);
+            this.highchartsChartConfigs.splice(idx, 1);
         }
         this.onChartsEdited();
     }
@@ -264,15 +325,15 @@ export default class ChartEditorV extends Vue {
                 delete this.panel[key];
             });
 
-            // Handle case where every image is deleted.
-            if (this.chartConfigs.length === 0) {
+            // Handle case where every chart is deleted.
+            if (this.storylinesChartConfigs.length === 0) {
                 this.panel.type = PanelType.Chart;
                 (this.panel as ChartPanel).src = '';
-            } else if (this.chartConfigs.length === 1) {
+            } else if (this.storylinesChartConfigs.length === 1) {
                 this.panel.type = PanelType.Chart;
 
                 // Grab the one chart config from the array.
-                const newChart = this.chartConfigs[0];
+                const newChart = this.storylinesChartConfigs[0];
 
                 // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
                 Object.keys(newChart).forEach((key) => {
@@ -284,7 +345,7 @@ export default class ChartEditorV extends Vue {
                 this.panel.type = PanelType.SlideshowChart;
 
                 // Turn each of the chart configs into a chart panel and add them to the slideshow.
-                (this.panel as SlideshowChartPanel).items = this.chartConfigs.map((chart: ChartConfig) => {
+                (this.panel as SlideshowChartPanel).items = this.storylinesChartConfigs.map((chart: ChartConfig) => {
                     return {
                         ...chart,
                         type: PanelType.Chart
@@ -308,36 +369,12 @@ export default class ChartEditorV extends Vue {
 .name-label {
     text-align: left !important;
 }
+
 .chart-btn {
     border: none !important;
 }
 
-.highed-chart-frame-body {
-    pointer-events: none;
-}
-
-.highed-toolbar-right .highed-icon {
-    min-width: 0 !important;
-    min-height: 0 !important;
-    padding-left: 0 !important;
-}
-
-.panel.top.highed-scrollbar {
-    margin-bottom: 0 !important;
-}
-
-.highed-res-preview {
-    padding: 4px 0;
-}
-
-.highed-res-number:disabled {
-    border-color: rgba(118, 118, 118, 0.3);
-}
-
-.highed-res-number {
-    line-height: normal;
-    background-color: field;
-    border-width: 2px;
-    border-style: inset;
+.highcharts-app-container {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 </style>
