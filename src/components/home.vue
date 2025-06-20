@@ -287,7 +287,11 @@
                     >
                         <div class="m-2 mt-4 ml-3">{{ $t('editor.uuid') }}: {{ storyline.uuid }}</div>
                         <div class="m-2 mb-4 ml-3">
-                            {{ $t('editor.previousProducts.productInfo.title') + ': ' + storyline.titleEN }}
+                            {{
+                                $t('editor.previousProducts.productInfo.title') +
+                                ': ' +
+                                (currLang === 'en' ? storyline.titleEN : storyline.titleFR)
+                            }}
                         </div>
                     </td>
                     <td
@@ -428,10 +432,13 @@ export default class HomeV extends Vue {
                 this.$t('editor.month.november'),
                 this.$t('editor.month.december')
             ];
+            const hour = d.getHours().toString().padStart(2, '0');
+            const minute = d.getMinutes().toString().padStart(2, '0');
+
             if (this.currLang === 'en') {
-                return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+                return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' ' + hour + ':' + minute;
             } else {
-                return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+                return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hour + ':' + minute;
             }
         }
     }
