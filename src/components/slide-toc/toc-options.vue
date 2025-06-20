@@ -88,7 +88,7 @@
 
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import DropdownMenu from '@/components/helpers/dropdown-menu.vue';
+import DropdownMenu from '@/components/support/dropdown-menu.vue';
 
 @Options({
     components: {
