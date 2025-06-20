@@ -1,5 +1,6 @@
 import { RouteLocationNormalized, Router } from 'vue-router';
 import { Pinia } from 'pinia';
+import type { Vfm } from 'vue-final-modal';
 
 declare module 'vue-router' {
     interface RouteMeta {
@@ -13,5 +14,6 @@ declare module '@vue/runtime-core' {
         $router: Router;
         $pinia: Pinia;
         $t: typeof import('vue-i18n')['t'];
+        $vfm: Vfm;
     }
 }

@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n';
+import { highchartsMessages } from 'highcharts-accessible-configuration-kit';
 
 type csvRows = { key: string; enValue: string; frValue: string }[];
 interface LocaleMessages {
@@ -26,12 +27,17 @@ function fold(rows: csvRows): LocaleMessages {
     );
 }
 
+const appMessages = fold(rows);
+
 const i18n = createI18n({
     legacy: false,
     locale: lang || undefined,
     fallbackLocale: 'en',
     globalInjection: true,
-    messages: fold(rows)
+    messages: {
+        en: { ...appMessages.en, ...highchartsMessages.en },
+        fr: { ...appMessages.fr, ...highchartsMessages.fr }
+    }
 });
 
 export { i18n };

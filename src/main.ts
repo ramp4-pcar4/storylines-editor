@@ -53,6 +53,7 @@ import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/dist/backdrop.css';
 
+import VuePapaParse from 'vue-papa-parse';
 import HighchartsVue from 'highcharts-vue';
 import Message from 'vue-m-message';
 import 'vue-m-message/dist/style.css';
@@ -62,6 +63,9 @@ import 'vue-accessible-color-picker/styles';
 
 import StorylinesViewer from 'ramp-storylines_demo-scenarios-pcar';
 import 'ramp-storylines_demo-scenarios-pcar/dist/style.css';
+
+import HighchartsAccessibleConfigurationKit from 'highcharts-accessible-configuration-kit';
+import 'highcharts-accessible-configuration-kit/dist/highcharts-accessible-configuration-kit.css';
 
 import { FocusContainer, FocusItem, FocusList } from '@/directives/focus-list';
 import { Truncate } from '@/directives/truncate/truncate';
@@ -76,12 +80,16 @@ app.use(pinia)
         directive: 'tippy',
         component: 'tippy'
     })
+    .use(HighchartsAccessibleConfigurationKit)
     .use(HighchartsVue, { tagName: 'highchart' })
     .use(Message)
     .use(StorylinesViewer)
     .use(VueMarkdownEditor)
+    .use(VuePapaParse)
     .use(ColorPicker)
     .use(vfm);
+
+app.provide('$papa', app.config.globalProperties.$papa);
 
 app.directive('focus-container', FocusContainer);
 app.directive('focus-list', FocusList);
