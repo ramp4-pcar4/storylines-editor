@@ -201,6 +201,7 @@ editor.chart.label.create,Add new chart,1,Ajouter un nouveau graphique,1
 editor.chart.label.info,Interactive chart,1,Graphique interactif,0
 editor.chart.label.nameExists,There is already an existing chart with the name {name}.,1,Il existe déjà un graphique portant le nom {name}.,0
 editor.chart.label.info,Interactive charts ({num}),1,Graphiques interactifs ({num}),1
+editor.chart.label.newTitle,New Chart {num},1,Nouveau graphique {num},0
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Voulez-vous vraiment supprimer le graphique {nom}?,1
 editor.map.title,Map title,1,Titre de la carte,1
 editor.map.edit.cancel,Cancel editing,1,Annuler les modifications,1
