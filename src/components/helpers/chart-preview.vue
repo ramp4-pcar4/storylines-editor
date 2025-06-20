@@ -30,10 +30,9 @@
             <!-- chart component -->
             <storylines-chart
                 class="w-full h-full"
-                :config="chartConfig"
-                :key="chartIdx"
+                :config="chart"
+                :key="chart.chartIdx"
                 :configFileStructure="configFileStructure"
-                @loaded="loadChart"
                 v-if="!loading"
             ></storylines-chart>
         </div>
@@ -62,6 +61,7 @@
             <button
                 class="respected-standard-button respected-gray-border-button respected-thin-button"
                 :id="`edit-${chart.name}-btn`"
+                @click="$emit('edit', chart)"
             >
                 <div class="flex items-center">
                     <svg height="18px" width="18px" viewBox="0 0 23 21" xmlns="http://www.w3.org/2000/svg">
@@ -80,15 +80,7 @@
 
 <script lang="ts">
 import { Prop, Vue } from 'vue-property-decorator';
-import {
-    ChartConfig,
-    ConfigFileStructure,
-    DQVChartConfig,
-    LineSeriesData,
-    PieDataRow,
-    PieSeriesData,
-    SourceCounts
-} from '@/definitions';
+import { ChartConfig, ConfigFileStructure, SourceCounts } from '@/definitions';
 
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
@@ -108,114 +100,11 @@ export default class ChartPreviewV extends Vue {
 
     loading = true;
     chartIdx = 0;
-    chartConfig = {};
     chartName = '';
-    modalEditor: typeof highed.ModalEditor = undefined;
 
     mounted(): void {
-        this.chartConfig = this.chart;
         this.chartName = this.chart.name || '';
         this.loading = false;
-    }
-
-    /**
-     * Save initial set of chart options used to create chart.
-     */
-    loadChart(chartOptions: DQVChartConfig): void {
-        // initialize higcharts editor and link to edit summoner node
-        if (this.modalEditor) {
-            return;
-        }
-
-        this.modalEditor = highed.ModalEditor(
-            `edit-${this.chartName}-btn`,
-            {
-                allowDone: true,
-                features: 'import templates customize done',
-                importer: {
-                    options: 'plugins csv json'
-                },
-                defaultChartOptions: chartOptions
-            },
-            (newChart: string) => {
-                const chart = JSON.parse(newChart);
-                const newName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
-
-                // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
-                if (this.sourceCounts[newName] > 0 && chart.title.text != this.chart.name) {
-                    alert(
-                        this.$t('editor.chart.label.nameExists', {
-                            name: chart.title.text
-                        })
-                    );
-
-                    // Re-open the editor so the issue can be fixed.
-                    setTimeout(() => this.modalEditor.show(), 100);
-                } else {
-                    const chartConfig = {
-                        name: chart.title.text,
-                        config: chart,
-                        src: ''
-                    };
-
-                    this.$emit('edit', { oldChart: this.chart, newChart: chartConfig });
-                    this.chartConfig = chartConfig;
-                    this.chartName = chartConfig.name;
-                    this.chartIdx += 1;
-                }
-            }
-        );
-
-        // restore CSV data if exists
-        if (chartOptions.data?.csv !== undefined) {
-            const csvData = chartOptions.data.csv;
-            this.modalEditor.editor.dataTable.loadCSV({ csv: csvData });
-        } else {
-            this.convertSeriesToCSV(chartOptions);
-        }
-
-        this.modalEditor.editor.chart.options.setAll(chartOptions);
-    }
-
-    /*
-     * Convert series data into formatted csvData string for charts created without using editor
-     * so that the datatable when re-opening modal is properly populated.
-     */
-    convertSeriesToCSV(chartOptions: DQVChartConfig): void {
-        if (chartOptions.chart?.type === 'pie') {
-            const seriesData = (chartOptions?.series as PieSeriesData).data;
-            if (seriesData) {
-                // pie charts only have one set of series data with the name;y format
-                const csvData = [
-                    // first row is attempt to extract data labels if exists
-                    `${(chartOptions?.series as PieSeriesData).name};${chartOptions?.yAxis?.title.text}`,
-                    ...seriesData.map((row: PieDataRow) => `${row.name};${row.y}`)
-                ];
-
-                // load formatted CSV string into datatable
-                this.modalEditor.editor.dataTable.loadCSV({ csv: csvData.join('\n') });
-            }
-        } else {
-            if (chartOptions?.series && (chartOptions?.series as LineSeriesData[]).length) {
-                // other chart types may have multiple sets of series data along with x-axis categories
-                // append series data name to its data set
-                let seriesData = (chartOptions?.series as LineSeriesData[]).map((series: LineSeriesData) => [
-                    series.name,
-                    ...series.data
-                ]);
-                if (chartOptions.xAxis !== undefined) {
-                    // add xAxis categories to series data if it exists
-                    const catoData = [chartOptions.xAxis?.title?.text].concat(chartOptions.xAxis?.categories);
-                    seriesData.unshift(catoData);
-                }
-
-                // join series data together
-                let csvData = seriesData[0].map((_, idx) => seriesData.map((data) => data[idx]).join(';'));
-
-                // load formatted CSV string into datatable
-                this.modalEditor.editor.dataTable.loadCSV({ csv: csvData.join('\n') });
-            }
-        }
     }
 }
 </script>
