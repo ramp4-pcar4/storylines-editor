@@ -30,6 +30,7 @@
             <!-- Close ToC sidebar button -->
             <button
                 v-if="isMobileSidebar"
+                :aria-label="$t(`editor.slides.toc.closeToC`)"
                 class="respected-standard-button respected-gray-border-button"
                 @click="$emit('close-sidebar')"
             >
