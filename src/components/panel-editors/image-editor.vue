@@ -199,6 +199,13 @@ export default class ImageEditorV extends Vue {
     get isDragging(): boolean {
         return this.dragging;
     }
+    //
+    // @Watch('panel.caption')
+    // onCaptionChange() {
+    //     if (this.panel.caption !== this.slideshowCaption) {
+    //         this.slideshowCaption = this.panel.caption;
+    //     }
+    // }
 
     mounted(): void {
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
