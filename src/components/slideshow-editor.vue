@@ -125,7 +125,8 @@
                             </button>
                         </td>
                         <td style="text-align: left !important" class="truncate">
-                            {{ idx + 1 }}. {{ item.title || $t('editor.slideshow.noTitle') }}
+                            <span class="ml-2 text-gray-400">{{ `${idx + 1}. ` }}</span>
+                            {{ item.title || $t('editor.slideshow.noTitle') }}
                         </td>
                         <td>{{ $t(`editor.slide.panel.type.${item.type}`) }}</td>
                         <td :class="{ 'rounded-br': idx === panel.items.length - 1 }">
@@ -186,20 +187,22 @@
             </span>
         </button>
 
-        <br /><br />
-        <div
-            id="create-and-edit-area"
-            v-if="editingStatus !== 'none'"
-            class="border rounded-md p-4"
-            :class="[editingStatus !== 'create' ? 'border-blue-300' : 'border-gray-300']"
-        >
-            <div class="flex w-full justify-between items-center">
-                <h2 class="text-xl font-semibold">
-                    {{
-                        $t(`editor.slideshow.label.${editingStatus}`) +
-                        (editingStatus === 'edit' ? ` (#${editingIdx + 1})` : '')
-                    }}
-                </h2>
+        <br />
+        <hr />
+        <br />
+        <div id="create-and-edit-area" v-if="editingStatus !== 'none'">
+            <div class="flex w-full justify-between items-center mb-2">
+                <div class="flex flex-col">
+                    <h2 class="text-xl font-bold">
+                        {{ $t(`editor.slideshow.label.${editingStatus}`) }}
+                    </h2>
+                    <p v-if="editingStatus === 'edit'" class="font-semibold text-md text-gray-500">
+                        {{
+                            `#${editingIdx + 1} - ` + (panel.items[editingIdx].title || $t('editor.slideshow.noTitle'))
+                        }}
+                    </p>
+                </div>
+
                 <!-- Save new slide -->
                 <button
                     v-if="editingStatus === 'create'"
@@ -260,7 +263,7 @@
                 </button>
             </div>
 
-            <hr class="border-solid border-t-2 border-gray-300 my-2" />
+            <!--            <hr class="border-solid border-t-2 border-gray-300 my-2" />-->
             <div>
                 <div class="mt-3" v-if="editingStatus === 'create'">
                     <!-- Creating new slide -->
