@@ -1727,7 +1727,11 @@ export default class MetadataEditorV extends Vue {
      * @param callback The callback function that is called on each ImagePanel/VideoPanel in the provided BasePanel
      * @param callbackArgs The additional argument(s) for the callback function (can be empty)
      */
-    panelHelper(panel: BasePanel, callback: (panel: ImagePanel | VideoPanel, ...args) => void, ...callbackArgs): void {
+    panelHelper(
+        panel: BasePanel,
+        callback: (panel: ImagePanel | VideoPanel | ChartPanel, ...args) => void,
+        ...callbackArgs
+    ): void {
         switch (panel.type) {
             case 'slideshow':
                 panel.items.forEach((item) => this.panelHelper(item, callback, ...callbackArgs));
@@ -1737,6 +1741,7 @@ export default class MetadataEditorV extends Vue {
                 break;
             case 'image':
             case 'video':
+            case 'chart':
                 callback(panel, ...callbackArgs);
         }
     }
