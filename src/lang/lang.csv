@@ -18,7 +18,7 @@ dynamic.panel.id,Panel ID,1,No d’identification du panneau,1
 dynamic.panel.type,Panel Type,1,Type de panneaux,1
 dynamic.panel.actions,Panel Actions,1,Actions du panneau,1
 dynamic.panel.idTaken,Panel ID is already in use,1,Le nom du panneau est déjà utilisé,1
-dynamic.panel.editor,Panel Editor:,1,Éditeur de panneaux:,1
+dynamic.panel.editor,Panel Editor,1,Éditeur de panneaux,1
 dynamic.panel.remove,Are you sure you want to remove this panel?,1,Etes-vous sûr de vouloir supprimer ce panneau?,0
 dynamic.panel.enterID,Enter Panel ID,1,Entrez l'ID du panneau,0
 dynamic.panel.add,Add New,1,Ajouter un nouveau,0
