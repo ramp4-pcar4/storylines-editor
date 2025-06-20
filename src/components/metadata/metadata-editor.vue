@@ -438,7 +438,7 @@
                                 </button>
                             </section>
                             <!-- ENG/FR config language toggle -->
-                            <a class="sub-link" @click="swapLang()" tabindex="0">
+                            <a class="sub-link" @click="swapConfigLang()" tabindex="0">
                                 {{
                                     productStore.configLang === 'en'
                                         ? $t('editor.frenchConfig')
@@ -616,9 +616,7 @@
         <template v-if="loadEditor && loadStatus === 'loaded'">
             <editor
                 :metadata="metadata"
-                :slides="slides"
                 :saving="saving"
-                :unsavedChanges="unsavedChanges"
                 @save-changes="onSave"
                 @refresh-config="refreshConfig"
                 @export-product="exportProduct"
@@ -632,7 +630,7 @@
                     <metadata-modal
                         :metadata="metadata"
                         @save-changes="saveMetadata(false)"
-                        @lang-change="swapLang()"
+                        @lang-change="swapConfigLang()"
                         @metadata-changed="updateMetadata"
                         @image-changed="onFileChange"
                         @image-source-changed="onImageSourceInput"
@@ -669,10 +667,12 @@ import {
     Slide,
     SourceCounts,
     StoryRampConfig,
+    SupportedLanguages,
     TextPanel
 } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
-import { useUserStore } from '../../stores/userStore';
+import { VueFinalModal } from 'vue-final-modal';
+import { useUserStore } from '@/stores/userStore';
 import { computed } from 'vue';
 
 import JSZip from 'jszip';
@@ -694,7 +694,7 @@ import { useProductStore } from '@/stores/productStore';
 
 interface RouteParams {
     uid: string;
-    configLang: string;
+    configLang: SupportedLanguages;
     configs: {
         [key: string]: StoryRampConfig | undefined;
     };
@@ -752,41 +752,19 @@ export default class MetadataEditorV extends Vue {
 
     // Saving properties.
     saving = false;
-    unsavedChanges = this.stateStore.getIsChanged();
-
-    @Watch('stateStore.isChanged')
-    onChanged() {
-        this.unsavedChanges = this.stateStore.getIsChanged();
-    }
 
     onMetadataEdited(): void {
-        if (this.configs[this.configLang]) {
-            this.useConfig(this.configs[this.configLang] as StoryRampConfig, false);
+        // Reload both metadata languages. Start with the other and then the current.
+        const otherLang = this.productStore.configLang === 'en' ? 'fr' : 'en';
+        if (this.productStore.configs[otherLang]) {
+            this.useConfig(this.productStore.configs[otherLang] as StoryRampConfig, true);
         }
-        this.updateSaveStatus(true);
+        if (this.productStore.configs[this.productStore.configLang]) {
+            this.useConfig(this.productStore.configs[this.productStore.configLang] as StoryRampConfig, true);
+        }
+        this.productStore.updateSaveStatus(true);
         this.stateStore.updateUndoRedoAbility();
     }
-
-    // @Watch('stateStore.reconcileToggler')
-    // onReconciliationRequest() {
-    //     const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-    //     console.log('RECONCILED SAVE', newConfigs);
-    //
-    //     if (newConfigs?.en) {
-    //         this.configs.en = newConfigs?.en;
-    //     }
-    //
-    //     if (newConfigs?.fr) {
-    //         this.configs.fr = newConfigs?.fr;
-    //     }
-    //     // this.configs.en = newConfigs?.en ?? this.configs.en;
-    //     // this.configs.fr = newConfigs?.fr ?? this.configs.fr;
-    //     console.log('UPDATED SAVE', JSON.parse(JSON.stringify(this.configs)));
-    //
-    //     this.loadSlides(this.configs);
-    //
-    //     this.updateSaveStatus(true);
-    // }
 
     controller = new AbortController();
 
@@ -862,7 +840,7 @@ export default class MetadataEditorV extends Vue {
     reqFields: { uuid: boolean } = {
         uuid: true
     };
-    slides: MultiLanguageSlide[] = [];
+    // slides: MultiLanguageSlide[] = [];
     sourceCounts: SourceCounts = {};
     sessionExpired = false;
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
@@ -903,7 +881,7 @@ export default class MetadataEditorV extends Vue {
         this.loadExisting = this.editExisting;
         // Generate UUID for new product
         this.uuid = (this.$route.params.uid as string) ?? (this.loadExisting ? undefined : uuidv4());
-        this.productStore.configLang = (this.$route.params.lang as string) || 'en';
+        this.productStore.configLang = (this.$route.params.lang as SupportedLanguages) || 'en';
 
         // Initialize Storylines config and the configuration structure.
         this.productStore.configs = { en: undefined, fr: undefined };
@@ -936,7 +914,7 @@ export default class MetadataEditorV extends Vue {
                 this.metadata = props.metadata;
                 this.productStore.sourceCounts = props.sourceCounts;
                 this.loadExisting = props.existing;
-                this.unsavedChanges = props.unsavedChanges;
+                this.stateStore.isChanged = props.unsavedChanges;
 
                 this.loadSlides(props.configs);
 
@@ -1142,7 +1120,7 @@ export default class MetadataEditorV extends Vue {
             }) ?? [];
 
         const maxLength = frSlides.length > engSlides.length ? frSlides.length : engSlides.length;
-        this.slides = Array.from({ length: maxLength }, (_, index) =>
+        this.productStore.slidesWorkingCopy = Array.from({ length: maxLength }, (_, index) =>
             Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
         );
     }
@@ -1733,6 +1711,7 @@ export default class MetadataEditorV extends Vue {
                 // }
             });
             this.stateStore.save(stateSave as Save);
+            this.productStore.currentSlide = '';
         } catch {
             Message.error(this.$t('editor.editMetadata.message.error.malformedProduct', this.uuid ?? ''));
             this.loadStatus = 'waiting';
@@ -1765,7 +1744,7 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    useConfig(config: StoryRampConfig, loadSlides?: boolean): void {
+    useConfig(config: StoryRampConfig, isReconciliation?: boolean): void {
         this.metadata.title = config.title;
         this.metadata.introTitle = config.introSlide.title;
         this.metadata.introSubtitle = config.introSlide.subtitle;
@@ -1783,7 +1762,7 @@ export default class MetadataEditorV extends Vue {
         // TODO: check schema version in the config, and if it doesn't match the current version in the schema (stored in
         // this.latestSchemaVersion), the product's local repo should be re-initialized
 
-        if (loadSlides === undefined || loadSlides) {
+        if (!isReconciliation) {
             this.loadSlides(this.productStore.configs);
         }
 
@@ -2011,7 +1990,7 @@ export default class MetadataEditorV extends Vue {
 
     onSaveFinish(): void {
         // Padding to prevent save button from being clicked rapidly
-        setTimeout(() => {
+        setTimeout(async () => {
             this.saving = false;
             // Extend the session on save if this is not the final save (after the session has expired).
             // Otherwise redirect to the home page.
@@ -2025,8 +2004,8 @@ export default class MetadataEditorV extends Vue {
             // This may be necessary to allow for changes to be properly detected after saving.
             // Without it, even attempted changes (e.g. keypress in an input field) are no longer detected, and the potential change handlers
             // aren't even run.
-            // There's likely a better solution, please add if you find it.
-            this.loadConfig();
+            // TODO: There's likely a better solution, please add if you find it.
+            await this.loadConfig();
         }, 500);
     }
 
@@ -2038,7 +2017,7 @@ export default class MetadataEditorV extends Vue {
     discardMetadataUpdates(): void {
         this.metadata = JSON.parse(JSON.stringify(this.temporaryMetadataCopy));
         this.editingMetadata = false;
-        this.unsavedChanges = false; // TODO: Does this cause false negatives? (maybe not if we don't have discarding for vfm)
+        this.stateStore.isChanged = false; // TODO: Does this cause false negatives? (maybe not if we don't have discarding for vfm)
     }
 
     /**
@@ -2146,19 +2125,19 @@ export default class MetadataEditorV extends Vue {
         };
         this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
         this.productStore.configs = { en: undefined, fr: undefined };
-        this.slides = [];
+        this.productStore.slidesWorkingCopy = [];
     }
 
     /**
      * Language toggle.
      */
-    async swapLang(): Promise<void> {
+    async swapConfigLang(): Promise<void> {
         await this.saveMetadata(false, true);
         this.productStore.configLang = this.productStore.oppositeLang;
         if (!this.productStore.configs[this.productStore.configLang]) {
             return;
         }
-        this.loadConfig(this.productStore.configs[this.productStore.configLang]);
+        await this.loadConfig(this.productStore.configs[this.productStore.configLang]);
     }
 
     /**
@@ -2330,9 +2309,9 @@ export default class MetadataEditorV extends Vue {
                         configFileStructure: this.productStore.configFileStructure,
                         sourceCounts: this.productStore.sourceCounts,
                         metadata: this.metadata,
-                        slides: this.slides,
+                        slides: this.productStore.slidesWorkingCopy,
                         existing: this.editExisting,
-                        unsavedChanges: this.unsavedChanges
+                        unsavedChanges: this.stateStore.isChanged
                     };
                 }
             });
@@ -2413,7 +2392,8 @@ export default class MetadataEditorV extends Vue {
     beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
         const curEditor = this.$route.name === 'editor';
         const confirmationMessage = 'Leave the page? Changes made may not be saved.';
-        const stay = !this.sessionExpired && this.unsavedChanges && curEditor && !window.confirm(confirmationMessage);
+        const stay =
+            !this.sessionExpired && this.stateStore.isChanged && curEditor && !window.confirm(confirmationMessage);
         const exitingProduct = to.name !== 'editor';
         // This component is going bye-bye, so we need to do some clean up so that timers cannot fire later.
         clearTimeout(this.lockStore.confirmationTimeout);

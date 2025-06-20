@@ -1,18 +1,26 @@
 <template>
     <div id="slideEditor" class="p-5">
-        <div v-if="!!currentSlide">
+        <div v-if="!!(productStore.currentSlide as Slide) && productStore.selectedSlideIndex !== -1">
             <div class="flex">
                 <div class="flex flex-col w-full">
                     <div class="flex justify-between flex-wrap gap-3 gap-y-1 items-center">
                         <h2 class="text-2xl font-bold">
-                            {{ $t('editor.slides.currentLangLabel', { lang: langTranslate, num: slideIndex + 1 }) }}
+                            {{
+                                $t('editor.slides.currentLangLabel', {
+                                    lang: langTranslate,
+                                    num: productStore.selectedSlideIndex + 1
+                                })
+                            }}
                         </h2>
 
                         <div class="flex items-stretch">
                             <button
                                 :aria-label="$t('editor.swapConfigs')"
                                 @click.stop="
-                                    selectSlide(slideIndex, (lang === 'en' ? 'fr' : 'en') as SupportedLanguages)
+                                    selectSlide(
+                                        productStore.selectedSlideIndex,
+                                        (productStore.selectedSlideLang === 'en' ? 'fr' : 'en') as SupportedLanguages
+                                    )
                                 "
                                 :disabled="!otherLangSlide"
                                 style="margin-right: 0.5rem"
@@ -33,8 +41,13 @@
                                 </svg>
                             </button>
                             <button
-                                @click.stop="selectSlide(slideIndex - 1, lang as SupportedLanguages)"
-                                :disabled="slideIndex === 0"
+                                @click.stop="
+                                    selectSlide(
+                                        productStore.selectedSlideIndex - 1,
+                                        productStore.selectedSlideLang as SupportedLanguages
+                                    )
+                                "
+                                :disabled="productStore.selectedSlideIndex === 0"
                                 class="respected-standard-button respected-gray-border-button"
                                 style="
                                     gap: 0.25rem;
@@ -59,7 +72,12 @@
                             >
                             </span>
                             <button
-                                @click.stop="selectSlide(slideIndex + 1, lang as SupportedLanguages)"
+                                @click.stop="
+                                    selectSlide(
+                                        productStore.selectedSlideIndex + 1,
+                                        productStore.selectedSlideLang as SupportedLanguages
+                                    )
+                                "
                                 :disabled="isLast"
                                 class="respected-standard-button respected-gray-border-button gap-1"
                                 style="
@@ -95,7 +113,7 @@
                         <input
                             type="text"
                             id="slideTitle"
-                            v-model="currentSlide.title"
+                            v-model="(productStore.currentSlide as Slide).title"
                             :placeholder="$t('editor.slides.addSlideTitle')"
                             class="respected-standard-input w-full lg:w-2/3"
                         />
@@ -139,13 +157,14 @@
             <div
                 class="flex gap-3 border-b pl-2"
                 style="border-color: rgba(209, 213, 219, 1)"
-                v-if="currentSlide.panel.length === 2"
+                v-if="(productStore.currentSlide as Slide).panel.length === 2"
             >
                 <!-- Left panel -->
                 <button
                     @click="
                         () => {
                             panelIndex = 0;
+                            productStore.selectedPanelIndex = 0;
                             advancedEditorView = false;
                             saveChanges();
                         }
@@ -197,8 +216,8 @@
                             {{
                                 $t(
                                     `editor.slide.panel.type.${
-                                        currentSlide.panel[0]?.type !== 'loading-page'
-                                            ? currentSlide.panel[0]?.type
+                                        (productStore.currentSlide as Slide).panel[0]?.type !== 'loading-page'
+                                            ? (productStore.currentSlide as Slide).panel[0]?.type
                                             : 'unknown'
                                     }`
                                 )
@@ -210,6 +229,7 @@
                 <button
                     @click="
                         () => {
+                            productStore.selectedPanelIndex = 1;
                             panelIndex = 1;
                             advancedEditorView = false;
                             saveChanges();
@@ -262,8 +282,8 @@
                             {{
                                 $t(
                                     `editor.slide.panel.type.${
-                                        currentSlide.panel[1]?.type !== 'loading-page'
-                                            ? currentSlide.panel[1]?.type
+                                        (productStore.currentSlide as Slide).panel[1]?.type !== 'loading-page'
+                                            ? (productStore.currentSlide as Slide).panel[1]?.type
                                             : 'unknown'
                                     }`
                                 )
@@ -291,6 +311,7 @@
                 <button
                     @click="
                         () => {
+                            productStore.selectedPanelIndex = 0;
                             advancedEditorView = false;
                             saveChanges();
                         }
@@ -338,8 +359,8 @@
                             {{
                                 $t(
                                     `editor.slide.panel.type.${
-                                        currentSlide.panel[0]?.type !== 'loading-page'
-                                            ? currentSlide.panel[0]?.type
+                                        (productStore.currentSlide as Slide).panel[0]?.type !== 'loading-page'
+                                            ? (productStore.currentSlide as Slide).panel[0]?.type
                                             : 'unknown'
                                     }`
                                 )
@@ -379,18 +400,24 @@
                             @input="
                                 newType = ($event.target as HTMLInputElement).value;
                                 if (
-                                    panelModified(currentSlide.panel[panelIndex]) ||
+                                    panelModified((productStore.currentSlide as Slide).panel[panelIndex]) ||
                                     // Changing to dynamic deletes content of both panels. Therefore, warn if ANY panel has changes.
-                                    (newType === 'dynamic' && currentSlide.panel.some((panel) => panelModified(panel)))
+                                    (newType === 'dynamic' &&
+                                        (productStore.currentSlide as Slide).panel.some((panel) =>
+                                            panelModified(panel)
+                                        ))
                                 ) {
-                                    $vfm.open(`change-slide-${slideIndex}`);
+                                    $vfm.open(`change-slide-${productStore.selectedSlideIndex}`);
                                 } else {
-                                    changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
+                                    changePanelType(
+                                        determineEditorType((productStore.currentSlide as Slide).panel[panelIndex]),
+                                        newType
+                                    );
                                     toggleCenterPanel();
                                     toggleCenterSlide();
                                 }
                             "
-                            :value="determineEditorType(currentSlide.panel[panelIndex])"
+                            :value="determineEditorType((productStore.currentSlide as Slide).panel[panelIndex])"
                         >
                             <option
                                 v-for="thing in Object.keys(editors).filter((editor) => editor !== 'loading')"
@@ -408,22 +435,26 @@
                     <div
                         class="flex flex-row"
                         :class="{ 'items-center': !currentRoute.includes('index-ca') }"
-                        v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'"
+                        v-if="determineEditorType((productStore.currentSlide as Slide).panel[0]) !== 'dynamic'"
                     >
                         <input
                             type="checkbox"
                             id="fullSlide"
                             class="rounded-none cursor-pointer w-4 h-4"
                             v-model="onePanelOnly"
-                            :disabled="onePanelOnly && determineEditorType(currentSlide.panel[0]) === 'dynamic'"
+                            :disabled="
+                                onePanelOnly &&
+                                determineEditorType((productStore.currentSlide as Slide).panel[0]) === 'dynamic'
+                            "
                             @change.stop="
                                 () => {
                                     // if statement doesn't work properly (?), so had to use ternary
                                     // sorry if you have to read this
-                                    currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])
-                                        ? $vfm.open(`one-panel-only-${slideIndex}`)
-                                        : currentSlide.panel.length === 1
-                                          ? $vfm.open(`one-to-two-panels-${slideIndex}`)
+                                    (productStore.currentSlide as Slide).panel.length > 1 &&
+                                    panelModified(currentSlide.panel[0])
+                                        ? $vfm.open(`one-panel-only-${productStore.selectedSlideIndex}`)
+                                        : (productStore.currentSlide as Slide).panel.length === 1
+                                          ? $vfm.open(`one-to-two-panels-${productStore.selectedSlideIndex}`)
                                           : toggleOnePanelOnly();
                                 }
                             "
@@ -450,26 +481,31 @@
                 </div>
                 <custom-editor
                     ref="editor"
-                    :config="currentSlide"
+                    :config="productStore.currentSlide as Slide"
                     @slide-edit="$emit('slide-edit')"
                     @config-edited="
                         (slideConfig: Slide, save: boolean = false) => {
-                            $emit('custom-slide-updated', slideConfig, save, lang);
+                            $emit('custom-slide-updated', slideConfig, save, productStore.selectedSlideLang);
                         }
                     "
                     @title-edit="
                         (title: string) => {
-                            $emit('custom-slide-updated', { ...currentSlide, title }, false, lang);
+                            $emit(
+                                'custom-slide-updated',
+                                { ...(productStore.currentSlide as Slide), title },
+                                false,
+                                productStore.selectedSlideLang
+                            );
                         }
                     "
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
                     ref="editor"
-                    :is="editors[determineEditorType(currentSlide.panel[panelIndex])]"
-                    :key="panelIndex + determineEditorType(currentSlide.panel[panelIndex])"
-                    :panel="currentSlide.panel[panelIndex]"
-                    :lang="lang"
+                    :is="editors[determineEditorType((productStore.currentSlide as Slide).panel[panelIndex])]"
+                    :key="panelIndex + determineEditorType((productStore.currentSlide as Slide).panel[panelIndex])"
+                    :panel="(productStore.currentSlide as Slide).panel[panelIndex]"
+                    :lang="productStore.selectedSlideLang"
                     :uid="uid"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
@@ -483,7 +519,7 @@
             <p class="text-sm font-semibold text-gray-500">{{ $t('editor.slides.select') }}.</p>
         </div>
         <action-modal
-            :name="`change-slide-${slideIndex}`"
+            :name="`change-slide-${productStore.selectedSlideIndex}`"
             :title="
                 $t('editor.slides.changePanelType.title', {
                     type: $t(`editor.slide.panel.type.${newType.toLowerCase() || 'unknown'}`)
@@ -491,26 +527,26 @@
             "
             :message="$t('editor.slides.changePanelType.message')"
             @ok="
-                determineEditorType(currentSlide.panel[panelIndex]) === 'map' &&
-                (currentSlide.panel[panelIndex] as MapPanel).shared
+                determineEditorType((productStore.currentSlide as Slide).panel[panelIndex]) === 'map' &&
+                ((productStore.currentSlide as Slide).panel[panelIndex] as MapPanel).shared
                     ? $emit('slide-change-shared-map', { index: panelIndex, lang: langTranslate })
                     : '';
 
-                changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
+                changePanelType(determineEditorType((productStore.currentSlide as Slide).panel[panelIndex]), newType);
                 toggleCenterPanel();
                 toggleCenterSlide();
             "
             @Cancel="cancelTypeChange"
         />
         <action-modal
-            :name="`one-panel-only-${slideIndex}`"
+            :name="`one-panel-only-${productStore.selectedSlideIndex}`"
             :title="$t('editor.slides.changeToOnePanel.title')"
             :message="$t('editor.slides.changeToOnePanel.message')"
             @ok="toggleOnePanelOnly()"
             @Cancel="onePanelOnly = false"
         />
         <multi-option-modal
-            :name="`one-to-two-panels-${slideIndex}`"
+            :name="`one-to-two-panels-${productStore.selectedSlideIndex}`"
             :title="$t('editor.slides.addBlankPanel.title')"
             :message="$t('editor.slides.addBlankPanel.message')"
             :options="[
@@ -526,6 +562,7 @@
 <script lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
 import MultiOptionModal from '@/components/support/multi-option-modal.vue';
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
@@ -573,10 +610,7 @@ import { useProductStore } from '@/stores/productStore';
 })
 export default class SlideEditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    @Prop() currentSlide!: Slide;
-    @Prop() lang!: string;
     @Prop() uid!: string;
-    @Prop() slideIndex!: number;
     @Prop() isLast!: boolean;
     @Prop() otherLangSlide!: Slide;
 
@@ -588,8 +622,10 @@ export default class SlideEditorV extends Vue {
     onePanelOnly = false;
     centerSlide = false;
     centerPanel = false;
-    includeInToc = true;
+    includeInToc = (this.productStore.currentSlide as Slide).includeInToc ?? false;
     dynamicSelected = false;
+
+    stateStore = useStateStore();
 
     currentRoute = window.location.href;
 
@@ -607,24 +643,28 @@ export default class SlideEditorV extends Vue {
     };
 
     mounted() {
-        this.langTranslate = this.$t(`editor.lang.${this.lang}`);
+        this.langTranslate = this.$t(`editor.lang.${this.productStore.selectedSlideLang}`);
     }
 
-    @Watch('currentSlide', { deep: true })
+    @Watch('productStore.currentSlide', { deep: true })
     onSlideChange(): void {
-        if (this.currentSlide) {
-            this.onePanelOnly = this.currentSlide.panel.length === 1;
-            this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-            this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
+        if (this.productStore.currentSlide) {
+            this.onePanelOnly = (this.productStore.currentSlide as Slide).panel.length === 1;
+            this.langTranslate = this.$t(`editor.lang.${this.productStore.selectedSlideLang}`);
+            this.centerPanel =
+                (this.productStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerPanel') ?? false;
             this.centerSlide =
                 (this.onePanelOnly
-                    ? this.determineEditorType(this.currentSlide.panel[0]) === 'dynamic'
-                        ? this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight')
-                        : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideFull')
-                    : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight') &&
-                      this.currentSlide.panel[1]?.cssClasses?.includes('centerSlideLeft')) ?? false;
-            this.includeInToc = this.currentSlide.includeInToc ?? true;
-            this.dynamicSelected = this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic';
+                    ? this.determineEditorType((this.productStore.currentSlide as Slide).panel[0]) === 'dynamic'
+                        ? (this.productStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideRight')
+                        : (this.productStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideFull')
+                    : (this.productStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideRight') &&
+                      (this.productStore.currentSlide as Slide).panel[1]?.cssClasses?.includes('centerSlideLeft')) ??
+                false;
+            this.includeInToc = (this.productStore.currentSlide as Slide).includeInToc ?? false;
+            this.dynamicSelected =
+                this.determineEditorType((this.productStore.currentSlide as Slide).panel[this.panelIndex]) ===
+                'dynamic';
         }
     }
 
@@ -636,7 +676,7 @@ export default class SlideEditorV extends Vue {
      */
     panelModified(panel: BasePanel): boolean {
         this.saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
-        const prevType = this.currentSlide.panel[this.panelIndex].type;
+        const prevType = (this.productStore.currentSlide as Slide).panel[this.panelIndex].type;
         const uuid = this.productStore.configFileStructure.uuid;
 
         let startingConfig = {
@@ -644,13 +684,13 @@ export default class SlideEditorV extends Vue {
             dynamic: {
                 type: PanelType.Dynamic,
                 title:
-                    this.currentSlide.panel[0] && prevType === 'text'
-                        ? (this.currentSlide.panel[0] as TextPanel).title
+                    (this.productStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                        ? ((this.productStore.currentSlide as Slide).panel[0] as TextPanel).title
                         : '',
                 titleTag: '',
                 content:
-                    this.currentSlide.panel[0] && prevType === 'text'
-                        ? (this.currentSlide.panel[0] as TextPanel).content
+                    (this.productStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                        ? ((this.productStore.currentSlide as Slide).panel[0] as TextPanel).content
                         : '',
                 children: []
             },
@@ -674,13 +714,13 @@ export default class SlideEditorV extends Vue {
             dynamic: {
                 type: PanelType.Dynamic,
                 title:
-                    this.currentSlide.panel[0] && prevType === 'text'
-                        ? (this.currentSlide.panel[0] as TextPanel).title
+                    (this.productStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                        ? ((this.productStore.currentSlide as Slide).panel[0] as TextPanel).title
                         : '',
                 titleTag: '',
                 content:
-                    this.currentSlide.panel[0] && prevType === 'text'
-                        ? (this.currentSlide.panel[0] as TextPanel).content
+                    (this.productStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                        ? ((this.productStore.currentSlide as Slide).panel[0] as TextPanel).content
                         : '',
                 children: []
             }
@@ -689,16 +729,19 @@ export default class SlideEditorV extends Vue {
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
             // Remove source content of both panels
-            this.currentSlide.panel.forEach((panel: BasePanel) => this.productStore.removeSourceCounts(panel));
+            (this.productStore.currentSlide as Slide).panel.forEach((panel: BasePanel) =>
+                this.productStore.removeSourceCounts(panel)
+            );
             this.panelIndex = 0;
-            this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
+            (this.productStore.currentSlide as Slide)['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
             this.dynamicSelected = true;
         } else {
             // Remove source content of panel having its type swapped
-            this.productStore.removeSourceCounts(this.currentSlide.panel[this.panelIndex]);
+            this.productStore.removeSourceCounts((this.productStore.currentSlide as Slide).panel[this.panelIndex]);
 
             // Switching panel type when dynamic panels are not involved.
-            this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
+            (this.productStore.currentSlide as Slide).panel[this.panelIndex] =
+                startingConfig[newType as keyof DefaultConfigs];
         }
     }
 
@@ -721,7 +764,7 @@ export default class SlideEditorV extends Vue {
 
     cancelTypeChange(): void {
         (this.$refs.typeSelector as HTMLSelectElement).value = this.determineEditorType(
-            this.currentSlide.panel[this.panelIndex]
+            (this.productStore.currentSlide as Slide).panel[this.panelIndex]
         );
     }
 
@@ -742,11 +785,15 @@ export default class SlideEditorV extends Vue {
         this.saveChanges();
 
         if (this.onePanelOnly) {
-            this.currentSlide['panel'] = [this.currentSlide.panel[this.panelIndex]];
+            (this.productStore.currentSlide as Slide)['panel'] = [
+                (this.productStore.currentSlide as Slide).panel[this.panelIndex]
+            ];
             this.panelIndex = 0;
         } else {
-            this.currentSlide['panel'] = [
-                ...(addToWhichSide === 'right' ? [Object.assign({}, this.currentSlide.panel[0])] : []),
+            (this.productStore.currentSlide as Slide)['panel'] = [
+                ...(addToWhichSide === 'right'
+                    ? [Object.assign({}, (this.productStore.currentSlide as Slide).panel[0])]
+                    : []),
                 Object.assign(
                     {},
                     {
@@ -755,7 +802,9 @@ export default class SlideEditorV extends Vue {
                         content: ''
                     }
                 ),
-                ...(addToWhichSide === 'left' ? [Object.assign({}, this.currentSlide.panel[0])] : [])
+                ...(addToWhichSide === 'left'
+                    ? [Object.assign({}, (this.productStore.currentSlide as Slide).panel[0])]
+                    : [])
             ];
             this.panelIndex = addToWhichSide === 'left' ? 0 : 1;
         }
@@ -768,12 +817,12 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleCenterSlide(): void {
-        if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
-            const dynamicPanel = this.currentSlide.panel[0] as DynamicPanel;
+        if (this.determineEditorType((this.productStore.currentSlide as Slide).panel[this.panelIndex]) === 'dynamic') {
+            const dynamicPanel = (this.productStore.currentSlide as Slide).panel[0] as DynamicPanel;
 
-            this.currentSlide.panel[0].cssClasses = this.centerSlide
+            (this.productStore.currentSlide as Slide).panel[0].cssClasses = this.centerSlide
                 ? 'centerSlideRight'
-                : (this.currentSlide.panel[0].cssClasses || '').replace('centerSlideRight', '');
+                : ((this.productStore.currentSlide as Slide).panel[0].cssClasses || '').replace('centerSlideRight', '');
 
             (dynamicPanel.children ?? []).forEach((child) => {
                 const panel = child.panel;
@@ -789,51 +838,45 @@ export default class SlideEditorV extends Vue {
                     applyTextAlign(panel, this.centerSlide, true);
                 }
             });
-        } else if (this.onePanelOnly || this.currentSlide.panel.length === 1) {
+        } else if (this.onePanelOnly || (this.productStore.currentSlide as Slide).panel.length === 1) {
             if (this.centerSlide) {
-                this.currentSlide.panel[0].cssClasses = 'centerSlideFull';
+                (this.productStore.currentSlide as Slide).panel[0].cssClasses = 'centerSlideFull';
             } else {
-                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
-                    'centerSlideRight',
-                    ''
-                );
-                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
-                    'centerSlideLeft',
-                    ''
-                );
-                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
-                    'centerSlideFull',
-                    ''
-                );
+                (this.productStore.currentSlide as Slide).panel[0].cssClasses = (
+                    (this.productStore.currentSlide as Slide).panel[0].cssClasses || ''
+                ).replace('centerSlideRight', '');
+                (this.productStore.currentSlide as Slide).panel[0].cssClasses = (
+                    (this.productStore.currentSlide as Slide).panel[0].cssClasses || ''
+                ).replace('centerSlideLeft', '');
+                (this.productStore.currentSlide as Slide).panel[0].cssClasses = (
+                    (this.productStore.currentSlide as Slide).panel[0].cssClasses || ''
+                ).replace('centerSlideFull', '');
             }
         } else {
             if (this.centerSlide) {
-                this.currentSlide.panel[0].cssClasses = 'centerSlideRight';
-                this.currentSlide.panel[1].cssClasses = 'centerSlideLeft';
+                (this.productStore.currentSlide as Slide).panel[0].cssClasses = 'centerSlideRight';
+                (this.productStore.currentSlide as Slide).panel[1].cssClasses = 'centerSlideLeft';
             } else {
-                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
-                    'centerSlideRight',
-                    ''
-                );
-                this.currentSlide.panel[1].cssClasses = (this.currentSlide.panel[1].cssClasses || '').replace(
-                    'centerSlideLeft',
-                    ''
-                );
+                (this.productStore.currentSlide as Slide).panel[0].cssClasses = (
+                    (this.productStore.currentSlide as Slide).panel[0].cssClasses || ''
+                ).replace('centerSlideRight', '');
+                (this.productStore.currentSlide as Slide).panel[1].cssClasses = (
+                    (this.productStore.currentSlide as Slide).panel[1].cssClasses || ''
+                ).replace('centerSlideLeft', '');
             }
         }
     }
 
     toggleCenterPanel(): void {
         if (this.centerPanel) {
-            for (const p in this.currentSlide.panel) {
-                this.currentSlide.panel[p].cssClasses = 'centerPanel';
+            for (const p in (this.productStore.currentSlide as Slide).panel) {
+                (this.productStore.currentSlide as Slide).panel[p].cssClasses = 'centerPanel';
             }
         } else {
-            for (const p in this.currentSlide.panel) {
-                this.currentSlide.panel[p].cssClasses = (this.currentSlide.panel[p].cssClasses || '').replace(
-                    'centerPanel',
-                    ''
-                );
+            for (const p in (this.productStore.currentSlide as Slide).panel) {
+                (this.productStore.currentSlide as Slide).panel[p].cssClasses = (
+                    (this.productStore.currentSlide as Slide).panel[p].cssClasses || ''
+                ).replace('centerPanel', '');
             }
         }
     }
@@ -847,7 +890,7 @@ export default class SlideEditorV extends Vue {
     }
 
     toggleIncludeInToc(): void {
-        this.currentSlide.includeInToc = this.includeInToc;
+        (this.productStore.currentSlide as Slide).includeInToc = this.includeInToc ?? false;
     }
 }
 </script>
