@@ -619,17 +619,19 @@ export default class SlideEditorV extends Vue {
 
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
-        this.onePanelOnly = this.currentSlide?.panel.length === 1;
-        this.langTranslate = this.$t(`editor.lang.${this.lang}`);
-        this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
-        this.centerSlide =
-            (this.onePanelOnly
-                ? this.determineEditorType(this.currentSlide.panel[0]) === 'dynamic'
-                    ? this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight')
-                    : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideFull')
-                : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight') &&
-                  this.currentSlide.panel[1]?.cssClasses?.includes('centerSlideLeft')) ?? false;
-        this.includeInToc = this.currentSlide.includeInToc ?? true;
+        if (this.currentSlide) {
+            this.onePanelOnly = this.currentSlide.panel.length === 1;
+            this.langTranslate = this.$t(`editor.lang.${this.lang}`);
+            this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
+            this.centerSlide =
+                (this.onePanelOnly
+                    ? this.determineEditorType(this.currentSlide.panel[0]) === 'dynamic'
+                        ? this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight')
+                        : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideFull')
+                    : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight') &&
+                      this.currentSlide.panel[1]?.cssClasses?.includes('centerSlideLeft')) ?? false;
+            this.includeInToc = this.currentSlide.includeInToc ?? true;
+        }
     }
 
     /**
