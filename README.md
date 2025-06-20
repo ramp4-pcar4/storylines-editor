@@ -1,6 +1,6 @@
 # RAMP Storylines Editor
 
-RAMP Storylines Editor is an implementation of [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) (the mapping framework), [RAMP4 Config Editor](https://github.com/ramp4-pcar4/config-editor) (used to create map configurations), [Highcharts Editor](https://www.highcharts.com/blog/products/highcharts-editor/) (used to create interactive charts and graphs), and [Storylines](https://github.com/ramp4-pcar4/story-ramp) (used to host and display the created product).
+RAMP Storylines Editor is an implementation of [RAMP4](https://github.com/ramp4-pcar4/ramp4-pcar4) (the mapping framework), [RAMP4 Config Editor](https://github.com/ramp4-pcar4/config-editor) (used to create map configurations), [Highcharts Editor](https://github.com/ramp4-pcar4/highcharts-editor) (used to create interactive charts and graphs), and [Storylines](https://github.com/ramp4-pcar4/story-ramp) (used to host and display the created product).
 
 The Storylines Editor is an easy-to-use, interactive narrative authoring tool used to produce and edit Storylines products that adhere to Government of Canada and Treasury Board web content standards and guidelines. The Editor allows for the customization of interactive maps and charts, and other multimedia to tell engaging stories about your data, and provides assistance in constructing complete configuration folders without the need to manually create and code configs.
 
