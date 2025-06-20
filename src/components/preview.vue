@@ -123,12 +123,23 @@ export default class StoryPreviewV extends Vue {
     lockStore = useLockStore();
     confirmationTimeout: NodeJS.Timeout | undefined = undefined; // the timer to show the session extension confirmation modal
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
+    localStorageKey = 'preview-broadcast-channel';
 
     extendSession(showPopup?: boolean): void {
         // Only send message to other BroadcastChannel if preview is connected to editor
         if (!this.savedProduct) {
             this.broadcast?.postMessage({ action: 'extend', showPopup });
         }
+    }
+
+    removeLocalStorageKey() {
+        localStorage.removeItem(this.localStorageKey);
+    }
+
+    beforeCreate() {
+        // When new tab is created, and another preview tab already has a BC, this will trigger its event listener, which
+        // closes its BC. If no other preview with a BC exists, this will do nothing
+        localStorage.removeItem(this.localStorageKey);
     }
 
     async mounted() {
@@ -143,6 +154,8 @@ export default class StoryPreviewV extends Vue {
             this.configFileStructure = window.props.configFileStructure;
             // This broadcast channel will be used to communicate regarding sessions with the main editor tab
             this.broadcast = new BroadcastChannel(window.props.secret);
+            localStorage.setItem(this.localStorageKey, true);
+
             this.broadcast.onmessage = (e) => {
                 const msg = e.data;
                 if (msg.action === 'confirm') {
@@ -203,6 +216,14 @@ export default class StoryPreviewV extends Vue {
                 this.addStylesheets(this.config.stylesheets);
             }
             this.loadStatus = 'loaded';
+            window.addEventListener('beforeunload', this.removeLocalStorageKey);
+            window.addEventListener('storage', (event) => {
+                if (event.key === this.localStorageKey) {
+                    this.broadcast?.close();
+                    document.onmousemove = () => undefined;
+                    document.onkeydown = () => undefined;
+                }
+            });
         } else {
             this.savedProduct = true;
             const userStore = useUserStore();
@@ -295,6 +316,10 @@ export default class StoryPreviewV extends Vue {
         const html = document.documentElement;
         html.setAttribute('lang', this.lang);
         this.$i18n.locale = this.lang;
+    }
+
+    beforeDestroy() {
+        window.removeEventListener('beforeunload', this.removeLocalStorageKey);
     }
 
     addStylesheets(paths: string[]): void {
