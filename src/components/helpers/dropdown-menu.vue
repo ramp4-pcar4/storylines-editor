@@ -198,4 +198,8 @@ onBeforeUnmount(() => {
 .rv-dropdown > *:hover:not(.disabled) {
     background-color: #eee;
 }
+
+.dropdown-button {
+    border-radius: 3px;
+}
 </style>
