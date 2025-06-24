@@ -24,7 +24,7 @@
                 </div>
                 <input
                     :disabled="disabled"
-                    class="text-center py-2 rounded-r hover:bg-gray-100"
+                    class="text-center py-2 rounded ml-1 hover:bg-gray-100"
                     :aria-label="name"
                     :value="selectedColour"
                     @input="(evt) => selectedColour = (evt.target as HTMLInputElement).value"

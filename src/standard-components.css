@@ -8,6 +8,29 @@
 
 /* Standard components */
 
+/* Standard 'link' button */
+.respected-standard-link-button {
+    text-decoration: underline;
+    color: black;
+    font-weight: 500;
+
+}
+
+/* Standard panel/slide options area */
+.respected-standard-options-area {
+    @apply bg-gray-100 flex flex-col lg:flex-row gap-y-3 gap-x-7 flex-wrap;
+    /*background-color: rgb(245, 245, 246);*/
+    padding: 4px 12px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .respected-standard-options-area {
+        width: fit-content;
+    }
+}
+
 /* Standard button base */
 .respected-standard-button {
     border-radius: 5px;
