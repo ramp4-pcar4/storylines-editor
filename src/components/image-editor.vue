@@ -175,6 +175,7 @@ import {
     SlideshowImagePanel,
     SourceCounts
 } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 import ImagePreviewV from './helpers/image-preview.vue';
@@ -209,6 +210,8 @@ export default class ImageEditorV extends Vue {
     }
 
     mounted(): void {
+        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
+        
         // This basically allows us to access the image(s) using one consistent variable instead of needing to check panel type.
         const images =
             this.panel.type === PanelType.SlideshowImage
@@ -216,16 +219,6 @@ export default class ImageEditorV extends Vue {
                 : this.panel.src
                 ? [this.panel]
                 : [];
-
-        if (this.centerSlide && this.dynamicSelected) {
-            for (const i in images) {
-                images[i].customStyles += 'text-align: left;';
-            }
-        } else if (!this.centerSlide && this.dynamicSelected) {
-            for (const i in images) {
-                images[i].customStyles = (images[i].customStyles || '').replace('text-align: left;', '');
-            }
-        }
 
         if (images !== undefined && images.length) {
             // Set images as loading until they are all loaded and resolve.

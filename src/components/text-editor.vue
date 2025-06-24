@@ -39,6 +39,7 @@
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TextPanel } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 import WETDashboardItemV from './helpers/wet-dashboard-item.vue';
 import WETComponents from './helpers/wet-component-templates.json';
 
@@ -401,11 +402,7 @@ export default class TextEditorV extends Vue {
     }
 
     mounted(): void {
-        if (this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles += 'text-align: left !important;';
-        } else if (!this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
-        }
+        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
 
         const rightToolbarToggles = Array.from(
             document.querySelectorAll('.v-md-editor__toolbar-right > .v-md-editor__toolbar-item')

@@ -84,6 +84,7 @@ import {
     SlideshowChartPanel,
     SourceCounts
 } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 import ChartPreviewV from './helpers/chart-preview.vue';
 import ConfirmationModalV from './helpers/confirmation-modal.vue';
 import draggable from 'vuedraggable';
@@ -127,6 +128,7 @@ export default class ChartEditorV extends Vue {
                 }
             );
         });
+        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
 
         // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
         const charts =
@@ -135,16 +137,6 @@ export default class ChartEditorV extends Vue {
                 : this.panel.src
                 ? [this.panel]
                 : [];
-
-        if (this.centerSlide && this.dynamicSelected) {
-            for (const c in charts) {
-                charts[c].customStyles += 'text-align: left;';
-            }
-        } else if (!this.centerSlide && this.dynamicSelected) {
-            for (const c in charts) {
-                charts[c].customStyles = (charts[c].customStyles || '').replace('text-align: left;', '');
-            }
-        }
 
         // load charts from existing storylines product
         if (charts !== undefined && charts.length) {

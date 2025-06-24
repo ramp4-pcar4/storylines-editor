@@ -74,6 +74,7 @@
 import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, MapPanel, SourceCounts, TimeSliderConfig } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 import { VueFinalModal } from 'vue-final-modal';
 import defaultConfig from '../../ramp-default.json';
 import TimeSliderEditorV from './helpers/time-slider-editor.vue';
@@ -128,12 +129,7 @@ export default class MapEditorV extends Vue {
             this.createNewConfig();
         }
 
-        if (this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles += 'text-align: left !important;';
-        } else if (!this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
-        }
-
+        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
         this.openEditor();
     }
 
