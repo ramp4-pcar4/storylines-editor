@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
 
@@ -82,6 +82,12 @@ export default class CustomEditorV extends Vue {
     showErrors = false;
 
     storylinesSchema = '';
+
+    @Watch('config', { immediate: true, deep: true })
+    onConfigChanged(newConfig: any) {
+        this.updatedConfig = JSON.parse(JSON.stringify(newConfig));
+        // this.validate();
+    }
 
     mounted(): void {
         import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
@@ -122,6 +128,7 @@ export default class CustomEditorV extends Vue {
         this.edited = true;
         this.jsonError = '';
         this.$emit('slide-edit');
+        this.$emit('title-edit', json.title);
 
         // if there are no validation errors update the slide config
         const valid = this.validate();

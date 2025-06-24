@@ -123,6 +123,7 @@
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { VideoFile, VideoPanel } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 
 import Message from 'vue-m-message';
 import draggable from 'vuedraggable';
@@ -193,11 +194,7 @@ export default class VideoEditorV extends Vue {
                 };
             }
         }
-        if (this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles += 'text-align: left !important;';
-        } else if (!this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
-        }
+        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
     }
 
     // adds an uploaded file that is either a: video, transcript or captions

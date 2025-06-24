@@ -137,6 +137,7 @@ import {
 import { VueFinalModal } from 'vue-final-modal';
 import { useProductStore } from '@/stores/productStore';
 
+import { applyTextAlign } from '@/utils/styleUtils';
 import ChartPreviewV from '../support/chart-preview.vue';
 import ConfirmationModalV from '../support/confirmation-modal.vue';
 import draggable from 'vuedraggable';
@@ -175,6 +176,8 @@ export default class ChartEditorV extends Vue {
     editingName: string | null = null;
 
     mounted(): void {
+        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
+
         // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
         const charts =
             this.panel.type === PanelType.SlideshowChart

@@ -75,12 +75,19 @@
                 </tr>
             </table>
 
-            <div v-if="editingSlide !== -1">
+            <div v-if="editingSlide !== -1" :style="{ display: editingMode ? 'block' : 'none' }">
                 <br />
                 <hr />
                 <br />
-                <span class="font-bold text-xl">{{ $t('dynamic.panel.editor') }}</span
-                ><br />
+                <div>
+                    <button
+                        class="respected-standard-button respected-black-bg-button"
+                        @click="switchSlide(-1)"
+                        :aria-label="$t('editor.done')"
+                    >
+                        {{ $t('editor.done') }}
+                    </button>
+                </div>
                 <component
                     ref="slide"
                     :is="editors[determineEditorType(panel.children[editingSlide].panel)]"
@@ -106,6 +113,7 @@ import {
     DynamicPanel,
     PanelType
 } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 
 import ChartEditorV from './chart-editor.vue';
 import ImageEditorV from './image-editor.vue';
@@ -148,6 +156,7 @@ export default class DynamicEditorV extends Vue {
     startingConfig: DefaultConfigs = JSON.parse(JSON.stringify(BaseStartingConfig));
 
     editingStatus = 'text';
+    editingMode = false;
     editingSlide = -1;
 
     newSlideName = '';
@@ -165,9 +174,17 @@ export default class DynamicEditorV extends Vue {
     }
 
     switchSlide(idx: number): void {
-        // Save slide changes if neccessary and switch to the newly selected slide.
-        this.saveChanges();
-        this.editingSlide = idx;
+        if (idx === -1 && this.editingSlide !== -1) {
+            // user pressed Done, so apply styles to the last active slide
+            const editedPanel = this.panel.children[this.editingSlide].panel;
+            applyTextAlign(editedPanel, this.centerSlide, this.dynamicSelected);
+            this.editingMode = false;
+        } else {
+            // Save slide changes if neccessary and switch to the newly selected slide.
+            this.saveChanges();
+            this.editingMode = true;
+            this.editingSlide = idx;
+        }
     }
 
     removeSlide(panel: BasePanel, index?: number): void {
@@ -183,6 +200,7 @@ export default class DynamicEditorV extends Vue {
                 this.editingSlide = -1;
             }
         }
+        this.editingMode = false;
     }
 
     createNewSlide(): void {
@@ -192,7 +210,8 @@ export default class DynamicEditorV extends Vue {
             id: this.newSlideName,
             panel: JSON.parse(JSON.stringify(this.startingConfig[this.newSlideType as keyof DefaultConfigs]))
         };
-
+        this.editingSlide = this.panel.children.length;
+        this.editingMode = false;
         this.newSlideName = '';
         this.panel.children.push(newConfig);
     }
