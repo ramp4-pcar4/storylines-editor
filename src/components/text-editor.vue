@@ -402,7 +402,9 @@ export default class TextEditorV extends Vue {
 
     mounted(): void {
         if (this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles += 'text-align: left !important;';
+            if (!this.panel.customStyles?.includes('text-align: left !important;')) {
+                this.panel.customStyles = (this.panel.customStyles || '') + 'text-align: left !important;';
+            }
         } else if (!this.centerSlide && this.dynamicSelected) {
             this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
         }

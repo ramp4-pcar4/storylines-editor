@@ -194,7 +194,9 @@ export default class VideoEditorV extends Vue {
             }
         }
         if (this.centerSlide && this.dynamicSelected) {
-            this.panel.customStyles += 'text-align: left !important;';
+            if (!this.panel.customStyles?.includes('text-align: left !important;')) {
+                this.panel.customStyles = (this.panel.customStyles || '') + 'text-align: left !important;';
+            }
         } else if (!this.centerSlide && this.dynamicSelected) {
             this.panel.customStyles = (this.panel.customStyles || '').replace('text-align: left !important;', '');
         }
