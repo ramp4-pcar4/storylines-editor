@@ -102,7 +102,7 @@
                         <span class="ml-auto"></span>
                     </div>
                     <!-- Whole-slide options -->
-                    <div class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
+                    <div class="respected-standard-options-area mt-3">
                         <!-- Center slide content -->
                         <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
                             <input
@@ -403,7 +403,7 @@
                     </div>
                 </div>
                 <!-- Panel options -->
-                <div v-if="!advancedEditorView" class="flex flex-col lg:flex-row mt-3 gap-y-3 gap-x-7 flex-wrap">
+                <div v-if="!advancedEditorView" class="respected-standard-options-area mt-3">
                     <!-- Make the current panel the full slide -->
                     <div
                         class="flex flex-row"

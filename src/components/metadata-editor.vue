@@ -29,7 +29,9 @@
                             params: { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
                         }"
                     >
-                        <div class="underline">{{ `${currLang === 'en' ? 'Français' : 'English'}` }}</div>
+                        <div class="respected-standard-link-button">
+                            {{ `${currLang === 'en' ? 'Français' : 'English'}` }}
+                        </div>
                     </router-link>
                 </header>
                 <!-- Main section: Page body content -->

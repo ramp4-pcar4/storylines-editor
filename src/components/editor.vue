@@ -220,7 +220,7 @@
                                 name: 'editor',
                                 params: { lang: currentRoute.includes('#/en') ? 'fr' : 'en', uid: uuid }
                             }"
-                            class="underline text-black font-medium px-2"
+                            class="respected-standard-link-button px-2"
                         >
                             <a>
                                 {{ currentRoute.includes('#/en') ? 'Français' : 'English' }}
@@ -882,16 +882,9 @@ window.addEventListener('resize', () => {
 }
 
 .toc-popup-button {
-    border: 1px solid rgb(135, 135, 135);
+    border: 1px solid rgb(209, 213, 219);
     background-color: rgb(243, 243, 243);
-    border-radius: 5px;
-    padding: 3px 12px;
-}
-.toc-popup-button:hover {
-    background-color: rgb(234, 234, 234);
-}
-.toc-popup-button:active {
-    background-color: rgb(221, 221, 221);
+    font-weight: 500 !important;
 }
 
 // Independent scrollable editor area only on desktop, so that header isn't fixed on mobile
