@@ -2059,7 +2059,38 @@ export default class MetadataEditorV extends Vue {
                 }
             });
         }
-        return this.loadConfig();
+        this.correctUuid();
+    }
+
+    /**
+     * Ensure that `uuid` is a case-sensitive match with the product's uuid on the server
+     */
+    correctUuid(): void {
+        const configFileNames = Object.keys(this.configFileStructure.zip.files).filter(
+            (key) => key.includes('.json') && !key.includes('/')
+        );
+        if (configFileNames.length > 0) {
+            const productUuid = configFileNames[0].substring(0, configFileNames[0].lastIndexOf('_')); // Case-sensitive UUID of product on server
+            // Only update uuid if its the same as on the server, just with incorrect letter case
+            if (productUuid !== this.uuid && productUuid.toLowerCase() === this.uuid.toLowerCase()) {
+                this.lockStore
+                    .transferLock(productUuid)
+                    .then(() => {
+                        this.uuid = productUuid;
+                        this.configFileStructure.uuid = productUuid;
+                        this.loadConfig();
+                    })
+                    .catch((err) => {
+                        Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                        console.error(err);
+                        this.error = true;
+                        this.loadStatus = 'waiting';
+                        this.clearConfig();
+                    });
+            }
+        } else {
+            this.loadConfig();
+        }
     }
 
     /**
