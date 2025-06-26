@@ -2087,6 +2087,8 @@ export default class MetadataEditorV extends Vue {
                         this.loadStatus = 'waiting';
                         this.clearConfig();
                     });
+            } else {
+                this.loadConfig();
             }
         } else {
             this.loadConfig();
