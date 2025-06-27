@@ -175,7 +175,7 @@ import {
     SlideshowImagePanel,
     SourceCounts
 } from '@/definitions';
-import { Options, Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 import ImagePreviewV from './helpers/image-preview.vue';
 import JSZip from 'jszip';
@@ -207,6 +207,13 @@ export default class ImageEditorV extends Vue {
     get isDragging(): boolean {
         return this.dragging;
     }
+    //
+    // @Watch('panel.caption')
+    // onCaptionChange() {
+    //     if (this.panel.caption !== this.slideshowCaption) {
+    //         this.slideshowCaption = this.panel.caption;
+    //     }
+    // }
 
     mounted(): void {
         // This basically allows us to access the image(s) using one consistent variable instead of needing to check panel type.
