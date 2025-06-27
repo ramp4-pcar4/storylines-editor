@@ -394,8 +394,22 @@
 
 <script lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
+import JSZip from 'jszip';
 import SlideTocButton from '@/components/slide-toc/slide-toc-button.vue';
-import { BasePanel, ChartPanel, ImagePanel, MultiLanguageSlide, Slide, TextPanel, VideoPanel } from '@/definitions';
+import {
+    BasePanel,
+    ChartPanel,
+    DynamicPanel,
+    ImagePanel,
+    MapPanel,
+    MultiLanguageSlide,
+    PanelType,
+    Slide,
+    SlideshowPanel,
+    SupportedLanguages,
+    TextPanel,
+    VideoPanel
+} from '@/definitions';
 import cloneDeep from 'clone-deep';
 import { VueFinalModal } from 'vue-final-modal';
 import { useEditorStore } from '@/stores/editorStore';
@@ -460,8 +474,8 @@ export default class SlideTocV extends Vue {
      * @param index Index of slide to select (usually slide number [in UI] - 1)
      * @param lang Specific config in slide to select ('en' or 'fr')
      */
-    selectSlide(index: number, lang: string, panelIndex?: number): void {
-        this.$emit('slide-change', index, lang, panelIndex);
+    selectSlide(index: number, lang: string, panelIndex?: number, done?: Function): void {
+        this.$emit('slide-change', index, lang, panelIndex, done);
     }
 
     /**
@@ -488,8 +502,41 @@ export default class SlideTocV extends Vue {
         this.$emit('slides-updated');
     }
 
+    /**
+     * Helper function to properly create new configs for any duplicated map panels/sub-panels,
+     * so editing the map panel on the original/duplicated map panel doesn't affect the other.
+     * @param lang The language of the slide config to handle.
+     * @param index The index of the slide config to handle.
+     */
+    async handleMapConfigForOneLang(lang: SupportedLanguages, index: number): Promise<void> {
+        // Need to use for loop, as forEach doesn't handle async properly
+        for (const panel of this.productStore.slidesWorkingCopy[index][lang]?.panel ?? []) {
+            if (panel.type === PanelType.Map) {
+                (panel as MapPanel).config = await this.productStore.duplicateMapConfig((panel as MapPanel).config);
+            } else if (panel.type === PanelType.Slideshow) {
+                // handle buried slideshow panel map configs
+                for (const slideshowItem of (panel as SlideshowPanel).items ?? []) {
+                    if (slideshowItem.type === PanelType.Map) {
+                        (slideshowItem as MapPanel).config = await this.productStore.duplicateMapConfig(
+                            (slideshowItem as MapPanel).config
+                        );
+                    }
+                }
+            } else if (panel.type === PanelType.Dynamic) {
+                // handle buried dynamic panel map configs
+                for (const dynamicItem of (panel as DynamicPanel).children ?? []) {
+                    if (dynamicItem.panel.type === PanelType.Map) {
+                        (dynamicItem.panel as MapPanel).config = await this.productStore.duplicateMapConfig(
+                            (dynamicItem.panel as MapPanel).config
+                        );
+                    }
+                }
+            }
+        }
+    }
+
     // Assumes that you've already checked that the other lang DOES have a config.
-    copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
+    async copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): Promise<void> {
         const oppositeLang = currLang === 'en' ? 'fr' : 'en';
         // Called on each image/video panel in the opposite lang's config (at the provided index)
         // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
@@ -564,13 +611,17 @@ export default class SlideTocV extends Vue {
         // src values are updated
         // (UPDATE: now panelHelper is in store, so we can make it return a Promise, and execute
         // the below code once it resolves)
-        setTimeout(() => {
+        setTimeout(async () => {
             (this.productStore.slidesWorkingCopy[index][currLang] as Slide).panel.forEach((panel) =>
                 this.productStore.removeSourceCounts(panel)
             );
             this.productStore.slidesWorkingCopy[index][currLang] = JSON.parse(
                 JSON.stringify(this.productStore.slidesWorkingCopy[index][oppositeLang])
             );
+
+            // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
+            await this.handleMapConfigForOneLang(currLang, index);
+
             this.$emit('slides-updated');
             this.$emit('slide-change', index, currLang);
         }, 300);
@@ -598,10 +649,12 @@ export default class SlideTocV extends Vue {
      * Copies an entire slide, creating a new identical slide at the next index.
      * @param index Index of the slide to copy.
      */
-    copySlide(index: number): void {
+    async copySlide(index: number): Promise<void> {
         // First switch to the slide for which the copy button was pressed. In the case where a new slide is created
         // and copied right away, this will save changes for it
-        this.selectSlide(index, this.lang);
+        await new Promise<void>((resolve) => {
+            this.selectSlide(index, this.lang, undefined, resolve);
+        });
 
         // increment source count of each asset in this slide
         const incrementSourceCounts = (panel: ImagePanel | VideoPanel | ChartPanel) => {
@@ -623,12 +676,24 @@ export default class SlideTocV extends Vue {
 
         // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
         this.productStore.slidesWorkingCopy.splice(index + 1, 0, cloneDeep(this.productStore.slidesWorkingCopy[index]));
-        this.$emit('slides-updated');
-        this.selectSlide(index + 1, this.editorStore.selectedSlideLang);
+
+        // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
+        await this.handleMapConfigForOneLang('en', index + 1);
+        await this.handleMapConfigForOneLang('fr', index + 1);
+
+        await new Promise<void>((resolve) => {
+            this.$emit('slides-updated', undefined, undefined, resolve);
+        });
+
         Message.success(this.$t('editor.slide.copy.success'));
+        this.selectSlide(index + 1, this.editorStore.selectedSlideLang);
         this.$emit('scroll-to-element', index + 1);
     }
 
+    /**
+     * Deletes a slide.
+     * @param index Index of the slide to delete.
+     */
     removeSlide(index: number): void {
         if (index === this.editorStore.selectedSlideIndex) {
             this.selectSlide(-1, this.editorStore.selectedSlideLang);

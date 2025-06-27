@@ -1557,6 +1557,55 @@ export const useProductStore = defineStore('product', {
                 case 'map':
                     callback(panel, ...callbackArgs);
             }
+        },
+        /**
+         * Helper function to deep-copy a map panel's configuration into a brand-new configuration
+         * (with its own file and everything).
+         * @param currentConfig The full filepath of the map panel config to copy.
+         */
+        async duplicateMapConfig(currentConfig: string): Promise<string> {
+            // ==============
+            // Create new blank config
+
+            const newFilePath = `${this.configFileStructure.uuid}/ramp-config/${this.configFileStructure.uuid}-map-${
+                this.getNumberOfMaps() + 1
+            }.json`;
+
+            // The 'new' (copied) config's shortened src
+            const newAssetSrc = `${newFilePath.substring(currentConfig.indexOf('/') + 1)}`;
+
+            // TODO: Is this the right way to deal with the copied file's sources? I'm not very well-versed w/ the source system
+            if (this.sourceCounts[newFilePath]) {
+                this.sourceCounts[newFilePath] += 1;
+            } else {
+                this.sourceCounts[newFilePath] = 1;
+            }
+
+            // ==================
+            // Grab current config file contents, and copy it over
+
+            // The 'original' (to be copied) config's shortened src
+            const oldAssetSrc = `${currentConfig.substring(currentConfig.indexOf('/') + 1)}`;
+
+            // Copy the config contents over
+            const sourceFile = this.configFileStructure.zip.file(oldAssetSrc);
+            if (sourceFile) {
+                const content = await sourceFile.async('string');
+                this.configFileStructure.zip.file(newAssetSrc, content);
+
+                // Return the path, that will be used as the map panel's panel.config
+                return newFilePath;
+            } else {
+                // Something happened
+                return '';
+            }
+        },
+        getNumberOfMaps(): number {
+            let n = 0;
+            this.configFileStructure.rampConfig.forEach((f) => {
+                n += 1;
+            });
+            return n;
         }
     }
 });

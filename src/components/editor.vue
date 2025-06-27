@@ -645,8 +645,6 @@ export default class EditorV extends Vue {
     editorStore = useEditorStore();
     stateStore = useStateStore();
 
-    stateStore = useStateStore();
-
     // Form properties.
     logoImage: undefined | File = undefined;
     loadSlides: undefined | MultiLanguageSlide[] = undefined;
@@ -923,7 +921,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number): void {
+    selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number, done?: Function): void {
         const configLang = this.editorStore.configLang;
 
         // save changes to current slide before changing slides
@@ -960,6 +958,9 @@ export default class EditorV extends Vue {
             this.editorStore.selectedSlideLang = newLang;
 
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
+            if (done) {
+                done();
+            }
         }, 5);
     }
 
@@ -986,7 +987,7 @@ export default class EditorV extends Vue {
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(dontEmitEvent?: boolean, dontChangeIndex?: boolean): void {
+    updateSlides(dontEmitEvent?: boolean, dontChangeIndex?: boolean, onDone?: Function): void {
         this.loadSlides = this.productStore.slidesWorkingCopy;
         if (!dontChangeIndex && this.editorStore.currentSlide !== '') {
             this.editorStore.selectedSlideIndex = this.loadSlides.findIndex(
@@ -1001,6 +1002,10 @@ export default class EditorV extends Vue {
 
         if (!dontEmitEvent) {
             this.editorStore.updateSaveStatus(undefined, 'Slide updated');
+        }
+
+        if (onDone) {
+            onDone();
         }
     }
 
