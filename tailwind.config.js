@@ -60,6 +60,20 @@ module.exports = {
                             '&:active': {
                                 color: 'blue'
                             }
+                        },
+                        code: {
+                            margin: '0',
+                            padding: '0.2em 0.4em',
+                            borderRadius: '3px',
+                            fontWeight: '100',
+                            fontSize: '85%',
+                            backgroundColor: '#edeff0'
+                        },
+                        'code::before': {
+                            content: '""'
+                        },
+                        'code::after': {
+                            content: '""'
                         }
                     }
                 },

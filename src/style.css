@@ -10,3 +10,7 @@
 .tippy-box[data-animation='chapter-menu'][data-placement^='right'] > .tippy-backdrop {
     transform-origin: 50% 0 !important;
 }
+
+#wb-cont code {
+    color: #c7254e !important;
+}
