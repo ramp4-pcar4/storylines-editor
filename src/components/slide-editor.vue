@@ -458,6 +458,9 @@
                     @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
                         $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
                     }"
+                    @title-edit="(title: string) => {
+                        $emit('custom-slide-updated', { ...currentSlide, title }, false, lang)
+                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -596,7 +599,10 @@ export default class SlideEditorV extends Vue {
     centerSlide = false;
     centerPanel = false;
     includeInToc = true;
-    dynamicSelected = false;
+
+    get dynamicSelected(): boolean {
+        return this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic';
+    }
 
     currentRoute = window.location.href;
 
@@ -699,7 +705,6 @@ export default class SlideEditorV extends Vue {
             this.currentSlide.panel.forEach((panel: BasePanel) => this.removeSourceCounts(panel));
             this.panelIndex = 0;
             this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
-            this.dynamicSelected = true;
         } else {
             // Remove source content of panel having its type swapped
             this.removeSourceCounts(this.currentSlide.panel[this.panelIndex]);
@@ -844,13 +849,32 @@ export default class SlideEditorV extends Vue {
 
     toggleCenterSlide(): void {
         if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
+            const dynamicPanel = this.currentSlide.panel[0] as DynamicPanel;
+            const customStyleTypes = ['text', 'map', 'video'];
+
             if (this.centerSlide) {
                 this.currentSlide.panel[0].cssClasses = 'centerSlideRight';
+                (dynamicPanel.children ?? []).forEach((child) => {
+                    if (
+                        customStyleTypes.includes(child.panel.type) &&
+                        !child.panel.customStyles?.includes('text-align: left !important;')
+                    ) {
+                        child.panel.customStyles = (child.panel.customStyles || '') + 'text-align: left !important;';
+                    }
+                });
             } else {
                 this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
                     'centerSlideRight',
                     ''
                 );
+                (dynamicPanel.children ?? []).forEach((child) => {
+                    if (customStyleTypes.includes(child.panel.type)) {
+                        child.panel.customStyles = (child.panel.customStyles || '').replace(
+                            'text-align: left !important;',
+                            ''
+                        );
+                    }
+                });
             }
         } else if (this.onePanelOnly || this.currentSlide.panel.length === 1) {
             if (this.centerSlide) {
