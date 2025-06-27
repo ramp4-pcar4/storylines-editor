@@ -642,7 +642,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number, lang?: SupportedLanguages): void {
+    selectSlide(index: number, lang?: SupportedLanguages, done?: Function): void {
         const configLang = this.productStore.configLang;
 
         // save changes to current slide before changing slides
@@ -675,6 +675,9 @@ export default class EditorV extends Vue {
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
+            if (done) {
+                done();
+            }
         }, 5);
     }
 
@@ -685,7 +688,9 @@ export default class EditorV extends Vue {
         const configLang = this.productStore.configLang;
 
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+        if (this.slides[this.slideIndex]) {
+            this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+        }
 
         this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
             slideConfig;
@@ -699,7 +704,7 @@ export default class EditorV extends Vue {
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(slides: MultiLanguageSlide[]): void {
+    updateSlides(slides: MultiLanguageSlide[], onDone?: Function): void {
         this.loadSlides = slides;
         this.slideIndex = this.loadSlides.findIndex(
             (bothSlides) =>
@@ -709,6 +714,10 @@ export default class EditorV extends Vue {
         this.productStore.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
 
         this.productStore.updateSaveStatus(undefined, 'Slide updated');
+
+        if (onDone) {
+            onDone();
+        }
     }
 
     /**
