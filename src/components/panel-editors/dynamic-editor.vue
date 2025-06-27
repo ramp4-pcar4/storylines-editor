@@ -132,7 +132,7 @@ import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
 import SlideshowEditorV from './slideshow-editor.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from '../support/confirmation-modal.vue';
 
 @Options({
     components: {

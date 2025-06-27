@@ -23,11 +23,16 @@
             </section>
 
             <ul class="list-unstyled p-5">
-                <li v-for="(section, idx) in components[pageLang].sections">
+                <li v-for="(section, idx) in components[pageLang].sections" :key="idx">
                     <details>
                         <summary class="font-bold text-xl">{{ section.section }}</summary>
                         <div class="flex flex-row flex-wrap">
-                            <wet-item v-for="component in section.children" :component="component" :editor="editor" />
+                            <wet-item
+                                v-for="component in section.children"
+                                :key="component.name"
+                                :component="component"
+                                :editor="editor"
+                            />
                         </div>
                     </details>
                 </li>
@@ -39,8 +44,8 @@
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TextPanel } from '@/definitions';
-import WETDashboardItemV from './helpers/wet-dashboard-item.vue';
-import WETComponents from './helpers/wet-component-templates.json';
+import WETDashboardItemV from '../support/wet-dashboard-item.vue';
+import WETComponents from '../support/wet-component-templates.json';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;

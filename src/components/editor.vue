@@ -557,13 +557,12 @@ import axios from 'axios';
 import { marked } from 'marked';
 
 import SlideEditorV from './slide-editor.vue';
-import SlideTocV from './slide-toc.vue';
-import MetadataContentV from './helpers/metadata-content.vue';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
-import HelpPanelV from './help-panel.vue';
-import HelpSectionV from './helpers/help-section.vue';
+import SlideTocV from './slide-toc/slide-toc.vue';
+import MetadataContentV from './metadata/metadata-content.vue';
+import ConfirmationModalV from './support/confirmation-modal.vue';
+import HelpPanelV from './help/help-panel.vue';
 import { useLockStore } from '@/stores/lockStore';
-import DropdownMenu from '@/components/helpers/dropdown-menu.vue';
+import DropdownMenu from '@/components/support/dropdown-menu.vue';
 
 @Options({
     components: {
@@ -573,7 +572,6 @@ import DropdownMenu from '@/components/helpers/dropdown-menu.vue';
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV,
         'help-panel': HelpPanelV,
-        'help-section': HelpSectionV,
         'dropdown-menu': DropdownMenu
     }
 })

@@ -379,8 +379,8 @@
 </template>
 
 <script lang="ts">
-import ActionModal from '@/components/helpers/action-modal.vue';
-import SlideTocButton from '@/components/helpers/slide-toc-button.vue';
+import ActionModal from '@/components/support/action-modal.vue';
+import SlideTocButton from './slide-toc-button.vue';
 import {
     BasePanel,
     ChartPanel,
@@ -402,9 +402,9 @@ import { VueFinalModal } from 'vue-final-modal';
 import Message from 'vue-m-message';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
-import ConfirmationModalV from './helpers/confirmation-modal.vue';
+import ConfirmationModalV from '../support/confirmation-modal.vue';
 
-import SlideEditorV from './slide-editor.vue';
+import SlideEditorV from '../slide-editor.vue';
 
 @Options({
     components: {
