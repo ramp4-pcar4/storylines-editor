@@ -94,6 +94,14 @@ export default class CustomEditorV extends Vue {
             this.updatedConfig = this.config;
             this.validate();
         });
+
+        // selects the <textarea> inside json-editor and add label attribute dynamically
+        this.$nextTick(() => {
+            const textarea = this.$el.querySelector('textarea.jsoneditor-text');
+            if (textarea) {
+                textarea.setAttribute('aria-label', this.$t('editor.slides.advanced.editor'));
+            }
+        });
     }
 
     // returns true if no validation errors, false if errors
@@ -137,5 +145,22 @@ export default class CustomEditorV extends Vue {
 <style lang="scss" scoped>
 :deep(.jsoneditor-vue) {
     height: 100vh;
+}
+
+:deep(div.jsoneditor) {
+    border-color: #0657db;
+}
+
+:deep(.jsoneditor-menu) {
+    background-color: #0657db;
+}
+
+:deep(div.jsoneditor-contextmenu ul li button) {
+    color: #cdddf8;
+}
+
+:deep(button.jsoneditor-selected) {
+    color: #383838 !important;
+    background-color: #ffffff !important;
 }
 </style>

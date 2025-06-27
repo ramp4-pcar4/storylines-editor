@@ -256,6 +256,7 @@ editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
+editor.slides.toc.closeToC,Close table of content sidebar,1,Fermer la barre latérale de la table des matières,0
 editor.slides.toc.noSlides,No Slides,1,Pas de diapositives,0
 editor.slides.toc.selectNewSlideMessage,Select 'New Blank Slide' to add your first slide.,1,Sélectionnez « Nouvelle diapositive vierge » pour ajouter votre première diapositive.,0
 editor.slides.toc.dropdownTooltip,Options,1,Options,0
@@ -289,6 +290,7 @@ editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
 editor.slides.slideTitle,Slide title,1,Titre de la diapositive,0
 editor.slides.addSlideTitle,Add a title,1,Ajoutez un titre,0
 editor.slides.advanced,Advanced,1,Avancé,0
+editor.slides.advanced.editor,JSON configuration editor,1,Éditeur de configuration JSON,0
 editor.slides.advanced.good,Configuration adheres to Storylines schema.,1,La configuration adhère au schéma Storylines.,0
 editor.slides.advanced.broken,This configuration violates the Storylines schema.,1,Cette configuration viole le schéma Storylines.,0
 editor.slides.advanced.details,Click here for more details.,1,Cliquez ici pour plus de détails.,0
@@ -301,6 +303,7 @@ editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une 
 editor.slides.panelNumber,Panel {num},1,Panneau {num},0
 editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
+editor.slides.panel.textEntry,Panel text entry,1,Saisie de texte du panneau,0
 editor.slide.panel.type.text,Text,1,Texte,1
 editor.slide.panel.type.image,Image,1,Image,1
 editor.slide.panel.type.slideshow,Slideshow,1,Diaporama,1

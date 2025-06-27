@@ -417,6 +417,14 @@ export default class TextEditorV extends Vue {
         });
 
         this.makeTextEditorElementsTabbable();
+
+        // selects the <textarea> and adds label attribute dynamically
+        this.$nextTick(() => {
+            const textarea = this.$el.querySelector('.CodeMirror textarea');
+            if (textarea) {
+                textarea.setAttribute('aria-label', this.$t('editor.slides.panel.textEntry'));
+            }
+        });
     }
 
     unmounted(): void {
@@ -488,5 +496,13 @@ label {
 
 :deep(.v-md-editor-preview) {
     position: relative;
+}
+
+:deep(.CodeMirror-linenumber) {
+    color: #383838;
+}
+
+:deep(.cm-header) {
+    color: blue !important;
 }
 </style>
