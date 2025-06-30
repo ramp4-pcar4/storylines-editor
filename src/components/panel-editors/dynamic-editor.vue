@@ -30,7 +30,7 @@
             ></component>
         </div>
         <div v-if="editingStatus === 'panels'">
-            <table class="w-2/3 mt-5">
+            <table style="width: 66.66%; min-width: 500px" class="mt-5">
                 <tr class="table-header">
                     <th>{{ $t('dynamic.panel.id') }}</th>
                     <th>{{ $t('dynamic.panel.type') }}</th>
