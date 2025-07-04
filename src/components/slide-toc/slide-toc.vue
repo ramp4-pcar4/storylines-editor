@@ -380,6 +380,7 @@
 
 <script lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
+import JSZip from 'jszip';
 import SlideTocButton from './slide-toc-button.vue';
 import {
     BasePanel,
@@ -390,9 +391,11 @@ import {
     ImagePanel,
     MapPanel,
     MultiLanguageSlide,
+    PanelType,
     Slide,
     SlideshowPanel,
     SourceCounts,
+    SupportedLanguages,
     TextPanel,
     VideoPanel
 } from '@/definitions';
@@ -498,8 +501,41 @@ export default class SlideTocV extends Vue {
         }, 10);
     }
 
+    /**
+     * Helper function to properly create new configs for any duplicated map panels/sub-panels,
+     * so editing the map panel on the original/duplicated map panel doesn't affect the other.
+     * @param lang The language of the slide config to handle.
+     * @param index The index of the slide config to handle.
+     */
+    async handleMapConfigForOneLang(lang: SupportedLanguages, index: number): Promise<void> {
+        // Need to use for loop, as forEach doesn't handle async properly
+        for (const panel of this.slides[index][lang]?.panel ?? []) {
+            if (panel.type === PanelType.Map) {
+                (panel as MapPanel).config = await this.duplicateMapConfig((panel as MapPanel).config);
+            } else if (panel.type === PanelType.Slideshow) {
+                // handle buried slideshow panel map configs
+                for (const slideshowItem of (panel as SlideshowPanel).items ?? []) {
+                    if (slideshowItem.type === PanelType.Map) {
+                        (slideshowItem as MapPanel).config = await this.duplicateMapConfig(
+                            (slideshowItem as MapPanel).config
+                        );
+                    }
+                }
+            } else if (panel.type === PanelType.Dynamic) {
+                // handle buried dynamic panel map configs
+                for (const dynamicItem of (panel as DynamicPanel).children ?? []) {
+                    if (dynamicItem.panel.type === PanelType.Map) {
+                        (dynamicItem.panel as MapPanel).config = await this.duplicateMapConfig(
+                            (dynamicItem.panel as MapPanel).config
+                        );
+                    }
+                }
+            }
+        }
+    }
+
     // Assumes that you've already checked that the other lang DOES have a config.
-    copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
+    async copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): Promise<void> {
         const oppositeLang = currLang === 'en' ? 'fr' : 'en';
         // Called on each image/video panel in the opposite lang's config (at the provided index)
         // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
@@ -562,9 +598,13 @@ export default class SlideTocV extends Vue {
         // TODO: find better alternative to setTimeout. This code MUST execute after the callback above executes on each
         // panel in the opposite lang's slide. Otherwise it will copy the contents of the opposite config before its
         // src values are updated
-        setTimeout(() => {
+        setTimeout(async () => {
             this.slides[index][currLang].panel.forEach((panel) => this.removeSourceHelper(panel));
             this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][oppositeLang]));
+
+            // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
+            await this.handleMapConfigForOneLang(currLang, index);
+
             this.$emit('slides-updated', this.slides);
             this.$emit('slide-change', index, currLang);
         }, 300);
@@ -586,7 +626,7 @@ export default class SlideTocV extends Vue {
      * Copies an entire slide, creating a new identical slide at the next index.
      * @param index Index of the slide to copy.
      */
-    copySlide(index: number): void {
+    async copySlide(index: number): Promise<void> {
         // First switch to the slide for which the copy button was pressed. In the case where a new slide is created
         // and copied right away, this will save changes for it
         this.selectSlide(index, this.lang);
@@ -602,12 +642,26 @@ export default class SlideTocV extends Vue {
 
         // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
+
+        // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
+        await this.handleMapConfigForOneLang('en', index + 1);
+        await this.handleMapConfigForOneLang('fr', index + 1);
+
         this.$emit('slides-updated', this.slides);
-        this.selectSlide(index + 1, this.lang);
+
         Message.success(this.$t('editor.slide.copy.success'));
-        this.scrollToElement(index + 1);
+
+        // TODO: setTimeout appears to be necessary for now, otherwise the slide switch fails to occur. Investigate & replace.
+        setTimeout(() => {
+            this.selectSlide(index + 1, this.lang);
+            this.scrollToElement(index + 1);
+        }, 10);
     }
 
+    /**
+     * Deletes a slide.
+     * @param index Index of the slide to delete.
+     */
     removeSlide(index: number): void {
         if (index === this.slideIndex) {
             this.selectSlide(-1, this.lang);
@@ -620,6 +674,59 @@ export default class SlideTocV extends Vue {
         this.slides.splice(index, 1);
         this.selectSlide(this.slides.length - 1, this.lang);
         this.$emit('slides-updated', this.slides);
+    }
+
+    // TODO: MOVE TO STORE (ONCE REFACTORS ARE MERGED)
+    getNumberOfMaps(): number {
+        let n = 0;
+        this.configFileStructure.rampConfig.forEach((f) => {
+            n += 1;
+        });
+        return n;
+    }
+
+    // TODO: MOVE TO STORE (ONCE REFACTORS ARE MERGED)
+    /**
+     * Helper function to deep-copy a map panel's configuration into a brand-new configuration
+     * (with its own file and everything).
+     * @param currentConfig The full filepath of the map panel config to copy.
+     */
+    async duplicateMapConfig(currentConfig: string): Promise<string> {
+        // ==============
+        // Create new blank config
+
+        const newFilePath = `${this.configFileStructure.uuid}/ramp-config/${this.configFileStructure.uuid}-map-${
+            this.getNumberOfMaps() + 1
+        }.json`;
+
+        // The 'new' (copied) config's shortened src
+        const newAssetSrc = `${newFilePath.substring(currentConfig.indexOf('/') + 1)}`;
+
+        // TODO: Is this the right way to deal with the copied file's sources? I'm not very well-versed w/ the source system
+        if (this.sourceCounts[newFilePath]) {
+            this.sourceCounts[newFilePath] += 1;
+        } else {
+            this.sourceCounts[newFilePath] = 1;
+        }
+
+        // ==================
+        // Grab current config file contents, and copy it over
+
+        // The 'original' (to be copied) config's shortened src
+        const oldAssetSrc = `${currentConfig.substring(currentConfig.indexOf('/') + 1)}`;
+
+        // Copy the config contents over
+        const sourceFile = this.configFileStructure.zip.file(oldAssetSrc);
+        if (sourceFile) {
+            const content = await sourceFile.async('string');
+            this.configFileStructure.zip.file(newAssetSrc, content);
+
+            // Return the path, that will be used as the map panel's panel.config
+            return newFilePath;
+        } else {
+            // Something happened
+            return '';
+        }
     }
 
     removeSourceCounts(deletedIndex: number): void {
