@@ -454,6 +454,7 @@
                     :slides="slides"
                     :currentSlide="currentSlide"
                     :slideIndex="slideIndex"
+                    @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slide-edit="$emit('save-status', undefined, 'ToC')"
                     @slides-updated="updateSlides"
@@ -516,6 +517,7 @@
                     @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
                         $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
                     }"
+                    @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slide-edit="onSlidesEdited"
                     @custom-slide-updated="updateCustomSlide"
@@ -587,6 +589,7 @@ export default class EditorV extends Vue {
     @Prop() configLang!: string;
     @Prop() saving!: boolean;
     @Prop() unsavedChanges!: boolean;
+    @Prop({ default: false }) isMobileSidebar!: boolean;
 
     currentRoute = window.location.href;
 
@@ -765,6 +768,18 @@ export default class EditorV extends Vue {
                 this.originalTextArray.push(info_results);
             }
         });
+    }
+
+    /**
+     * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
+     * @param index The index of the slide to scroll to.
+     */
+    scrollToElement(index: number): void {
+        setTimeout(() => {
+            document
+                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 10);
     }
 
     exportProduct(): void {
