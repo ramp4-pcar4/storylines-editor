@@ -166,20 +166,11 @@
 </template>
 
 <script lang="ts">
-import {
-    BaseStartingConfig,
-    ConfigFileStructure,
-    ImageFile,
-    ImagePanel,
-    PanelType,
-    SlideshowImagePanel,
-    SourceCounts
-} from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
+import { ImageFile, ImagePanel, PanelType, SlideshowImagePanel } from '@/definitions';
 import draggable from 'vuedraggable';
 import ImagePreviewV from '../support/image-preview.vue';
-import JSZip from 'jszip';
-import Message from 'vue-m-message';
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -189,12 +180,12 @@ import Message from 'vue-m-message';
 })
 export default class ImageEditorV extends Vue {
     @Prop() panel!: ImagePanel | SlideshowImagePanel;
-    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop({ default: true }) allowMany!: boolean;
     @Prop({ default: false }) centerSlide!: boolean;
     @Prop({ default: false }) dynamicSelected!: boolean;
+
+    productStore = useProductStore();
 
     dragging = false;
     edited = false;
@@ -236,7 +227,7 @@ export default class ImageEditorV extends Vue {
                 // Check if the config file exists in the ZIP folder first.
                 const assetSrc = `${image.src.substring(image.src.indexOf('/') + 1)}`;
                 const filename = image.src.replace(/^.*[\\/]/, '');
-                const compressedAssetFile = this.configFileStructure.zip.file(assetSrc);
+                const compressedAssetFile = this.productStore.configFileStructure.zip.file(assetSrc);
                 const assetType = assetSrc.split('.').at(-1);
 
                 if (compressedAssetFile) {
@@ -266,193 +257,8 @@ export default class ImageEditorV extends Vue {
         }
     }
 
-    // TODO: move method into a plugin. That way it isn't repeated in the metadata/video editors
-    // Converts a file into a promise that resolves to an ArrayBuffer containing the files data
-    readBinaryData(file: File): Promise<ArrayBuffer> {
-        return new Promise((resolve, reject) => {
-            const fileReader = new FileReader();
-            fileReader.onload = () => {
-                resolve(fileReader.result);
-            };
-            fileReader.onerror = () => {
-                reject(new Error('Could not load file reader'));
-            };
-            fileReader.readAsArrayBuffer(file);
-        });
-    }
-
-    // TODO: move method into a plugin. That way it isn't repeated in the metadata/video editors
-    // Converts a file into a promise that resolves to its hash, as an array of 8-bit integers
-    obtainHashData(file: File): Promise<Uint8Array> {
-        return this.readBinaryData(file)
-            .then((res) => {
-                res = new Uint8Array(res);
-                return window.crypto.subtle.digest('SHA-256', res);
-            })
-            .then((res) => {
-                res = new Uint8Array(res);
-                return res;
-            });
-    }
-
-    // TODO: move method into a plugin. That way it isn't repeated in the metadata/video editors
-    /**
-     * Helper used to find all instances of the specified file in the specified asset folder
-     * @param file File that was uploaded
-     * @param folder The asset folder withinn which we should be searching
-     * @param checkNested Flag that indicates whether we should consider assets with nested subfolders
-     */
-    filesInAssetFolder(file: File, folder: string, checkNested = true): Array<Promise<string>> {
-        // Here, if a file in the specified folder has the same name and hash as the file uploaded, then we consider the
-        // two to be the same. Otherwise, we consider them to be different. We even consider if the asset is within a
-        // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
-        // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
-        // an array of duplicate asset promises
-        const sharedAssetPromises = [];
-        this.configFileStructure.assets[folder].forEach((relativePath, compressedBinary) => {
-            const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
-
-            // Only compare the hashes of two files when they have the exact same name
-            if (assetName === file.name) {
-                sharedAssetPromises.push(
-                    this.compareFiles(file, compressedBinary, assetName).then((fileSame) =>
-                        fileSame ? relativePath : 'N/A'
-                    )
-                );
-            }
-        });
-
-        return sharedAssetPromises;
-    }
-
-    // TODO: move method into a plugin. That way it isn't repeated in the metadata/video editors
-    /**
-     * Compares the hashes of two files
-     * @param file File that was uploaded
-     * @param compressedBinary Compressed binary file from configFileStructure
-     * @param compressedName The name of the compressed binary file
-     */
-    async compareFiles(file: File, compressedBinary: JSZip.JSZipObject, compressedName: string): Promise<boolean> {
-        const fileHash = await this.obtainHashData(file);
-        const compressedType = compressedName.split('.').at(-1);
-
-        return compressedBinary
-            .async(compressedType !== 'svg' ? 'blob' : 'text')
-            .then((assetFile) => {
-                if (compressedType === 'svg') {
-                    assetFile = new File([assetFile], compressedName, {
-                        type: 'image/svg+xml'
-                    });
-                }
-                return this.obtainHashData(assetFile);
-            })
-            .then((hash) => {
-                return hash.join() === fileHash.join();
-            });
-    }
-
-    // TODO: move method into a plugin. That way it isn't repeated in the metadata/video editors
-    // Helper for onFileChange and dropImages. Maps a File object to an ImageFile object
     async addUploadedFile(file: File): Promise<ImageFile> {
-        const oppositeLang = this.lang === 'en' ? 'fr' : 'en';
-        const sharedAssetPaths = await Promise.all(this.filesInAssetFolder(file, 'shared', false));
-        let inSharedAsset = false;
-        let oppositeSourceCount = 0;
-        let newAssetName = file.name;
-        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${file.name}`;
-
-        // Should contain either 0 or 1 promise.
-        sharedAssetPaths.forEach((sharedAssetPath) => {
-            inSharedAsset = sharedAssetPath !== 'N/A';
-        });
-
-        // If the asset is already in the shared asset folder, we do not need to do anything. We can assume that it
-        // does not exist in the opposite lang's asset folder (i.e. we assume shared asset system is working correctly)
-        if (!inSharedAsset) {
-            const oppositeAssetPaths = await Promise.all(this.filesInAssetFolder(file, oppositeLang));
-            // If the current promise contains 'N/A', then the current path refers to an asset in the opposite asset
-            // folder that has the same name, but different contents, as the asset uploaded. In this case we do
-            // nothing, as this asset is not a valid duplicate.
-            for (const oppositeAssetPath of oppositeAssetPaths) {
-                if (oppositeAssetPath !== 'N/A') {
-                    const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${oppositeAssetPath}`;
-                    oppositeSourceCount += this.sourceCounts[oppositeFileSource] ?? 0;
-                    this.sourceCounts[oppositeFileSource] = 0;
-                    this.configFileStructure.assets[oppositeLang].remove(oppositeAssetPath);
-
-                    // Add asset to shared folder if asset is yet to be moved to the shared folder. If an asset with the
-                    // same name, but different content, is already in the shared folder, we must give the asset we are
-                    // uploading a unique name. Otherwise the existing asset will be overwritten
-                    if (!inSharedAsset) {
-                        let i = 2;
-                        while (this.configFileStructure.assets['shared'].file(newAssetName)) {
-                            // If the updated name is the same as a file that already exists in the shared asset folder,
-                            // we must compare that file with the uploaded file, since they wouldnt have been compared
-                            // on the first run due to having different names (Such an asset COULD also be in the shared
-                            // or opposite lang asset folder, since a new name is now being used. However we shouldn't
-                            // execute this entire method again just for an edge case like a name change, so we can
-                            // leave this as is for now)
-                            if (i > 2) {
-                                const filesEqual = await this.compareFiles(
-                                    file,
-                                    this.configFileStructure.assets['shared'].file(newAssetName),
-                                    newAssetName
-                                );
-                                if (filesEqual) break;
-                            }
-                            newAssetName = `${file.name.split('.').at(0)}(${i}).${file.name.split('.').at(-1)}`;
-                            i++;
-                        }
-                        uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
-                        this.configFileStructure.assets['shared'].file(newAssetName, file);
-                        inSharedAsset = true;
-                    }
-                    this.$emit('shared-asset', oppositeFileSource, uploadSource, oppositeLang); // must be emitted for each duplicate asset
-                }
-            }
-        }
-
-        // If the asset uploaded is in the shared asset folder, then no need to upload to the current langs assets folder
-        if (!inSharedAsset) {
-            const currAssetPaths = await Promise.all(this.filesInAssetFolder(file, this.lang, false));
-            // Should contain either 0 or 1 promise.
-            // Need to use await here
-            for (const currAssetPath of currAssetPaths) {
-                // If asset w/ same name but different contents is in curr lang asset folder, set name in curr lang
-                // asset folder to a unique name, to avoid overwriting an existing file.
-                if (currAssetPath === 'N/A') {
-                    let i = 2;
-                    while (this.configFileStructure.assets[this.lang].file(newAssetName)) {
-                        // If the updated name is the same as a file that already exists in the current langs asset folder,
-                        // we must compare that file with the uploaded file, since they wouldnt have been compared
-                        // on the first run due to having different names
-                        if (i > 2) {
-                            const filesEqual = await this.compareFiles(
-                                file,
-                                this.configFileStructure.assets[this.lang].file(newAssetName),
-                                newAssetName
-                            );
-                            if (filesEqual) break;
-                        }
-                        newAssetName = `${file.name.split('.').at(0)}(${i}).${file.name.split('.').at(-1)}`;
-                        i++;
-                    }
-                }
-            }
-            uploadSource = `${this.configFileStructure.uuid}/assets/${this.lang}/${newAssetName}`;
-            this.configFileStructure.assets[this.lang].file(newAssetName, file);
-        }
-
-        // Notify user of the change in the name of their uploaded asset, to avoid any confusion
-        if (file.name !== newAssetName) {
-            Message.info(this.$t('editor.slides.assetNameChange', { oldName: file.name, newName: newAssetName }));
-        }
-
-        if (this.sourceCounts[uploadSource]) {
-            this.sourceCounts[uploadSource] += 1 + oppositeSourceCount;
-        } else {
-            this.sourceCounts[uploadSource] = 1 + oppositeSourceCount;
-        }
+        const { inSharedAsset, newAssetName, uploadSource } = await this.productStore.addUploadedFile(file);
 
         let imageSrc = URL.createObjectURL(file);
         return {
@@ -502,9 +308,9 @@ export default class ImageEditorV extends Vue {
             const assetRelativePath = this.imagePreviews[idx].id.split('/').slice(3).join('/');
 
             // Remove the image from the product ZIP file.
-            this.sourceCounts[assetSource] -= 1;
-            if (this.sourceCounts[assetSource] === 0) {
-                this.configFileStructure.assets[assetFolder].remove(assetRelativePath);
+            this.productStore.decrementSourceCount(assetSource);
+            if (!this.productStore.sourceExists(assetSource)) {
+                // Revote the object URL if the image has been fully removed.
                 URL.revokeObjectURL(this.imagePreviews[idx].src);
             }
             this.imagePreviews.splice(idx, 1);
