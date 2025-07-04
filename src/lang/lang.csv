@@ -153,6 +153,8 @@ editor.browse,Browse,1,Parcourir,1
 editor.remove,Remove,1,Supprimer,1
 editor.back,Back,1,Retour,1
 editor.next,Next,1,Suivant,1
+editor.undo,Undo,1,Défaire,0
+editor.redo,Redo,1,Refaire,0
 editor.preview,Preview,1,Afficher l’aperçu,1
 editor.confirm,Confirm,1,Confirmer,1
 editor.cancel,Cancel,1,Annuler,1

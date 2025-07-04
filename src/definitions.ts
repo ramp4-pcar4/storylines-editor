@@ -360,3 +360,19 @@ export const BaseStartingConfig: DefaultConfigs = {
         src: ''
     }
 };
+
+/* Helper functions */
+
+/* Merge source into target IN-PLACE. */
+export function deepMerge(target: any, source: any) {
+    for (const key in source) {
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            if (!target[key]) {
+                target[key] = {}; // Ensure reactivity by setting each key manually
+            }
+            deepMerge(target[key], source[key]);
+        } else {
+            target[key] = source[key];
+        }
+    }
+}

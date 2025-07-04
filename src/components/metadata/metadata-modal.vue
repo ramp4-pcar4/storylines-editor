@@ -27,7 +27,11 @@
                                 />
                             </svg>
                             <p>
-                                {{ configLang === 'en' ? $t('editor.frenchConfig') : $t('editor.englishConfig') }}
+                                {{
+                                    stateStore.configLang === 'en'
+                                        ? $t('editor.frenchConfig')
+                                        : $t('editor.englishConfig')
+                                }}
                             </p>
                         </button>
                         <button
@@ -59,6 +63,7 @@ import MetadataContentV from './metadata-content.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { MetadataContent } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
+import { useStateStore } from '@/stores/stateStore';
 
 @Options({
     components: {
@@ -77,7 +82,8 @@ import { VueFinalModal } from 'vue-final-modal';
 })
 export default class MetadataModalV extends Vue {
     @Prop() metadata!: MetadataContent;
-    @Prop() configLang: 'en' | 'fr';
+
+    stateStore = useStateStore();
 }
 </script>
 

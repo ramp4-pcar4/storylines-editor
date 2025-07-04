@@ -129,6 +129,65 @@
                             </div>
                             <p class="mobile-hidden-text select-none">{{ $t('editor.unsavedChanges') }}</p>
                         </div>
+
+                        <div class="flex">
+                            <button
+                                @click.stop="stateStore.undo"
+                                :disabled="!canUndo"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'bottom',
+                                    content: $t('editor.undo'),
+                                    animateFill: true,
+                                    touch: ['hold', 500]
+                                }"
+                                class="respected-standard-button respected-gray-border-button respected-dynamic-header-button"
+                                style="
+                                    padding-left: 4px !important;
+                                    padding-right: 4px !important;
+                                    border-top-left-radius: 0.25rem;
+                                    border-bottom-left-radius: 0.25rem;
+                                    border-top-right-radius: 0px;
+                                    border-bottom-right-radius: 0px;
+                                    border-right-width: 0;
+                                "
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path
+                                        fill="currentColor"
+                                        d="M8 19q-.425 0-.712-.288T7 18t.288-.712T8 17h6.1q1.575 0 2.738-1T18 13.5T16.838 11T14.1 10H7.8l1.9 1.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275L4.7 9.7q-.15-.15-.213-.325T4.426 9t.063-.375T4.7 8.3l3.6-3.6q.275-.275.7-.275t.7.275t.275.7t-.275.7L7.8 8h6.3q2.425 0 4.163 1.575T20 13.5t-1.737 3.925T14.1 19z"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                @click.stop="stateStore.redo"
+                                :disabled="!canRedo"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'bottom',
+                                    content: $t('editor.redo'),
+                                    animateFill: true,
+                                    touch: ['hold', 500]
+                                }"
+                                class="respected-standard-button respected-gray-border-button respected-dynamic-header-button"
+                                style="
+                                    padding-left: 4px !important;
+                                    padding-right: 4px !important;
+                                    border-top-left-radius: 0px;
+                                    border-bottom-left-radius: 0px;
+                                    border-top-right-radius: 0.25rem;
+                                    border-bottom-right-radius: 0.25rem;
+                                "
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path
+                                        fill="currentColor"
+                                        d="M16.2 10H9.9q-1.575 0-2.738 1T6 13.5T7.163 16T9.9 17H16q.425 0 .713.288T17 18t-.288.713T16 19H9.9q-2.425 0-4.163-1.575T4 13.5t1.738-3.925T9.9 8h6.3l-1.9-1.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l3.6 3.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-3.6 3.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+
                         <!-- Reset changes button -->
                         <button
                             :disabled="!unsavedChanges"
@@ -468,7 +527,6 @@
                         }
                     "
                     :configFileStructure="configFileStructure"
-                    :lang="configLang"
                     :sourceCounts="sourceCounts"
                 ></slide-toc>
             </div>
@@ -493,7 +551,6 @@
                         }
                     "
                     :configFileStructure="configFileStructure"
-                    :lang="configLang"
                     :sourceCounts="sourceCounts"
                     :closeSidebar="closeSidebar"
                     :isMobileSidebar="true"
@@ -540,10 +597,12 @@
 </template>
 
 <script lang="ts">
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
     ConfigFileStructure,
+    deepMerge,
     HelpSection,
     ImagePanel,
     MetadataContent,
@@ -586,12 +645,13 @@ export default class EditorV extends Vue {
     @Prop() metadata!: MetadataContent;
 
     @Prop() slides!: MultiLanguageSlide[];
-    @Prop() configLang!: string;
     @Prop() saving!: boolean;
     @Prop() unsavedChanges!: boolean;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     currentRoute = window.location.href;
+
+    stateStore = useStateStore();
 
     // Form properties.
     uuid = '';
@@ -620,9 +680,69 @@ export default class EditorV extends Vue {
         ]
     };
 
+    canUndo = false;
+    canRedo = false;
+
+    @Watch('stateStore.canUndo')
+    onUndoAbilityUpdate(): void {
+        this.canUndo = this.stateStore.canUndo;
+    }
+
+    @Watch('stateStore.canRedo')
+    onRedoAbilityUpdate(): void {
+        this.canRedo = this.stateStore.canRedo;
+    }
+
     @Watch('slides', { deep: true })
     onSlidesEdited(): void {
         this.$emit('save-status', true);
+    }
+
+    /**
+     * Runs whenever we need to update the app's config variables with the current selected save state in the stateStore.
+     * Used for updating immediately after setting undo/redo variables.
+     */
+    @Watch('stateStore.reconcileToggler')
+    onReconciliationRequest(): void {
+        const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
+
+        if (newConfigs?.en) {
+            deepMerge(this.configs.en, newConfigs.en);
+        }
+
+        if (newConfigs?.fr) {
+            deepMerge(this.configs.fr, newConfigs.fr);
+        }
+
+        const engSlides =
+            this.configs.en?.slides.map((engSlide) => {
+                return {
+                    // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
+                    en: engSlide && Object.keys(engSlide).length ? (engSlide as Slide) : undefined
+                };
+            }) ?? [];
+        const frSlides =
+            this.configs.fr?.slides.map((frSlide) => {
+                return {
+                    // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
+                    fr: frSlide && Object.keys(frSlide).length ? (frSlide as Slide) : undefined
+                };
+            }) ?? [];
+
+        const maxLength = frSlides.length > engSlides.length ? frSlides.length : engSlides.length;
+        const newSlides = Array.from({ length: maxLength }, (_, index) =>
+            Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
+        );
+        // deepMerge(this.loadSlides, newSlides);
+        deepMerge(this.slides, newSlides);
+
+        this.updateSlides(this.slides, true);
+        this.selectSlide(this.slideIndex, this.stateStore.activeSlideLang, this.stateStore.selectedPanelIndex);
+
+        // Also runs updateSaveStatus, so we don't need to emit save-status
+        // TODO: This is janky, throwing stuff around like hot potato. Refactor once the core variable refactor PR is merged.
+        this.$emit('reconciliation-metadata-edited');
+        // this.$emit('save-status', true);
     }
 
     @Watch('metadata', { deep: true })
@@ -674,7 +794,7 @@ export default class EditorV extends Vue {
     /**
      * Change current slide to selected slide.
      */
-    selectSlide(index: number, lang?: SupportedLanguages): void {
+    selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number): void {
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();
@@ -686,9 +806,9 @@ export default class EditorV extends Vue {
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
-        const newLang = lang || this.configLang || 'en';
-        if (this.configLang !== newLang) {
-            this.$emit('lang-change', newLang);
+        const newLang = lang || this.stateStore.activeSlideLang || 'en';
+        if (this.stateStore.activeSlideLang !== newLang) {
+            this.stateStore.activeSlideLang = newLang;
         }
 
         setTimeout(() => {
@@ -703,7 +823,9 @@ export default class EditorV extends Vue {
                 this.currentSlide = selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
             }
             this.slideIndex = index;
-            (this.$refs.slide as SlideEditorV).panelIndex = 0;
+            (this.$refs.slide as SlideEditorV).panelIndex = panelIndex ?? 0;
+            this.stateStore.selectedPanelIndex = panelIndex ?? 0;
+
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
         }, 5);
     }
@@ -713,9 +835,11 @@ export default class EditorV extends Vue {
      */
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? this.configLang) as keyof MultiLanguageSlide] = slideConfig;
+        this.slides[this.slideIndex][(lang ?? this.stateStore.activeSlideLang) as keyof MultiLanguageSlide] =
+            slideConfig;
 
-        this.configs[(lang ?? this.configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] = slideConfig;
+        this.configs[(lang ?? this.stateStore.activeSlideLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
+            slideConfig;
 
         // save changes emitted from advanced editor
         if (save) {
@@ -726,7 +850,7 @@ export default class EditorV extends Vue {
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(slides: MultiLanguageSlide[]): void {
+    updateSlides(slides: MultiLanguageSlide[], dontEmitEvent?: boolean): void {
         this.loadSlides = slides;
         this.slideIndex = this.loadSlides.findIndex(
             (bothSlides) =>
@@ -735,7 +859,9 @@ export default class EditorV extends Vue {
         this.configs.en!.slides = this.slides.map((slides) => slides.en!);
         this.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
 
-        this.$emit('save-status', undefined, 'Slide updated');
+        if (!dontEmitEvent) {
+            this.$emit('save-status', undefined, 'Slide updated');
+        }
     }
 
     /**

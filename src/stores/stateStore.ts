@@ -43,7 +43,7 @@
  *   to refresh its config variables).
  */
 
-import { StoryRampConfig } from '@/definitions';
+import { ConfigFileStructure, MultiLanguageSlide, StoryRampConfig, SupportedLanguages } from '@/definitions';
 import { DetailedDiff, detailedDiff, diff } from 'deep-object-diff';
 import { defineStore } from 'pinia';
 import { deepmerge } from '@fastify/deepmerge';
@@ -52,6 +52,7 @@ interface StateChange {
     timestamp: number;
     origin: string | 'unknown';
     changes: DetailedDiff | 'external';
+    differentFromBase: boolean; // If the change to that point is different from the latestSavedState
 }
 
 export interface Save {
@@ -89,6 +90,14 @@ const deepMerge = deepmerge({ all: true, mergeArray: replaceByClonedSource });
 
 export const useStateStore = defineStore('state', {
     state: () => ({
+        // ========== EXTRA STUFF ==========================
+        // TODO: Move somewhere more appropriate later
+        selectedPanelIndex: 0 as number,
+        activeSlideLang: 'en' as SupportedLanguages,
+        configLang: 'en' as SupportedLanguages,
+
+        // ========== STATE MANAGEMENT VARIABLES ===========
+
         /**
          * Indicates whether there are any unsaved changes.
          */
@@ -121,11 +130,24 @@ export const useStateStore = defineStore('state', {
          * to get the latest save, and replace the various non-save config variables (e.g. `configs` in the editor, for now)
          * with its values.
          */
-        reconcileToggler: false
+        reconcileToggler: false,
+
+        // UNDO/REDO INDICATOR VARIABLES
+
+        /**
+         * Boolean indicating whether there is valid state to undo, and whether the state system can undo it
+         * ("whether undo is possible").
+         */
+        canUndo: false,
+
+        /**
+         * Boolean indicating whether there is valid state to redo, and whether the state system can redo it
+         * ("whether redo is possible").
+         */
+        canRedo: false
     }),
     actions: {
-        // ================================
-        // ACTIONS
+        // ========= STATE MANAGEMENT ACTIONS ==========
 
         /**
          * Manual override for the current "is state changed" value, when you want to modify it directly. Use sparingly.
@@ -168,14 +190,28 @@ export const useStateStore = defineStore('state', {
             // Determine all differences between the latest config and the latest save
             const newDiff = detailedDiff(this.latestSavedState, newConfigs);
 
+            // ======================
+            // Handling the cases
+
+            // If changes are the same as the ones already added to the list (at that position), don't bother re-listing them
+            // Notably prevents "redo" operations from being detected as new changes and mucking things up
+            if (this.isDiffEmpty(diff(combinedPreviousDiffs !== 'external' ? combinedPreviousDiffs : {}, newDiff))) {
+                return false;
+            }
             // There are no changes whatsoever from the last save. Set stuff accordingly.
-            if (this.isDiffEmpty(newDiff)) {
+            else if (this.isDiffEmpty(newDiff)) {
+                // Currently still at the base save. No need to add an 'empty diff'!
+                if (this.currentLoc === -1) {
+                    return false;
+                }
+
                 // Add an 'empty diff' to the list, indicating past changes have been erased.
                 // Doing this allows the erasing to be undone too (bring back past changes).
                 this.recordNewChange({
                     timestamp: Date.now(),
                     origin: origin ?? 'unknown',
-                    changes: newDiff
+                    changes: newDiff,
+                    differentFromBase: false
                 });
 
                 this.isChanged = false;
@@ -188,7 +224,7 @@ export const useStateStore = defineStore('state', {
                 return false;
             }
 
-            // Save new diff to stateChangesList
+            // "Fail" cases have all been checked and failed. Save the new diff to stateChangesList
             this.recordNewChange({
                 timestamp: Date.now(),
                 origin: origin ?? 'unknown',
@@ -197,7 +233,8 @@ export const useStateStore = defineStore('state', {
                 // new changes (we'd need to merge all preceding entries in stateChangesList every
                 // single time) in exchange for a negligible decrease in memory usage.
                 // If anyone disagrees, feel free to @ me.
-                changes: newDiff
+                changes: newDiff,
+                differentFromBase: true
             });
             this.isChanged = true;
             return true;
@@ -207,31 +244,52 @@ export const useStateStore = defineStore('state', {
          * Delete all recorded diffs since the last save.
          * @param reconcile Whether to ask the app to 'refresh'.
          */
-        resetAllChanges(reconcile: boolean = true): void {
+        resetAllChanges(reconcile = true): void {
             this.currentLoc = -1;
             this.stateChangesList = [];
             this.isChanged = false;
+            this.updateUndoRedoAbility();
             if (reconcile) {
                 this.reconcileAppState(true);
             }
         },
 
-        // Reverts the diff at currentLoc. currentLoc will be placed at currentLoc - 1.
-        // TODO: Proper implementation
+        /**
+         * Undoes the last operation (in the list of operations), if there is one.
+         * Technically: Reverts the diff at currentLoc. currentLoc will be placed at currentLoc - 1.
+         */
         undo(): void {
             if (this.currentLoc === -1) return;
 
             this.currentLoc--;
+            this.updateUndoRedoAbility();
             this.reconcileAppState();
+
+            if (this.currentLoc === -1) {
+                this.isChanged = false;
+            } else {
+                this.isChanged = this.stateChangesList[this.currentLoc].differentFromBase;
+            }
         },
 
-        // Re-applies the diff at currentLoc + 1, and sets currentLoc to that.
-        // TODO: Proper implementation
+        /**
+         * Redoes the last undone operation (in the list of operations), if there is one.
+         * Technically: Re-applies the diff at currentLoc + 1, and sets currentLoc to that.
+         */
         redo(): void {
             if (this.currentLoc === this.getNumberOfChanges() - 1) return;
 
+            if (this.currentLoc === -1) this.isChanged = true;
+
             this.currentLoc++;
+            this.updateUndoRedoAbility();
             this.reconcileAppState();
+            this.isChanged = this.stateChangesList[this.currentLoc].differentFromBase;
+        },
+
+        updateUndoRedoAbility(): void {
+            this.canUndo = this.currentLoc > -1;
+            this.canRedo = this.currentLoc !== this.getNumberOfChanges() - 1;
         },
 
         /**
@@ -250,6 +308,7 @@ export const useStateStore = defineStore('state', {
 
             this.stateChangesList.push(newChanges);
             this.currentLoc++;
+            this.updateUndoRedoAbility();
         },
 
         /**
@@ -267,7 +326,6 @@ export const useStateStore = defineStore('state', {
                 // Erase all changes after currentLoc
                 this.eraseSubsequentChanges();
             }
-
             this.reconcileToggler = !this.reconcileToggler;
         },
 
@@ -309,7 +367,7 @@ export const useStateStore = defineStore('state', {
          * Determines if a diff is empty. Also returns true if the diff has keys but all the values are empty (e.g. something like {a:{b:{}}} returns true).
          * @param diff The diff to check.
          */
-        isDiffEmpty(diff: DetailedDiff): boolean {
+        isDiffEmpty(diff: any): boolean {
             if (typeof diff !== 'object' || diff === null) {
                 return false; // Non-object values won't be treated as "empty"
             }
@@ -321,17 +379,74 @@ export const useStateStore = defineStore('state', {
          * Creates a new Save object based on the changes up to the given loc, and returns it. Non-mutating.
          * @param loc The location up to which you want changes considered for the save.
          */
-        addChangesToNewSave(loc?: number): Save {
-            loc = loc ?? this.currentLoc;
+        addChangesToNewSave(loc?: number): Save | undefined {
+            const location = loc ?? this.currentLoc;
 
-            const changesToAdd = this.stateChangesList[loc].changes;
+            // Handle case where we're right back to start (there was only one change)
+            if (location === -1) {
+                return JSON.parse(JSON.stringify(this.latestSavedState));
+            }
 
-            let newSave = JSON.parse(JSON.stringify(this.latestSavedState));
+            const changesToAdd = this.stateChangesList[location]?.changes;
 
-            // TODO: CHECK IF THIS ACTUALLY WORKS
-            newSave = deepMerge(newSave, changesToAdd.added, changesToAdd.deleted, changesToAdd.updated);
+            // TODO: This prevents undo/redo if using one of the 'external config' editors (e.g. map, charts). Once they're integrated, remove/replace.
+            if (!changesToAdd || changesToAdd === 'external') {
+                return undefined;
+            }
+            let newSave: Save = JSON.parse(JSON.stringify(this.latestSavedState));
+
+            newSave = this.createSaveFromDiff(newSave, changesToAdd);
 
             return newSave;
+        },
+
+        createSaveFromDiff(prevSave: Save, diff: DetailedDiff): Save {
+            const applyReverse = (target: any, diff: DetailedDiff) => {
+                // 1. Restore all `added` keys
+                deepMerge(target, diff.added);
+
+                // 2. Restore `updated` values
+                deepMerge(target, diff.updated);
+
+                // 3. Delete `deleted` values
+                deepDelete(target, diff.deleted);
+            };
+
+            // Deletes keys in `template` from `target`
+            function deepDelete(target: any, template: any) {
+                for (const key in template) {
+                    if (typeof template[key] === 'object' && template[key] !== null) {
+                        if (target[key]) {
+                            deepDelete(target[key], template[key]);
+                            // Clean up empty objects
+                            if (Object.keys(target[key]).length === 0) {
+                                delete target[key];
+                            }
+                        }
+                    } else {
+                        delete target[key];
+                    }
+                }
+            }
+
+            // Recursively sets values in `source` into `target`
+            const deepMerge = (target: any, source: any) => {
+                for (const key in source) {
+                    if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+                        if (!target[key] || typeof target[key] !== 'object') {
+                            target[key] = {};
+                        }
+                        deepMerge(target[key], source[key]);
+                    } else {
+                        target[key] = source[key];
+                    }
+                }
+            };
+
+            const clone = structuredClone(prevSave); // deep clone
+
+            applyReverse(clone, diff);
+            return clone;
         },
 
         // Erases all changes after the change at currentLoc.
