@@ -14,3 +14,21 @@
 #wb-cont code {
     color: #c7254e !important;
 }
+
+.time-slider .noUi-value {
+    display: none; 
+}
+
+.time-slider .noUi-pips .noUi-value:nth-of-type(2),
+.time-slider .noUi-value:last-of-type {
+    display: block;
+}
+
+.time-slider .noUi-marker {
+    height: 8px !important;
+}
+
+.time-slider .noUi-marker[style*="left: 0%"],
+.time-slider .noUi-marker[style*="left: 100%"] {
+    height: 15px !important;
+}
