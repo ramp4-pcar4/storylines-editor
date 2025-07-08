@@ -423,8 +423,8 @@
                                     currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])
                                         ? $vfm.open(`one-panel-only-${slideIndex}`)
                                         : currentSlide.panel.length === 1
-                                        ? $vfm.open(`one-to-two-panels-${slideIndex}`)
-                                        : toggleOnePanelOnly();
+                                          ? $vfm.open(`one-to-two-panels-${slideIndex}`)
+                                          : toggleOnePanelOnly();
                                 }
                             "
                         />
@@ -452,12 +452,16 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => {
-                        $emit('custom-slide-updated', slideConfig, save, lang)
-                    }"
-                    @title-edit="(title: string) => {
-                        $emit('custom-slide-updated', { ...currentSlide, title }, false, lang)
-                    }"
+                    @config-edited="
+                        (slideConfig: Slide, save: boolean = false) => {
+                            $emit('custom-slide-updated', slideConfig, save, lang);
+                        }
+                    "
+                    @title-edit="
+                        (title: string) => {
+                            $emit('custom-slide-updated', { ...currentSlide, title }, false, lang);
+                        }
+                    "
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -527,9 +531,12 @@ import {
     BasePanel,
     BaseStartingConfig,
     DefaultConfigs,
+    DynamicPanel,
     MapPanel,
     PanelType,
     Slide,
+    SlideshowChartPanel,
+    SlideshowImagePanel,
     StoryRampConfig,
     SupportedLanguages,
     TextPanel
@@ -775,8 +782,8 @@ export default class SlideEditorV extends Vue {
                         panel.type === 'slideshowImage'
                             ? (panel as SlideshowImagePanel)
                             : panel.type === 'slideshowChart'
-                            ? (panel as SlideshowChartPanel)
-                            : panel;
+                              ? (panel as SlideshowChartPanel)
+                              : panel;
                     applyTextAlign(slideshowPanel, this.centerSlide, true);
                 } else {
                     applyTextAlign(panel, this.centerSlide, true);
@@ -833,7 +840,7 @@ export default class SlideEditorV extends Vue {
 
     getNumberOfMaps(): number {
         let n = 0;
-        this.productStore.configFileStructure.rampConfig.forEach((f) => {
+        this.productStore.configFileStructure.rampConfig.forEach((_f) => {
             n += 1;
         });
         return n;

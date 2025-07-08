@@ -333,54 +333,62 @@
                                         <col class="w-3/5" />
                                         <col span="1" />
                                     </colgroup>
-                                    <tr>
-                                        <td
-                                            style="background-color: #e7e7e7"
-                                            class="font-bold border-b border-solid border-black"
-                                        >
-                                            <div class="m-2 mr-0 ml-3">
-                                                {{ $t('editor.editMetadata.versionHistory.saveDate') }}
-                                            </div>
-                                        </td>
-                                        <td
-                                            style="background-color: #e7e7e7"
-                                            class="font-bold border-b border-solid border-black"
-                                        >
-                                            <div class="ml-0">
-                                                {{ $t('editor.editMetadata.versionHistory.actions') }}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr v-for="(historyItem, idx) in storylineHistory" :key="idx">
-                                        <td
-                                            style="background-color: #f9f9f9"
-                                            class="border-b border-solid pl-4"
-                                            :class="
-                                                idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
-                                            "
-                                        >
-                                            {{ formatDate(historyItem.created) }}
-                                        </td>
-                                        <td
-                                            style="background-color: #f9f9f9"
-                                            class="border-b border-solid py-3 pr-3"
-                                            :class="
-                                                idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
-                                            "
-                                        >
-                                            <button
-                                                class="respected-standard-button respected-gray-border-button respected-mainline-button"
-                                                @click="
-                                                    () => {
-                                                        selectHistory(historyItem);
-                                                        loadHistory();
-                                                    }
+                                    <thead>
+                                        <tr>
+                                            <td
+                                                style="background-color: #e7e7e7"
+                                                class="font-bold border-b border-solid border-black"
+                                            >
+                                                <div class="m-2 mr-0 ml-3">
+                                                    {{ $t('editor.editMetadata.versionHistory.saveDate') }}
+                                                </div>
+                                            </td>
+                                            <td
+                                                style="background-color: #e7e7e7"
+                                                class="font-bold border-b border-solid border-black"
+                                            >
+                                                <div class="ml-0">
+                                                    {{ $t('editor.editMetadata.versionHistory.actions') }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(historyItem, idx) in storylineHistory" :key="idx">
+                                            <td
+                                                style="background-color: #f9f9f9"
+                                                class="border-b border-solid pl-4"
+                                                :class="
+                                                    idx === storylineHistory.length - 1
+                                                        ? 'border-black'
+                                                        : 'border-gray-200'
                                                 "
                                             >
-                                                <span>{{ $t('editor.editMetadata.versionHistory.load') }}</span>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                                {{ formatDate(historyItem.created) }}
+                                            </td>
+                                            <td
+                                                style="background-color: #f9f9f9"
+                                                class="border-b border-solid py-3 pr-3"
+                                                :class="
+                                                    idx === storylineHistory.length - 1
+                                                        ? 'border-black'
+                                                        : 'border-gray-200'
+                                                "
+                                            >
+                                                <button
+                                                    class="respected-standard-button respected-gray-border-button respected-mainline-button"
+                                                    @click="
+                                                        () => {
+                                                            selectHistory(historyItem);
+                                                            loadHistory();
+                                                        }
+                                                    "
+                                                >
+                                                    <span>{{ $t('editor.editMetadata.versionHistory.load') }}</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </section>
@@ -656,9 +664,6 @@ import {
     MetadataContent,
     MultiLanguageSlide,
     Slide,
-    SlideshowChart,
-    SlideshowImage,
-    SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
     TextPanel
@@ -981,26 +986,32 @@ export default class MetadataEditorV extends Vue {
         const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
         const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
         const timeBuffer = isFirefox ? 2000 : 0;
-        this.lockStore.confirmationTimeout = setTimeout(() => {
-            // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
-            document.onmousemove = () => undefined;
-            document.onkeydown = () => undefined;
-            this.$vfm.open(`confirm-extend-session-editor`);
-            this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
-        }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000 + timeBuffer);
+        this.lockStore.confirmationTimeout = setTimeout(
+            () => {
+                // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+                this.$vfm.open(`confirm-extend-session-editor`);
+                this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
+            },
+            this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000 + timeBuffer
+        );
         // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
-        this.lockStore.endTimeout = setTimeout(() => {
-            // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
-            document.onmousemove = () => undefined;
-            document.onkeydown = () => undefined;
-            this.sessionExpired = true;
-            this.$vfm.close('confirm-extend-session-editor');
-            if (this.$route.name === 'editor') {
-                this.$refs['mainEditor'].saveChanges();
-            } else {
-                this.generateConfig();
-            }
-        }, this.lockStore.timeRemaining * 1000 + 1000 + timeBuffer);
+        this.lockStore.endTimeout = setTimeout(
+            () => {
+                // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+                this.sessionExpired = true;
+                this.$vfm.close('confirm-extend-session-editor');
+                if (this.$route.name === 'editor') {
+                    (this.$refs['mainEditor'] as any).saveChanges();
+                } else {
+                    this.generateConfig();
+                }
+            },
+            this.lockStore.timeRemaining * 1000 + 1000 + timeBuffer
+        );
         // Now add event listeners to detect for inactivity.
         document.onmousemove = () => this.extendSession();
         document.onkeydown = () => this.extendSession();
@@ -1062,7 +1073,7 @@ export default class MetadataEditorV extends Vue {
                             });
                         });
                     } else {
-                        res(); // resolve on 404 error, so that loadStatus gets set to loaded
+                        res(undefined); // resolve on 404 error, so that loadStatus gets set to loaded
                     }
                 });
             }
@@ -1209,7 +1220,7 @@ export default class MetadataEditorV extends Vue {
             this.loadStatus = 'loading';
             const secret = this.lockStore.secret;
             fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, {
-                headers: { user: this.user, secret: secret },
+                headers: { user: this.user as any, secret: secret },
                 signal: this.controller.signal
             })
                 .then((res: Response) => {
@@ -1348,16 +1359,18 @@ export default class MetadataEditorV extends Vue {
         }
         this.loadStatus = 'loading';
         const secret = this.lockStore.secret;
-        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user: this.user, secret } }).then((res: Response) => {
-            if (res.status === 404) {
-                // Product not found.
-                this.loadStatus = 'waiting';
-            } else {
-                res.json().then((json) => {
-                    this.storylineHistory = json;
-                });
+        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user: this.user as any, secret } }).then(
+            (res: Response) => {
+                if (res.status === 404) {
+                    // Product not found.
+                    this.loadStatus = 'waiting';
+                } else {
+                    res.json().then((json) => {
+                        this.storylineHistory = json;
+                    });
+                }
             }
-        });
+        );
     }
 
     selectHistory(selected: any): void {
@@ -1422,7 +1435,7 @@ export default class MetadataEditorV extends Vue {
                             newUuid: this.changeUuid,
                             configs: { en: convertedEnglish, fr: convertedFrench }
                         })
-                        .then(async (res: AxiosResponse) => {
+                        .then(async (_res: AxiosResponse) => {
                             // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
                             if (import.meta.env.VITE_APP_NET_API_URL) {
                                 await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
@@ -1545,8 +1558,8 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    async createMainStyles(configZip: typeof JSZip): void {
-        const existingStyles = configZip.folder('styles').file('main.css');
+    async createMainStyles(configZip: typeof JSZip): Promise<void> {
+        const existingStyles = configZip.folder('styles')?.file('main.css');
 
         if (existingStyles) {
             // need to ensure the classes in this css file are not the same as the default ones...
@@ -1565,11 +1578,11 @@ export default class MetadataEditorV extends Vue {
                 styles += `.centerSlideFull {\n\ttext-align: center;\n}\n\n`;
             }
             styles += res;
-            configZip.folder('styles').file('main.css', styles);
+            configZip.folder('styles')?.file('main.css', styles);
         } else {
             const styles = `.centerPanel {\n\ttext-align: center;\n}\n\n.centerSlideLeft {\n\ttext-align: left;\n}\n
 .centerSlideRight {\n\ttext-align: right;\n}\n\n.centerSlideFull {\n\ttext-align: center;\n}\n\n`;
-            configZip.folder('styles').file('main.css', styles);
+            configZip.folder('styles')?.file('main.css', styles);
         }
     }
 
@@ -1750,7 +1763,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.sameConfig = config.sameConfig ?? true;
         this.metadata.dateModified = config.dateModified;
-        this.metadata.schemaVersion = config.schemaVersion;
+        this.metadata.schemaVersion = config.schemaVersion ?? '';
 
         // TODO: check schema version in the config, and if it doesn't match the current version in the schema (stored in
         // this.latestSchemaVersion), the product's local repo should be re-initialized
@@ -1804,7 +1817,7 @@ export default class MetadataEditorV extends Vue {
                 saveAs(blob, `${this.productStore.configFileStructure.uuid}.zip`);
                 Message.success(this.$t('editor.export.success'));
             },
-            (err) => {
+            (_err) => {
                 Message.error(this.$t('editor.export.error'));
             }
         );
@@ -1870,7 +1883,7 @@ export default class MetadataEditorV extends Vue {
                 formData.append('data', content, `${this.uuid}.zip`);
                 const headers = {
                     'Content-Type': 'multipart/form-data',
-                    user: this.user,
+                    user: this.user as any,
                     secret: this.lockStore.secret
                 };
                 Message.warning(this.$t('editor.editMetadata.message.wait'));
@@ -1892,7 +1905,7 @@ export default class MetadataEditorV extends Vue {
                                         titleEn: this.productStore.configs['en']?.title ?? '',
                                         titleFr: this.productStore.configs['fr']?.title ?? ''
                                     })
-                                    .then((response: any) => {
+                                    .then((_response: any) => {
                                         const userStore = useUserStore();
                                         userStore.fetchUserProfile();
                                         formData.append('uuid', this.uuid);
@@ -1905,7 +1918,7 @@ export default class MetadataEditorV extends Vue {
                                                 import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
                                                 formData
                                             )
-                                            .then((response: any) => {
+                                            .then((_response: any) => {
                                                 Message.success(this.$t('editor.editMetadata.message.successfulSave'));
                                             })
                                             .catch((error: any) => console.log(error.response || error))
@@ -1940,7 +1953,7 @@ export default class MetadataEditorV extends Vue {
                                                     import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
                                                     formData
                                                 )
-                                                .then((response: any) => {
+                                                .then((_response: any) => {
                                                     Message.success(
                                                         this.$t('editor.editMetadata.message.successfulSave')
                                                     );
@@ -2107,9 +2120,12 @@ export default class MetadataEditorV extends Vue {
             logoPreview: '',
             logoName: '',
             logoAltText: '',
+            introBgName: '',
+            introBgPreview: '',
             tocOrientation: '',
             returnTop: true,
-            sameConfig: true
+            sameConfig: true,
+            schemaVersion: ''
         };
         this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
         this.productStore.configs = { en: undefined, fr: undefined };
