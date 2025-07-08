@@ -44,10 +44,10 @@
                 <button
                     :aria-label="panel?.type"
                     v-for="(panel, panelIndex) in element[selectedLang]?.panel"
-                    :key="panel.id || panelIndex"
+                    :key="(panel as any).id || panelIndex"
                     class="flex gap-0.5 border rounded w-min py-0.5 px-0.5 cursor-default"
                     :class="[
-                        panel?.type === 'map' && panel.shared
+                        panel?.type === 'map' && (panel as MapPanel).shared
                             ? 'border-yellow-800 bg-yellow-200 hover:border-yellow-400'
                             : 'border-transparent hover:border-gray-400 hover:bg-gray-300'
                     ]"
@@ -62,9 +62,9 @@
                     }"
                 >
                     <span
-                        v-html="determinePanelImage(panel?.type)"
+                        v-html="determinePanelImage(panel?.type as PanelType)"
                         :style="{
-                            fill: panel?.type === 'map' && panel.shared ? '#92400e' : 'rgba(0,0,0,0.75)'
+                            fill: panel?.type === 'map' && (panel as MapPanel).shared ? '#92400e' : 'rgba(0,0,0,0.75)'
                         }"
                         style="min-height: 11px; max-height: 11px; min-width: 11px; max-width: 11px"
                     ></span>
@@ -160,7 +160,7 @@
 </template>
 
 <script lang="ts">
-import { BasePanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
+import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from './toc-options.vue';
 
@@ -185,7 +185,7 @@ export default class SlideTocV extends Vue {
     @Prop({ default: false }) isMobileSidebar!: boolean;
     @Prop() isActiveSlide!: boolean;
 
-    oppositeLang = '';
+    oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
 
     textEditorIcon = TextEditorIcon;
@@ -197,7 +197,7 @@ export default class SlideTocV extends Vue {
     slideshowEditorIcon = SlideshowEditorIcon;
     dynamicEditorIcon = DynamicEditorIcon;
 
-    createMiniIconTooltip(panelIndex: number, element: Slide, panel: BasePanel) {
+    createMiniIconTooltip(panelIndex: number, element: MultiLanguageSlide, panel: BasePanel) {
         // Function to escape HTML sequences
         // panel.title is user input, and therefore a potential attack vector
         const escapeHTML = (text: string) => {
@@ -215,14 +215,14 @@ export default class SlideTocV extends Vue {
         const maxLength = 130;
 
         return `<p style="justify-self: left; text-align: left"><strong>${
-            element[this.selectedLang]?.panel.length > 1
+            (element[this.selectedLang] as Slide).panel.length > 1
                 ? this.$t('editor.slides.panelNumber', { num: panelIndex + 1 })
                 : this.$t('editor.slides.fullscreenPanel')
         }: ${this.$t(`editor.slide.panel.type.${panel?.type}`)}</strong><br/>${
-            panel.title
+            (panel as any).title
                 ? '"' +
-                  escapeHTML(panel.title).substring(0, maxLength) +
-                  ((panel.title as string)?.length > maxLength ? '...' : '') +
+                  escapeHTML((panel as any).title).substring(0, maxLength) +
+                  (((panel as any).title as string)?.length > maxLength ? '...' : '') +
                   '"'
                 : 'No title'
         }</p>`;
@@ -288,6 +288,7 @@ export default class SlideTocV extends Vue {
     border-radius: 3px;
     padding: 2px;
 }
+
 .slide-toc-button:hover {
     background-color: rgb(209, 213, 219);
 }

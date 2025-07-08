@@ -18,9 +18,4 @@ declare global {
     }
 
     const RAMP: any;
-
-    const highed: {
-        ready(callback: () => void): void;
-        ModalEditor: any;
-    };
 }

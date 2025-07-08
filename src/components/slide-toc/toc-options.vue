@@ -115,9 +115,11 @@ export default class TocOptionsV extends Vue {
     padding: 2px;
     line-height: 1;
 }
+
 .slide-toc-button:hover {
     background-color: rgb(209, 213, 219);
 }
+
 span {
     font-weight: 500;
 }

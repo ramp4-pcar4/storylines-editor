@@ -526,8 +526,8 @@ import SlideTocV from './slide-toc/slide-toc.vue';
 import MetadataContentV from './metadata/metadata-content.vue';
 import ConfirmationModalV from './support/confirmation-modal.vue';
 import HelpPanelV from './help/help-panel.vue';
-import { useLockStore } from '@/stores/lockStore';
 import DropdownMenu from '@/components/support/dropdown-menu.vue';
+import { useLockStore } from '@/stores/lockStore';
 import { useProductStore } from '@/stores/productStore';
 
 @Options({
@@ -604,7 +604,7 @@ export default class EditorV extends Vue {
         });
 
         observer.observe(document.querySelector('.editor-header') as Element);
-        this.dropdownButtonWidth = this.$refs.dropdownButton.offsetWidth ?? 0;
+        this.dropdownButtonWidth = (this.$refs.dropdownButton as HTMLElement).offsetWidth ?? 0;
     }
 
     beforeDestroy(): void {

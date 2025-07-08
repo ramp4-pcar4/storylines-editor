@@ -47,9 +47,9 @@
                 <metadata-content
                     :metadata="metadata"
                     :createNew="false"
-                    @metadata-changed="(key, value) => $emit('metadata-changed', key, value)"
-                    @image-changed="(event, type) => $emit('image-changed', event, type)"
-                    @image-source-changed="(event, type) => $emit('image-source-changed', event, type)"
+                    @metadata-changed="(key: string, value: string) => $emit('metadata-changed', key, value)"
+                    @image-changed="(event: Event, type: string) => $emit('image-changed', event, type)"
+                    @image-source-changed="(event: Event, type: string) => $emit('image-source-changed', event, type)"
                     @logo-removed="productStore.decrementSourceCount('Logo')"
                     @background-removed="productStore.decrementSourceCount('Background')"
                 ></metadata-content>
