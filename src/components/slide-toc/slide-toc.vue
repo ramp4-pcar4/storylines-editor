@@ -472,7 +472,7 @@ export default class SlideTocV extends Vue {
      * @param currLang The config to delete, either 'en' for English of 'fr' for French.
      */
     deleteConfig(slides: MultiLanguageSlide, currLang: 'en' | 'fr'): void {
-        slides[currLang].panel.forEach((panel: BasePanel) => this.productStore.removeSourceCounts(panel));
+        slides[currLang]?.panel.forEach((panel: BasePanel) => this.productStore.removeSourceCounts(panel));
         slides[currLang] = undefined;
         this.$emit('slides-updated', this.slides);
     }
@@ -486,7 +486,7 @@ export default class SlideTocV extends Vue {
         // in the shared folder (in which case we do nothing), and if an asset with the same name and different
         // contents already exists in the shared folder (in which case we give the asset uploaded to the shared
         // asset folder a unique name)
-        const oppositeToSharedFolder = async (panel: ImagePanel | VideoPanel, oppositeLang: string): void => {
+        const oppositeToSharedFolder = async (panel: ImagePanel | VideoPanel, oppositeLang: string): Promise<void> => {
             // Copying to the shared folder isn't currently supported for maps or charts.
             // TODO: remove this once it is supported
             if ((panel as BasePanel).type === 'chart' || (panel as BasePanel).type === 'map') {
@@ -497,7 +497,7 @@ export default class SlideTocV extends Vue {
             if (panel.src) {
                 const assetSrc = panel.src.split('/');
                 const fileName = assetSrc.at(-1);
-                const assetType = fileName.split('.').at(-1);
+                const assetType = fileName?.split('.').at(-1);
                 let inSharedAssets = assetSrc[2] === 'shared';
                 let sharedFileSource = `${this.productStore.configFileStructure.uuid}/assets/shared/${fileName}`;
 
@@ -514,21 +514,24 @@ export default class SlideTocV extends Vue {
 
                     // If an asset with the same name, but different content, is already in the shared folder, we must
                     // give the asset we are uploading a unique name. Otherwise the existing asset will be overwritten
-                    while (this.productStore.configFileStructure.assets['shared'].file(sharedAssetName)) {
-                        sharedAssetName = `${compressedFile.name.split('.').at(0)}(${i}).${compressedFile.name
+                    while (this.productStore.configFileStructure.assets['shared'].file(sharedAssetName as string)) {
+                        sharedAssetName = `${compressedFile?.name.split('.').at(0)}(${i}).${compressedFile?.name
                             .split('.')
                             .at(-1)}`;
                         i++;
                     }
                     sharedFileSource = `${this.productStore.configFileStructure.uuid}/assets/shared/${sharedAssetName}`;
-                    await compressedFile.async(assetType !== 'svg' ? 'blob' : 'text').then((assetFile) => {
+                    await compressedFile?.async(assetType !== 'svg' ? 'blob' : 'text').then((assetFile) => {
                         if (assetType === 'svg') {
-                            assetFile = new File([assetFile], fileName, {
+                            assetFile = new File([assetFile], fileName as string, {
                                 type: 'image/svg+xml'
                             });
                         }
                         this.productStore.configFileStructure.assets[oppositeLang].remove(oppositeRelativePath);
-                        this.productStore.configFileStructure.assets['shared'].file(sharedAssetName, assetFile);
+                        this.productStore.configFileStructure.assets['shared'].file(
+                            sharedAssetName as string,
+                            assetFile
+                        );
                         this.productStore.sourceCounts[sharedFileSource] =
                             this.productStore.sourceCounts[oppositeFileSource] ?? 0;
                         this.productStore.sourceCounts[oppositeFileSource] = 0;
@@ -541,7 +544,7 @@ export default class SlideTocV extends Vue {
             }
         };
 
-        this.slides[index][oppositeLang].panel.forEach((panel) => {
+        this.slides[index][oppositeLang]?.panel.forEach((panel) => {
             this.productStore.panelHelper(panel, oppositeToSharedFolder, oppositeLang);
         });
 
@@ -549,7 +552,9 @@ export default class SlideTocV extends Vue {
         // panel in the opposite lang's slide. Otherwise it will copy the contents of the opposite config before its
         // src values are updated
         setTimeout(() => {
-            this.slides[index][currLang].panel.forEach((panel) => this.productStore.removeSourceCounts(panel));
+            (this.slides[index][currLang] as Slide).panel.forEach((panel) =>
+                this.productStore.removeSourceCounts(panel)
+            );
             this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][oppositeLang]));
             this.$emit('slides-updated', this.slides);
             this.$emit('slide-change', index, currLang);
@@ -587,13 +592,17 @@ export default class SlideTocV extends Vue {
 
         // increment source count of each asset in this slide
         const incrementSourceCounts = (panel: ImagePanel | VideoPanel | ChartPanel) => {
-            const source = !!panel.src ? panel.src : !!panel.config ? panel.config : undefined;
+            const source = !!panel.src
+                ? panel.src
+                : !!(panel as ChartPanel).config
+                  ? (panel as ChartPanel).config
+                  : undefined;
             if (source) {
                 this.productStore.sourceCounts[source] += 1;
             }
         };
-        this.slides[index].en.panel.forEach((panel) => this.productStore.panelHelper(panel, incrementSourceCounts));
-        this.slides[index].fr.panel.forEach((panel) => this.productStore.panelHelper(panel, incrementSourceCounts));
+        this.slides[index]?.en?.panel.forEach((panel) => this.productStore.panelHelper(panel, incrementSourceCounts));
+        this.slides[index]?.fr?.panel.forEach((panel) => this.productStore.panelHelper(panel, incrementSourceCounts));
 
         // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
         this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
@@ -645,10 +654,10 @@ export default class SlideTocV extends Vue {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
 
-        if (overlayElement.style.display != 'none' && window.innerWidth >= 768) {
-            overlayElement.style.display = 'none';
-        } else if (sidebarElement.style.width === '20rem' && window.innerWidth < 768) {
-            overlayElement.style.display = 'block';
+        if (overlayElement?.style.display != 'none' && window.innerWidth >= 768) {
+            overlayElement!.style.display = 'none';
+        } else if (sidebarElement?.style.width === '20rem' && window.innerWidth < 768) {
+            overlayElement!.style.display = 'block';
         }
     }
     mounted() {

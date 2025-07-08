@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-interface Storyline {
+export interface Storyline {
     uuid: string;
     titleEN: string;
     titleFR: string;
@@ -8,7 +8,7 @@ interface Storyline {
     isUserStoryline?: boolean;
 }
 
-interface UserProfile {
+export interface UserProfile {
     userName?: string;
     role?: string;
     storylines?: Array<Storyline>;

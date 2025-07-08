@@ -19,6 +19,7 @@ declare global {
 
     const RAMP: any;
 
+    // TODO: remove when HACK is integrated
     const highed: {
         ready(callback: () => void): void;
         ModalEditor: any;
