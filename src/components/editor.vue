@@ -458,11 +458,13 @@
                     @slide-edit="$emit('save-status', undefined, 'ToC')"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
+                    @shared-asset="
+                        (oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                            $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                        }
+                    "
                     @process-panel="
-                        (panel, callback, ...args) => {
+                        (panel: BasePanel, callback: any, ...args: any[]) => {
                             $emit('process-panel', panel, callback, ...args);
                         }
                     "
@@ -483,11 +485,13 @@
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
                     @close-sidebar="closeSidebar"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
+                    @shared-asset="
+                        (oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                            $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                        }
+                    "
                     @process-panel="
-                        (panel, callback, ...args) => {
+                        (panel: BasePanel, callback: any, ...args: any[]) => {
                             $emit('process-panel', panel, callback, ...args);
                         }
                     "
@@ -513,9 +517,11 @@
                     :slideIndex="slideIndex"
                     :isLast="slideIndex === slides.length - 1"
                     :uid="uuid"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
+                    @shared-asset="
+                        (oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                            $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                        }
+                    "
                     @slide-change="selectSlide"
                     @slide-edit="onSlidesEdited"
                     @custom-slide-updated="updateCustomSlide"
@@ -543,7 +549,6 @@ import {
     BasePanel,
     ConfigFileStructure,
     HelpSection,
-    ImagePanel,
     MetadataContent,
     MultiLanguageSlide,
     Slide,
@@ -643,7 +648,7 @@ export default class EditorV extends Vue {
         });
 
         observer.observe(document.querySelector('.editor-header') as Element);
-        this.dropdownButtonWidth = this.$refs.dropdownButton.offsetWidth ?? 0;
+        this.dropdownButtonWidth = (this.$refs.dropdownButton as HTMLElement).offsetWidth ?? 0;
     }
 
     beforeDestroy(): void {
@@ -902,9 +907,11 @@ window.addEventListener('resize', () => {
     border-radius: 5px;
     padding: 3px 12px;
 }
+
 .toc-popup-button:hover {
     background-color: rgb(234, 234, 234);
 }
+
 .toc-popup-button:active {
     background-color: rgb(221, 221, 221);
 }

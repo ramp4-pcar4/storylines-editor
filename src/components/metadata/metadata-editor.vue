@@ -331,54 +331,62 @@
                                         <col class="w-3/5" />
                                         <col span="1" />
                                     </colgroup>
-                                    <tr>
-                                        <td
-                                            style="background-color: #e7e7e7"
-                                            class="font-bold border-b border-solid border-black"
-                                        >
-                                            <div class="m-2 mr-0 ml-3">
-                                                {{ $t('editor.editMetadata.versionHistory.saveDate') }}
-                                            </div>
-                                        </td>
-                                        <td
-                                            style="background-color: #e7e7e7"
-                                            class="font-bold border-b border-solid border-black"
-                                        >
-                                            <div class="ml-0">
-                                                {{ $t('editor.editMetadata.versionHistory.actions') }}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr v-for="(historyItem, idx) in storylineHistory" :key="idx">
-                                        <td
-                                            style="background-color: #f9f9f9"
-                                            class="border-b border-solid pl-4"
-                                            :class="
-                                                idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
-                                            "
-                                        >
-                                            {{ formatDate(historyItem.created) }}
-                                        </td>
-                                        <td
-                                            style="background-color: #f9f9f9"
-                                            class="border-b border-solid py-3 pr-3"
-                                            :class="
-                                                idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
-                                            "
-                                        >
-                                            <button
-                                                class="respected-standard-button respected-gray-border-button respected-mainline-button"
-                                                @click="
-                                                    () => {
-                                                        selectHistory(historyItem);
-                                                        loadHistory();
-                                                    }
+                                    <thead>
+                                        <tr>
+                                            <td
+                                                style="background-color: #e7e7e7"
+                                                class="font-bold border-b border-solid border-black"
+                                            >
+                                                <div class="m-2 mr-0 ml-3">
+                                                    {{ $t('editor.editMetadata.versionHistory.saveDate') }}
+                                                </div>
+                                            </td>
+                                            <td
+                                                style="background-color: #e7e7e7"
+                                                class="font-bold border-b border-solid border-black"
+                                            >
+                                                <div class="ml-0">
+                                                    {{ $t('editor.editMetadata.versionHistory.actions') }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(historyItem, idx) in storylineHistory" :key="idx">
+                                            <td
+                                                style="background-color: #f9f9f9"
+                                                class="border-b border-solid pl-4"
+                                                :class="
+                                                    idx === storylineHistory.length - 1
+                                                        ? 'border-black'
+                                                        : 'border-gray-200'
                                                 "
                                             >
-                                                <span>{{ $t('editor.editMetadata.versionHistory.load') }}</span>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                                {{ formatDate(historyItem.created) }}
+                                            </td>
+                                            <td
+                                                style="background-color: #f9f9f9"
+                                                class="border-b border-solid py-3 pr-3"
+                                                :class="
+                                                    idx === storylineHistory.length - 1
+                                                        ? 'border-black'
+                                                        : 'border-gray-200'
+                                                "
+                                            >
+                                                <button
+                                                    class="respected-standard-button respected-gray-border-button respected-mainline-button"
+                                                    @click="
+                                                        () => {
+                                                            selectHistory(historyItem);
+                                                            loadHistory();
+                                                        }
+                                                    "
+                                                >
+                                                    <span>{{ $t('editor.editMetadata.versionHistory.load') }}</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </section>
@@ -668,8 +676,8 @@ import {
     MultiLanguageSlide,
     PanelType,
     Slide,
-    SlideshowChart,
-    SlideshowImage,
+    SlideshowChartPanel,
+    SlideshowImagePanel,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -993,26 +1001,32 @@ export default class MetadataEditorV extends Vue {
         const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
         const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
         const timeBuffer = isFirefox ? 2000 : 0;
-        this.lockStore.confirmationTimeout = setTimeout(() => {
-            // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
-            document.onmousemove = () => undefined;
-            document.onkeydown = () => undefined;
-            this.$vfm.open(`confirm-extend-session-editor`);
-            this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
-        }, this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000 + timeBuffer);
+        this.lockStore.confirmationTimeout = setTimeout(
+            () => {
+                // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+                this.$vfm.open(`confirm-extend-session-editor`);
+                this.lockStore.broadcast?.postMessage({ action: 'confirm', value: this.lockStore.timeRemaining });
+            },
+            this.lockStore.timeRemaining * 1000 - warnTime * 60 * 1000 + timeBuffer
+        );
         // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
-        this.lockStore.endTimeout = setTimeout(() => {
-            // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
-            document.onmousemove = () => undefined;
-            document.onkeydown = () => undefined;
-            this.sessionExpired = true;
-            this.$vfm.close('confirm-extend-session-editor');
-            if (this.$route.name === 'editor') {
-                this.$refs['mainEditor'].saveChanges();
-            } else {
-                this.generateConfig();
-            }
-        }, this.lockStore.timeRemaining * 1000 + 1000 + timeBuffer);
+        this.lockStore.endTimeout = setTimeout(
+            () => {
+                // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
+                document.onmousemove = () => undefined;
+                document.onkeydown = () => undefined;
+                this.sessionExpired = true;
+                this.$vfm.close('confirm-extend-session-editor');
+                if (this.$route.name === 'editor') {
+                    (this.$refs['mainEditor'] as any).saveChanges();
+                } else {
+                    this.generateConfig();
+                }
+            },
+            this.lockStore.timeRemaining * 1000 + 1000 + timeBuffer
+        );
         // Now add event listeners to detect for inactivity.
         document.onmousemove = () => this.extendSession();
         document.onkeydown = () => this.extendSession();
@@ -1074,7 +1088,7 @@ export default class MetadataEditorV extends Vue {
                             });
                         });
                     } else {
-                        res(); // resolve on 404 error, so that loadStatus gets set to loaded
+                        res(undefined); // resolve on 404 error, so that loadStatus gets set to loaded
                     }
                 });
             }
@@ -1222,7 +1236,7 @@ export default class MetadataEditorV extends Vue {
             this.loadStatus = 'loading';
             const secret = this.lockStore.secret;
             fetch(this.apiUrl + `/retrieve/${this.uuid}/${version}`, {
-                headers: { user: this.user, secret: secret },
+                headers: { user: this.user as any, secret: secret },
                 signal: this.controller.signal
             })
                 .then((res: Response) => {
@@ -1331,7 +1345,6 @@ export default class MetadataEditorV extends Vue {
 
                     // Reset fields
                     this.baseUuid = this.uuid;
-                    this.renamed = '';
                     this.changeUuid = '';
 
                     // Attempt to fetch the project from the server.
@@ -1362,16 +1375,18 @@ export default class MetadataEditorV extends Vue {
         }
         this.loadStatus = 'loading';
         const secret = this.lockStore.secret;
-        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user: this.user, secret } }).then((res: Response) => {
-            if (res.status === 404) {
-                // Product not found.
-                this.loadStatus = 'waiting';
-            } else {
-                res.json().then((json) => {
-                    this.storylineHistory = json;
-                });
+        fetch(this.apiUrl + `/history/${this.uuid}`, { headers: { user: this.user as any, secret } }).then(
+            (res: Response) => {
+                if (res.status === 404) {
+                    // Product not found.
+                    this.loadStatus = 'waiting';
+                } else {
+                    res.json().then((json) => {
+                        this.storylineHistory = json;
+                    });
+                }
             }
-        });
+        );
     }
 
     selectHistory(selected: any): void {
@@ -1406,7 +1421,6 @@ export default class MetadataEditorV extends Vue {
         }
 
         const prevUuid = this.configFileStructure.uuid;
-        const userStore = useUserStore();
 
         // Fetch the two existing configuration files.
         const enFile = this.configFileStructure?.zip.file(`${prevUuid}_en.json`);
@@ -1435,7 +1449,7 @@ export default class MetadataEditorV extends Vue {
                             newUuid: this.changeUuid,
                             configs: { en: convertedEnglish, fr: convertedFrench }
                         })
-                        .then(async (res: AxiosResponse) => {
+                        .then(async (_res: AxiosResponse) => {
                             // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
                             if (import.meta.env.VITE_APP_NET_API_URL) {
                                 await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
@@ -1547,7 +1561,7 @@ export default class MetadataEditorV extends Vue {
         config.slides.forEach((slide) => {
             if (Object.keys(slide).length !== 0) {
                 if ((slide as Slide).backgroundImage) {
-                    (slide as Slide).backgroundImage = (slide as Slide).backgroundImage.replace(
+                    (slide as Slide).backgroundImage = (slide as Slide).backgroundImage?.replace(
                         `${prevUuid}/assets/`,
                         `${this.changeUuid}/assets/`
                     );
@@ -1586,8 +1600,8 @@ export default class MetadataEditorV extends Vue {
                 this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.logo.src);
             }
 
-            if (configs[lang].introSlide.backgroundImage) {
-                this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.backgroundImage);
+            if (configs[lang]?.introSlide.backgroundImage) {
+                this.incrementSourceCount((configs[lang] as StoryRampConfig).introSlide.backgroundImage as string);
             }
 
             configs[lang]?.slides.forEach((slide) => {
@@ -1613,12 +1627,12 @@ export default class MetadataEditorV extends Vue {
                 });
                 break;
             case PanelType.SlideshowImage:
-                (panel as SlideshowImage).items.forEach((item: ImagePanel) => {
+                (panel as SlideshowImagePanel).items.forEach((item: ImagePanel) => {
                     this.panelSourceHelper(item);
                 });
                 break;
             case PanelType.SlideshowChart:
-                (panel as SlideshowChart).items.forEach((item: ChartPanel) => {
+                (panel as SlideshowChartPanel).items.forEach((item: ChartPanel) => {
                     this.panelSourceHelper(item);
                 });
                 break;
@@ -1657,11 +1671,11 @@ export default class MetadataEditorV extends Vue {
 
     decrementSourceCount(src: string | 'Logo' | 'Background'): void {
         if (src === 'Logo') {
-            src = this.configs[this.configLang].introSlide.logo.src;
+            src = this.configs[this.configLang]?.introSlide.logo.src as string;
         }
 
         if (src === 'Background') {
-            src = this.configs[this.configLang].introSlide.backgroundImage;
+            src = this.configs[this.configLang]?.introSlide.backgroundImage as string;
         }
 
         if (src) {
@@ -1670,7 +1684,7 @@ export default class MetadataEditorV extends Vue {
             }
             if (this.sourceCounts[src] <= 0) {
                 const relativePath = src.split('/').slice(1).join('/');
-                this.configFileStructure.zip.remove(relativePath);
+                this.configFileStructure?.zip.remove(relativePath);
             }
         }
     }
@@ -1684,20 +1698,22 @@ export default class MetadataEditorV extends Vue {
      */
     panelHelper(
         panel: BasePanel,
-        callback: (panel: ImagePanel | VideoPanel | ChartPanel, ...args) => void,
-        ...callbackArgs
+        callback: (panel: ImagePanel | VideoPanel | ChartPanel, ...args: any[]) => void,
+        ...callbackArgs: any[]
     ): void {
         switch (panel.type) {
             case 'slideshow':
-                panel.items.forEach((item) => this.panelHelper(item, callback, ...callbackArgs));
+                (panel as SlideshowPanel).items.forEach((item) => this.panelHelper(item, callback, ...callbackArgs));
                 break;
             case 'dynamic':
-                panel.children.forEach((child) => this.panelHelper(child.panel, callback, ...callbackArgs));
+                (panel as DynamicPanel).children.forEach((child) =>
+                    this.panelHelper(child.panel, callback, ...callbackArgs)
+                );
                 break;
             case 'image':
             case 'video':
             case 'chart':
-                callback(panel, ...callbackArgs);
+                callback(panel as ChartPanel, ...callbackArgs);
         }
     }
 
@@ -1711,7 +1727,11 @@ export default class MetadataEditorV extends Vue {
     updateToSharedAsset(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string): void {
         const oppositeConfig = this.configs[oppositeLang];
 
-        const updateAssetSrc = (panel: ImagePanel | VideoPanel, oppositeAssetPath: string, sharedAssetPath: string) => {
+        const updateAssetSrc = (
+            panel: ImagePanel | VideoPanel | ChartPanel,
+            oppositeAssetPath: string,
+            sharedAssetPath: string
+        ) => {
             if (panel.src) {
                 if (panel.src === oppositeAssetPath) {
                     panel.src = sharedAssetPath;
@@ -1720,7 +1740,7 @@ export default class MetadataEditorV extends Vue {
         };
 
         // Need to check logo seperately
-        if (oppositeConfig.introSlide.logo.src === oppositeAssetPath) {
+        if (oppositeConfig?.introSlide.logo.src === oppositeAssetPath) {
             oppositeConfig.introSlide.logo.src = sharedAssetPath;
         }
 
@@ -1740,7 +1760,7 @@ export default class MetadataEditorV extends Vue {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.onload = () => {
-                resolve(fileReader.result);
+                resolve(fileReader.result as ArrayBuffer);
             };
             fileReader.onerror = () => {
                 reject(new Error('Could not load file reader'));
@@ -1754,12 +1774,12 @@ export default class MetadataEditorV extends Vue {
     obtainHashData(file: File): Promise<Uint8Array> {
         return this.readBinaryData(file)
             .then((res) => {
-                res = new Uint8Array(res);
-                return window.crypto.subtle.digest('SHA-256', res);
+                const uint8Res = new Uint8Array(res);
+                return window.crypto.subtle.digest('SHA-256', uint8Res);
             })
             .then((res) => {
-                res = new Uint8Array(res);
-                return res;
+                const hashArray = new Uint8Array(res);
+                return hashArray;
             });
     }
 
@@ -1777,8 +1797,8 @@ export default class MetadataEditorV extends Vue {
         // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
         // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
         // an array of duplicate asset promises
-        const sharedAssetPromises = [];
-        this.configFileStructure.assets[folder].forEach((relativePath, compressedBinary) => {
+        const sharedAssetPromises: Array<Promise<string>> = [];
+        this.configFileStructure?.assets[folder].forEach((relativePath, compressedBinary) => {
             const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
             if (assetName === file.name) {
                 sharedAssetPromises.push(
@@ -1812,7 +1832,7 @@ export default class MetadataEditorV extends Vue {
                         type: 'image/svg+xml'
                     });
                 }
-                return this.obtainHashData(assetFile);
+                return this.obtainHashData(assetFile as File);
             })
             .then((hash) => {
                 return hash.join() === fileHash.join();
@@ -1834,7 +1854,7 @@ export default class MetadataEditorV extends Vue {
         let inSharedAsset = false;
         let oppositeSourceCount = 0;
         let newAssetName = asset.name;
-        let uploadSource = `${this.configFileStructure.uuid}/assets/shared/${asset.name}`;
+        let uploadSource = `${this.configFileStructure?.uuid}/assets/shared/${asset.name}`;
 
         // Should contain either 0 or 1 promise.
         sharedAssetPaths.forEach((sharedAssetPath) => {
@@ -1848,24 +1868,26 @@ export default class MetadataEditorV extends Vue {
             // nothing, as this asset is not a valid duplicate.
             for (const oppositeAssetPath of oppositeAssetPaths) {
                 if (oppositeAssetPath !== 'N/A') {
-                    const oppositeFileSource = `${this.configFileStructure.uuid}/assets/${oppositeLang}/${oppositeAssetPath}`;
+                    const oppositeFileSource = `${this.configFileStructure?.uuid}/assets/${oppositeLang}/${oppositeAssetPath}`;
                     oppositeSourceCount += this.sourceCounts[oppositeFileSource] ?? 0;
                     this.sourceCounts[oppositeFileSource] = 0;
-                    this.configFileStructure.assets[oppositeLang].remove(oppositeAssetPath);
+                    this.configFileStructure?.assets[oppositeLang].remove(oppositeAssetPath);
 
                     // Add asset to shared folder if asset is yet to be moved to the shared folder. If an asset with the
                     // same name, but different content, is already in the shared folder, we must give the asset we are
                     // uploading a unique name. Otherwise the existing asset will be overwritten
                     if (!inSharedAsset) {
                         let i = 2;
-                        while (this.configFileStructure.assets['shared'].file(newAssetName)) {
+                        while (this.configFileStructure?.assets['shared'].file(newAssetName)) {
                             // If the updated name is the same as a file that already exists in the shared asset folder,
                             // we must compare that file with the uploaded file, since they wouldnt have been compared
                             // on the first run due to having different names
                             if (i > 2) {
                                 const filesEqual = await this.compareFiles(
                                     asset,
-                                    this.configFileStructure.assets[this.configLang].file(newAssetName),
+                                    this.configFileStructure?.assets[this.configLang].file(
+                                        newAssetName
+                                    ) as JSZip.JSZipObject,
                                     newAssetName
                                 );
                                 if (filesEqual) break;
@@ -1873,8 +1895,8 @@ export default class MetadataEditorV extends Vue {
                             newAssetName = `${asset.name.split('.').at(0)}(${i}).${asset.name.split('.').at(-1)}`;
                             i++;
                         }
-                        uploadSource = `${this.configFileStructure.uuid}/assets/shared/${newAssetName}`;
-                        this.configFileStructure.assets['shared'].file(newAssetName, asset);
+                        uploadSource = `${this.configFileStructure?.uuid}/assets/shared/${newAssetName}`;
+                        this.configFileStructure?.assets['shared'].file(newAssetName, asset);
                         inSharedAsset = true;
                     }
                     this.updateToSharedAsset(oppositeFileSource, uploadSource, oppositeLang);
@@ -1891,14 +1913,16 @@ export default class MetadataEditorV extends Vue {
                 // asset folder to a unique name, to avoid overwriting an existing file.
                 if (currAssetPath === 'N/A') {
                     let i = 2;
-                    while (this.configFileStructure.assets[this.configLang].file(newAssetName)) {
+                    while (this.configFileStructure?.assets[this.configLang].file(newAssetName)) {
                         // If the updated name is the same as a file that already exists in the current langs asset folder,
                         // we must compare that file with the uploaded file, since they wouldnt have been compared
                         // on the first run due to having different names
                         if (i > 2) {
                             const filesEqual = await this.compareFiles(
                                 asset,
-                                this.configFileStructure.assets[this.configLang].file(newAssetName),
+                                this.configFileStructure?.assets[this.configLang].file(
+                                    newAssetName
+                                ) as JSZip.JSZipObject,
                                 newAssetName
                             );
                             if (filesEqual) break;
@@ -1908,8 +1932,8 @@ export default class MetadataEditorV extends Vue {
                     }
                 }
             }
-            uploadSource = `${this.configFileStructure.uuid}/assets/${this.configLang}/${newAssetName}`;
-            this.configFileStructure.assets[this.configLang].file(newAssetName, asset);
+            uploadSource = `${this.configFileStructure?.uuid}/assets/${this.configLang}/${newAssetName}`;
+            this.configFileStructure?.assets[this.configLang].file(newAssetName, asset);
         }
 
         // Notify user of the change in the name of their uploaded asset, to avoid any confusion
@@ -1922,7 +1946,7 @@ export default class MetadataEditorV extends Vue {
         if (type === 'backgroundImage') {
             if (config.introSlide.backgroundImage !== uploadSource) {
                 this.incrementSourceCount(uploadSource);
-                this.decrementSourceCount(config.introSlide.backgroundImage);
+                this.decrementSourceCount(config.introSlide.backgroundImage as string);
                 this.sourceCounts[uploadSource] += oppositeSourceCount;
                 config.introSlide.backgroundImage = uploadSource;
             }
@@ -1936,8 +1960,8 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    async createMainStyles(configZip: typeof JSZip): void {
-        const existingStyles = configZip.folder('styles').file('main.css');
+    async createMainStyles(configZip: typeof JSZip): Promise<void> {
+        const existingStyles = configZip.folder('styles')?.file('main.css');
 
         if (existingStyles) {
             // need to ensure the classes in this css file are not the same as the default ones...
@@ -1956,11 +1980,11 @@ export default class MetadataEditorV extends Vue {
                 styles += `.centerSlideFull {\n\ttext-align: center;\n}\n\n`;
             }
             styles += res;
-            configZip.folder('styles').file('main.css', styles);
+            configZip.folder('styles')?.file('main.css', styles);
         } else {
             const styles = `.centerPanel {\n\ttext-align: center;\n}\n\n.centerSlideLeft {\n\ttext-align: left;\n}\n
 .centerSlideRight {\n\ttext-align: right;\n}\n\n.centerSlideFull {\n\ttext-align: center;\n}\n\n`;
-            configZip.folder('styles').file('main.css', styles);
+            configZip.folder('styles')?.file('main.css', styles);
         }
     }
 
@@ -1998,7 +2022,7 @@ export default class MetadataEditorV extends Vue {
         if (uploadFiles !== undefined) {
             uploadFiles.forEach((file) => {
                 if (file) {
-                    this.configFileStructure.assets['shared'].file(file?.name, file);
+                    this.configFileStructure?.assets['shared'].file(file?.name, file);
                 }
             });
         }
@@ -2009,7 +2033,7 @@ export default class MetadataEditorV extends Vue {
      * Ensure that `uuid` is a case-sensitive match with the product's uuid on the server
      */
     correctUuid(): void {
-        const configFileNames = Object.keys(this.configFileStructure.zip.files).filter(
+        const configFileNames = Object.keys(this.configFileStructure!.zip.files).filter(
             (key) => key.includes('.json') && !key.includes('/')
         );
         if (configFileNames.length > 0) {
@@ -2020,7 +2044,7 @@ export default class MetadataEditorV extends Vue {
                     .transferLock(productUuid)
                     .then(() => {
                         this.uuid = productUuid;
-                        this.configFileStructure.uuid = productUuid;
+                        this.configFileStructure!.uuid = productUuid;
                         this.loadConfig();
                     })
                     .catch((err) => {
@@ -2139,7 +2163,7 @@ export default class MetadataEditorV extends Vue {
         this.metadata.returnTop = config.returnTop ?? true;
         this.metadata.sameConfig = config.sameConfig ?? true;
         this.metadata.dateModified = config.dateModified;
-        this.metadata.schemaVersion = config.schemaVersion;
+        this.metadata.schemaVersion = config.schemaVersion ?? '';
 
         // TODO: check schema version in the config, and if it doesn't match the current version in the schema (stored in
         // this.latestSchemaVersion), the product's local repo should be re-initialized
@@ -2193,7 +2217,7 @@ export default class MetadataEditorV extends Vue {
                 saveAs(blob, `${this.configFileStructure?.uuid}.zip`);
                 Message.success(this.$t('editor.export.success'));
             },
-            (err) => {
+            (_err) => {
                 Message.error(this.$t('editor.export.error'));
             }
         );
@@ -2259,7 +2283,7 @@ export default class MetadataEditorV extends Vue {
                 formData.append('data', content, `${this.uuid}.zip`);
                 const headers = {
                     'Content-Type': 'multipart/form-data',
-                    user: this.user,
+                    user: this.user as any,
                     secret: this.lockStore.secret
                 };
                 Message.warning(this.$t('editor.editMetadata.message.wait'));
@@ -2281,7 +2305,7 @@ export default class MetadataEditorV extends Vue {
                                         titleEn: this.configs['en']?.title ?? '',
                                         titleFr: this.configs['fr']?.title ?? ''
                                     })
-                                    .then((response: any) => {
+                                    .then((_response: any) => {
                                         const userStore = useUserStore();
                                         userStore.fetchUserProfile();
                                         formData.append('uuid', this.uuid);
@@ -2294,7 +2318,7 @@ export default class MetadataEditorV extends Vue {
                                                 import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
                                                 formData
                                             )
-                                            .then((response: any) => {
+                                            .then((_response: any) => {
                                                 Message.success(this.$t('editor.editMetadata.message.successfulSave'));
                                             })
                                             .catch((error: any) => console.log(error.response || error))
@@ -2329,7 +2353,7 @@ export default class MetadataEditorV extends Vue {
                                                     import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
                                                     formData
                                                 )
-                                                .then((response: any) => {
+                                                .then((_response: any) => {
                                                     Message.success(
                                                         this.$t('editor.editMetadata.message.successfulSave')
                                                     );
@@ -2496,9 +2520,12 @@ export default class MetadataEditorV extends Vue {
             logoPreview: '',
             logoName: '',
             logoAltText: '',
+            introBgName: '',
+            introBgPreview: '',
             tocOrientation: '',
             returnTop: true,
-            sameConfig: true
+            sameConfig: true,
+            schemaVersion: ''
         };
         this.temporaryMetadataCopy = JSON.parse(JSON.stringify(this.metadata));
         this.configs = { en: undefined, fr: undefined };
@@ -2780,7 +2807,7 @@ export default class MetadataEditorV extends Vue {
         }
     }
 
-    async handleUuidEnter(): void {
+    async handleUuidEnter(): Promise<void> {
         if (this.editExisting) {
             this.handleUuidLoad();
         } else {

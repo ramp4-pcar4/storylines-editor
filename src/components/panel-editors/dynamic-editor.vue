@@ -31,54 +31,58 @@
         </div>
         <div v-if="editingStatus === 'panels'">
             <table class="w-2/3 mt-5">
-                <tr class="table-header">
-                    <th>{{ $t('dynamic.panel.id') }}</th>
-                    <th>{{ $t('dynamic.panel.type') }}</th>
-                    <th>{{ $t('dynamic.panel.actions') }}</th>
-                </tr>
-                <tr class="table-contents" v-for="(item, idx) in panel.children" :key="idx">
-                    <td>{{ item.id }}</td>
-                    <td>{{ determineEditorType(item.panel) }}</td>
-                    <td>
-                        <button @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</button> |
-                        <button @click="$vfm.open(`delete-item-${idx}`)">{{ $t('editor.remove') }}</button>
-                    </td>
+                <thead>
+                    <tr class="table-header">
+                        <th>{{ $t('dynamic.panel.id') }}</th>
+                        <th>{{ $t('dynamic.panel.type') }}</th>
+                        <th>{{ $t('dynamic.panel.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-contents" v-for="(item, idx) in panel.children" :key="idx">
+                        <td>{{ item.id }}</td>
+                        <td>{{ determineEditorType(item.panel) }}</td>
+                        <td>
+                            <button @click="() => switchSlide(idx)">{{ $t('editor.chart.label.edit') }}</button> |
+                            <button @click="$vfm.open(`delete-item-${idx}`)">{{ $t('editor.remove') }}</button>
+                        </td>
 
-                    <confirmation-modal
-                        :name="`delete-item-${idx}`"
-                        :message="$t('dynamic.panel.remove')"
-                        @ok="() => removeSlide(item as any, idx)"
-                    />
-                </tr>
-                <tr class="table-add-row">
-                    <td class="flex flex-col items-center">
-                        <input
-                            id="panelId"
-                            class="respected-standard-input"
-                            type="text"
-                            :placeholder="$t('dynamic.panel.enterID')"
-                            v-model="newSlideName"
-                            :aria-label="$t('dynamic.panel.enterID')"
+                        <confirmation-modal
+                            :name="`delete-item-${idx}`"
+                            :message="$t('dynamic.panel.remove')"
+                            @ok="() => removeSlide(item as any, idx)"
                         />
-                        <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
-                    </td>
-                    <td>
-                        <select v-model="newSlideType" class="respected-standard-select justify-self-center">
-                            <option v-for="thing in Object.keys(editors)" :key="thing">
-                                {{ thing }}
-                            </option>
-                        </select>
-                    </td>
-                    <td>
-                        <button
-                            class="respected-standard-button respected-gray-border-button respected-thin-button justify-self-center"
-                            @click="createNewSlide"
-                            :disabled="idUsed || !newSlideName"
-                        >
-                            {{ $t('dynamic.panel.add') }}
-                        </button>
-                    </td>
-                </tr>
+                    </tr>
+                    <tr class="table-add-row">
+                        <td class="flex flex-col items-center">
+                            <input
+                                id="panelId"
+                                class="respected-standard-input"
+                                type="text"
+                                :placeholder="$t('dynamic.panel.enterID')"
+                                v-model="newSlideName"
+                                :aria-label="$t('dynamic.panel.enterID')"
+                            />
+                            <p v-if="idUsed">{{ $t('dynamic.panel.idTaken') }}</p>
+                        </td>
+                        <td>
+                            <select v-model="newSlideType" class="respected-standard-select justify-self-center">
+                                <option v-for="thing in Object.keys(editors)" :key="thing">
+                                    {{ thing }}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <button
+                                class="respected-standard-button respected-gray-border-button respected-thin-button justify-self-center"
+                                @click="createNewSlide"
+                                :disabled="idUsed || !newSlideName"
+                            >
+                                {{ $t('dynamic.panel.add') }}
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
 
             <div v-if="editingSlide !== -1">
@@ -98,9 +102,11 @@
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit', 'Dynamic editor')"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
+                    @shared-asset="
+                        (oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                            $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                        }
+                    "
                 ></component>
             </div>
         </div>
@@ -296,20 +302,24 @@ export default class DynamicEditorV extends Vue {
     background-color: #ddd;
     padding: 5px;
 }
+
 .table-contents td {
     text-align: center;
     padding: 5px;
 }
+
 .table-contents:hover {
     background-color: #eee;
     cursor: pointer;
 }
+
 .table-add-row td {
     vertical-align: top;
     text-align: center;
     border-top: 1px solid #ddd;
     padding: 5px;
 }
+
 .table-add-row input[type='text'],
 .table-add-row select,
 .table-add-row button {

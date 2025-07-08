@@ -167,7 +167,6 @@
 
 <script lang="ts">
 import {
-    BaseStartingConfig,
     ConfigFileStructure,
     ImageFile,
     ImagePanel,
@@ -214,8 +213,8 @@ export default class ImageEditorV extends Vue {
             this.panel.type === PanelType.SlideshowImage
                 ? (this.panel.items as Array<ImagePanel>)
                 : this.panel.src
-                ? [this.panel]
-                : [];
+                  ? [this.panel]
+                  : [];
 
         if (this.centerSlide && this.dynamicSelected) {
             for (const i in images) {
@@ -250,7 +249,7 @@ export default class ImageEditorV extends Vue {
                             return {
                                 ...image,
                                 id: image.src,
-                                src: URL.createObjectURL(assetFile)
+                                src: URL.createObjectURL(assetFile as Blob)
                             } as ImageFile;
                         })
                     );
@@ -272,7 +271,7 @@ export default class ImageEditorV extends Vue {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.onload = () => {
-                resolve(fileReader.result);
+                resolve(fileReader.result as ArrayBuffer);
             };
             fileReader.onerror = () => {
                 reject(new Error('Could not load file reader'));
@@ -286,12 +285,12 @@ export default class ImageEditorV extends Vue {
     obtainHashData(file: File): Promise<Uint8Array> {
         return this.readBinaryData(file)
             .then((res) => {
-                res = new Uint8Array(res);
-                return window.crypto.subtle.digest('SHA-256', res);
+                const uint8Res = new Uint8Array(res);
+                return window.crypto.subtle.digest('SHA-256', uint8Res);
             })
             .then((res) => {
-                res = new Uint8Array(res);
-                return res;
+                const hashArray = new Uint8Array(res);
+                return hashArray;
             });
     }
 
@@ -308,7 +307,7 @@ export default class ImageEditorV extends Vue {
         // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
         // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
         // an array of duplicate asset promises
-        const sharedAssetPromises = [];
+        const sharedAssetPromises: Array<Promise<string>> = [];
         this.configFileStructure.assets[folder].forEach((relativePath, compressedBinary) => {
             const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
 
@@ -344,7 +343,7 @@ export default class ImageEditorV extends Vue {
                         type: 'image/svg+xml'
                     });
                 }
-                return this.obtainHashData(assetFile);
+                return this.obtainHashData(assetFile as File);
             })
             .then((hash) => {
                 return hash.join() === fileHash.join();
@@ -395,7 +394,7 @@ export default class ImageEditorV extends Vue {
                             if (i > 2) {
                                 const filesEqual = await this.compareFiles(
                                     file,
-                                    this.configFileStructure.assets['shared'].file(newAssetName),
+                                    this.configFileStructure.assets['shared'].file(newAssetName) as JSZip.JSZipObject,
                                     newAssetName
                                 );
                                 if (filesEqual) break;
@@ -429,7 +428,7 @@ export default class ImageEditorV extends Vue {
                         if (i > 2) {
                             const filesEqual = await this.compareFiles(
                                 file,
-                                this.configFileStructure.assets[this.lang].file(newAssetName),
+                                this.configFileStructure.assets[this.lang].file(newAssetName) as JSZip.JSZipObject,
                                 newAssetName
                             );
                             if (filesEqual) break;
@@ -516,7 +515,6 @@ export default class ImageEditorV extends Vue {
         if (this.edited) {
             // Delete the existing properties so we can rebuild the object.
             Object.keys(this.panel).forEach((key) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 delete this.panel[key];
             });
@@ -536,7 +534,6 @@ export default class ImageEditorV extends Vue {
                 Object.keys(imageFile).forEach((key) => {
                     if (key === 'id') return; // we don't need this one.
 
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     (this.panel as ImagePanel)[key] = imageFile[key];
                 });

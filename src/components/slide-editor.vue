@@ -423,8 +423,8 @@
                                     currentSlide.panel.length > 1 && panelModified(currentSlide.panel[0])
                                         ? $vfm.open(`one-panel-only-${slideIndex}`)
                                         : currentSlide.panel.length === 1
-                                        ? $vfm.open(`one-to-two-panels-${slideIndex}`)
-                                        : toggleOnePanelOnly();
+                                          ? $vfm.open(`one-to-two-panels-${slideIndex}`)
+                                          : toggleOnePanelOnly();
                                 }
                             "
                         />
@@ -452,12 +452,16 @@
                     ref="editor"
                     :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
-                    @config-edited="(slideConfig: Slide, save?: boolean = false) => {
-                        $emit('custom-slide-updated', slideConfig, save, lang)
-                    }"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
+                    @config-edited="
+                        (slideConfig: Slide, save: boolean = false) => {
+                            $emit('custom-slide-updated', slideConfig, save, lang);
+                        }
+                    "
+                    @shared-asset="
+                        (oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                            $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                        }
+                    "
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -471,9 +475,11 @@
                     :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
+                    @shared-asset="
+                        (oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
+                            $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
+                        }
+                    "
                     @slide-edit="$emit('slide-edit')"
                     v-else
                 ></component>
@@ -540,8 +546,6 @@ import {
     MapPanel,
     PanelType,
     Slide,
-    SlideshowChartPanel,
-    SlideshowImagePanel,
     SlideshowPanel,
     SourceCounts,
     StoryRampConfig,
@@ -901,7 +905,7 @@ export default class SlideEditorV extends Vue {
 
     getNumberOfMaps(): number {
         let n = 0;
-        this.configFileStructure.rampConfig.forEach((f) => {
+        this.configFileStructure.rampConfig.forEach((_f) => {
             n += 1;
         });
         return n;

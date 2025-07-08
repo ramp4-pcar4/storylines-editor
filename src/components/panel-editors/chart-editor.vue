@@ -133,8 +133,8 @@ export default class ChartEditorV extends Vue {
             this.panel.type === PanelType.SlideshowChart
                 ? (this.panel.items as Array<ChartPanel>)
                 : this.panel.src
-                ? [this.panel]
-                : [];
+                  ? [this.panel]
+                  : [];
 
         if (this.centerSlide && this.dynamicSelected) {
             for (const c in charts) {
@@ -268,7 +268,6 @@ export default class ChartEditorV extends Vue {
         if (this.edited) {
             // Delete the existing properties so we can rebuild the object.
             Object.keys(this.panel).forEach((key) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 delete this.panel[key];
             });
@@ -285,7 +284,6 @@ export default class ChartEditorV extends Vue {
 
                 // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
                 Object.keys(newChart).forEach((key) => {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     (this.panel as ChartPanel)[key] = newChart[key];
                 });

@@ -49,16 +49,20 @@ export default class HelpSectionV extends Vue {
     padding: 10px 15px !important;
     margin: 0px !important;
 }
+
 .help-section-header .dropdown-icon {
     transition: transform 0.3s cubic-bezier(0.35, 0, 0.25, 1);
 }
+
 .help-item-leave-active,
 .help-item-enter-active {
     transition: all 0.3s;
 }
+
 .help-item-enter-active {
     transition-delay: 0.1s;
 }
+
 .help-item-leave-to,
 .help-item-enter {
     @apply max-h-0 opacity-0;

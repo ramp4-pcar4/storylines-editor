@@ -27,7 +27,7 @@
                     class="text-center py-2 rounded-r hover:bg-gray-100"
                     :aria-label="name"
                     :value="selectedColour"
-                    @input="(evt) => selectedColour = (evt.target as HTMLInputElement).value"
+                    @input="(evt) => (selectedColour = (evt.target as HTMLInputElement).value)"
                 />
             </div>
             <ColorPicker
@@ -36,7 +36,7 @@
                 alpha-channel="hide"
                 :visible-formats="['hex']"
                 default-format="hex"
-                @color-change="(evt: any) => this.selectedColour = evt.cssColor"
+                @color-change="(evt: any) => (this.selectedColour = evt.cssColor)"
             >
                 <template #copy-button></template>
             </ColorPicker>
@@ -52,8 +52,8 @@ export default class LoadingPageV extends Vue {
     @Prop() name!: string;
     @Prop() disabled?: boolean;
 
-    isOpen: boolean = false;
-    selectedColour: string = '';
+    isOpen = false;
+    selectedColour = '';
 
     beforeMount(): void {
         this.selectedColour = this.value;
@@ -72,7 +72,7 @@ export default class LoadingPageV extends Vue {
      * @param evt a string representing the new colour value.
      */
     @Watch('selectedColour')
-    colourChanged(evt: Event): void {
+    colourChanged(_evt: Event): void {
         // If the value didn't change, don't fire the event.
         if (this.value === this.selectedColour) return;
 

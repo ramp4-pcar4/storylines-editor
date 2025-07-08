@@ -1,4 +1,4 @@
-import { RouteLocationNormalized } from 'vue-router';
+import { RouteLocationNormalized, Router } from 'vue-router';
 import { Pinia } from 'pinia';
 
 declare module 'vue-router' {
@@ -10,6 +10,9 @@ declare module 'vue-router' {
 declare module '@vue/runtime-core' {
     interface ComponentCustomProperties {
         $route: RouteLocationNormalized;
+        $router: Router;
         $pinia: Pinia;
+        $t: (typeof import('vue-i18n'))['t'];
+        $i18n: import('vue-1i8n')['I18n'];
     }
 }

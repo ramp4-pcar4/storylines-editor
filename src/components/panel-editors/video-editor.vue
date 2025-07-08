@@ -164,8 +164,6 @@ export default class VideoEditorV extends Vue {
 
                 // retrieve existing video file
                 const assetSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
-                const filename = this.panel.src.replace(/^.*[\\/]/, '');
-
                 const assetFile = this.configFileStructure.zip.file(assetSrc);
                 if (assetFile) {
                     this.videoPreviewPromise = assetFile.async('blob').then((res: Blob) => {
@@ -206,7 +204,7 @@ export default class VideoEditorV extends Vue {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.onload = () => {
-                resolve(fileReader.result);
+                resolve(fileReader.result as ArrayBuffer);
             };
             fileReader.onerror = () => {
                 reject(new Error('Could not load file reader'));
@@ -220,12 +218,12 @@ export default class VideoEditorV extends Vue {
     obtainHashData(file: File): Promise<Uint8Array> {
         return this.readBinaryData(file)
             .then((res) => {
-                res = new Uint8Array(res);
-                return window.crypto.subtle.digest('SHA-256', res);
+                const uint8Res = new Uint8Array(res);
+                return window.crypto.subtle.digest('SHA-256', uint8Res);
             })
             .then((res) => {
-                res = new Uint8Array(res);
-                return res;
+                const hashArray = new Uint8Array(res);
+                return hashArray;
             });
     }
 
@@ -242,7 +240,7 @@ export default class VideoEditorV extends Vue {
         // subfolder of the specified folder, so long as the name and hash of the file is the same. There may be more than one
         // instance of the specified asset in the specified folder, albeit in seperate subfolders, hence why we collect
         // an array of duplicate asset promises
-        const sharedAssetPromises = [];
+        const sharedAssetPromises: Array<Promise<string>> = [];
         this.configFileStructure.assets[folder].forEach((relativePath, compressedBinary) => {
             const assetName = checkNested ? relativePath.split('/').at(-1) : relativePath;
             if (assetName === file.name) {
@@ -276,7 +274,7 @@ export default class VideoEditorV extends Vue {
                         type: 'image/svg+xml'
                     });
                 }
-                return this.obtainHashData(assetFile);
+                return this.obtainHashData(assetFile as File);
             })
             .then((hash) => {
                 return hash.join() === fileHash.join();
@@ -322,7 +320,7 @@ export default class VideoEditorV extends Vue {
                             if (i > 2) {
                                 const filesEqual = await this.compareFiles(
                                     file,
-                                    this.configFileStructure.assets['shared'].file(newAssetName),
+                                    this.configFileStructure.assets['shared'].file(newAssetName) as JSZip.JSZipObject,
                                     newAssetName
                                 );
                                 if (filesEqual) break;
@@ -355,7 +353,7 @@ export default class VideoEditorV extends Vue {
                         if (i > 2) {
                             const filesEqual = await this.compareFiles(
                                 file,
-                                this.configFileStructure.assets[this.lang].file(newAssetName),
+                                this.configFileStructure.assets[this.lang].file(newAssetName) as JSZip.JSZipObject,
                                 newAssetName
                             );
                             if (filesEqual) break;

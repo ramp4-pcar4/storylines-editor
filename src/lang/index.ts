@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
 
-type csvRows = { key: string; enValue: string; frValue: string }[];
+type csvRows = { key: string; enValue: string; enValid: string; frValue: string; frValid: string }[];
 interface LocaleMessages {
     [key: string]: { [name: string]: string };
 }

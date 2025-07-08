@@ -78,7 +78,7 @@ export default class TextEditorV extends Vue {
     }
 
     // Detecting whether the text editor is in fullscreen mode
-    isFullScreen: boolean = false;
+    isFullScreen = false;
     onFullscreenChange(isFullScreen: boolean) {
         this.isFullScreen = isFullScreen;
     }
@@ -103,10 +103,10 @@ export default class TextEditorV extends Vue {
 
             // Define the key behavior
             cm.setOption('extraKeys', {
-                Tab: (cm: any) => {
+                Tab: (_cm: any) => {
                     this.moveFocus(1);
                 },
-                'Shift-Tab': (cm: any) => {
+                'Shift-Tab': (_cm: any) => {
                     this.moveFocus(-1);
                 }
             });
@@ -116,7 +116,7 @@ export default class TextEditorV extends Vue {
         const toolbar = this.$el.querySelector('.v-md-editor__toolbar');
         if (!toolbar) return;
 
-        const makeButtonInteractive = (el) => {
+        const makeButtonInteractive = (el: HTMLElement) => {
             el.setAttribute('tabindex', '0');
 
             if (!el.dataset.keyboardEnabled) {
@@ -146,7 +146,7 @@ export default class TextEditorV extends Vue {
                         if (menu) {
                             setTimeout(() => {
                                 const firstItem = menu.querySelector('.v-md-editor__menu-item');
-                                firstItem?.focus();
+                                (firstItem as HTMLElement).focus();
                             }, 100);
                         }
                     }
@@ -157,7 +157,7 @@ export default class TextEditorV extends Vue {
 
         const makeDropdownItemsInteractive = () => {
             const items = toolbar.querySelectorAll('.v-md-editor__menu-item');
-            items.forEach((item) => {
+            items.forEach((item: HTMLElement) => {
                 item.setAttribute('tabindex', '0');
                 item.setAttribute('role', 'menuitem');
 
@@ -170,17 +170,17 @@ export default class TextEditorV extends Vue {
                             e.preventDefault();
                             const next = item.nextElementSibling;
                             if (next?.classList.contains('v-md-editor__menu-item')) {
-                                next.focus();
+                                (next as HTMLElement).focus();
                             }
                         } else if (e.key === 'ArrowUp') {
                             e.preventDefault();
                             const prev = item.previousElementSibling;
                             if (prev?.classList.contains('v-md-editor__menu-item')) {
-                                prev.focus();
+                                (prev as HTMLElement).focus();
                             }
                         } else if (e.key === 'Escape') {
                             // Return focus to the dropdown toggle
-                            item.closest('.v-md-editor__toolbar-item')?.focus();
+                            (item.closest('.v-md-editor__toolbar-item') as HTMLElement).focus();
                         }
                     });
                     item.dataset.keyboardEnabled = 'true';
@@ -386,7 +386,7 @@ export default class TextEditorV extends Vue {
         window.location.href.includes('index-ca') ? '| wetToolbar' : ''
     } | save`;
 
-    toolbarTooltipAdjust(toggle): void {
+    toolbarTooltipAdjust(toggle: HTMLElement): void {
         const slideEditor = document.querySelector('#slideEditor') as HTMLElement;
         const scrollbarVisible =
             slideEditor.scrollHeight > slideEditor.clientHeight ||
@@ -396,12 +396,12 @@ export default class TextEditorV extends Vue {
         // limit the right position of the toggle's tooltip if the toggle is sufficiently close to the right
         // border of the screen (only when scrollbar is visible)
         if (scrollbarVisible && toggleToRightBorder <= 90) {
-            toggle.children[0].style.right = `${Math.max(
+            (toggle.children[0] as HTMLElement).style.right = `${Math.max(
                 Math.min(-40, -toggleToRightBorder + scrollbarOffset),
                 -65
             )}px`;
         } else {
-            toggle.children[0].style.right = `${-toggleToRightBorder}px`;
+            (toggle.children[0] as HTMLElement).style.right = `${-toggleToRightBorder}px`;
         }
     }
 
@@ -417,7 +417,7 @@ export default class TextEditorV extends Vue {
         );
         rightToolbarToggles.forEach((toggle) => {
             toggle.addEventListener('mouseover', () => {
-                this.toolbarTooltipAdjust(toggle);
+                this.toolbarTooltipAdjust(toggle as HTMLElement);
             });
         });
 
@@ -438,7 +438,7 @@ export default class TextEditorV extends Vue {
         );
         rightToolbarToggles.forEach((toggle) => {
             toggle.removeEventListener('mouseover', () => {
-                this.toolbarTooltipAdjust(toggle);
+                this.toolbarTooltipAdjust(toggle as HTMLElement);
             });
         });
     }

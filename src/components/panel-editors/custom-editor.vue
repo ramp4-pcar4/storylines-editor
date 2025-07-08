@@ -51,10 +51,13 @@
             :mode="'text'"
             :show-btns="false"
             :expandedOnStart="true"
-            @has-error="(err: string) => { jsonError = err; validate()}"
-            @json-change="
-                (json: any) => onJsonChange(json)
+            @has-error="
+                (err: string) => {
+                    jsonError = err;
+                    validate();
+                }
             "
+            @json-change="(json: any) => onJsonChange(json)"
         ></json-editor>
     </div>
 </template>
@@ -70,7 +73,6 @@ import { Validator } from 'jsonschema';
     }
 })
 export default class CustomEditorV extends Vue {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Prop() config!: string;
 
     updatedConfig = '';
@@ -81,7 +83,7 @@ export default class CustomEditorV extends Vue {
     validatorErrors: any = [];
     showErrors = false;
 
-    storylinesSchema = '';
+    storylinesSchema: any = '';
 
     mounted(): void {
         import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
