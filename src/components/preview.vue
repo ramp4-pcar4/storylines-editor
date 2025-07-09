@@ -70,6 +70,11 @@
                     {{ $t('story.date') }}
                     {{ config.dateModified }}
                 </div>
+                <div
+                    class="footer-padding"
+                    v-if="footerPadding"
+                    :style="footerPaddingStyle"
+                ></div>
             </div>
         </div>
         <div v-else></div>
@@ -91,6 +96,7 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
 import Message from 'vue-m-message';
 import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
@@ -114,6 +120,16 @@ export default class StoryPreviewV extends Vue {
     configFileStructure: ConfigFileStructure | undefined = undefined;
     savedProduct = false;
     loadStatus = 'loading';
+    footerPadding = computed(
+        () => !window.location.href.includes('index-ca-en.html') && !window.location.href.includes('index-ca-fr.html')
+    );
+    lastSlideHeight = 0;
+    footerPaddingStyle = computed(() => {
+        this.measureNav();
+        const extra = 64 + this.navHeight + 64 + 56 + 60;
+        const h = `calc(100dvh - ${this.lastSlideHeight + extra}px)`;
+        return { height: h };
+    });
     activeChapterIndex = -1;
     lang = 'en';
     headerHeight = 0;
@@ -127,6 +143,12 @@ export default class StoryPreviewV extends Vue {
     confirmationTimeout: NodeJS.Timeout | undefined = undefined; // the timer to show the session extension confirmation modal
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
     localStorageKey = 'preview-broadcast-channel';
+    navHeight = 0;
+
+    measureNav(): void {
+        const nav = document.getElementById('h-navbar');
+        this.navHeight = nav ? nav.offsetHeight : 0;
+    }
 
     extendSession(showPopup?: boolean): void {
         // Only send message to other BroadcastChannel if preview is connected to editor
@@ -368,6 +390,11 @@ export default class StoryPreviewV extends Vue {
         const headerH = document.getElementById('story-header');
         if (headerH) {
             this.headerHeight = headerH.clientHeight;
+        }
+        const slides = document.querySelectorAll('.story-slide');
+        const lastSlide = slides[slides.length - 1] as HTMLElement;
+        if (lastSlide) {
+            this.lastSlideHeight = lastSlide.offsetHeight;
         }
     }
 }
