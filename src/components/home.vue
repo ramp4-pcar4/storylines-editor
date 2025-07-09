@@ -291,6 +291,7 @@
                                 <input
                                     type="file"
                                     name="folder"
+                                    id="product-folder"
                                     @change="productFolderUploaded"
                                     multiple="false"
                                     webkitdirectory
@@ -841,7 +842,8 @@ td {
     height: 20px;
 }
 
-input[type='file']:not(:focus-visible) {
+#product-zip-file:not(:focus-visible),
+#product-folder:not(:focus-visible) {
     position: absolute !important;
     width: 1px !important;
     height: 1px !important;
