@@ -67,6 +67,11 @@
                     {{ $t('story.date') }}
                     {{ config.dateModified }}
                 </div>
+                <div
+                    class="footer-padding"
+                    v-if="footerPadding"
+                    :style="{ height: `calc(100dvh - ${lastSlideHeight + 260}px)` }"
+                ></div>
             </div>
         </div>
         <div v-else></div>
@@ -88,6 +93,7 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
 import Message from 'vue-m-message';
 import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
@@ -111,6 +117,10 @@ export default class StoryPreviewV extends Vue {
     configFileStructure: ConfigFileStructure | undefined = undefined;
     savedProduct = false;
     loadStatus = 'loading';
+    footerPadding = computed(
+        () => !window.location.href.includes('index-ca-en.html') && !window.location.href.includes('index-ca-fr.html')
+    );
+    lastSlideHeight = 0;
     activeChapterIndex = -1;
     lang = 'en';
     headerHeight = 0;
@@ -365,6 +375,11 @@ export default class StoryPreviewV extends Vue {
         const headerH = document.getElementById('story-header');
         if (headerH) {
             this.headerHeight = headerH.clientHeight;
+        }
+        const slides = document.querySelectorAll('.story-slide');
+        const lastSlide = slides[slides.length - 1] as HTMLElement;
+        if (lastSlide) {
+            this.lastSlideHeight = lastSlide.offsetHeight;
         }
     }
 }
