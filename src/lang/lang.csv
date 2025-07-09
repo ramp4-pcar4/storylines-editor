@@ -188,7 +188,11 @@ editor.video.title,Video Title,1,Titre de la vidéo,1
 editor.video.label.drag,Drag your video file here,1,Glissez votre fichier vidéo ici,1
 editor.video.label.sizeLimit,({size}MB limit),1,(limite de {size}MB),1
 editor.video.label.captions,Video Captions,1,Sous-titres,1
+editor.video.label.captions.uploaded,Caption uploaded,1,Légende téléchargée,0
+editor.video.caption.error,Incorrect file type for caption,1,Type de fichier incorrect pour la légende,0
 editor.video.label.transcript,Video Transcript,1,Transcription,1
+editor.video.label.transcript.uploaded,Transcript uploaded,1,Transcription téléchargée,0
+editor.video.transcript.error,Incorrect file type for transcript,1,Type de fichier incorrect pour la transcription,0
 editor.video.label.upload,Upload,1,Télécharger,1
 editor.video.sizeExceeded,File too big!,1,Fichier trop volumineux!,1
 editor.video.label.linkSupport,Supports YouTube links (regular and shortened) as well as direct links to mp4 videos.,1,Prend en charge les liens YouTube (normaux et raccourcis) ainsi que les liens directs vers des vidéos mp4.,1
