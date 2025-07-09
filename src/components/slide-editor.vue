@@ -455,9 +455,6 @@
                     @config-edited="(slideConfig: Slide, save?: boolean = false) => {
                         $emit('custom-slide-updated', slideConfig, save, lang)
                     }"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -465,15 +462,10 @@
                     :is="editors[determineEditorType(currentSlide.panel[panelIndex])]"
                     :key="panelIndex + determineEditorType(currentSlide.panel[panelIndex])"
                     :panel="currentSlide.panel[panelIndex]"
-                    :configFileStructure="configFileStructure"
                     :lang="lang"
                     :uid="uid"
-                    :sourceCounts="sourceCounts"
                     :centerSlide="centerSlide"
                     :dynamicSelected="dynamicSelected"
-                    @shared-asset="(oppositeAssetPath: string, sharedAssetPath: string, oppositeLang: string) => {
-                        $emit('shared-asset', oppositeAssetPath, sharedAssetPath, oppositeLang);
-                    }"
                     @slide-edit="$emit('slide-edit')"
                     v-else
                 ></component>
@@ -531,23 +523,13 @@ import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
     BaseStartingConfig,
-    ChartPanel,
-    ConfigFileStructure,
     DefaultConfigs,
-    DynamicChildItem,
-    DynamicPanel,
-    ImagePanel,
     MapPanel,
     PanelType,
     Slide,
-    SlideshowChartPanel,
-    SlideshowImagePanel,
-    SlideshowPanel,
-    SourceCounts,
     StoryRampConfig,
     SupportedLanguages,
-    TextPanel,
-    VideoPanel
+    TextPanel
 } from '@/definitions';
 
 import ChartEditorV from './panel-editors/chart-editor.vue';
@@ -560,6 +542,8 @@ import SlideshowEditorV from './panel-editors/slideshow-editor.vue';
 import LoadingPageV from './support/loading-page.vue';
 import DynamicEditorV from './panel-editors/dynamic-editor.vue';
 import { toRaw } from 'vue';
+
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
@@ -579,13 +563,13 @@ import { toRaw } from 'vue';
 export default class SlideEditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
     @Prop() currentSlide!: Slide;
-    @Prop() configFileStructure!: ConfigFileStructure;
     @Prop() lang!: string;
     @Prop() uid!: string;
     @Prop() slideIndex!: number;
     @Prop() isLast!: boolean;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop() otherLangSlide!: Slide;
+
+    productStore = useProductStore();
 
     panelIndex = 0;
     advancedEditorView = false;
@@ -641,6 +625,7 @@ export default class SlideEditorV extends Vue {
     panelModified(panel: BasePanel): boolean {
         this.saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
         const prevType = this.currentSlide.panel[this.panelIndex].type;
+        const uuid = this.productStore.configFileStructure.uuid;
 
         let startingConfig = {
             ...JSON.parse(JSON.stringify(BaseStartingConfig)),
@@ -659,9 +644,7 @@ export default class SlideEditorV extends Vue {
             },
             map: {
                 type: PanelType.Map,
-                config: `${this.configFileStructure.uuid}/ramp-config/${
-                    this.configFileStructure.uuid
-                }-map-${this.getNumberOfMaps()}.json`,
+                config: `${uuid}/ramp-config/${uuid}-map-${this.getNumberOfMaps()}.json`,
                 title: '',
                 scrollguard: false
             }
@@ -694,87 +677,16 @@ export default class SlideEditorV extends Vue {
         // When switching to a dynamic panel, remove the secondary panel.
         if (newType === 'dynamic') {
             // Remove source content of both panels
-            this.currentSlide.panel.forEach((panel: BasePanel) => this.removeSourceCounts(panel));
+            this.currentSlide.panel.forEach((panel: BasePanel) => this.productStore.removeSourceCounts(panel));
             this.panelIndex = 0;
             this.currentSlide['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
             this.dynamicSelected = true;
         } else {
             // Remove source content of panel having its type swapped
-            this.removeSourceCounts(this.currentSlide.panel[this.panelIndex]);
+            this.productStore.removeSourceCounts(this.currentSlide.panel[this.panelIndex]);
 
             // Switching panel type when dynamic panels are not involved.
             this.currentSlide.panel[this.panelIndex] = startingConfig[newType as keyof DefaultConfigs];
-        }
-    }
-
-    removeSourceCounts(panel: BasePanel): void {
-        // The provided panel is being removed. Update source counts accordingly.
-        switch (panel.type) {
-            case 'map': {
-                const mapPanel = panel as MapPanel;
-                this.sourceCounts[mapPanel.config] -= 1;
-                if (this.sourceCounts[mapPanel.config] === 0) {
-                    this.configFileStructure.zip.remove(
-                        `${mapPanel.config.substring(mapPanel.config.indexOf('/') + 1)}`
-                    );
-                }
-                break;
-            }
-
-            case 'image': {
-                const imagePanel = panel as ImagePanel;
-                this.sourceCounts[imagePanel.src] -= 1;
-                if (this.sourceCounts[imagePanel.src] === 0) {
-                    this.configFileStructure.zip.remove(`${imagePanel.src.substring(imagePanel.src.indexOf('/') + 1)}`);
-                }
-
-                break;
-            }
-
-            case 'chart': {
-                const chartPanel = panel as ChartPanel;
-                this.sourceCounts[chartPanel.src] -= 1;
-                if (this.sourceCounts[chartPanel.src] === 0) {
-                    this.configFileStructure.zip.remove(`${chartPanel.src.substring(chartPanel.src.indexOf('/') + 1)}`);
-                }
-
-                break;
-            }
-
-            case 'slideshow':
-            case 'slideshowImage':
-            case 'slideshowChart': {
-                const slideshowPanel = panel as SlideshowPanel;
-                slideshowPanel.items.forEach((item: TextPanel | ImagePanel | MapPanel | ChartPanel) => {
-                    this.removeSourceCounts(item);
-                });
-                break;
-            }
-
-            case 'video': {
-                const videoPanel = panel as VideoPanel;
-                if (videoPanel.videoType === 'local') {
-                    this.sourceCounts[videoPanel.src] -= 1;
-                    if (this.sourceCounts[videoPanel.src] === 0) {
-                        this.configFileStructure.zip.remove(
-                            `${videoPanel.src.substring(videoPanel.src.indexOf('/') + 1)}`
-                        );
-                    }
-                }
-                break;
-            }
-
-            case 'dynamic': {
-                const dynamicPanel = panel as DynamicPanel;
-                dynamicPanel.children.forEach((subPanel: DynamicChildItem) => {
-                    this.removeSourceCounts(subPanel.panel);
-                });
-                break;
-            }
-
-            case 'text': {
-                break;
-            }
         }
     }
 
@@ -902,7 +814,7 @@ export default class SlideEditorV extends Vue {
 
     getNumberOfMaps(): number {
         let n = 0;
-        this.configFileStructure.rampConfig.forEach((f) => {
+        this.productStore.configFileStructure.rampConfig.forEach((f) => {
             n += 1;
         });
         return n;

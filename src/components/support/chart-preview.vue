@@ -32,7 +32,7 @@
                 class="w-full h-full"
                 :config="chartConfig"
                 :key="chartIdx"
-                :configFileStructure="configFileStructure"
+                :configFileStructure="productStore.configFileStructure"
                 @loaded="loadChart"
                 v-if="!loading"
             ></storylines-chart>
@@ -80,15 +80,9 @@
 
 <script lang="ts">
 import { Prop, Vue } from 'vue-property-decorator';
-import {
-    ChartConfig,
-    ConfigFileStructure,
-    DQVChartConfig,
-    LineSeriesData,
-    PieDataRow,
-    PieSeriesData,
-    SourceCounts
-} from '@/definitions';
+import { ChartConfig, DQVChartConfig, LineSeriesData, PieDataRow, PieSeriesData } from '@/definitions';
+
+import { useProductStore } from '@/stores/productStore';
 
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
@@ -101,10 +95,10 @@ exportData(Highcharts);
 
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
-    @Prop() configFileStructure!: ConfigFileStructure;
-    @Prop() sourceCounts!: SourceCounts;
     @Prop() lang!: string;
     @Prop() index!: number;
+
+    productStore = useProductStore();
 
     loading = true;
     chartIdx = 0;
@@ -139,10 +133,10 @@ export default class ChartPreviewV extends Vue {
             },
             (newChart: string) => {
                 const chart = JSON.parse(newChart);
-                const newName = `${this.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
+                const newName = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.title.text}.json`;
 
                 // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
-                if (this.sourceCounts[newName] > 0 && chart.title.text != this.chart.name) {
+                if (this.productStore.sourceExists(newName) && chart.title.text != this.chart.name) {
                     alert(
                         this.$t('editor.chart.label.nameExists', {
                             name: chart.title.text
