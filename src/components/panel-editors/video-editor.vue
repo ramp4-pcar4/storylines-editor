@@ -106,15 +106,168 @@
                 :lang="lang"
                 @delete="deleteVideo"
             >
-                <!-- <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.video.label.captions') }}:</label>
-                    <input class="w-4/5" type="file" @change="updateCaptions" />
-                </div>
+                <div class="caption-transcript">
+                    <!-- Captions dont work for YT videos -->
+                    <div
+                        class="flex flex-col gap-1 mt-4 ml-1 w-full text-left"
+                        v-if="videoPreview.videoType !== 'YouTube'"
+                    >
+                        <div class="flex justify-start items-center">
+                            <label for="caption-input" class="text-label font-semibold"
+                                >{{ $t('editor.video.label.captions') }}:</label
+                            >
+                            <span
+                                class=""
+                                :content="$t('editor.video.caption.info')"
+                                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
+                                tabindex="0"
+                            >
+                                <svg
+                                    class="fill-current"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 416.979 416.979"
+                                    xml:space="preserve"
+                                >
+                                    <g>
+                                        <path
+                                            d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85   c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786   c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576   c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765   c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
+                                        />
+                                    </g>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="flex w-full items-center gap-2 mb-1">
+                            <input
+                                id="caption-input"
+                                class="hidden"
+                                type="file"
+                                @change="updateCaptions"
+                                ref="videoCaptionInput"
+                                accept=".vtt"
+                            />
+                            <input
+                                class="file-input-button"
+                                type="button"
+                                @click="inputCaptionFile"
+                                :value="$t('editor.video.label.chooseFile')"
+                            />
+                            <p class="line-clamp-2">
+                                {{ $t('editor.video.label.captions.uploaded') }}:
+                                {{ videoPreview.caption ? videoPreview.caption.split('/').at(-1) : 'N/A' }}
+                            </p>
+                            <button
+                                class="file-remove-button"
+                                v-if="videoPreview.caption"
+                                @click="deleteCaption"
+                                :aria-label="$t('editor.video.label.captions.delete')"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'top',
+                                    content: $t('editor.video.label.captions.delete'),
+                                    animateFill: true,
+                                    hideOnClick: false
+                                }"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="1"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M18 6l-12 12" />
+                                    <path d="M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
 
-                <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.video.label.transcript') }}:</label>
-                    <input class="w-4/5" type="file" @change="updateTranscript" />
-                </div> -->
+                    <div class="flex flex-col gap-1 mt-4 ml-1 w-full text-left">
+                        <div class="flex justify-start items-center">
+                            <label for="transcript-input" class="text-label font-semibold"
+                                >{{ $t('editor.video.label.transcript') }}:</label
+                            >
+                            <span
+                                class=""
+                                :content="$t('editor.video.transcript.info')"
+                                v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
+                                tabindex="0"
+                            >
+                                <svg
+                                    class="fill-current"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 416.979 416.979"
+                                    xml:space="preserve"
+                                >
+                                    <g>
+                                        <path
+                                            d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85   c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786   c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576   c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765   c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
+                                        />
+                                    </g>
+                                </svg>
+                            </span>
+                        </div>
+
+                        <div class="flex w-full items-center gap-2 mb-1">
+                            <input
+                                id="transcript-input"
+                                class="hidden"
+                                type="file"
+                                @change="updateTranscript"
+                                ref="videoTranscriptInput"
+                                accept=".html,.md"
+                            />
+                            <input
+                                class="file-input-button"
+                                type="button"
+                                @click="inputTranscriptFile"
+                                :value="$t('editor.video.label.chooseFile')"
+                            />
+                            <p class="line-clamp-2 w-3/5">
+                                {{ $t('editor.video.label.transcript.uploaded') }}:
+                                {{ videoPreview.transcript ? videoPreview.transcript.split('/').at(-1) : 'N/A' }}
+                            </p>
+                            <button
+                                class="file-remove-button"
+                                :aria-label="$t('editor.video.label.transcript.delete')"
+                                v-if="videoPreview.transcript"
+                                @click="deleteTranscript"
+                                v-tippy="{
+                                    delay: '200',
+                                    placement: 'top',
+                                    content: $t('editor.video.label.transcript.delete'),
+                                    animateFill: true,
+                                    hideOnClick: false
+                                }"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="1"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M18 6l-12 12" />
+                                    <path d="M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </VideoPreview>
         </div>
     </div>
@@ -193,8 +346,18 @@ export default class VideoEditorV extends Vue {
                     src: this.panel.src
                 };
             }
+            this.videoPreview.caption = this.panel.caption ?? '';
+            this.videoPreview.transcript = this.panel.transcript ?? '';
         }
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
+    }
+
+    inputCaptionFile() {
+        document.querySelector('#caption-input').click();
+    }
+
+    inputTranscriptFile() {
+        document.querySelector('#transcript-input').click();
     }
 
     // adds an uploaded file that is either a: video, transcript or captions
@@ -202,8 +365,8 @@ export default class VideoEditorV extends Vue {
         const { inSharedAsset, newAssetName, uploadSource } = await this.productStore.addUploadedFile(file);
 
         // check if source file is creating a new video or uploading captions/transcript for current video
-        const fileSrc = URL.createObjectURL(file);
         if (type === 'src') {
+            const fileSrc = URL.createObjectURL(file);
             const assetName = inSharedAsset ? newAssetName : file.name;
             this.videoPreview = {
                 id: uploadSource,
@@ -213,7 +376,7 @@ export default class VideoEditorV extends Vue {
             };
             this.findFileType(assetName);
         } else {
-            this.videoPreview[type as 'caption' | 'transcript'] = fileSrc;
+            this.videoPreview[type as 'caption' | 'transcript'] = uploadSource;
         }
         this.edited = true;
         this.$emit('slide-edit');
@@ -282,12 +445,24 @@ export default class VideoEditorV extends Vue {
 
     updateCaptions(e: Event): void {
         const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        this.addUploadedFile(file, 'caption');
+        if (file.name.split('.').at(-1) === 'vtt') {
+            this.addUploadedFile(file, 'caption').then(() => {
+                this.onVideoEdited();
+            });
+        } else {
+            Message.error(this.$t('editor.video.caption.error'));
+        }
     }
 
     updateTranscript(e: Event): void {
         const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        this.addUploadedFile(file, 'transcript');
+        if (['html', 'md'].includes(file.name.split('.').at(-1))) {
+            this.addUploadedFile(file, 'transcript').then(() => {
+                this.onVideoEdited();
+            });
+        } else {
+            Message.error(this.$t('editor.video.transcript.error'));
+        }
     }
 
     dropVideo(e: DragEvent): void {
@@ -295,9 +470,9 @@ export default class VideoEditorV extends Vue {
             const file = [...e.dataTransfer.files][0];
             this.addUploadedFile(file, 'src').then(() => {
                 this.dragging = false;
+                this.onVideoEdited();
             });
         }
-        this.onVideoEdited();
     }
 
     deleteVideo(): void {
@@ -314,10 +489,27 @@ export default class VideoEditorV extends Vue {
         this.onVideoEdited();
     }
 
+    deleteCaption(): void {
+        if (this.videoPreview.caption) {
+            this.productStore.decrementSourceCount(this.videoPreview.caption);
+            this.videoPreview.caption = '';
+            (this.$refs.videoCaptionInput as HTMLInputElement).value = '';
+            this.onVideoEdited();
+        }
+    }
+
+    deleteTranscript(): void {
+        if (this.videoPreview.transcript) {
+            this.productStore.decrementSourceCount(this.videoPreview.transcript);
+            this.videoPreview.transcript = '';
+            (this.$refs.videoTranscriptInput as HTMLInputElement).value = '';
+            this.onVideoEdited();
+        }
+    }
+
     saveChanges(): void {
         if (this.edited && this.videoPreview) {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
-            console.log('SAVING PROPERLY');
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
 
@@ -337,6 +529,52 @@ export default class VideoEditorV extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.line-clamp-2 {
+    overflow: hidden;
+    word-wrap: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.caption-transcript {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.file-input-button {
+    border-radius: 5px;
+    padding: 0.375rem 15px;
+    font-weight: 600;
+    transition-duration: 0.2s;
+    margin: 0;
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid black;
+    height: 40px;
+}
+
+.file-input-button:hover {
+    background-color: rgba(209, 213, 219, var(--tw-border-opacity));
+    color: black;
+}
+
+.file-remove-button {
+    border-radius: 20px;
+    transition-duration: 0.2s;
+    margin: 5px;
+    padding: 2px;
+}
+
+.file-remove-button:hover {
+    background-color: rgba(209, 213, 219, var(--tw-border-opacity));
+}
+
 .upload-video {
     input[type='file']:not(:focus-visible) {
         position: absolute !important;
@@ -356,7 +594,6 @@ export default class VideoEditorV extends Vue {
 }
 
 .text-label {
-    width: 25% !important;
     margin-right: 0.5rem !important;
     margin-bottom: 0 !important;
 }
