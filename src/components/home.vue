@@ -662,7 +662,7 @@ td {
     grid-template-columns: repeat(auto-fit, minmax(25vw, 1fr));
 }
 
-input[type='file']:not(:focus-visible) {
+#product-zip-file:not(:focus-visible) {
     position: absolute !important;
     width: 1px !important;
     height: 1px !important;

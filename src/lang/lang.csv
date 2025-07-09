@@ -185,10 +185,19 @@ editor.image.altTag,Alt tag,1,Texte de remplacement,1
 editor.image.slideshowCaption,Slideshow caption,1,Légende du diaporama,1
 editor.image.loadingError,An error occurred when trying to load image,1,Une erreur est survenue lors du chargement de l’image.,1
 editor.video.title,Video Title,1,Titre de la vidéo,1
+editor.video.label.chooseFile,Choose File,1,Choisir le fichier,0
 editor.video.label.drag,Drag your video file here,1,Glissez votre fichier vidéo ici,1
 editor.video.label.sizeLimit,({size}MB limit),1,(limite de {size}MB),1
 editor.video.label.captions,Video Captions,1,Sous-titres,1
+editor.video.label.captions.uploaded,Caption uploaded,1,Légende téléchargée,0
+editor.video.label.captions.delete,Delete Caption,1,Enlever la légende,0
+editor.video.caption.info,File must be of type .vtt,1,Le fichier doit être de type .vtt,0
+editor.video.caption.error,Incorrect file type for caption (must be .vtt file),1,Type de fichier incorrect pour la légende (doit être un fichier .vtt),0
 editor.video.label.transcript,Video Transcript,1,Transcription,1
+editor.video.label.transcript.uploaded,Transcript uploaded,1,Transcription téléchargée,0
+editor.video.label.transcript.delete,Delete Transcript,1,Enlever la transcription,0
+editor.video.transcript.info,File must be of type .html or .md,1,Le fichier doit être de type .html ou .md,0
+editor.video.transcript.error,Incorrect file type for transcript (must be .html or .md file),1,Type de fichier incorrect pour la transcription (doit être un fichier .html ou .md),0
 editor.video.label.upload,Upload,1,Télécharger,1
 editor.video.sizeExceeded,File too big!,1,Fichier trop volumineux!,1
 editor.video.label.linkSupport,Supports YouTube links (regular and shortened) as well as direct links to mp4 videos.,1,Prend en charge les liens YouTube (normaux et raccourcis) ainsi que les liens directs vers des vidéos mp4.,1
