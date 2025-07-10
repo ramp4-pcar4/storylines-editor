@@ -47,6 +47,7 @@ import { TextPanel } from '@/definitions';
 import { applyTextAlign } from '@/utils/styleUtils';
 import WETDashboardItemV from '../support/wet-dashboard-item.vue';
 import WETComponents from '../support/wet-component-templates.json';
+import DOMPurify from 'dompurify';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;
@@ -79,7 +80,7 @@ export default class TextEditorV extends Vue {
     }
 
     // Detecting whether the text editor is in fullscreen mode
-    isFullScreen: boolean = false;
+    isFullScreen = false;
     onFullscreenChange(isFullScreen: boolean) {
         this.isFullScreen = isFullScreen;
     }
@@ -404,6 +405,14 @@ export default class TextEditorV extends Vue {
         } else {
             toggle.children[0].style.right = `${-toggleToRightBorder}px`;
         }
+    }
+
+    saveChanges() {
+        this.panel.content = DOMPurify.sanitize(this.panel.content, {
+            FORCE_BODY: true,
+            ADD_TAGS: ['AudioPlayer'],
+            ADD_ATTR: ['transcript']
+        }).replaceAll('audioplayer', 'AudioPlayer');
     }
 
     mounted(): void {
