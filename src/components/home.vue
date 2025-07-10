@@ -27,7 +27,7 @@
                 :to="{ name: 'home', params: { lang: currLang === 'en' ? 'fr' : 'en' } }"
                 v-if="!sourceFile.includes('index-ca')"
             >
-                <div class="underline">{{ `${currLang === 'en' ? 'Français' : 'English'}` }}</div>
+                <div class="respected-standard-link-button">{{ `${currLang === 'en' ? 'Français' : 'English'}` }}</div>
             </router-link>
         </header>
         <div class="relative" style="margin-right: 10%; margin-left: 10%">
