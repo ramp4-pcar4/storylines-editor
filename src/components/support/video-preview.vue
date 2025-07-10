@@ -23,6 +23,7 @@
                         :height="file.height ? file.height : 400"
                         :width="file.width"
                         allowfullscreen
+                        :title="file.title"
                     ></iframe>
                 </template>
 
