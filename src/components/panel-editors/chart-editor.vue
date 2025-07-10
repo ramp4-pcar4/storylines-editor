@@ -127,13 +127,7 @@
 <script lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import {
-    ChartConfig,
-    ChartPanel,
-    HighchartsConfig,
-    PanelType,
-    SlideshowChartPanel
-} from '@/definitions';
+import { ChartConfig, ChartPanel, HighchartsConfig, PanelType, SlideshowChartPanel } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import { useProductStore } from '@/stores/productStore';
 
@@ -183,8 +177,8 @@ export default class ChartEditorV extends Vue {
             this.panel.type === PanelType.SlideshowChart
                 ? (this.panel.items as Array<ChartPanel>)
                 : this.panel.src
-                ? [this.panel]
-                : [];
+                  ? [this.panel]
+                  : [];
 
         // fetch single existing chart config from ZIP
         if (this.panel.type === PanelType.Chart && this.panel.src) {
@@ -259,7 +253,10 @@ export default class ChartEditorV extends Vue {
             this.productStore.incrementSourceCount(chartSrc);
 
             // Add chart config to ZIP file.
-            this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(newConfig, null, 4));
+            this.productStore.configFileStructure.charts[this.lang].file(
+                `${title}.json`,
+                JSON.stringify(newConfig, null, 4)
+            );
             this.storylinesChartConfigs.push(chartConfig);
             this.chartVersions[title] = 0;
             this.highchartsChartConfigs.push(newConfig);
@@ -318,7 +315,10 @@ export default class ChartEditorV extends Vue {
 
             const newTitle = updatedConfig.title.text;
             // Add updated chart config to ZIP
-            this.productStore.configFileStructure.charts[this.lang].file(`${newTitle}.json`, JSON.stringify(updatedConfig, null, 4));
+            this.productStore.configFileStructure.charts[this.lang].file(
+                `${newTitle}.json`,
+                JSON.stringify(updatedConfig, null, 4)
+            );
 
             // Update local copies of Highcharts + Storylines chart configs
             this.storylinesChartConfigs[idx] = {
@@ -335,10 +335,15 @@ export default class ChartEditorV extends Vue {
     deleteChart(chart: ChartConfig): void {
         const idx = this.storylinesChartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
         if (idx !== -1) {
-            const filePath = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`;
             // Remove the chart from the config file.
-            this.productStore.sourceCounts[`${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] -= 1;
-            if (this.productStore.sourceCounts[`${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`] === 0) {
+            this.productStore.sourceCounts[
+                `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`
+            ] -= 1;
+            if (
+                this.productStore.sourceCounts[
+                    `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`
+                ] === 0
+            ) {
                 this.productStore.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
             }
             this.storylinesChartConfigs.splice(idx, 1);
@@ -351,7 +356,6 @@ export default class ChartEditorV extends Vue {
         if (this.edited) {
             // Delete the existing properties so we can rebuild the object.
             Object.keys(this.panel).forEach((key) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 delete this.panel[key];
             });
@@ -368,7 +372,6 @@ export default class ChartEditorV extends Vue {
 
                 // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
                 Object.keys(newChart).forEach((key) => {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     (this.panel as ChartPanel)[key] = newChart[key];
                 });

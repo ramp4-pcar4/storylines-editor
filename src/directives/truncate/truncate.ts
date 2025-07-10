@@ -91,7 +91,7 @@ function onShow(instance: any) {
  * @param the text content
  * @returns a string with any URLs hyperlinked.
  */
-function linkifyContent(content: string | null): TippyContent {
+function linkifyContent(content: string | null): typeof TippyContent {
     if (content === null) {
         return '';
     }
@@ -104,5 +104,5 @@ function linkifyContent(content: string | null): TippyContent {
     });
     res = `<div style='word-break: break-all; text-wrap: wrap;'>${res}</div>`;
 
-    return <TippyContent>res;
+    return <typeof TippyContent>res;
 }

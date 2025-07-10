@@ -236,7 +236,7 @@ export default class MapEditorV extends Vue {
 
     getNumberOfMaps(): number {
         let n = 0;
-        this.productStore.configFileStructure.rampConfig.forEach((f) => {
+        this.productStore.configFileStructure.rampConfig.forEach((_f) => {
             n += 1;
         });
         return n;
@@ -255,6 +255,7 @@ select {
     background: white;
     padding: 0.25rem 0.5rem;
 }
+
 .map-item {
     width: 300px;
     background: #eee;
@@ -267,11 +268,13 @@ select {
         padding: 0 !important;
     }
 }
+
 .edit-map {
     content: url('../assets/edit-icon.svg');
     margin: 0 auto;
     margin-bottom: 20px;
 }
+
 .add-map {
     content: url('../assets/add.svg');
     margin: 0 auto;
@@ -285,12 +288,22 @@ input[type='number'] {
 :deep(rv-basemap-item .rv-basemap-thumb img) {
     max-width: none;
 }
+
 :deep(.rv-details-attrib-value a) {
     white-space: unset !important;
 }
 
-$font-list: 'Montserrat', -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji,
+$font-list:
+    'Montserrat',
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Helvetica,
+    Arial,
+    sans-serif,
+    Apple Color Emoji,
     Segoe UI Emoji;
+
 :deep(.ramp-app) {
     height: 100%;
     h1,

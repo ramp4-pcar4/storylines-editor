@@ -17,7 +17,7 @@ function removeTextAlignLeft(styles?: string): string {
  *
  * - For 'image' and 'chart' types, it adds/removes `text-align: left;`.
  * - For all other types, it adds/removes `text-align: left !important;`.
- * - If the input has an `items` array, each item is processed. 
+ * - If the input has an `items` array, each item is processed.
  * - Otherwise, the input is treated as a single panel or an array of panels.
  */
 export function applyTextAlign(panelOrGroup: any, centerSlide: boolean, dynamicSelected: boolean) {
@@ -26,8 +26,8 @@ export function applyTextAlign(panelOrGroup: any, centerSlide: boolean, dynamicS
     const items = Array.isArray(panelOrGroup.items)
         ? panelOrGroup.items
         : Array.isArray(panelOrGroup)
-        ? panelOrGroup
-        : [panelOrGroup];
+          ? panelOrGroup
+          : [panelOrGroup];
 
     if (centerSlide) {
         items.forEach((item: any) => {

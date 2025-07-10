@@ -13,7 +13,8 @@ declare module '@vue/runtime-core' {
         $route: RouteLocationNormalized;
         $router: Router;
         $pinia: Pinia;
-        $t: typeof import('vue-i18n')['t'];
+        $t: (typeof import('vue-i18n'))['t'];
         $vfm: Vfm;
+        $i18n: import('vue-1i8n')['I18n'];
     }
 }

@@ -90,6 +90,7 @@ export default class LandingV extends Vue {
     margin-left: 2rem /* 32px */;
     margin-right: 2rem /* 32px */;
 }
+
 .lang-selector:hover {
     background-color: #2572b4;
 }

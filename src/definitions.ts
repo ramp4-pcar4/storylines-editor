@@ -3,7 +3,6 @@ import JSZip from 'jszip';
 export type SupportedLanguages = 'en' | 'fr';
 
 export interface StoryRampConfig {
-    schemaVersion: string;
     title: string;
     lang: string;
     introSlide: Intro;
@@ -15,6 +14,8 @@ export interface StoryRampConfig {
     sameConfig: boolean;
     stylesheets?: string[];
     dateModified: string;
+    tableOfContents?: MenuItem[];
+    schemaVersion?: string;
 }
 
 export interface ConfigFileStructure {
@@ -28,6 +29,7 @@ export interface ConfigFileStructure {
         [key: string]: JSZip;
     };
     rampConfig: JSZip;
+    styles?: JSZip;
 }
 
 export interface SourceCounts {
@@ -53,6 +55,17 @@ export interface MetadataContent {
     sameConfig: boolean;
     dateModified: string;
     schemaVersion: string;
+}
+
+export interface MenuItem {
+    title: string;
+    slideIndex: number;
+    sublist?: [
+        {
+            title: string;
+            slideIndex: number;
+        }
+    ];
 }
 
 export interface HelpSection {
@@ -119,7 +132,7 @@ export interface DQVChartConfig {
         enablePolling: boolean;
         csv?: string;
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     plotOptions?: any;
     exporting?: {
         buttons: {
@@ -152,7 +165,7 @@ export interface Slide {
     // panel: [BasePanel, BasePanel | undefined];
     panel: BasePanel[];
     includeInToc?: boolean;
-    backgroundImage: string;
+    backgroundImage?: string;
 }
 
 export interface MultiLanguageSlide {
@@ -269,7 +282,7 @@ export interface SlideshowChartPanel extends BasePanel {
 export interface ChartPanel extends BasePanel {
     type: PanelType.Chart;
     src: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     config?: any;
     name?: string;
     options?: DQVOptions;
@@ -278,7 +291,7 @@ export interface ChartPanel extends BasePanel {
 
 export interface ChartConfig {
     src: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     config?: any;
     name?: string;
     chartIdx?: number;
@@ -385,8 +398,7 @@ export const BaseStartingConfig: DefaultConfigs = {
     slideshow: {
         type: PanelType.Slideshow,
         items: [],
-        caption: '',
-        userCreated: true
+        caption: ''
     },
     image: {
         type: PanelType.Image,

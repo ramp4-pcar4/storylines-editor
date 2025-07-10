@@ -268,83 +268,87 @@
                     <col class="w-3/5" />
                     <col span="2" />
                 </colgroup>
-                <tr>
-                    <td style="background-color: #e7e7e7" class="font-bold border-b border-solid border-black">
-                        <div style="font-size: calc(70% + 0.25vw)" class="m-2 mr-0 ml-3">
-                            {{ $t('editor.previousProducts.productInfo') }}
-                        </div>
-                    </td>
-                    <td style="background-color: #e7e7e7" class="font-bold border-b border-solid border-black">
-                        <div style="font-size: calc(70% + 0.25vw)">
-                            {{ $t('editor.previousProducts.lastModified') }}
-                        </div>
-                    </td>
-                    <td style="background-color: #e7e7e7" class="font-bold border-b border-solid border-black">
-                        <div style="font-size: calc(70% + 0.25vw)" class="ml-2">
-                            {{ $t('editor.previousProducts.actions') }}
-                        </div>
-                    </td>
-                </tr>
-                <tr v-for="(storyline, idx) in userStorylines" :key="idx">
-                    <td
-                        style="background-color: #f9f9f9; padding-right: 1vw"
-                        class="border-b border-solid"
-                        :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
-                    >
-                        <div class="m-2 mt-4 ml-3">{{ $t('editor.uuid') }}: {{ storyline.uuid }}</div>
-                        <div class="m-2 mb-4 ml-3">
-                            {{
-                                $t('editor.previousProducts.productInfo.title') +
-                                ': ' +
-                                (currLang === 'en' ? storyline.titleEN : storyline.titleFR)
-                            }}
-                        </div>
-                    </td>
-                    <td
-                        style="background-color: #f9f9f9; padding-right: 1vw"
-                        class="border-b border-solid"
-                        :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
-                    >
-                        {{ dateFormatter(storyline.lastModified) }}
-                    </td>
-                    <td
-                        style="background-color: #f9f9f9; padding-right: 1vw"
-                        class="border-b border-solid"
-                        :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
-                    >
-                        <button
-                            class="flex items-center font-semibold rounded-sm py-2 border border-solid border-black home-buttons"
-                            style="
-                                padding-right: 1vw;
-                                padding-left: 1vw;
-                                word-wrap: break-word;
-                                overflow-wrap: break-word;
-                                display: flex;
-                                flex-wrap: wrap;
-                                white-space: normal;
-                                min-width: 0;
-                                max-width: 100%;
-                            "
-                            @click="editProduct(storyline.uuid)"
+                <thead>
+                    <tr>
+                        <td style="background-color: #e7e7e7" class="font-bold border-b border-solid border-black">
+                            <div style="font-size: calc(70% + 0.25vw)" class="m-2 mr-0 ml-3">
+                                {{ $t('editor.previousProducts.productInfo') }}
+                            </div>
+                        </td>
+                        <td style="background-color: #e7e7e7" class="font-bold border-b border-solid border-black">
+                            <div style="font-size: calc(70% + 0.25vw)">
+                                {{ $t('editor.previousProducts.lastModified') }}
+                            </div>
+                        </td>
+                        <td style="background-color: #e7e7e7" class="font-bold border-b border-solid border-black">
+                            <div style="font-size: calc(70% + 0.25vw)" class="ml-2">
+                                {{ $t('editor.previousProducts.actions') }}
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(storyline, idx) in userStorylines" :key="idx">
+                        <td
+                            style="background-color: #f9f9f9; padding-right: 1vw"
+                            class="border-b border-solid"
+                            :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
                         >
-                            <span class="pr-1">
-                                <svg
-                                    height="20"
-                                    width="20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    class="size-6"
-                                >
-                                    <path
-                                        d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"
-                                    />
-                                </svg>
-                            </span>
-                            <span>{{ $t('editor.chart.label.edit') }}</span>
-                        </button>
-                    </td>
-                </tr>
+                            <div class="m-2 mt-4 ml-3">{{ $t('editor.uuid') }}: {{ storyline.uuid }}</div>
+                            <div class="m-2 mb-4 ml-3">
+                                {{
+                                    $t('editor.previousProducts.productInfo.title') +
+                                    ': ' +
+                                    (currLang === 'en' ? storyline.titleEN : storyline.titleFR)
+                                }}
+                            </div>
+                        </td>
+                        <td
+                            style="background-color: #f9f9f9; padding-right: 1vw"
+                            class="border-b border-solid"
+                            :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
+                        >
+                            {{ dateFormatter(storyline.lastModified) }}
+                        </td>
+                        <td
+                            style="background-color: #f9f9f9; padding-right: 1vw"
+                            class="border-b border-solid"
+                            :class="idx === userStorylines.length - 1 ? 'border-black' : 'border-gray-200'"
+                        >
+                            <button
+                                class="flex items-center font-semibold rounded-sm py-2 border border-solid border-black home-buttons"
+                                style="
+                                    padding-right: 1vw;
+                                    padding-left: 1vw;
+                                    word-wrap: break-word;
+                                    overflow-wrap: break-word;
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    white-space: normal;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                "
+                                @click="editProduct(storyline.uuid)"
+                            >
+                                <span class="pr-1">
+                                    <svg
+                                        height="20"
+                                        width="20"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                        class="size-6"
+                                    >
+                                        <path
+                                            d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"
+                                        />
+                                    </svg>
+                                </span>
+                                <span>{{ $t('editor.chart.label.edit') }}</span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -354,12 +358,13 @@
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { Storyline, UserProfile, useUserStore } from '../stores/userStore';
 import { useLockStore } from '../stores/lockStore';
-import Message from 'vue-m-message';
 import { VueFinalModal } from 'vue-final-modal';
 import { AxiosResponse } from 'axios';
-import axios from 'axios';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { throttle } from 'throttle-debounce';
+
+import axios from 'axios';
+import Message from 'vue-m-message';
 
 @Options({
     components: {
@@ -377,7 +382,7 @@ export default class HomeV extends Vue {
     profile: UserProfile = {};
     showExpired = false;
     apiUrl = import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040';
-    productZip = '';
+    productZip: string | File = '';
     productZipName = '';
     productUuid = '';
     loading = false;
@@ -388,7 +393,7 @@ export default class HomeV extends Vue {
 
     mounted(): void {
         this.currLang = (this.$route.params.lang as string) || 'en';
-        this.sourceFile = window.location.href.split('/').find((s) => s.includes('#'));
+        this.sourceFile = window.location.href.split('/').find((s) => s.includes('#')) as string;
         // If the user was redirected here due to session end, show session end popup.
         if (this.sessionExpired) {
             this.showExpired = true;
@@ -414,7 +419,11 @@ export default class HomeV extends Vue {
     }
 
     get userStorylines(): Array<Storyline> {
-        return this.profile?.storylines?.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified)) || {};
+        return (
+            this.profile?.storylines?.sort(
+                (a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+            ) || []
+        );
     }
 
     get isDragging(): boolean {
@@ -447,9 +456,10 @@ export default class HomeV extends Vue {
                 return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hour + ':' + minute;
             }
         }
+        return '';
     }
 
-    editProduct(uuid: number): void {
+    editProduct(uuid: string): void {
         this.$router.push({ name: 'editor', params: { uid: uuid } });
     }
 
@@ -473,7 +483,7 @@ export default class HomeV extends Vue {
         }
     }
 
-    productZipDropped(e: Event) {
+    productZipDropped(e: DragEvent) {
         // TODO: If a product folder was uploaded instead of a zip, zip it
         if (e.dataTransfer !== null) {
             const fileUploaded = e.dataTransfer.files[0];
@@ -623,7 +633,7 @@ export default class HomeV extends Vue {
     closeModal(): void {
         this.$vfm.close('admin-upload-modal');
         const fileInput = document.querySelector('#product-zip-file');
-        fileInput.value = '';
+        (fileInput as HTMLInputElement).value = '';
         this.productUuid = '';
         this.productZip = '';
         this.productZipName = '';
@@ -643,6 +653,7 @@ export default class HomeV extends Vue {
     min-height: 110px;
     justify-self: center;
 }
+
 .home-buttons:hover {
     background-color: #e7e7e7;
 }
