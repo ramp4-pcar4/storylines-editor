@@ -81,7 +81,7 @@ export default class CustomEditorV extends Vue {
     validatorErrors: any = [];
     showErrors = false;
 
-    storylinesSchema = '';
+    storylinesSchema: Record<string, any> = {};
 
     mounted(): void {
         import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
@@ -105,27 +105,29 @@ export default class CustomEditorV extends Vue {
     }
 
     // returns true if no validation errors, false if errors
-    validate(): boolean {
+    validate(validateJson?: any): boolean {
         // TODO: add any missing properties in schema as required (e.g. chart options)
-        const checkValidation = this.validator.validate(this.updatedConfig, this.storylinesSchema as any);
+        const checkConfig = validateJson ?? this.updatedConfig;
+
+        const checkValidation = this.validator.validate(checkConfig, this.storylinesSchema as any);
         this.validatorErrors = checkValidation.errors;
         if (this.jsonError) {
             this.validatorErrors.push(this.jsonError);
             return false;
         }
-        return true;
+        return this.validatorErrors.length === 0;
     }
 
     onJsonChange(json: any): void {
-        // json editor library does not contain 2-way v-model binding so need to set manually
-        this.updatedConfig = json;
-        this.edited = true;
         this.jsonError = '';
-        this.$emit('slide-edit');
+        const valid = this.validate(json);
 
         // if there are no validation errors update the slide config
-        const valid = this.validate();
         if (valid) {
+            // json editor library does not contain 2-way v-model binding so need to set manually
+            this.updatedConfig = json;
+            this.edited = true;
+            this.$emit('slide-edit');
             this.$emit('config-edited', this.updatedConfig);
         }
     }
