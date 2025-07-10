@@ -106,15 +106,46 @@
                 :lang="lang"
                 @delete="deleteVideo"
             >
-                <!-- <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.video.label.captions') }}:</label>
-                    <input class="w-4/5" type="file" @change="updateCaptions" />
-                </div>
+                <div class="caption-transcript">
+                    <div class="flex flex-col gap-1 mt-4 ml-1 w-full text-left">
+                        <label for="caption-input" class="w-full text-label font-semibold"
+                            >{{ $t('editor.video.label.captions') }}:</label
+                        >
+                        <div class="flex w-full items-center gap-2 mb-1">
+                            <!-- consider using a seperate button and hiding the file input -->
+                            <input id="caption-input" class="hidden" type="file" @change="updateCaptions" />
+                            <input
+                                class="file-input-button"
+                                type="button"
+                                @click="inputCaptionFile"
+                                value="Choose File"
+                            />
+                            <p class="line-clamp-2">
+                                {{ $t('editor.video.label.captions.uploaded') }}:
+                                {{ videoPreview.caption ? videoPreview.caption.split('/').at(-1) : 'N/A' }}
+                            </p>
+                        </div>
+                    </div>
 
-                <div class="flex mt-4 items-center w-full text-left">
-                    <label class="text-label">{{ $t('editor.video.label.transcript') }}:</label>
-                    <input class="w-4/5" type="file" @change="updateTranscript" />
-                </div> -->
+                    <div class="flex flex-col gap-1 mt-4 ml-1 w-full text-left">
+                        <label class="w-full text-label font-semibold"
+                            >{{ $t('editor.video.label.transcript') }}:</label
+                        >
+                        <div class="flex w-full gap-2 mb-1">
+                            <input id="transcript-input" class="hidden" type="file" @change="updateTranscript" />
+                            <input
+                                class="file-input-button"
+                                type="button"
+                                @click="inputTranscriptFile"
+                                value="Choose File"
+                            />
+                            <p class="line-clamp-2 w-3/5">
+                                {{ $t('editor.video.label.transcript.uploaded') }}:
+                                {{ videoPreview.transcript ? videoPreview.transcript.split('/').at(-1) : 'N/A' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </VideoPreview>
         </div>
     </div>
@@ -193,8 +224,18 @@ export default class VideoEditorV extends Vue {
                     src: this.panel.src
                 };
             }
+            this.videoPreview.caption = this.panel.caption ?? '';
+            this.videoPreview.transcript = this.panel.transcript ?? '';
         }
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
+    }
+
+    inputCaptionFile() {
+        document.querySelector('#caption-input').click();
+    }
+
+    inputTranscriptFile() {
+        document.querySelector('#transcript-input').click();
     }
 
     // adds an uploaded file that is either a: video, transcript or captions
@@ -213,7 +254,7 @@ export default class VideoEditorV extends Vue {
             };
             this.findFileType(assetName);
         } else {
-            this.videoPreview[type as 'caption' | 'transcript'] = fileSrc;
+            this.videoPreview[type as 'caption' | 'transcript'] = uploadSource;
         }
         this.edited = true;
         this.$emit('slide-edit');
@@ -282,12 +323,20 @@ export default class VideoEditorV extends Vue {
 
     updateCaptions(e: Event): void {
         const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        this.addUploadedFile(file, 'caption');
+        if (file.name.split('.').at(-1) === 'vtt') {
+            this.addUploadedFile(file, 'caption');
+        } else {
+            Message.error(this.$t('editor.video.caption.error'));
+        }
     }
 
     updateTranscript(e: Event): void {
         const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        this.addUploadedFile(file, 'transcript');
+        if (['html', 'md'].includes(file.name.split('.').at(-1))) {
+            this.addUploadedFile(file, 'transcript');
+        } else {
+            Message.error(this.$t('editor.video.transcript.error'));
+        }
     }
 
     dropVideo(e: DragEvent): void {
@@ -317,7 +366,6 @@ export default class VideoEditorV extends Vue {
     saveChanges(): void {
         if (this.edited && this.videoPreview) {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
-            console.log('SAVING PROPERLY');
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
 
@@ -337,6 +385,41 @@ export default class VideoEditorV extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.line-clamp-2 {
+    overflow: hidden;
+    word-wrap: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.caption-transcript {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.file-input-button {
+    border-radius: 5px;
+    padding: 0.375rem 15px;
+    font-weight: 600;
+    transition-duration: 0.2s;
+    margin: 0;
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid black;
+    height: 40px;
+}
+
+.file-input-button:hover {
+    background-color: rgba(209, 213, 219, var(--tw-border-opacity));
+    color: black;
+}
+
 .upload-video {
     input[type='file']:not(:focus-visible) {
         position: absolute !important;
@@ -356,7 +439,7 @@ export default class VideoEditorV extends Vue {
 }
 
 .text-label {
-    width: 25% !important;
+    width: 100% !important;
     margin-right: 0.5rem !important;
     margin-bottom: 0 !important;
 }
