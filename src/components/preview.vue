@@ -28,10 +28,13 @@
 
                     <button
                         @click="changeLang"
-                        class="respected-standard-button respected-black-bg-button max-h-[40px] mr-2"
+                        class="respected-standard-button respected-black-bg-button max-h-[40px]"
+                        style="margin-right: 0.5rem"
                     >
                         <span class="inline-block">{{
-                            lang === 'en' ? $t('editor.lang.fr') : $t('editor.lang.en')
+                            lang === 'en'
+                                ? $t('editor.lang.fr', 1, { locale: 'fr' })
+                                : $t('editor.lang.en', 1, { locale: 'en' })
                         }}</span>
                     </button>
                 </header>
