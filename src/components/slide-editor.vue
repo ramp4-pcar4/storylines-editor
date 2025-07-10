@@ -455,6 +455,9 @@
                     @config-edited="(slideConfig: Slide, save?: boolean = false) => {
                         $emit('custom-slide-updated', slideConfig, save, lang)
                     }"
+                    @title-edit="(title: string) => {
+                        $emit('custom-slide-updated', { ...currentSlide, title }, false, lang)
+                    }"
                     v-if="advancedEditorView"
                 ></custom-editor>
                 <component
@@ -531,6 +534,7 @@ import {
     SupportedLanguages,
     TextPanel
 } from '@/definitions';
+import { applyTextAlign } from '@/utils/styleUtils';
 
 import ChartEditorV from './panel-editors/chart-editor.vue';
 import CustomEditorV from './panel-editors/custom-editor.vue';
@@ -613,6 +617,7 @@ export default class SlideEditorV extends Vue {
                     : this.currentSlide.panel[0]?.cssClasses?.includes('centerSlideRight') &&
                       this.currentSlide.panel[1]?.cssClasses?.includes('centerSlideLeft')) ?? false;
             this.includeInToc = this.currentSlide.includeInToc ?? true;
+            this.dynamicSelected = this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic';
         }
     }
 
@@ -755,14 +760,26 @@ export default class SlideEditorV extends Vue {
 
     toggleCenterSlide(): void {
         if (this.determineEditorType(this.currentSlide.panel[this.panelIndex]) === 'dynamic') {
-            if (this.centerSlide) {
-                this.currentSlide.panel[0].cssClasses = 'centerSlideRight';
-            } else {
-                this.currentSlide.panel[0].cssClasses = (this.currentSlide.panel[0].cssClasses || '').replace(
-                    'centerSlideRight',
-                    ''
-                );
-            }
+            const dynamicPanel = this.currentSlide.panel[0] as DynamicPanel;
+
+            this.currentSlide.panel[0].cssClasses = this.centerSlide
+                ? 'centerSlideRight'
+                : (this.currentSlide.panel[0].cssClasses || '').replace('centerSlideRight', '');
+
+            (dynamicPanel.children ?? []).forEach((child) => {
+                const panel = child.panel;
+                if (panel.type === 'image' || panel.type === 'chart' || /^slideshow/.test(panel.type)) {
+                    const slideshowPanel =
+                        panel.type === 'slideshowImage'
+                            ? (panel as SlideshowImagePanel)
+                            : panel.type === 'slideshowChart'
+                            ? (panel as SlideshowChartPanel)
+                            : panel;
+                    applyTextAlign(slideshowPanel, this.centerSlide, true);
+                } else {
+                    applyTextAlign(panel, this.centerSlide, true);
+                }
+            });
         } else if (this.onePanelOnly || this.currentSlide.panel.length === 1) {
             if (this.centerSlide) {
                 this.currentSlide.panel[0].cssClasses = 'centerSlideFull';
