@@ -47,18 +47,6 @@
                             @ok="() => removeSlide(item.panel as any, idx)"
                         />
                     </tr>
-                    <tr class="table-add-row">
-                        <td class="flex flex-col items-center">
-                            <input
-                                id="panelId"
-                                class="respected-standard-input"
-                                type="text"
-                                :placeholder="$t('dynamic.panel.enterID')"
-                                v-model="newSlideName"
-                                :aria-label="$t('dynamic.panel.enterID')"
-                            />
-                        </td>
-                    </tr>
 
                     <tr class="table-add-row">
                         <td class="flex flex-col items-center">
@@ -247,9 +235,13 @@ export default class DynamicEditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('dynamicEditor - saveChanges()');
+        console.log('slide ref');
+        console.log(this.$refs.slide);
         if (
             this.$refs.slide !== undefined &&
-            typeof (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges === 'function'
+            typeof (this.$refs.slide as ImageEditorV | ChartEditorV)?.saveChanges === 'function'
         ) {
             (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges();
         }
