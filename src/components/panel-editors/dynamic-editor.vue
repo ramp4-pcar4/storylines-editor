@@ -439,6 +439,10 @@ export default class DynamicEditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('dynamicEditor - saveChanges()');
+        console.log('slide ref');
+        console.log(this.$refs.slide);
         if (
             this.editingSlide !== -1 &&
             this.$refs.slide !== undefined &&

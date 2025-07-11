@@ -612,7 +612,7 @@ export default class SlideTocV extends Vue {
         // (UPDATE: now panelHelper is in store, so we can make it return a Promise, and execute
         // the below code once it resolves)
         setTimeout(async () => {
-            (this.productStore.slidesWorkingCopy[index][currLang] as Slide).panel.forEach((panel) =>
+            (this.productStore.slidesWorkingCopy[index][currLang] as Slide)?.panel.forEach((panel) =>
                 this.productStore.removeSourceCounts(panel)
             );
             this.productStore.slidesWorkingCopy[index][currLang] = JSON.parse(
