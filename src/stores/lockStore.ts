@@ -123,12 +123,12 @@ export const useLockStore = defineStore('lock', {
         },
         // Resets the current session back to a full 30 minutes.
         resetSession(overrideTime?: number) {
-            this.timeRemaining =
-                overrideTime !== undefined
-                    ? overrideTime
-                    : import.meta.env.VITE_APP_CURR_ENV
-                      ? Number(import.meta.env.VITE_SESSION_END) * 60
-                      : 1800; //  This value is in seconds!!! Don't mix up the units!!!
+            this.timeRemaining = 300;
+            // overrideTime !== undefined
+            //     ? overrideTime
+            //     : import.meta.env.VITE_APP_CURR_ENV
+            //     ? Number(import.meta.env.VITE_SESSION_END) * 60
+            //     : 1800; //  This value is in seconds!!! Don't mix up the units!!!
             clearInterval(this.timeInterval);
             // Update the time remaining every second.
             this.timeInterval = setInterval(() => {

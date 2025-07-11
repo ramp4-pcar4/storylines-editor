@@ -14,6 +14,7 @@
                 :left-toolbar="toolbarOptions"
                 :toolbar="toolbar"
                 @fullscreen-change="onFullscreenChange"
+                ref="mdEditor"
             ></v-md-editor>
         </div>
         <!-- WET Component Dashboard. Only accessible if using the Canada.ca template. -->

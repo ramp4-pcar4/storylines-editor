@@ -210,7 +210,7 @@ export const useStateStore = defineStore('state', {
          * Delete all recorded diffs since the last save.
          * @param reconcile Whether to ask the app to 'refresh'.
          */
-        resetAllChanges(reconcile: boolean = true): void {
+        resetAllChanges(reconcile = true): void {
             this.currentLoc = -1;
             this.stateChangesList = [];
             this.isChanged = false;
