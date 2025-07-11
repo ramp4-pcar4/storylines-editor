@@ -82,6 +82,8 @@ const panelTypeToSchemaKey = {
 } as const;
 type PanelType = keyof typeof panelTypeToSchemaKey;
 
+import { useEditorStore } from '@/stores/editorStore';
+
 @Options({
     components: {
         'json-editor': Vue3JsonEditor
@@ -100,6 +102,8 @@ export default class CustomEditorV extends Vue {
     storylinesSchema: Record<string, any> = {};
 
     mounted(): void {
+        console.log(' ');
+        console.log('mounted');
         import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
             this.storylinesSchema = {
                 ...StorylinesSchema.$defs.slide,
@@ -232,6 +236,8 @@ export default class CustomEditorV extends Vue {
     }
 
     onJsonChange(json: any): void {
+        console.log(' ');
+        console.log('onJSONChange');
         this.jsonError = '';
         const valid = this.validate(json);
         this.edited = true;

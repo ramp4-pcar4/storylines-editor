@@ -658,6 +658,8 @@ export default class EditorV extends Vue {
     }
 
     mounted(): void {
+        console.log(' ');
+        console.log('editor mounted');
         // from https://css-tricks.com/how-to-detect-when-a-sticky-element-gets-pinned/
         const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-40', e.intersectionRatio < 1), {
             threshold: [1]
@@ -823,7 +825,7 @@ export default class EditorV extends Vue {
 
         this.productStore.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] =
             this.editorStore.currentSlide;
-        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide].slides[this.slideIndex] =
+        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
             this.editorStore.currentSlide;
 
         // save changes emitted from advanced editor
@@ -947,6 +949,8 @@ export default class EditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('editor - saveChanges()');
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();

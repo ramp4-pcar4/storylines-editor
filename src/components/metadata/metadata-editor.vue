@@ -842,6 +842,8 @@ export default class MetadataEditorV extends Vue {
     }
 
     async renameProduct(): Promise<void> {
+        console.log(' ');
+        console.log('renameProduct()');
         if (!this.productStore.configFileStructure) {
             return;
         }
@@ -1091,6 +1093,8 @@ export default class MetadataEditorV extends Vue {
      *
      */
     continueToEditor(): void {
+        console.log(' ');
+        console.log('continueToEditor()');
         this.loadingIntoEditor = true;
 
         // Needed in order to show the loading spinner at all
@@ -1158,6 +1162,8 @@ export default class MetadataEditorV extends Vue {
     }
 
     beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
+        console.log(' ');
+        console.log('metadata - beforeRouteLeave()');
         const curEditor = this.$route.name === 'editor';
         const confirmationMessage = this.$t('editor.leaveWarning');
         const stay =

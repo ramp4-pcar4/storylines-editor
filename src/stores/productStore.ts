@@ -1173,6 +1173,57 @@ export const useProductStore = defineStore('product', {
                 }
             });
         },
+        /**
+         * Generates a new product file for brand new products.
+         */
+        generateNewConfig(): Promise<void> {
+            console.log(' ');
+            console.log('generateNewConfig()');
+            const editorStore = useEditorStore();
+
+            const configLang = editorStore.configLang;
+            const configZip = new JSZip();
+            // Generate a new configuration file and populate required fields.
+            this.configs[configLang] = this.configHelper();
+            const config = this.configs[configLang] as StoryRampConfig;
+            config.introSlide.logo.altText = this.metadata.logoAltText ?? '';
+            config.schemaVersion = this.latestSchemaVersion;
+
+            // Set the source of the product logo
+            if (!this.metadata.logoName) {
+                config.introSlide.logo.src = '';
+            } else if (!this.metadata.logoName.includes('http')) {
+                config.introSlide.logo.src = `${this.uuid}/assets/shared/${this.logoImage?.name}`;
+            } else {
+                config.introSlide.logo.src = this.metadata.logoName;
+            }
+
+            // Set the source of the introduction slide background image
+            if (!this.metadata.introBgName) {
+                config.introSlide.backgroundImage = '';
+            } else if (!this.metadata.introBgName.includes('http')) {
+                config.introSlide.backgroundImage = `${this.uuid}/assets/shared/${this.introBgImage?.name}`;
+            } else {
+                config.introSlide.backgroundImage = this.metadata.introBgName;
+            }
+
+            config.slides = [];
+
+            const otherLang = editorStore.oppositeLang;
+            this.configs[otherLang] = cloneDeep(config);
+            (this.configs[otherLang] as StoryRampConfig).lang = otherLang;
+            const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
+
+            // Add the newly generated Storylines configuration file to the ZIP file.
+            const fileName = `${this.uuid}_${configLang}.json`;
+            const formattedConfigFile = JSON.stringify(config, null, 4);
+
+            configZip.file(fileName, formattedConfigFile);
+            configZip.file(`${this.uuid}_${otherLang}.json`, formattedOtherLangConfig);
+
+            // Generate the file structure, defer uploading the image until the structure is created.
+            return this.configFileStructureHelper(configZip, [this.logoImage, this.introBgImage]);
+        },
 
         /**
          * Generates a new product file for brand new products.

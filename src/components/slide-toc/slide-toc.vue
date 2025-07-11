@@ -494,6 +494,8 @@ export default class SlideTocV extends Vue {
 
     // Assumes that you've already checked that the other lang DOES have a config.
     copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
+        console.log(' ');
+        console.log('copyConfigFromOtherLang()');
         const oppositeLang = currLang === 'en' ? 'fr' : 'en';
         // Called on each image/video panel in the opposite lang's config (at the provided index)
         // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
@@ -634,6 +636,10 @@ export default class SlideTocV extends Vue {
     }
 
     removeSlide(index: number): void {
+        console.log(' ');
+        console.log('removeSlide()');
+        console.log('index');
+        console.log(index);
         if (index === this.slideIndex) {
             this.selectSlide(-1, this.lang);
             // this.$emit('slide-change', -1);
