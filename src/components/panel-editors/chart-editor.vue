@@ -55,6 +55,7 @@
                         :index="index"
                         @edit="
                             (chart: ChartConfig) => {
+                                console.log('chart preview opened');
                                 openEditor(chart.name as string);
                             }
                         "
@@ -223,8 +224,11 @@ export default class ChartEditorV extends Vue {
     }
 
     openEditor(name: string) {
+        console.log(' ');
+        console.log('openEditor()');
         const idx = this.highchartsChartConfigs.findIndex((cfg) => cfg.title.text === name);
         if (idx !== -1) {
+            console.log('open highcharts edit modal');
             this.editingConfig = this.highchartsChartConfigs[idx];
             this.editingName = name;
             this.$vfm.open('highcharts-edit-modal');
