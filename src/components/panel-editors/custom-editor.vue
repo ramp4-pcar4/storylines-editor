@@ -46,7 +46,7 @@
             </div>
         </div>
         <json-editor
-            v-model="updatedConfig"
+            v-model="config"
             lang="en"
             :mode="'text'"
             :show-btns="false"
@@ -63,9 +63,11 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
+import { useEditorStore } from '@/stores/editorStore';
 
 const panelTypeToSchemaKey = {
     text: 'textPanel',
@@ -78,7 +80,6 @@ const panelTypeToSchemaKey = {
     slideshowImage: 'multimediaSlideshow',
     slideshowChart: 'multimediaSlideshow'
 } as const;
-
 type PanelType = keyof typeof panelTypeToSchemaKey;
 
 @Options({
@@ -87,23 +88,16 @@ type PanelType = keyof typeof panelTypeToSchemaKey;
     }
 })
 export default class CustomEditorV extends Vue {
-    @Prop() config!: string;
+    editorStore = useEditorStore();
+    config = computed(() => this.editorStore.currentSlide);
 
-    updatedConfig = '';
     edited = false;
-
     jsonError = '';
     validator: Validator = new Validator();
     validatorErrors: any = [];
     showErrors = false;
 
     storylinesSchema: Record<string, any> = {};
-
-    @Watch('config', { immediate: true, deep: true })
-    onConfigChanged(newConfig: any) {
-        this.updatedConfig = JSON.parse(JSON.stringify(newConfig));
-        // this.validate();
-    }
 
     mounted(): void {
         import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
@@ -113,9 +107,7 @@ export default class CustomEditorV extends Vue {
                 additionalProperties: StorylinesSchema.additionalProperties
             };
 
-            this.updatedConfig = this.config;
-
-            const checkValidation = this.validator.validate(this.updatedConfig, this.storylinesSchema as any);
+            const checkValidation = this.validator.validate(this.config, this.storylinesSchema as any);
             if (checkValidation.errors.length !== 0) {
                 // adding defaults for existing products that have missing required properties
                 this.normalizeConfig(this.config, this.storylinesSchema.$defs.slide, this.storylinesSchema, true);
@@ -204,12 +196,12 @@ export default class CustomEditorV extends Vue {
 
             // if value is an array (e.g., panel), normalize each item
             if ((Array.isArray(value) && resolvedSchema.items) || Array.isArray(config?.children)) {
-                const configItems = Array.isArray(value) && value.length > 0 ? value : config?.children ?? [];
+                const configItems = Array.isArray(value) && value.length > 0 ? value : (config?.children ?? []);
 
                 for (const item of configItems) {
                     if (config?.children?.includes(item)) {
                         const childSchema = rootSchema.$defs?.['dynamicChildItem'];
-                        if (childSchema) this.normalizeConfig(item, childSchema, rootSchema, injectRequired);  
+                        if (childSchema) this.normalizeConfig(item, childSchema, rootSchema, injectRequired);
                     }
 
                     const type = item?.type ?? item?.panel?.type;
@@ -228,7 +220,7 @@ export default class CustomEditorV extends Vue {
     // returns true if no validation errors, false if errors
     validate(validateJson?: any): boolean {
         // TODO: add any missing properties in schema as required (e.g. chart options)
-        const checkConfig = validateJson ?? this.updatedConfig;
+        const checkConfig = validateJson ?? this.config;
 
         const checkValidation = this.validator.validate(checkConfig, this.storylinesSchema as any);
         this.validatorErrors = checkValidation.errors;
@@ -242,20 +234,21 @@ export default class CustomEditorV extends Vue {
     onJsonChange(json: any): void {
         this.jsonError = '';
         const valid = this.validate(json);
+        this.edited = true;
+        this.$emit('slide-edit');
         this.$emit('title-edit', json.title);
 
         // if there are no validation errors update the slide config
         if (valid) {
             // json editor library does not contain 2-way v-model binding so need to set manually
-            this.updatedConfig = json;
+            this.editorStore.currentSlide = json;
             this.edited = true;
             this.$emit('slide-edit');
-            this.$emit('config-edited', this.updatedConfig);
+            this.$emit('config-edited');
         }
     }
 
     saveChanges(): void {
-        this.$emit('config-edited', this.updatedConfig);
         this.edited = false;
 
         // If the user saves or leaves the advanced editor page with errors, give them a warning.

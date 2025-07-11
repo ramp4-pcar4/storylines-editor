@@ -97,7 +97,7 @@
                     <div class="space-x-2 flex flex-row items-center">
                         <!-- Unsaved changes indicator -->
                         <div
-                            v-if="unsavedChanges"
+                            v-if="editorStore.editorUnsavedChanges"
                             class="text-red-700 flex flex-row items-center w-auto"
                             v-tippy="{
                                 delay: '200',
@@ -131,7 +131,7 @@
                         </div>
                         <!-- Reset changes button -->
                         <button
-                            :disabled="!unsavedChanges"
+                            :disabled="!editorStore.editorUnsavedChanges"
                             @click="$vfm.open(`reload-config`)"
                             class="respected-standard-button respected-gray-border-button respected-dynamic-header-button"
                             truncate-trigger
@@ -169,7 +169,7 @@
                         <button
                             @click="saveChanges"
                             class="respected-standard-button respected-black-bg-button respected-dynamic-header-button"
-                            :disabled="!unsavedChanges || saving"
+                            :disabled="!editorStore.editorUnsavedChanges || editorStore.editorSaving"
                             truncate-trigger
                         >
                             <svg
@@ -205,9 +205,11 @@
                                         offset: [-10, 20]
                                     }
                                 }"
-                                >{{ saving ? $t('editor.savingChanges') : $t('editor.saveChanges') }}</span
+                                >{{
+                                    editorStore.editorSaving ? $t('editor.savingChanges') : $t('editor.saveChanges')
+                                }}</span
                             >
-                            <span v-if="saving" class="align-middle inline-block px-1">
+                            <span v-if="editorStore.editorSaving" class="align-middle inline-block px-1">
                                 <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
                             </span>
                         </button>
@@ -215,10 +217,10 @@
                         <!-- ENG/FR page toggle -->
                         <router-link
                             target
-                            v-if="uuid && !currentRoute.includes('index-ca')"
+                            v-if="productStore.uuid && !currentRoute.includes('index-ca')"
                             :to="{
                                 name: 'editor',
-                                params: { lang: currentRoute.includes('#/en') ? 'fr' : 'en', uid: uuid }
+                                params: { lang: currentRoute.includes('#/en') ? 'fr' : 'en', uid: productStore.uuid }
                             }"
                             @click="productStore.configLang = currentRoute.includes('#/en') ? 'fr' : 'en'"
                             class="respected-standard-link-button px-2"
@@ -246,7 +248,7 @@
                                     options: {
                                         delay: '200',
                                         placement: 'bottom-start',
-                                        content: metadata.title,
+                                        content: productStore.metadata.title,
                                         animateFill: true,
                                         touch: ['hold', 500]
                                     }
@@ -268,17 +270,17 @@
                                     options: {
                                         delay: '200',
                                         placement: 'bottom-start',
-                                        content: uuid,
+                                        content: productStore.uuid,
                                         animateFill: true,
                                         touch: ['hold', 500]
                                     }
                                 }"
-                                >{{ $t('editor.uuid') }}: {{ uuid }}</span
+                                >{{ $t('editor.uuid') }}: {{ productStore.uuid }}</span
                             >
                         </div>
                         <span class="ml-auto"></span>
                         <div class="flex items-center flex-nowrap gap-2 justify-between md:justify-start">
-                            <slot name="langModal" v-bind="{ unsavedChanges: unsavedChanges }"></slot>
+                            <slot name="langModal" v-bind="{ unsavedChanges: editorStore.editorUnsavedChanges }"></slot>
                             <!-- Preview dropdown -->
                             <dropdown-menu
                                 class="flex-shrink-0"
@@ -457,19 +459,16 @@
         <div class="editor-body flex">
             <!-- Left side -->
             <!-- Sidebar, desktop version -->
-            <div id="sidebar-desktop" class="w-80 flex flex-col flex-shrink-0 border-r border-black editor-toc hidden">
+            <div id="sidebar-desktop" class="w-80 flex flex-col flex-shrink-0 border-r border-black editor-toc">
                 <!-- ToC -->
                 <slide-toc
                     class="flex-1"
-                    :slides="slides"
-                    :currentSlide="currentSlide"
                     :slideIndex="slideIndex"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
-                    @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
                     @slides-updated="updateSlides"
-                    @open-metadata-modal="$emit('open-metadata-modal')"
-                    :lang="productStore.configLang"
+                    @open-metadata-modal="openMetadataModal"
+                    :lang="editorStore.configLang"
                 ></slide-toc>
             </div>
             <!-- Sidebar, mobile version -->
@@ -477,14 +476,12 @@
                 <!-- Mobile ToC -->
                 <!-- Bigger buttons, more visual dividers, more colors -->
                 <slide-toc
-                    :slides="slides"
-                    :currentSlide="currentSlide"
                     :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
-                    @open-metadata-modal="$vfm.open('metadata-edit-modal')"
+                    @open-metadata-modal="openMetadataModal"
                     @close-sidebar="closeSidebar"
-                    :lang="productStore.configLang"
+                    :lang="editorStore.configLang"
                     :closeSidebar="closeSidebar"
                     :isMobileSidebar="true"
                 ></slide-toc>
@@ -495,31 +492,41 @@
                 <slide-editor
                     class="editor-area w-full"
                     ref="slide"
-                    :currentSlide="currentSlide"
                     :otherLangSlide="
-                        slides[slideIndex]?.[slides.find((slide) => slide.fr === currentSlide) ? 'en' : 'fr']
+                        productStore.slides[slideIndex]?.[
+                            productStore.slides.find((slide) => slide.fr === editorStore.currentSlide) ? 'en' : 'fr'
+                        ]
                     "
-                    :lang="slides.find((slide) => slide.fr === currentSlide) ? 'fr' : 'en'"
+                    :lang="productStore.slides.find((slide) => slide.fr === editorStore.currentSlide) ? 'fr' : 'en'"
                     :slideIndex="slideIndex"
-                    :isLast="slideIndex === slides.length - 1"
-                    :uid="uuid"
+                    :isLast="slideIndex === productStore.slides.length - 1"
+                    :uid="productStore.uuid"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
-                    @slide-edit="onSlidesEdited"
+                    @slide-edit="onSlidesEdited()"
                     @custom-slide-updated="updateCustomSlide"
                 ></slide-editor>
             </div>
         </div>
 
         <!-- Edit metadata modal -->
-        <slot name="metadataModal"></slot>
+        <!-- Click Done or outside the modal to save changes LOCALLY. -->
+        <metadata-modal></metadata-modal>
         <!-- Help modal -->
         <help-panel :helpSections="helpSections" :originalTextArray="originalTextArray"></help-panel>
         <!-- Reload config confirmation modal -->
+        <confirmation-modal :name="`reload-config`" :message="$t('editor.refreshChanges.modal')" @ok="refreshConfig" />
         <confirmation-modal
-            :name="`reload-config`"
-            :message="$t('editor.refreshChanges.modal')"
-            @ok="$emit('refresh-config')"
+            :name="`confirm-extend-session-editor`"
+            :message="
+                $t('editor.extendSession', {
+                    mins: Math.floor(lockStore.timeRemaining / 60),
+                    secs: lockStore.timeRemaining - Math.floor(lockStore.timeRemaining / 60) * 60,
+                    totalMins: totalTime
+                })
+            "
+            :messageClass="'text-lg'"
+            @ok="editorStore.extendSession(true)"
         />
     </div>
 </template>
@@ -530,6 +537,9 @@ import { HelpSection, MetadataContent, MultiLanguageSlide, Slide, SupportedLangu
 import { VueSpinnerOval } from 'vue3-spinners';
 import axios from 'axios';
 import { marked } from 'marked';
+import Message from 'vue-m-message';
+import { saveAs } from 'file-saver';
+import { RouteLocationNormalized } from 'vue-router';
 
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc/slide-toc.vue';
@@ -537,8 +547,12 @@ import MetadataContentV from './metadata/metadata-content.vue';
 import ConfirmationModalV from './support/confirmation-modal.vue';
 import HelpPanelV from './help/help-panel.vue';
 import DropdownMenu from '@/components/support/dropdown-menu.vue';
+import MetadataModalV from './metadata/metadata-modal.vue';
+
 import { useLockStore } from '@/stores/lockStore';
 import { useProductStore } from '@/stores/productStore';
+import { useEditorStore } from '@/stores/editorStore';
+import { useStateStore } from '@/stores/stateStore';
 
 @Options({
     components: {
@@ -548,29 +562,28 @@ import { useProductStore } from '@/stores/productStore';
         'slide-editor': SlideEditorV,
         'slide-toc': SlideTocV,
         'help-panel': HelpPanelV,
-        'dropdown-menu': DropdownMenu
+        'dropdown-menu': DropdownMenu,
+        'metadata-modal': MetadataModalV
     }
 })
 export default class EditorV extends Vue {
-    @Prop() metadata!: MetadataContent;
-    @Prop() slides!: MultiLanguageSlide[];
-    @Prop() saving!: boolean;
-    @Prop() unsavedChanges!: boolean;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     currentRoute = window.location.href;
     productStore = useProductStore();
+    lockStore = useLockStore();
+    editorStore = useEditorStore();
+    stateStore = useStateStore();
 
     // Form properties.
-    uuid = '';
     logoImage: undefined | File = undefined;
     loadSlides: undefined | MultiLanguageSlide[] = undefined;
-    currentSlide: Slide | string = '';
-    slideIndex = -1;
+    slideIndex = -1; // Should we store this in editorStore?
     helpSections: HelpSection[] = [];
     helpMd = '';
     originalTextArray: string[] = [];
     dropdownButtonWidth = 0;
+    totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
 
     defaultBlankSlide: Slide = {
         title: '',
@@ -588,21 +601,58 @@ export default class EditorV extends Vue {
         ]
     };
 
-    @Watch('slides', { deep: true })
+    @Watch('productStore.slides', { deep: true })
     onSlidesEdited(): void {
-        this.productStore.updateSaveStatus(true);
+        this.editorStore.updateSaveStatus(true);
     }
 
-    @Watch('metadata', { deep: true })
+    @Watch('productStore.metadata', { deep: true })
     onMetadataEdited(): void {
-        this.productStore.updateSaveStatus(true);
+        this.editorStore.updateSaveStatus(true);
+    }
+
+    // Saving properties.
+    @Watch('stateStore.isChanged')
+    onChanged() {
+        this.editorStore.editorUnsavedChanges = this.stateStore.isChanged;
+    }
+
+    @Watch('stateStore.reconcileToggler')
+    onReconciliationRequest() {
+        const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
+
+        this.productStore.configs.en = newConfigs.en;
+        this.productStore.configs.fr = newConfigs.fr;
     }
 
     created(): void {
-        this.loadSlides = this.slides;
-        this.uuid = this.$route.params.uid as string;
+        this.productStore.uuid = this.$route.params.uid as string;
 
         window.addEventListener('beforeunload', this.beforeWindowUnload);
+
+        // Only fetch a product when there isn't one already in the productStore
+        if (this.editorStore.loadStatus === 'waiting') {
+            this.productStore
+                .generateRemoteConfig()
+                .then(() => {
+                    Message.success(this.$t('editor.editMetadata.message.successfulLoad'));
+                    // Need to wait until product data is loaded into store before accessing it
+                    this.restoreProperties();
+                    this.editorStore.loadExisting = true;
+                })
+                .catch(() => {
+                    // Handle any connection/lock errors here
+                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
+                    setTimeout(() => {
+                        this.$router.push({ name: 'home' });
+                    }, 2000);
+                });
+        } else {
+            this.restoreProperties();
+        }
+
+        // extend the session
+        this.editorStore.extendSession(true);
 
         this.fetchMarkdown();
     }
@@ -615,10 +665,96 @@ export default class EditorV extends Vue {
 
         observer.observe(document.querySelector('.editor-header') as Element);
         this.dropdownButtonWidth = (this.$refs.dropdownButton as HTMLElement).offsetWidth ?? 0;
+
+        this.editorStore.registerEditorComponent(this); // store this component in the editorStore
     }
 
     beforeDestroy(): void {
         window.removeEventListener('beforeunload', this.beforeWindowUnload);
+    }
+
+    openMetadataModal() {
+        this.productStore.loadConfig(this.productStore.configs[this.editorStore.configLang]).then(() => {
+            this.$vfm.open('metadata-edit-modal');
+        });
+    }
+
+    /**
+     * Ensure that `loadSlides` and `currentSlide` are up to date with whats in the `productStore`. Essential after saving
+     * and resetting unsaved changes
+     */
+    restoreProperties() {
+        // TODO: When calling refreshConfig, `currentSlide` loses its reference to `slides` within the `productStore`. So
+        // `updateSlides()` would set `slideIndex` to -1. There may be a better workaround
+        const slideIndex = this.slideIndex;
+        this.updateSlides();
+        // TODO: This would open the wrong panel if you were editing the right panel of a slide. We could keep track of
+        // the panel index somewhere and set it as needed
+        this.selectSlide(this.slideIndex !== -1 ? this.slideIndex : slideIndex);
+    }
+
+    refreshConfig(): void {
+        this.editorStore.currentSlide = '';
+        this.editorStore.editorUnsavedChanges = false;
+        // Re-fetch the product from the server.
+        if (this.editorStore.loadExisting) {
+            this.editorStore.reloadExisting = true;
+            this.productStore.generateRemoteConfig().then(() => {
+                this.restoreProperties();
+            });
+        } else {
+            this.editorStore.reloadExisting = false;
+            this.productStore.generateNewConfig().then(() => {
+                this.restoreProperties();
+            });
+        }
+    }
+
+    beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
+        this.$i18n.locale = to.params.lang as string;
+        document.onmousemove = () => undefined;
+        document.onkeydown = () => undefined;
+
+        // Both `to` and `from` are guaranteed to have a uuid param, unlike in the `metadata-editor` component
+        const uuidChange = to.params.uid !== from.params.uid;
+
+        // Unlock the product when the uuid in the url is updated
+        if (uuidChange) {
+            this.lockStore.unlockStoryline();
+            clearTimeout(this.lockStore.confirmationTimeout);
+            clearTimeout(this.lockStore.endTimeout);
+
+            // Ensures that upon executing the created() hook, the product is fetched from the server
+            this.editorStore.loadStatus = 'waiting';
+            this.editorStore.currentSlide = '';
+        }
+
+        next();
+    }
+
+    beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
+        const curEditor = this.$route.name === 'editor';
+        const confirmationMessage = this.$t('editor.leaveWarning');
+
+        const stay =
+            !this.editorStore.sessionExpired &&
+            this.editorStore.editorUnsavedChanges &&
+            curEditor &&
+            !window.confirm(confirmationMessage);
+        // This component is going bye-bye, so we need to do some clean up so that timers cannot fire later.
+        clearTimeout(this.lockStore.confirmationTimeout);
+        clearTimeout(this.lockStore.endTimeout);
+        document.onmousemove = () => undefined;
+        document.onkeydown = () => undefined;
+
+        // Always unlock product, regardless of if we're reloading or navigating to a diff page
+        this.lockStore.unlockStoryline();
+
+        if (stay) {
+            next(false);
+        } else {
+            next();
+        }
     }
 
     /**
@@ -643,7 +779,7 @@ export default class EditorV extends Vue {
      * Change current slide to selected slide.
      */
     selectSlide(index: number, lang?: SupportedLanguages): void {
-        const configLang = this.productStore.configLang;
+        const configLang = this.editorStore.configLang;
 
         // save changes to current slide before changing slides
         if (this.$refs.slide !== undefined) {
@@ -651,26 +787,27 @@ export default class EditorV extends Vue {
         }
 
         // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
-        this.currentSlide = {
+        this.editorStore.currentSlide = {
             title: '',
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
 
         const newLang = lang || configLang || 'en';
         if (configLang !== newLang) {
-            this.$emit('lang-change', newLang);
+            this.editorStore.changeLang(newLang);
         }
 
         setTimeout(() => {
-            if (index === -1 || !this.loadSlides) {
-                this.currentSlide = '';
+            if (index === -1 || !this.loadSlides || !this.loadSlides[index] || !this.loadSlides[index][newLang].panel) {
+                this.editorStore.currentSlide = '';
             } else {
                 const selectedLang = newLang as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
 
                 // If the requested language config for a slide doesn't exist, open the other language
                 // This edge case should ONLY pop up while using the "Next/Previous Slide" buttons
-                this.currentSlide = selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
+                this.editorStore.currentSlide =
+                    selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
             }
             this.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
@@ -681,34 +818,35 @@ export default class EditorV extends Vue {
     /**
      * Update slide for a custom config made through advanced editor.
      */
-    updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
-        const configLang = this.productStore.configLang;
+    updateCustomSlide(save?: boolean, lang?: string): void {
+        const configLang = this.editorStore.configLang;
 
-        this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
-
-        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
-            slideConfig;
+        this.productStore.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] =
+            this.editorStore.currentSlide;
+        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide].slides[this.slideIndex] =
+            this.editorStore.currentSlide;
 
         // save changes emitted from advanced editor
         if (save) {
-            this.$emit('save-changes');
+            this.productStore.onSave();
         }
     }
 
     /**
      * Updates slides after adding, removing, or reordering.
      */
-    updateSlides(slides: MultiLanguageSlide[]): void {
-        this.loadSlides = slides;
+    updateSlides(): void {
+        this.loadSlides = this.productStore.slides;
         this.slideIndex = this.loadSlides.findIndex(
             (bothSlides) =>
-                (this.currentSlide as Slide) === bothSlides['en'] || (this.currentSlide as Slide) === bothSlides['fr']
+                (this.editorStore.currentSlide as Slide) === bothSlides['en'] ||
+                (this.editorStore.currentSlide as Slide) === bothSlides['fr']
         );
-        this.productStore.configs.en!.slides = this.slides.map((slides) => slides.en!);
-        this.productStore.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
 
-        this.productStore.updateSaveStatus(undefined, 'Slide updated');
+        this.productStore.configs.en!.slides = this.productStore.slides.map((slides) => slides.en!);
+        this.productStore.configs.fr!.slides = this.productStore.slides.map((slides) => slides.fr!);
+
+        this.editorStore.updateSaveStatus(undefined, 'Slide updated');
     }
 
     /**
@@ -756,11 +894,21 @@ export default class EditorV extends Vue {
     }
 
     exportProduct(): void {
-        if (this.$refs.slide != null && this.currentSlide !== '') {
+        if (this.$refs.slide != null && this.editorStore.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
-        this.$emit('export-product');
+        this.productStore.generateConfig(false);
+
+        this.productStore.configFileStructure.zip.generateAsync({ type: 'blob' }).then(
+            (blob) => {
+                saveAs(blob, `${this.productStore.configFileStructure.uuid}.zip`);
+                Message.success(this.$t('editor.export.success'));
+            },
+            (err) => {
+                Message.error(this.$t('editor.export.error'));
+            }
+        );
     }
 
     /**
@@ -769,7 +917,7 @@ export default class EditorV extends Vue {
      */
     preview(language: string): void {
         // save current slide final changes before previewing product
-        if (this.$refs.slide != null && this.currentSlide !== '') {
+        if (this.$refs.slide != null && this.editorStore.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
@@ -786,7 +934,7 @@ export default class EditorV extends Vue {
         setTimeout(() => {
             const routeData = this.$router.resolve({
                 name: 'preview',
-                params: { lang: language, uid: this.uuid }
+                params: { lang: language, uid: this.productStore.uuid }
             });
             const previewTab = window.open(routeData.href, '_blank');
             (previewTab as Window).props = {
@@ -804,13 +952,12 @@ export default class EditorV extends Vue {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
-        // emit save changes event
-        this.$emit('save-changes');
+        this.productStore.onSave().then(this.restoreProperties);
     }
 
     beforeWindowUnload(e: BeforeUnloadEvent): void {
-        // show popup if when leaving page with unsaved changes
-        if (this.unsavedChanges && !window.confirm()) {
+        // show popup if when leaving page with unsaved changes, or with a brand new product
+        if ((this.editorStore.editorUnsavedChanges && !window.confirm()) || !this.editorStore.loadExisting) {
             e.preventDefault();
         }
     }
