@@ -418,6 +418,8 @@ export default class MetadataEditorV extends Vue {
 
     productStore = useProductStore();
 
+    productStore = useProductStore();
+
     openFileSelector(where = 'logoUpload'): void {
         document.getElementById(where)?.click();
     }

@@ -10,7 +10,7 @@ import JSZip from 'jszip';
 
 import Message from 'vue-m-message';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
+import { computed, Ref } from 'vue';
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
 
@@ -21,6 +21,7 @@ import type {
     DynamicPanel,
     ImagePanel,
     MapPanel,
+    MetadataContent,
     Slide,
     SlideshowPanel,
     TextPanel,
@@ -28,7 +29,7 @@ import type {
 } from '@/definitions';
 import { PanelType } from '@/definitions';
 
-import { useStateStore } from './stateStore';
+import { Save, useStateStore } from './stateStore';
 import { useUserStore } from './userStore';
 import { useLockStore } from './lockStore';
 import { useEditorStore } from './editorStore';
@@ -44,16 +45,16 @@ interface ProductState {
     slidesWorkingCopy: MultiLanguageSlide[];
     sourceCounts: SourceCounts;
     debounceTimer: ReturnType<typeof setTimeout> | null;
-    i18n: any;
     metadata: MetadataContent;
     temporaryMetadataCopy: MetadataContent;
     uuid: string;
-    user: string;
+    user: Ref<string>;
     i18n: any;
     logoImage: undefined | File;
     introBgImage: undefined | File;
     apiUrl: string;
     latestSchemaVersion: string;
+    loadStatus: string;
 }
 
 export const useProductStore = defineStore('product', {
@@ -70,7 +71,6 @@ export const useProductStore = defineStore('product', {
         // IMPORTANT: Avoid using stateStore's handlePotentialChange() directly, this timer may cause issues with change detection and saving to the configs variable.
         // Instead, ALWAYS call either updateSaveStatus() (if in metadata-editor) or emit the 'save-status' event instead!
         debounceTimer: null,
-        i18n: useI18n(),
         metadata: {
             title: '',
             introTitle: '',
@@ -118,7 +118,8 @@ export const useProductStore = defineStore('product', {
         logoImage: undefined as undefined | File,
         introBgImage: undefined as undefined | File,
         apiUrl: import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040',
-        latestSchemaVersion: ''
+        latestSchemaVersion: '',
+        loadStatus: ''
     }),
     getters: {
         folders: (state: ProductState) => {
@@ -1188,6 +1189,55 @@ export const useProductStore = defineStore('product', {
                     });
                 }
             });
+        },
+        /**
+         * Generates a new product file for brand new products.
+         */
+        generateNewConfig(): Promise<void> {
+            const editorStore = useEditorStore();
+
+            const configLang = editorStore.configLang;
+            const configZip = new JSZip();
+            // Generate a new configuration file and populate required fields.
+            this.configs[configLang] = this.configHelper();
+            const config = this.configs[configLang] as StoryRampConfig;
+            config.introSlide.logo.altText = this.metadata.logoAltText ?? '';
+            config.schemaVersion = this.latestSchemaVersion;
+
+            // Set the source of the product logo
+            if (!this.metadata.logoName) {
+                config.introSlide.logo.src = '';
+            } else if (!this.metadata.logoName.includes('http')) {
+                config.introSlide.logo.src = `${this.uuid}/assets/shared/${this.logoImage?.name}`;
+            } else {
+                config.introSlide.logo.src = this.metadata.logoName;
+            }
+
+            // Set the source of the introduction slide background image
+            if (!this.metadata.introBgName) {
+                config.introSlide.backgroundImage = '';
+            } else if (!this.metadata.introBgName.includes('http')) {
+                config.introSlide.backgroundImage = `${this.uuid}/assets/shared/${this.introBgImage?.name}`;
+            } else {
+                config.introSlide.backgroundImage = this.metadata.introBgName;
+            }
+
+            config.slides = [];
+
+            const otherLang = editorStore.oppositeLang;
+            this.configs[otherLang] = cloneDeep(config);
+            (this.configs[otherLang] as StoryRampConfig).lang = otherLang;
+            const formattedOtherLangConfig = JSON.stringify(this.configs[otherLang], null, 4);
+
+            // Add the newly generated Storylines configuration file to the ZIP file.
+            const fileName = `${this.uuid}_${configLang}.json`;
+            const formattedConfigFile = JSON.stringify(config, null, 4);
+
+            configZip.file(fileName, formattedConfigFile);
+            configZip.file(`${this.uuid}_${otherLang}.json`, formattedOtherLangConfig);
+
+            // Generate the file structure, defer uploading the image until the structure is created.
+            return this.configFileStructureHelper(configZip, [this.logoImage, this.introBgImage]);
         },
 
         /**

@@ -645,8 +645,6 @@ export default class EditorV extends Vue {
     editorStore = useEditorStore();
     stateStore = useStateStore();
 
-    stateStore = useStateStore();
-
     // Form properties.
     logoImage: undefined | File = undefined;
     loadSlides: undefined | MultiLanguageSlide[] = undefined;
@@ -752,7 +750,7 @@ export default class EditorV extends Vue {
         this.onMetadataEdited();
     }
 
-    @Watch('metadata', { deep: true })
+    @Watch('productStore.metadata', { deep: true })
     onMetadataEdited(): void {
         // Reload both metadata languages. Start with the other and then the current.
         const otherLang = this.editorStore.configLang === 'en' ? 'fr' : 'en';
@@ -804,6 +802,8 @@ export default class EditorV extends Vue {
     }
 
     mounted(): void {
+        console.log(' ');
+        console.log('editor mounted');
         // from https://css-tricks.com/how-to-detect-when-a-sticky-element-gets-pinned/
         const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-40', e.intersectionRatio < 1), {
             threshold: [1]
@@ -943,7 +943,7 @@ export default class EditorV extends Vue {
         }
 
         setTimeout(() => {
-            if (index === -1 || !this.loadSlides || !this.loadSlides[index] || !this.loadSlides[index][newLang].panel) {
+            if (index === -1 || !this.loadSlides || !this.loadSlides[index] || !this.loadSlides[index]?.[newLang]?.panel) {
                 this.editorStore.currentSlide = '';
             } else {
                 const selectedLang = newLang as keyof MultiLanguageSlide;
@@ -971,11 +971,11 @@ export default class EditorV extends Vue {
 
         this.productStore.slidesWorkingCopy[this.editorStore.selectedSlideIndex][
             (lang ?? currentLang) as keyof MultiLanguageSlide
-        ] = this.editorStore.currentSlide;
+        ] = this.editorStore.currentSlide as Slide;
 
         this.productStore.configs[(lang ?? currentLang) as keyof MultiLanguageSlide]!.slides[
             this.editorStore.selectedSlideIndex
-        ] = this.editorStore.currentSlide;
+        ] = this.editorStore.currentSlide as Slide;
 
         // save changes emitted from advanced editor
         if (save) {
@@ -1102,6 +1102,8 @@ export default class EditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('editor - saveChanges()');
         // save current slide final changes before generating config file
         if (this.$refs.slide !== undefined) {
             (this.$refs.slide as SlideEditorV).saveChanges();

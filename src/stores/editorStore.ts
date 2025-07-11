@@ -1,6 +1,7 @@
 import {
     ConfigFileStructure,
     MultiLanguageSlide,
+    Slide,
     SourceCounts,
     StoryRampConfig,
     SupportedLanguages
@@ -85,6 +86,7 @@ export const useEditorStore = defineStore('editor', {
         async swapConfigLang(): Promise<void> {
             const productStore = useProductStore();
             await productStore.saveMetadata(false, true);
+            this.configLang = this.oppositeLang;
             if (!productStore.configs[this.configLang]) {
                 await productStore.generateNewConfig(false);
             }
@@ -98,6 +100,8 @@ export const useEditorStore = defineStore('editor', {
         // TODO: do we need to be calling this function when updating the metadata for a new project? We get an "undefined is not valid JSON"
         // error each time changes are detected
         updateSaveStatus(payload: boolean | undefined, origin?: string): void {
+            console.log(' ');
+            console.log('updateSaveStatus()');
             const stateStore = useStateStore();
             const productStore = useProductStore();
 
@@ -127,6 +131,7 @@ export const useEditorStore = defineStore('editor', {
             const timeBuffer = isFirefox ? 2000 : 0;
             lockStore.confirmationTimeout = setTimeout(
                 () => {
+                    console.log('confirmation timeout');
                     // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
                     document.onmousemove = () => undefined;
                     document.onkeydown = () => undefined;
@@ -138,6 +143,7 @@ export const useEditorStore = defineStore('editor', {
             // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
             lockStore.endTimeout = setTimeout(
                 () => {
+                    console.log('endtimeout');
                     // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
                     document.onmousemove = () => undefined;
                     document.onkeydown = () => undefined;
@@ -173,6 +179,8 @@ export const useEditorStore = defineStore('editor', {
         },
 
         clearData(): void {
+            console.log(' ');
+            console.log('editorStore - clearData()');
             this.changeUuid = '';
             this.error = false;
             this.warning = 'none';
@@ -190,6 +198,9 @@ export const useEditorStore = defineStore('editor', {
          * Ensure that `uuid` is a case-sensitive match with the product's uuid on the server
          */
         correctUuid(): Promise<void> {
+            console.log(' ');
+            console.log('correctUuid()');
+
             return new Promise((resolve, reject) => {
                 const productStore = useProductStore();
                 const lockStore = useLockStore();
