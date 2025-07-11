@@ -11,9 +11,8 @@ import { i18n } from './lang';
 import 'ramp-pcar/dist/ramp.css';
 import VueMarkdownEditor from './plugins/markdown-editor/index';
 
-import { createVfm } from 'vue-final-modal';
 import 'vue-final-modal/style.css';
-const vfm = createVfm();
+import { vfm } from './plugins/vfm/index';
 
 import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';

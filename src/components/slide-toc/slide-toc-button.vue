@@ -4,15 +4,17 @@
         class="flex gap-2 px-2 rounded-md bg-transparent hover:bg-gray-200"
         :disabled="!element[selectedLang]"
         :class="{
-            'selected-toc-config-item': element[selectedLang] === currentSlide,
+            'selected-toc-config-item': element[selectedLang] === editorStore.currentSlide,
             'py-1': !isMobileSidebar,
             'py-2': isMobileSidebar,
-            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === currentSlide,
-            'cursor-not-allowed border-2 border-red-400': !element[selectedLang]
+            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === editorStore.currentSlide,
+            'cursor-not-allowed border-2 border-red-400': isMissingConfig()
         }"
         @click.stop="
-            $emit('select-slide');
-            isMobileSidebar && $emit('close-sidebar');
+            if (!isMissingConfig()) {
+                $emit('select-slide');
+                isMobileSidebar && $emit('close-sidebar');
+            }
         "
     >
         <!-- ::lang:: text -->
@@ -50,12 +52,14 @@
                         panel?.type === 'map' && (panel as MapPanel).shared
                             ? 'border-yellow-800 bg-yellow-200 hover:border-yellow-400'
                             : 'border-transparent hover:border-gray-400 hover:bg-gray-300',
-                        element[selectedLang] === currentSlide && this.productStore.selectedPanelIndex === panelIndex
+                        element[selectedLang] === editorStore.currentSlide &&
+                        this.editorStore.selectedPanelIndex === panelIndex
                             ? ''
                             : ''
                     ]"
                     :style="[
-                        element[selectedLang] === currentSlide && this.productStore.selectedPanelIndex === panelIndex
+                        element[selectedLang] === editorStore.currentSlide &&
+                        this.editorStore.selectedPanelIndex === panelIndex
                             ? 'background-color: #c1c1c5 !important;'
                             : ''
                     ]"
@@ -103,7 +107,7 @@
         </div>
 
         <!-- Options for ::lang:: items with missing configs (e.g. one language has config, other doesn't) -->
-        <div v-if="!element[selectedLang]" class="ml-auto flex my-auto">
+        <div v-if="isMissingConfig()" class="ml-auto flex my-auto">
             <!-- Create a new blank config -->
             <button
                 :aria-label="$t('editor.slides.toc.newBlankConfig')"
@@ -177,6 +181,7 @@ import { useProductStore } from '@/stores/productStore';
 import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from './toc-options.vue';
+import { useEditorStore } from '@/stores/editorStore';
 
 import TextEditorIcon from '@/assets/text-editor.svg?raw';
 import ImageEditorIcon from '@/assets/image-editor.svg?raw';
@@ -195,7 +200,6 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
 export default class SlideTocV extends Vue {
     @Prop() selectedLang!: SupportedLanguages;
     @Prop() element!: MultiLanguageSlide;
-    @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
     @Prop() isActiveSlide!: boolean;
 
@@ -203,6 +207,8 @@ export default class SlideTocV extends Vue {
 
     oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
+
+    editorStore = useEditorStore();
 
     textEditorIcon = TextEditorIcon;
     imageEditorIcon = ImageEditorIcon;
@@ -242,6 +248,10 @@ export default class SlideTocV extends Vue {
                   '"'
                 : 'No title'
         }</p>`;
+    }
+
+    isMissingConfig(): void {
+        return !this.element[this.selectedLang] || !this.element[this.selectedLang].panel;
     }
 
     updateContent(): void {
