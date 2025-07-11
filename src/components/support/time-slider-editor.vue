@@ -1,7 +1,7 @@
 <template>
     <div class="px-5 pt-4">
         <div class="flex items-center">
-            <label class="respected-standard-label">{{ $t('editor.map.timeslider.range') }}</label>
+            <label class="respected-standard-label pr-3">{{ $t('editor.map.timeslider.range') }}</label>
             <input
                 class="respected-standard-input"
                 type="number"
@@ -18,7 +18,7 @@
         </div>
         <br />
         <div class="flex items-center">
-            <label class="respected-standard-label">{{ $t('editor.map.timeslider.start') }}</label>
+            <label class="respected-standard-label pr-3">{{ $t('editor.map.timeslider.start') }}</label>
             <input
                 class="respected-standard-input ml-3"
                 type="number"
