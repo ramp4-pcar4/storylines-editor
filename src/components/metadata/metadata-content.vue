@@ -11,7 +11,7 @@
                         type="text"
                         name="title"
                         id="metaTitle"
-                        :value="metadata.title"
+                        :value="productStore.metadata.title"
                         @change="metadataChanged"
                         class="respected-standard-input"
                     />
@@ -19,7 +19,7 @@
                         {{ $t('editor.metadataForm.caption.title') }}
                     </p>
                 </div>
-                <p v-if="!editing">{{ metadata.title || $t('editor.metadataForm.na') }}</p>
+                <p v-if="!editing">{{ productStore.metadata.title || $t('editor.metadataForm.na') }}</p>
             </div>
             <!-- Layout and Navigation Section -->
             <section class="border mt-5 rounded-md px-4 md:px-5 py-3">
@@ -32,7 +32,7 @@
                             type="checkbox"
                             id="sameConfig"
                             class="self-center rounded-none cursor-pointer w-4 h-4"
-                            v-model="metadata.sameConfig"
+                            v-model="productStore.metadata.sameConfig"
                             @change="metadataChanged"
                         />
                         <label class="respected-standard-label" for="sameConfig">{{ $t('editor.sameConfig') }}</label>
@@ -42,7 +42,9 @@
                     </p>
                     <p v-if="!editing">
                         {{
-                            metadata.sameConfig ? $t('editor.metadataForm.enabled') : $t('editor.metadataForm.disabled')
+                            productStore.metadata.sameConfig
+                                ? $t('editor.metadataForm.enabled')
+                                : $t('editor.metadataForm.disabled')
                         }}
                     </p>
                 </div>
@@ -55,7 +57,7 @@
                             name="tocOrientation"
                             id="toc"
                             @change="metadataChanged"
-                            v-model="metadata.tocOrientation"
+                            v-model="productStore.metadata.tocOrientation"
                         >
                             <option value="vertical">{{ $t('editor.tocOrientation.vertical') }}</option>
                             <option value="horizontal">{{ $t('editor.tocOrientation.horizontal') }}</option>
@@ -64,7 +66,7 @@
                             {{ $t('editor.metadataForm.caption.tocOrientation') }}
                         </p>
                     </div>
-                    <p v-if="!editing">{{ metadata.tocOrientation || $t('editor.metadataForm.na') }}</p>
+                    <p v-if="!editing">{{ productStore.metadata.tocOrientation || $t('editor.metadataForm.na') }}</p>
                 </div>
                 <!-- Include return to top navigation -->
                 <div class="metadata-item">
@@ -74,7 +76,7 @@
                             type="checkbox"
                             id="returnToTop"
                             class="self-center rounded-none cursor-pointer w-4 h-4"
-                            v-model="metadata.returnTop"
+                            v-model="productStore.metadata.returnTop"
                             @change="metadataChanged"
                         />
                         <label class="respected-standard-label" for="returnToTop">{{ $t('editor.returnTop') }}</label>
@@ -84,7 +86,9 @@
                     </p>
                     <p v-if="!editing">
                         {{
-                            metadata.returnTop ? $t('editor.metadataForm.enabled') : $t('editor.metadataForm.disabled')
+                            productStore.metadata.returnTop
+                                ? $t('editor.metadataForm.enabled')
+                                : $t('editor.metadataForm.disabled')
                         }}
                     </p>
                 </div>
@@ -105,7 +109,7 @@
                         <input
                             type="text"
                             name="introTitle"
-                            :value="metadata.introTitle"
+                            :value="productStore.metadata.introTitle"
                             @change="metadataChanged"
                             id="introTitle"
                             class="respected-standard-input"
@@ -114,7 +118,7 @@
                             {{ $t('editor.metadataForm.caption.introTitle') }}
                         </p>
                     </div>
-                    <p v-if="!editing">{{ metadata.introTitle || $t('editor.metadataForm.na') }}</p>
+                    <p v-if="!editing">{{ productStore.metadata.introTitle || $t('editor.metadataForm.na') }}</p>
                 </div>
                 <!-- Intro subtitle -->
                 <div class="metadata-item w-full md:w-5/12 flex-1">
@@ -124,7 +128,7 @@
                             type="text"
                             name="introSubtitle"
                             id="introSubtitle"
-                            :value="metadata.introSubtitle"
+                            :value="productStore.metadata.introSubtitle"
                             @change="metadataChanged"
                             class="respected-standard-input"
                         />
@@ -132,7 +136,7 @@
                             {{ $t('editor.metadataForm.caption.introSubtitle') }}
                         </p>
                     </div>
-                    <p v-if="!editing">{{ metadata.introSubtitle || $t('editor.metadataForm.na') }}</p>
+                    <p v-if="!editing">{{ productStore.metadata.introSubtitle || $t('editor.metadataForm.na') }}</p>
                 </div>
             </section>
             <!-- Subsection: Logo stuff -->
@@ -144,8 +148,8 @@
                         <input
                             type="text"
                             id="metaLogo"
-                            @change="$emit('image-source-changed', $event, 'logo')"
-                            :value="metadata.logoName"
+                            @change="onImageSourceInput($event, 'logo')"
+                            :value="productStore.metadata.logoName"
                             class="respected-standard-input lg:w-1/2"
                         />
                         <!-- Upload button -->
@@ -163,25 +167,27 @@
                         </button>
                         <!-- Delete button -->
                         <button
-                            v-if="metadata.logoName || metadata.logoPreview"
+                            v-if="productStore.metadata.logoName || productStore.metadata.logoPreview"
                             @click.stop="removeLogo"
                             class="respected-standard-button respected-gray-border-button respected-form-button"
                         >
                             {{ $t('editor.remove') }}
                         </button>
                     </div>
-                    <p class="break-all" v-if="!editing">{{ metadata.logoName || $t('editor.metadataForm.na') }}</p>
+                    <p class="break-all" v-if="!editing">
+                        {{ productStore.metadata.logoName || $t('editor.metadataForm.na') }}
+                    </p>
                 </div>
                 <!-- Logo Preview -->
-                <div v-if="!!metadata.logoPreview" class="metadata-item">
+                <div v-if="!!productStore.metadata.logoPreview" class="metadata-item">
                     <div class="respected-standard-label">{{ $t('editor.logoPreview') }}:</div>
                     <img
-                        :src="metadata.logoPreview"
-                        v-if="!!metadata.logoPreview && metadata.logoPreview != 'error'"
+                        :src="productStore.metadata.logoPreview"
+                        v-if="!!productStore.metadata.logoPreview && productStore.metadata.logoPreview != 'error'"
                         class="image-preview"
                         :alt="$t('editor.logoPreviewAltText')"
                     />
-                    <p v-if="metadata.logoPreview == 'error'" class="image-preview">
+                    <p v-if="productStore.metadata.logoPreview == 'error'" class="image-preview">
                         {{ $t('editor.image.loadingError') }}
                     </p>
                 </div>
@@ -190,7 +196,7 @@
                 <input
                     type="file"
                     id="logoUpload"
-                    @change="$emit('image-changed', $event, 'logo')"
+                    @change="onFileChange($event, 'logo')"
                     class="respected-standard-input w-1/4"
                     style="display: none"
                 />
@@ -202,7 +208,7 @@
                             type="text"
                             name="logoAltText"
                             id="logoAltText"
-                            :value="metadata.logoAltText"
+                            :value="productStore.metadata.logoAltText"
                             @change="metadataChanged"
                             class="respected-standard-input"
                         />
@@ -210,14 +216,14 @@
                             {{ $t('editor.metadataForm.caption.logoAltText') }}
                         </p>
                     </div>
-                    <p v-if="!editing">{{ metadata.logoAltText || $t('editor.metadataForm.na') }}</p>
+                    <p v-if="!editing">{{ productStore.metadata.logoAltText || $t('editor.metadataForm.na') }}</p>
                 </div>
                 <div class="flex flex-wrap gap-4">
                     <div class="metadata-item">
                         <span class="respected-standard-label">{{ $t('editor.introTitleColour') }}</span>
                         <ColourPickerInput
                             name="titleColour"
-                            :value="metadata.titleColour"
+                            :value="productStore.metadata.titleColour"
                             @change="metadataChanged"
                             :disabled="!editing"
                         />
@@ -226,7 +232,7 @@
                         <span class="respected-standard-label">{{ $t('editor.introSubtitleColour') }}</span>
                         <ColourPickerInput
                             name="subtitleColour"
-                            :value="metadata.subtitleColour"
+                            :value="productStore.metadata.subtitleColour"
                             @change="metadataChanged"
                             :disabled="!editing"
                         />
@@ -258,7 +264,7 @@
                         </div>
                         <ColourPickerInput
                             name="buttonColour"
-                            :value="metadata.buttonColour"
+                            :value="productStore.metadata.buttonColour"
                             @change="metadataChanged"
                             :disabled="!editing"
                         />
@@ -275,8 +281,8 @@
                             <input
                                 type="text"
                                 id="metaIntroBg"
-                                @change="$emit('image-source-changed', $event, 'introBg')"
-                                :value="metadata.introBgName"
+                                @change="onImageSourceInput($event, 'introBg')"
+                                :value="productStore.metadata.introBgName"
                                 class="respected-standard-input lg:w-1/2"
                             />
                             <!-- Upload button -->
@@ -295,7 +301,7 @@
                             </button>
                             <!-- Delete button -->
                             <button
-                                v-if="metadata.introBgName || metadata.introBgPreview"
+                                v-if="productStore.metadata.introBgName || productStore.metadata.introBgPreview"
                                 @click.stop="removeIntroBackground"
                                 class="respected-standard-button respected-gray-border-button respected-form-button"
                             >
@@ -307,18 +313,20 @@
                         </p>
                     </div>
 
-                    <p class="break-all" v-if="!editing">{{ metadata.introBgName || $t('editor.metadataForm.na') }}</p>
+                    <p class="break-all" v-if="!editing">
+                        {{ productStore.metadata.introBgName || $t('editor.metadataForm.na') }}
+                    </p>
                 </div>
                 <!-- Logo Preview -->
-                <div v-if="!!metadata.introBgPreview" class="metadata-item">
+                <div v-if="!!productStore.metadata.introBgPreview" class="metadata-item">
                     <div class="respected-standard-label">{{ $t('editor.introBackgroundPreview') }}:</div>
                     <img
-                        :src="metadata.introBgPreview"
-                        v-if="!!metadata.introBgPreview && metadata.introBgPreview != 'error'"
+                        :src="productStore.metadata.introBgPreview"
+                        v-if="!!productStore.metadata.introBgPreview && productStore.metadata.introBgPreview != 'error'"
                         class="image-preview"
                         :alt="$t('editor.introBackgroundPreview')"
                     />
-                    <p v-if="metadata.introBgPreview == 'error'" class="image-preview">
+                    <p v-if="productStore.metadata.introBgPreview == 'error'" class="image-preview">
                         {{ $t('editor.image.loadingError') }}
                     </p>
                 </div>
@@ -327,7 +335,7 @@
                 <input
                     type="file"
                     id="backgroundUpload"
-                    @change="$emit('image-changed', $event, 'introBg')"
+                    @change="onFileChange($event, 'introBg')"
                     class="respected-standard-input w-1/4"
                     style="display: none"
                 />
@@ -345,7 +353,7 @@
                         type="text"
                         name="contextLink"
                         id="contextLink"
-                        :value="metadata.contextLink"
+                        :value="productStore.metadata.contextLink"
                         @change="metadataChanged"
                         class="respected-standard-input"
                     />
@@ -353,7 +361,9 @@
                         {{ $t('editor.metadataForm.caption.contextLink') }}
                     </p>
                 </div>
-                <p class="break-all" v-if="!editing">{{ metadata.contextLink || $t('editor.metadataForm.na') }}</p>
+                <p class="break-all" v-if="!editing">
+                    {{ productStore.metadata.contextLink || $t('editor.metadataForm.na') }}
+                </p>
             </div>
             <!-- Context label -->
             <div class="metadata-item">
@@ -363,7 +373,7 @@
                         type="text"
                         name="contextLabel"
                         id="contextLabel"
-                        :value="metadata.contextLabel"
+                        :value="productStore.metadata.contextLabel"
                         @change="metadataChanged"
                         class="respected-standard-input"
                     />
@@ -371,7 +381,7 @@
                         {{ $t('editor.metadataForm.caption.contextLabel') }}
                     </p>
                 </div>
-                <p v-if="!editing">{{ metadata.contextLabel || $t('editor.metadataForm.na') }}</p>
+                <p v-if="!editing">{{ productStore.metadata.contextLabel || $t('editor.metadataForm.na') }}</p>
             </div>
             <!-- Date modified -->
             <div class="metadata-item">
@@ -382,11 +392,11 @@
                         type="date"
                         name="dateModified"
                         id="dateModified"
-                        :value="metadata.dateModified"
+                        :value="productStore.metadata.dateModified"
                         @change="metadataChanged"
                     />
                 </div>
-                <p v-if="!editing">{{ metadata.dateModified || $t('editor.metadataForm.na') }}</p>
+                <p v-if="!editing">{{ productStore.metadata.dateModified || $t('editor.metadataForm.na') }}</p>
             </div>
         </section>
     </div>
@@ -396,39 +406,106 @@
 import { MetadataContent } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import ColourPickerInput from '../support/colour-picker-input.vue';
+import { useProductStore } from '@/stores/productStore';
 
 @Options({
     components: {
         ColourPickerInput: ColourPickerInput
-    },
-    emits: ['metadata-changed', 'image-changed', 'image-source-changed', 'background-removed', 'logo-removed']
+    }
 })
 export default class MetadataEditorV extends Vue {
-    @Prop() metadata!: MetadataContent;
     @Prop({ default: true }) editing!: boolean;
+
+    productStore = useProductStore();
 
     openFileSelector(where = 'logoUpload'): void {
         document.getElementById(where)?.click();
     }
 
     metadataChanged(event: Event): void {
-        this.$emit(
-            'metadata-changed',
+        this.productStore.updateMetadata(
             (event.target as HTMLInputElement).name,
             (event.target as HTMLInputElement).value
         );
     }
 
     removeLogo(): void {
-        this.metadata.logoName = '';
-        this.metadata.logoPreview = '';
-        this.$emit('logo-removed');
+        this.productStore.metadata.logoName = '';
+        this.productStore.metadata.logoPreview = '';
+        this.productStore.decrementSourceCount('Logo');
     }
 
     removeIntroBackground(): void {
-        this.metadata.introBgName = '';
-        this.metadata.introBgPreview = '';
-        this.$emit('background-removed');
+        this.productStore.metadata.introBgName = '';
+        this.productStore.metadata.introBgPreview = '';
+        this.productStore.decrementSourceCount('Background');
+    }
+
+    onImageSourceInput(e: InputEvent, src: string): void {
+        const isImgUrl = (url: string) => {
+            const img = new Image();
+            img.src = url;
+            return new Promise((resolve) => {
+                img.onerror = () => resolve(false);
+                img.onload = () => resolve(true);
+            });
+        };
+
+        switch (src) {
+            case 'logo':
+                this.productStore.metadata.logoName = (e.target as HTMLInputElement).value;
+
+                isImgUrl(this.productStore.metadata.logoName).then((res) => {
+                    if (res) {
+                        this.productStore.metadata.logoPreview = this.productStore.metadata.logoName;
+                        Message.success(this.$t('editor.editMetadata.message.imageSuccessfulLoad'));
+                    } else {
+                        this.productStore.metadata.logoPreview = 'error';
+                        Message.error(this.$t('editor.editMetadata.message.error.imageFailedLoad'));
+                    }
+                });
+
+                break;
+            case 'introBg':
+                this.productStore.metadata.introBgName = (e.target as HTMLInputElement).value;
+
+                isImgUrl(this.productStore.metadata.introBgName).then((res) => {
+                    if (res) {
+                        this.productStore.metadata.introBgPreview = this.productStore.metadata.introBgName;
+                        Message.success(this.$t('editor.editMetadata.message.imageSuccessfulLoad'));
+                    } else {
+                        this.productStore.metadata.introBgPreview = 'error';
+                        Message.error(this.$t('editor.editMetadata.message.error.imageFailedLoad'));
+                    }
+                });
+                break;
+            default:
+                console.error('onImageSourceInput received invalid source.');
+        }
+    }
+
+    onFileChange(e: Event, src: string): void {
+        // Retrieve the uploaded file.
+        const uploadedFile = ((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+
+        switch (src) {
+            case 'logo':
+                this.productStore.logoImage = uploadedFile;
+
+                // Generate an image preview.
+                this.productStore.metadata.logoPreview = URL.createObjectURL(uploadedFile);
+                this.productStore.metadata.logoName = uploadedFile.name;
+                break;
+            case 'introBg':
+                this.productStore.introBgImage = uploadedFile;
+
+                // Generate an image preview.
+                this.productStore.metadata.introBgPreview = URL.createObjectURL(uploadedFile);
+                this.productStore.metadata.introBgName = uploadedFile.name;
+                break;
+            default:
+                console.error('onFileChange received invalid source.');
+        }
     }
 }
 </script>

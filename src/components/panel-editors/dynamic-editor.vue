@@ -442,7 +442,7 @@ export default class DynamicEditorV extends Vue {
         if (
             this.editingSlide !== -1 &&
             this.$refs.slide !== undefined &&
-            typeof (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges === 'function'
+            typeof (this.$refs.slide as ImageEditorV | ChartEditorV)?.saveChanges === 'function'
         ) {
             (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges();
         }
