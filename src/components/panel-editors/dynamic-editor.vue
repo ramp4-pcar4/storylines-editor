@@ -200,7 +200,12 @@
                                 <select
                                     v-model="newSlideType"
                                     class="respected-standard-select"
-                                    style="width: 80% !important; text-align-last: left !important; text-align: start !important; justify-self: start !important;"
+                                    style="
+                                        width: 80% !important;
+                                        text-align-last: left !important;
+                                        text-align: start !important;
+                                        justify-self: start !important;
+                                    "
                                 >
                                     <option v-for="thing in Object.keys(editors)" :key="thing">
                                         {{ thing }}
@@ -434,10 +439,14 @@ export default class DynamicEditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('dynamicEditor - saveChanges()');
+        console.log('slide ref');
+        console.log(this.$refs.slide);
         if (
             this.editingSlide !== -1 &&
             this.$refs.slide !== undefined &&
-            typeof (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges === 'function'
+            typeof (this.$refs.slide as ImageEditorV | ChartEditorV)?.saveChanges === 'function'
         ) {
             (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges();
         }

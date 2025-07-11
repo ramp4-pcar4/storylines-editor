@@ -95,7 +95,7 @@
                         <input
                             type="text"
                             id="slideTitle"
-                            v-model="currentSlide.title"
+                            v-model="editorStore.currentSlide.title"
                             :placeholder="$t('editor.slides.addSlideTitle')"
                             class="respected-standard-input w-full lg:w-2/3"
                         />
@@ -139,7 +139,7 @@
             <div
                 class="flex gap-3 border-b pl-2"
                 style="border-color: rgba(209, 213, 219, 1)"
-                v-if="currentSlide.panel.length === 2"
+                v-if="currentSlide.panel?.length === 2"
             >
                 <!-- Left panel -->
                 <button
@@ -450,16 +450,15 @@
                 </div>
                 <custom-editor
                     ref="editor"
-                    :config="currentSlide"
                     @slide-edit="$emit('slide-edit')"
                     @config-edited="
-                        (slideConfig: Slide, save: boolean = false) => {
-                            $emit('custom-slide-updated', slideConfig, save, lang);
+                        (save: boolean = false) => {
+                            $emit('custom-slide-updated', save, lang);
                         }
                     "
                     @title-edit="
-                        (title: string) => {
-                            $emit('custom-slide-updated', { ...currentSlide, title }, false, lang);
+                        () => {
+                            $emit('custom-slide-updated', false, lang);
                         }
                     "
                     v-if="advancedEditorView"
@@ -491,12 +490,12 @@
             "
             :message="$t('editor.slides.changePanelType.message')"
             @ok="
-                determineEditorType(currentSlide.panel[panelIndex]) === 'map' &&
-                (currentSlide.panel[panelIndex] as MapPanel).shared
+                determineEditorType(editorStore.currentSlide.panel[panelIndex]) === 'map' &&
+                (editorStore.currentSlide.panel[panelIndex] as MapPanel).shared
                     ? $emit('slide-change-shared-map', { index: panelIndex, lang: langTranslate })
                     : '';
 
-                changePanelType(determineEditorType(currentSlide.panel[panelIndex]), newType);
+                changePanelType(determineEditorType(editorStore.currentSlide.panel[panelIndex]), newType);
                 toggleCenterPanel();
                 toggleCenterSlide();
             "
@@ -524,6 +523,7 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
 import ActionModal from '@/components/support/action-modal.vue';
 import MultiOptionModal from '@/components/support/multi-option-modal.vue';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
@@ -555,6 +555,7 @@ import DynamicEditorV from './panel-editors/dynamic-editor.vue';
 import { toRaw } from 'vue';
 
 import { useProductStore } from '@/stores/productStore';
+import { useEditorStore } from '@/stores/editorStore';
 
 @Options({
     components: {
@@ -573,7 +574,6 @@ import { useProductStore } from '@/stores/productStore';
 })
 export default class SlideEditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    @Prop() currentSlide!: Slide;
     @Prop() lang!: string;
     @Prop() uid!: string;
     @Prop() slideIndex!: number;
@@ -581,6 +581,7 @@ export default class SlideEditorV extends Vue {
     @Prop() otherLangSlide!: Slide;
 
     productStore = useProductStore();
+    editorStore = useEditorStore();
 
     panelIndex = 0;
     advancedEditorView = false;
@@ -590,9 +591,7 @@ export default class SlideEditorV extends Vue {
     centerPanel = false;
     includeInToc = true;
     dynamicSelected = false;
-
     currentRoute = window.location.href;
-
     langTranslate = '';
 
     editors: Record<string, string> = {
@@ -606,13 +605,17 @@ export default class SlideEditorV extends Vue {
         dynamic: 'dynamic-editor'
     };
 
+    currentSlide = computed(() => this.editorStore.currentSlide);
+
     mounted() {
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
     }
 
     @Watch('currentSlide', { deep: true })
     onSlideChange(): void {
-        if (this.currentSlide) {
+        console.log(' ');
+        console.log('slide editor - onSlideChange');
+        if (this.currentSlide && this.currentSlide.panel) {
             this.onePanelOnly = this.currentSlide.panel.length === 1;
             this.langTranslate = this.$t(`editor.lang.${this.lang}`);
             this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
@@ -703,6 +706,8 @@ export default class SlideEditorV extends Vue {
     }
 
     saveChanges(): void {
+        console.log(' ');
+        console.log('slideEditor - saveChanges');
         if (
             this.$refs.editor != null &&
             typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV | TextEditorV)
