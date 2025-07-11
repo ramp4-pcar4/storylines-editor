@@ -46,7 +46,7 @@
             </div>
         </div>
         <json-editor
-            v-model="updatedConfig"
+            v-model="config"
             lang="en"
             :mode="'text'"
             :show-btns="false"
@@ -63,9 +63,12 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
+
+import { useEditorStore } from '@/stores/editorStore';
 
 @Options({
     components: {
@@ -73,11 +76,10 @@ import { Validator } from 'jsonschema';
     }
 })
 export default class CustomEditorV extends Vue {
-    @Prop() config!: string;
+    editorStore = useEditorStore();
+    config = computed(() => this.editorStore.currentSlide);
 
-    updatedConfig = '';
     edited = false;
-
     jsonError = '';
     validator: Validator = new Validator();
     validatorErrors: any = [];
@@ -85,13 +87,9 @@ export default class CustomEditorV extends Vue {
 
     storylinesSchema: Record<string, any> = {};
 
-    @Watch('config', { immediate: true, deep: true })
-    onConfigChanged(newConfig: any) {
-        this.updatedConfig = JSON.parse(JSON.stringify(newConfig));
-        // this.validate();
-    }
-
     mounted(): void {
+        console.log(' ');
+        console.log('mounted');
         import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
             this.storylinesSchema = {
                 ...StorylinesSchema.$defs.slide,
@@ -99,7 +97,6 @@ export default class CustomEditorV extends Vue {
                 additionalProperties: StorylinesSchema.additionalProperties
             };
 
-            this.updatedConfig = this.config;
             this.validate();
         });
 
@@ -115,7 +112,7 @@ export default class CustomEditorV extends Vue {
     // returns true if no validation errors, false if errors
     validate(validateJson?: any): boolean {
         // TODO: add any missing properties in schema as required (e.g. chart options)
-        const checkConfig = validateJson ?? this.updatedConfig;
+        const checkConfig = validateJson ?? this.config;
 
         const checkValidation = this.validator.validate(checkConfig, this.storylinesSchema as any);
         this.validatorErrors = checkValidation.errors;
@@ -127,22 +124,29 @@ export default class CustomEditorV extends Vue {
     }
 
     onJsonChange(json: any): void {
+        console.log(' ');
+        console.log('onJSONChange');
         this.jsonError = '';
         const valid = this.validate(json);
+        this.edited = true;
+        console.log('slide-edit emitted');
+        this.$emit('slide-edit');
+        console.log('title-edit');
         this.$emit('title-edit', json.title);
 
         // if there are no validation errors update the slide config
         if (valid) {
             // json editor library does not contain 2-way v-model binding so need to set manually
-            this.updatedConfig = json;
+            this.editorStore.currentSlide = json;
             this.edited = true;
             this.$emit('slide-edit');
-            this.$emit('config-edited', this.updatedConfig);
+            this.$emit('config-edited');
         }
     }
 
     saveChanges(): void {
-        this.$emit('config-edited', this.updatedConfig);
+        console.log('  ');
+        console.log('custom-editor: saveChanges');
         this.edited = false;
 
         // If the user saves or leaves the advanced editor page with errors, give them a warning.

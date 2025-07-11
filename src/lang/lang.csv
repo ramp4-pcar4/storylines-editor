@@ -163,6 +163,7 @@ editor.export.error,Export failed,1,Échec de l'exportation,1
 editor.rename,Rename,1,Rename,0
 editor.openSidebar,Open sidebar,1,Ouvrir la barre latérale,0
 editor.leaveEditor,Leave Editor,1,Quitter l'éditeur,0
+editor.leaveWarning,Leave the page? Changes made may not be saved.,1,Sortir de la page ? Les modifications apportées pourraient ne pas être enregistrées.,0
 editor.loadPrevious,Load Previous,1,Charger le précédent,0
 editor.viewHistory,View Previous,1,Voir précédent,0
 editor.browse,Browse,1,Parcourir,1
