@@ -232,7 +232,7 @@ export default class SlideTocV extends Vue {
         }</p>`;
     }
 
-    isMissingConfig(): void {
+    isMissingConfig(): boolean {
         return !this.element[this.selectedLang] || !this.element[this.selectedLang].panel;
     }
 

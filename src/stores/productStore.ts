@@ -22,7 +22,7 @@ import type {
 } from '@/definitions';
 import { PanelType } from '@/definitions';
 
-import { useStateStore } from './stateStore';
+import { Save, useStateStore } from './stateStore';
 import { useUserStore } from './userStore';
 import { useLockStore } from './lockStore';
 import { useEditorStore } from './editorStore';
@@ -42,7 +42,6 @@ interface ProductState {
     temporaryMetadataCopy: MetadataContent;
     uuid: string;
     user: string;
-    i18n: any;
     logoImage: undefined | File;
     introBgImage: undefined | File;
     apiUrl: string;
@@ -704,7 +703,7 @@ export const useProductStore = defineStore('product', {
         /**
          * Helper for generateConfig(). Calls the /upload endpoing to upload the product to the server
          */
-        uploadProductData(formData, headers): Promsie<void> {
+        uploadProductData(formData, headers): Promise<void> {
             const editorStore = useEditorStore();
             const lockStore = useLockStore();
 
@@ -1177,8 +1176,6 @@ export const useProductStore = defineStore('product', {
          * Generates a new product file for brand new products.
          */
         generateNewConfig(): Promise<void> {
-            console.log(' ');
-            console.log('generateNewConfig()');
             const editorStore = useEditorStore();
 
             const configLang = editorStore.configLang;

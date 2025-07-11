@@ -800,7 +800,7 @@ export default class EditorV extends Vue {
         }
 
         setTimeout(() => {
-            if (index === -1 || !this.loadSlides || !this.loadSlides[index] || !this.loadSlides[index][newLang].panel) {
+            if (index === -1 || !this.loadSlides || !this.loadSlides[index] || !this.loadSlides[index]?.[newLang]?.panel) {
                 this.editorStore.currentSlide = '';
             } else {
                 const selectedLang = newLang as keyof MultiLanguageSlide;
