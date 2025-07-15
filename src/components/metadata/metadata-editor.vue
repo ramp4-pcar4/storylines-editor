@@ -32,7 +32,9 @@
                         v-if="!currentRoute.includes('index-ca')"
                         :to="{
                             name: editExisting ? 'metadataExisting' : 'metadataNew',
-                            params: { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
+                            params: editExisting
+                                ? { lang: currLang === 'en' ? 'fr' : 'en', uid: uuid }
+                                : { lang: currLang === 'en' ? 'fr' : 'en' }
                         }"
                     >
                         <div class="respected-standard-link-button">
@@ -650,7 +652,7 @@ import { Save, useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
-import { throttle } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce';
 import {
     ConfigFileStructure,
     MetadataContent,
@@ -2128,60 +2130,77 @@ export default class MetadataEditorV extends Vue {
         this.loadConfig(this.productStore.configs[this.productStore.configLang]);
     }
 
-    checkUuid = throttle(300, (rename?: boolean): void => {
+    /**
+     * Checks if the UUID is invalid due to being blank or containing illegal characters.
+     */
+    isUuidInvalid(rename: boolean): 'blank' | 'badChar' | null {
+        if (!rename && !this.uuid && !this.loadExisting) {
+            return 'blank';
+        }
+
+        // All reserved characters in URLs. The user can't use these for their UUID
+        const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
+        const illegalCharsContained = illegalChars.filter((badChar) =>
+            (rename ? this.changeUuid : this.uuid).includes(badChar)
+        );
+
+        if (illegalCharsContained.length) {
+            return 'badChar';
+        }
+
+        return null;
+    }
+
+    checkUuid(rename?: boolean): void {
         if (rename || !this.loadExisting) this.checkingUuid = true;
 
         if (!this.loadExisting || rename) {
-            // All reserved characters in URLs. The user can't use these for their UUID
-            const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
-            const illegalCharsContained = illegalChars.filter((badChar) =>
-                (rename ? this.changeUuid : this.uuid).includes(badChar)
-            );
-
-            if (illegalCharsContained.length) {
+            const errorType = this.isUuidInvalid(!!rename);
+            if (errorType) {
                 this.error = true;
-                this.warning = 'badChar';
+                this.warning = errorType;
                 this.checkingUuid = false;
                 return;
             }
 
-            if (!rename && !this.uuid) {
-                if (!this.loadExisting) {
-                    this.error = true;
-                    this.warning = 'blank';
-                }
-                this.checkingUuid = false;
-                return;
-            }
-
-            // If renaming, show the loading spinner while we check whether the UUID is taken.
-            fetch(this.apiUrl + `/check/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
-                if (res.status !== 404) {
-                    this.warning = rename ? 'rename' : 'uuid';
-
-                    if (!this.loadExisting) {
-                        this.error = true;
-                    }
-                }
-
-                if (rename || !this.loadExisting) this.checkingUuid = false;
-
-                fetch(this.apiUrl + `/retrieveMessages`)
-                    .then((res: any) => {
-                        if (res.ok) return res.json();
-                    })
-                    .then((data) => {
-                        axios
-                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
-                                messages: data.messages
-                            })
-                            .catch((error: any) => console.log(error.response || error));
-                    })
-                    .catch((error: any) => console.log(error.response || error));
-            });
+            this.fetchUuidCheck(!!rename);
         }
         this.warning = 'none';
         this.highlightedIndex = -1;
+    }
+
+    /**
+     * Debounce the fetch call to help prevent console spamming.
+     */
+    fetchUuidCheck = debounce(600, (rename: boolean) => {
+        if (this.isUuidInvalid(rename)) {
+            return;
+        }
+        // If renaming, show the loading spinner while we check whether the UUID is taken.
+        fetch(this.apiUrl + `/check/${rename ? this.changeUuid : this.uuid}`).then((res: Response) => {
+            if (res.status !== 404) {
+                this.warning = rename ? 'rename' : 'uuid';
+
+                if (!this.loadExisting) {
+                    this.error = true;
+                }
+            }
+
+            if (rename || !this.loadExisting) this.checkingUuid = false;
+
+            fetch(this.apiUrl + `/retrieveMessages`)
+                .then((res: any) => {
+                    if (res.ok) return res.json();
+                })
+                .then((data) => {
+                    axios
+                        .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
+                            messages: data.messages
+                        })
+                        .catch((error: any) => console.log(error.response || error));
+                })
+                .catch((error: any) => console.log(error.response || error));
+        });
     });
 
     /**
