@@ -99,6 +99,7 @@ export default class MapEditorV extends Vue {
 
     // config editor
     rampEditorApi: any = '';
+    currLang = 'en';
 
     // For creating new files.
     newFileName = '';
@@ -111,6 +112,7 @@ export default class MapEditorV extends Vue {
     strippedFileName = '';
 
     mounted(): void {
+        this.currLang = (this.$route.params.lang as string) || 'en';
         this.usingTimeSlider = !!this.panel.timeSlider;
         this.status = this.panel.config !== '' ? 'default' : 'creating';
         this.strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[2].split('.')[0] : '';
@@ -175,6 +177,7 @@ export default class MapEditorV extends Vue {
                 configFile.async('string').then((res: string) => {
                     const conf = JSON.parse(res);
                     this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
+                    this.rampEditorApi.setLanguage(this.currLang);
                 });
             } else {
                 // If it does not exist in the ZIP folder, try and fetch from server.
@@ -183,6 +186,7 @@ export default class MapEditorV extends Vue {
                         let stringResponse = JSON.stringify(res);
                         const conf = JSON.parse(stringResponse);
                         this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
+                        this.rampEditorApi.setLanguage(this.currLang);
                     });
                 });
             }
