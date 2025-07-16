@@ -8,9 +8,9 @@ story.window.title,RAMP Storylines,1,Scénarios de la PCAR,1
 story.date,Date modified:,1,Date de modification:,1
 story.error,An error occurred while loading this Storylines product. See developer console for more information.,1,Une erreur est survenue pendant le chargement ce scénarios produit. Voir la console du promoteur pour obtenir de plus amples renseignements.,1
 image.fullscreen,Full Screen,1,Plein Écran,1
-audio.transcript.show,View Transcript,1,Afficher la transcription,0
-audio.transcript.hide,Hide Transcript,1,Cacher la transcription,0
-audio.transcript.none,No transcript available,1,Aucune transcription disponible,0
+audio.transcript.show,View Transcript,1,Voir la transcription,1
+audio.transcript.hide,Hide Transcript,1,Masquer la transcription,1
+audio.transcript.none,No transcript available,1,Aucune transcription disponible,1
 dynamic.back,Back,1,Retour,0
 dynamic.textSection,Text Section,1,Section de texte,1
 dynamic.panel.collection,Panel Collection,1,Collection de panneaux,1
@@ -39,12 +39,12 @@ editor.window.title,RAMP Storylines Editor,1,Éditeur de scénarios de la PCAR,1
 editor.configOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,Êtes-vous sûr de vouloir remplacer le produit « {uuid} » ?,0
 editor.createProduct,Create New Storylines Product,1,Créer un nouveau produit de scénarios,1
 editor.loadProduct,Load Existing Storylines Product,1,Charger un produit Storylines existant,0
-editor.adminUpload,Upload Product Zip,1,Télécharger le fichier zip du produit,0
+editor.adminUpload,Upload Product Zip,1,Télécharger le produit,0
 editor.adminUpload.successfulUpload,Successfully uploaded product to the server,1,Le produit a été téléchargé avec succès sur le serveur,0
 editor.adminUpload.missingInput,Need to provide both a UUID and zip file. Try again,1,Vous devez fournir à la fois un UUID et un fichier zip. Essayer de nouveau,0
-editor.adminUpload.incorrectType,Only zip files are allowed. Try again,1,Seuls les fichiers zip sont autorisés. Essayer de nouveau,0
+editor.adminUpload.incorrectType,Only zip files are allowed. Try again,1,Le dossier téléchargé ne correspond pas à la structure du produit.,0
 editor.adminUpload.oneFileOnly,You are only allowed to upload one file. The first of the files you uploaded has been chosen.,1,Vous n'êtes autorisé à télécharger qu'un seul fichier. Le premier des fichiers que vous avez téléchargés a été choisi.,0
-editor.adminUpload.fileName,Name of file uploaded,1,Nom du fichier téléchargé,0
+editor.adminUpload.fileName,Name of file uploaded,1,Nom du dossier téléchargé,0
 editor.adminUpload.zipFileInfo,"A zipped product folder can be obtained by navigating to a product folder, highlighting all of it's contents, right clicking and then compressing to a zip file.",0,"Un dossier de produit zippé peut être obtenu en naviguant vers un dossier de produit, en mettant en surbrillance tout son contenu, en cliquant avec le bouton droit de la souris, puis en le compressant dans un fichier zip.",0
 editor.chooseOption,What would you like to do?,1,Qu'aimeriez-vous faire?,0
 editor.dashboard,Dashboard,1,Tableau de bord,0
@@ -88,7 +88,7 @@ editor.metadataForm.caption.logoAltText,"For accessibility purposes, provide des
 editor.metadataForm.caption.introBackground,"The background image is displayed on the first slide of the storyline product, behind the intro title and subtitle.",1,"L'image d'arrière-plan est affichée sur la première diapositive du produit scénarisé, derrière le titre et le sous-titre de l'introduction.",1
 editor.metadataForm.caption.contextLink,"Context link shows up at the bottom of the page to provide additional resources for interested users.",1,"Le lien contextuel apparaît au bas de la page pour fournir des ressources supplémentaires aux utilisateurs intéressés.",0
 editor.metadataForm.caption.contextLabel,"Context label shows up as text. When users click the context link, the linked site appears in a new tab for the user.",1,"L'étiquette de contexte s'affiche sous forme de texte. Lorsque les utilisateurs cliquent sur le lien contextuel, le site lié apparaît dans un nouvel onglet pour l'utilisateur.",0
-editor.metadataForm.layoutAndNav.heading,Layout and Navigation,1,Mise en page et Navigation,0
+editor.metadataForm.layoutAndNav.heading,Layout and Navigation,1,Mise en page et navigation,1
 editor.metadataForm.introPage.heading,Introduction page details,1,Détails de la page d'introduction,0
 editor.metadataForm.introPage.explanation,"The introduction page of the storylines product is displayed to users at the beginning of the storyline product, before any content slides.",1,"La page d'introduction du produit Storylines est affichée aux utilisateurs au début du produit Storylines, avant toute diapositive de contenu.",0
 editor.metadataForm.endOfPage.heading,End of page information,1,Informations de fin de page,0
@@ -121,7 +121,7 @@ editor.warning.renameFailed,Failed to rename product.,1,Échec du renommage du p
 editor.warning.badChar,"Illegal character entered. You cannot use these characters in your UUID: {': / # ? & @ % +'}",1,"Caractère illégal saisi. Vous ne pouvez pas utiliser ces caractères dans votre UUID: {': / # ? & @ % +'}",0
 editor.changeUuid,Click here to change UUID,1,Cliquez ici pour changer,0
 editor.title,Title,1,Titre,1
-editor.respectTitle,RAMP-Enhanced Storylines Product Editor & Creation Tool,1,Éditeur de produits et outil de création de scénarios améliorés par RAMP,0
+editor.respectTitle,RAMP - Enhanced Storylines Product Editor & Creation Tool,1,PCAR - Outil de création et d'édition de scénarios amélioré,1
 editor.logo,Logo,1,Logo,1
 editor.logoPreview,Logo preview,1,Aperçu du logo,1
 editor.logoPreviewAltText,Preview of product logo,1,Aperçu du logo du produit,0
@@ -168,9 +168,9 @@ editor.confirmOverwrite,Are you sure you want to overwrite product '{uuid}'?,1,A
 editor.resetChanges,Reset Changes,1,Annuler,1
 editor.refreshChanges.modal,"Are you sure you want to reload the product? All unsaved changes will be lost.",1,"Voulez-vous vraiment recharger ce produit? Toute modification non enregistrée sera perdue.",1
 editor.changeLang.modal,"Are you sure you want to switch languages? Unsaved changes may be lost.",1,"Voulez-vous vraiment changer de langue? Toute modification non enregistrée sera perdue.",1
-editor.wetDashboard.title,WET Component Dashboard,1,Tableau de bord des composants WET,0
-editor.wetDashboard.info,"Please check the <a class='font-bold alert-link' target='_NEW' href='https://wet-boew.github.io/wet-boew-styleguide/index-en.html'>WET design documentation</a> to ensure that you are following the specified accessibility guidelines.",1,"Veuillez consulter la <a class='font-bold alert-link' target='_NEW' href='https://wet-boew.github.io/wet-boew-styleguide/index-fr.html'>documentation de conception WET</a> pour vous assurer que vous suivez les directives d'accessibilité spécifiées.",0
-editor.enterText,Enter Text,1,Entrez le texte,0
+editor.wetDashboard.title,WET Component Dashboard,1,Tableau de bord des composants humides,1
+editor.wetDashboard.info,"Please check the <a class='font-bold alert-link' target='_NEW' href='https://wet-boew.github.io/wet-boew-styleguide/index-en.html'>WET design documentation</a> to ensure that you are following the specified accessibility guidelines.",1,"« Veuillez consulter la <a class='font-bold alert-link' target='_NEW' href='https://wet-boew.github.io/wet-boew-styleguide/index-fr.html'>la documentation relative à la conception WET</a> afin de vous assurer que vous respectez les directives d'accessibilité spécifiées. »",1
+editor.enterText,Enter Text,1,Entrer le texte,1
 editor.frenchConfig,View French Config,1,Afficher la configuration en français,1
 editor.englishConfig,View English Config,1,Afficher la configuration en anglais,1
 editor.returnToLanding,Return to Landing,1,Retour à la page d’accueil,1
@@ -202,8 +202,8 @@ editor.chart.label.create,Add new chart,1,Ajouter un nouveau graphique,1
 editor.chart.label.info,Interactive chart,1,Graphique interactif,0
 editor.chart.label.nameExists,There is already an existing chart with the name {name}.,1,Il existe déjà un graphique portant le nom {name}.,0
 editor.chart.label.info,Interactive charts ({num}),1,Graphiques interactifs ({num}),1
-editor.chart.delete.confirm.header,Confirm chart deletion,1,Confirmer la suppression du graphique,0
-editor.chart.label.newTitle,New Chart {num},1,Nouveau graphique {num},0
+editor.chart.delete.confirm.header,Confirm chart deletion,1,Confirmer la suppression du graphique,1
+editor.chart.label.newTitle,New Chart {num},1,Nouveau graphique {num},1
 editor.chart.delete.confirm,Are you sure you want to delete the chart {name}?,1,Voulez-vous vraiment supprimer le graphique {nom}?,1
 editor.map.title,Map title,1,Titre de la carte,1
 editor.map.edit.cancel,Cancel editing,1,Annuler les modifications,1
@@ -257,7 +257,7 @@ editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
-editor.slides.toc.closeToC,Close table of content sidebar,1,Fermer la barre latérale de la table des matières,0
+editor.slides.toc.closeToC,Close table of content sidebar,1,Fermer la barre latérale du sommaire,1
 editor.slides.toc.noSlides,No Slides,1,Pas de diapositives,0
 editor.slides.toc.selectNewSlideMessage,Select 'New Blank Slide' to add your first slide.,1,Sélectionnez « Nouvelle diapositive vierge » pour ajouter votre première diapositive.,0
 editor.slides.toc.dropdownTooltip,Options,1,Options,0
@@ -291,7 +291,7 @@ editor.slides.fullscreenPanel,Fullscreen panel,1,Panneau plein écran,1
 editor.slides.slideTitle,Slide title,1,Titre de la diapositive,0
 editor.slides.addSlideTitle,Add a title,1,Ajoutez un titre,0
 editor.slides.advanced,Advanced,1,Avancé,0
-editor.slides.advanced.editor,JSON configuration editor,1,Éditeur de configuration JSON,0
+editor.slides.advanced.editor,JSON configuration editor,1,Éditeur de configuration JSON,1
 editor.slides.advanced.good,Configuration adheres to Storylines schema.,1,La configuration adhère au schéma Storylines.,0
 editor.slides.advanced.broken,This configuration violates the Storylines schema.,1,Cette configuration viole le schéma Storylines.,0
 editor.slides.advanced.details,Click here for more details.,1,Cliquez ici pour plus de détails.,0
@@ -304,7 +304,7 @@ editor.slides.select,Please select a slide to edit,1,Veuillez sélectionner une 
 editor.slides.panelNumber,Panel {num},1,Panneau {num},0
 editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
-editor.slides.panel.textEntry,Panel text entry,1,Saisie de texte du panneau,0
+editor.slides.panel.textEntry,Panel text entry,1,Saisie de texte dans le panneau,1
 editor.slide.panel.type.text,Text,1,Texte,1
 editor.slide.panel.type.image,Image,1,Image,1
 editor.slide.panel.type.slideshow,Slideshow,1,Diaporama,1
@@ -327,9 +327,10 @@ editor.tocOrientation.info,The table of contents orientation will be set to vert
 editor.tocOrientation.vertical,Vertical,1,Verticale,0
 editor.tocOrientation.horizontal,Horizontal,1,Horizontale,0
 editor.returnTop,Include return to top navigation,1,Inclure le retour en haut de la navigation,0
-editor.sameConfig,Same across configurations,1,Idem dans toutes les configurations,0
-editor.sameConfig.info,Determines whether the table of contents orientation and return-to-top navigation are shared across English and French configurations.,1,Détermine si l'orientation de la table des matières et la navigation de retour en haut sont partagées entre les configurations anglaise et française.,0
-editor.sameConfig.tooltip,Navigation and layout settings are currently synchronized. They can be customized per language on the next page in the metadata editor.,1,Les paramètres de navigation et de mise en page sont actuellement synchronisés. Ils peuvent être personnalisés par langue sur la page suivante de l'éditeur de métadonnées.,0
+editor.sameConfig,Same across configurations,1,Identique dans toutes les configurations,1
+editor.sameConfig.info,Determines whether the table of contents orientation and return-to-top navigation are shared across English and French configurations.,1,Détermine si l'orientation de la table des matières et la navigation de retour en haut de page sont communes aux configurations anglaise 
+et française.,1
+editor.sameConfig.tooltip,Navigation and layout settings are currently synchronized. They can be customized per language on the next page in the metadata editor.,1,Les paramètres de navigation et de mise en page sont actuellement synchronisés. Ils peuvent être personnalisés par langue à la page suivante dans l'éditeur de métadonnées.,1
 editor.landing.greeting,Hello,1,Bonjour,1
 editor.month.january,January,1,Janvier,0
 editor.month.february,February,1,Février,0
