@@ -44,7 +44,6 @@
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { VueFinalModal } from 'vue-final-modal';
-// import { Options } from 'vue-property-decorator';
 
 interface modalOption {
     label: string;
@@ -77,6 +76,7 @@ export default class MetadataEditorV extends Vue {
     max-width: 90%;
     border-radius: 0.75rem /* 12px */;
 }
+
 h2 {
     line-height: 1.3;
     border-bottom: 0px;

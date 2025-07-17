@@ -76,13 +76,16 @@ function purgeFalses(obj: any): any {
         return obj.map((item) => purgeFalses(item));
     }
 
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-        // We don't want to delete a prop if it has a value, or if it's a required prop
-        if ((value !== null && value !== undefined && value) || REQUIRED_PROPS.includes(key)) {
-            acc[key] = typeof value === 'object' ? purgeFalses(value) : value;
-        }
-        return acc;
-    }, {} as Record<string, any>);
+    return Object.entries(obj).reduce(
+        (acc, [key, value]) => {
+            // We don't want to delete a prop if it has a value, or if it's a required prop
+            if ((value !== null && value !== undefined && value) || REQUIRED_PROPS.includes(key)) {
+                acc[key] = typeof value === 'object' ? purgeFalses(value) : value;
+            }
+            return acc;
+        },
+        {} as Record<string, any>
+    );
 }
 
 const deepMerge = deepmerge({ all: true, mergeArray: replaceByClonedSource });
@@ -329,7 +332,12 @@ export const useStateStore = defineStore('state', {
             let newSave = JSON.parse(JSON.stringify(this.latestSavedState));
 
             // TODO: CHECK IF THIS ACTUALLY WORKS
-            newSave = deepMerge(newSave, changesToAdd.added, changesToAdd.deleted, changesToAdd.updated);
+            newSave = deepMerge(
+                newSave,
+                (changesToAdd as DetailedDiff).added,
+                (changesToAdd as DetailedDiff).deleted,
+                (changesToAdd as DetailedDiff).updated
+            );
 
             return newSave;
         },

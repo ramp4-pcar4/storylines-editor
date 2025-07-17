@@ -202,14 +202,14 @@ export default class ImageEditorV extends Vue {
 
     mounted(): void {
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
-        
+
         // This basically allows us to access the image(s) using one consistent variable instead of needing to check panel type.
         const images =
             this.panel.type === PanelType.SlideshowImage
                 ? (this.panel.items as Array<ImagePanel>)
                 : this.panel.src
-                ? [this.panel]
-                : [];
+                  ? [this.panel]
+                  : [];
 
         if (images !== undefined && images.length) {
             // Set images as loading until they are all loaded and resolve.
@@ -234,7 +234,7 @@ export default class ImageEditorV extends Vue {
                             return {
                                 ...image,
                                 id: image.src,
-                                src: URL.createObjectURL(assetFile)
+                                src: URL.createObjectURL(assetFile as Blob)
                             } as ImageFile;
                         })
                     );
@@ -296,10 +296,7 @@ export default class ImageEditorV extends Vue {
     deleteImage(img: ImageFile): void {
         const idx = this.imagePreviews.findIndex((file: ImageFile) => file.id === img.id);
         if (idx !== -1) {
-            const assetFolder = this.imagePreviews[idx].id.split('/')[2];
             const assetSource = this.imagePreviews[idx].id;
-            const assetRelativePath = this.imagePreviews[idx].id.split('/').slice(3).join('/');
-
             // Remove the image from the product ZIP file.
             this.productStore.decrementSourceCount(assetSource);
             if (!this.productStore.sourceExists(assetSource)) {
@@ -315,7 +312,6 @@ export default class ImageEditorV extends Vue {
         if (this.edited) {
             // Delete the existing properties so we can rebuild the object.
             Object.keys(this.panel).forEach((key) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 delete this.panel[key];
             });
@@ -335,7 +331,6 @@ export default class ImageEditorV extends Vue {
                 Object.keys(imageFile).forEach((key) => {
                     if (key === 'id') return; // we don't need this one.
 
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     (this.panel as ImagePanel)[key] = imageFile[key];
                 });

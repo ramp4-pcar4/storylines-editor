@@ -62,7 +62,6 @@ class FocusContainerManager {
         this.element.tabIndex = 0;
         this.disableTabbing();
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const focusManager = this;
 
@@ -84,7 +83,6 @@ class FocusContainerManager {
      * Removes all of the event listeners on the container element.
      */
     removeEventListeners() {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const focusManager = this;
         this.element.removeEventListener('keypress', function (event: KeyboardEvent) {
@@ -158,7 +156,6 @@ class FocusContainerManager {
      * @return {HTMLElement} the first valid element
      */
     enableTabbing() {
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         let first_tabbable_item: any = undefined;
         Array.prototype.map.call(this.element.querySelectorAll(TABBABLE_TAGS), (el) => {
             // !!el.offsetParent means it is visible

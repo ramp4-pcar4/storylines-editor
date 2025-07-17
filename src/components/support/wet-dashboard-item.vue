@@ -36,7 +36,7 @@ export default class WETDashboardItemV extends Vue {
             const content = selected || this.$t('editor.enterText');
 
             // Scroll back up to the text editor so the user can see that the component has been added.
-            this.editor.$el.parentElement.scrollIntoView({
+            (this.editor as any).$el.parentElement.scrollIntoView({
                 block: 'start',
                 behavior: 'smooth'
             });
