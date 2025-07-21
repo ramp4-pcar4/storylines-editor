@@ -188,16 +188,7 @@ export default class ChartEditorV extends Vue {
 
         // fetch single existing chart config from ZIP
         if (this.panel.type === PanelType.Chart && this.panel.src) {
-            const chartSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
-            const highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
-            if (highchartsJson) {
-                highchartsJson.async('string').then((res: string) => {
-                    this.highchartsChartConfigs.push(JSON.parse(res));
-                });
-            }
-
-            this.extractStorylinesChartConfig(this.panel as ChartPanel);
-            this.chartIdx += 1;
+            this.fetchChartConfig(this.panel, 0, this.panel.config?.title?.text);
         }
 
         if (this.centerSlide && this.dynamicSelected) {
@@ -212,20 +203,37 @@ export default class ChartEditorV extends Vue {
 
         // fetch multiple existing chart configs from ZIP
         if (this.panel.type === PanelType.SlideshowChart) {
+            let idx = 0;
             charts.forEach((chart: ChartPanel) => {
-                this.extractStorylinesChartConfig(chart);
-
-                // extract actual highcharts config from
-                const chartSrc = `${chart.src.substring(chart.src.indexOf('/') + 1)}`;
-                const highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
-                if (highchartsJson) {
-                    highchartsJson.async('string').then((res: string) => {
-                        this.highchartsChartConfigs.push(JSON.parse(res));
-                    });
-                }
-                this.chartIdx += 1;
+                this.fetchChartConfig(chart, idx, chart.name);
             });
         }
+    }
+
+    fetchChartConfig(chart: ChartPanel | { config?: any; src?: string }, idx: number, chartName?: string) {
+        const chartSrc = chartName
+            ? `charts/${this.lang}/${chartName}.json`
+            : chart.src
+            ? chart.src.substring(chart.src.indexOf('/') + 1)
+            : '';
+
+        let highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+
+        // If not found, create file from config
+        if (!highchartsJson && chartName) {
+            const title = chartName;
+            this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(chart.config, null, 4));
+            highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+        }
+
+        if (highchartsJson) {
+            highchartsJson.async('string').then((res: string) => {
+                this.highchartsChartConfigs.push(JSON.parse(res));
+                this.extractStorylinesChartConfig(chart as ChartPanel, idx);
+                idx += 1;
+            });
+        }
+        this.chartIdx += 1;
     }
 
     openEditor(name: string) {
@@ -269,10 +277,12 @@ export default class ChartEditorV extends Vue {
         this.chartIdx += 1;
     }
 
-    extractStorylinesChartConfig(chart: ChartPanel): void {
+    extractStorylinesChartConfig(chart: ChartPanel, chartIdx: number): void {
         let chartName = '';
         // extract chart name
-        if (chart.options && chart.options.title) {
+        if (this.highchartsChartConfigs[chartIdx]?.title.text) {
+            chartName = this.highchartsChartConfigs[chartIdx]?.title.text;
+        } else if (chart.options && chart.options.title) {
             chartName = chart.options.title;
         } else {
             const path = chart.src.match(/.*\/(.*)$/);
