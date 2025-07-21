@@ -188,8 +188,18 @@ export default class ChartEditorV extends Vue {
 
         // fetch single existing chart config from ZIP
         if (this.panel.type === PanelType.Chart && this.panel.src) {
-            const chartSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
-            const highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+            const chartSrc = this.panel.config?.title?.text
+                ? `charts/${this.lang}/${this.panel.config.title.text}.json`
+                : this.panel.src.substring(this.panel.src.indexOf('/') + 1);
+
+            let highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+
+            if (!highchartsJson && this.panel.config?.title?.text) {
+                const title = this.panel.config.title.text;
+                this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(this.panel.config, null, 4));
+                highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+            }
+
             if (highchartsJson) {
                 highchartsJson.async('string').then((res: string) => {
                     this.highchartsChartConfigs.push(JSON.parse(res));
@@ -216,8 +226,15 @@ export default class ChartEditorV extends Vue {
                 this.extractStorylinesChartConfig(chart);
 
                 // extract actual highcharts config from
-                const chartSrc = `${chart.src.substring(chart.src.indexOf('/') + 1)}`;
-                const highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+                const chartSrc = `charts/${this.lang}/${chart.name}.json`;
+                let highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+
+                if (!highchartsJson && chart.config) {
+                    const title = chart.name;
+                    this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(chart.config, null, 4));
+                    highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
+                }
+
                 if (highchartsJson) {
                     highchartsJson.async('string').then((res: string) => {
                         this.highchartsChartConfigs.push(JSON.parse(res));
