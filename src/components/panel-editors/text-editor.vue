@@ -43,6 +43,7 @@
 
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
+import { VueMarkdownEditor, langMap } from '@/main';
 import { TextPanel } from '@/definitions';
 import { applyTextAlign } from '@/utils/styleUtils';
 import WETDashboardItemV from '../support/wet-dashboard-item.vue';
@@ -73,9 +74,12 @@ export default class TextEditorV extends Vue {
     components: WETComponentsObject = WETComponents;
     pageLang = window.location.href.includes('index-ca-en') ? 'en' : 'fr'; // this is only used if `index-ca` is already in the URL.
 
-    @Watch('panel.content', { deep: true })
+    @Watch('panel.content', { deep: true, immediate: true })
     onContentChanged() {
         this.$emit('slide-edit');
+
+        const currentLocale = this.$i18n.locale === 'fr' ? 'fr-FR' : 'en-US';
+        VueMarkdownEditor.lang.use(currentLocale, langMap[currentLocale]);
     }
 
     // Detecting whether the text editor is in fullscreen mode
@@ -236,152 +240,155 @@ export default class TextEditorV extends Vue {
     // Minor issue when selecting content after clicking a toolbar item: it will always select the first instance of the content string.
     // For example, if your text is "span", changing font size while selecting it won't select <span style...>SPAN</span> afterward, but <SPAN style...>span</span>.
     // The default (module-provided) toolbar items have the same issue (try the content "*" for Bold).
-    toolbar = {
-        fontSize: {
-            title: 'Font Size',
-            text: 'Aa',
-            menus: {
-                itemWidth: '42px',
-                rowNum: 10,
-                items: this.fontSizes.map((fontSize) => {
-                    return {
-                        name: `${fontSize}`,
-                        text: `${fontSize}`,
+    get toolbar() {
+        const vm = this;
+        return {
+            fontSize: {
+                title: this.$t('editor.text.fontsize.title'),
+                text: 'Aa',
+                menus: {
+                    itemWidth: '42px',
+                    rowNum: 10,
+                    items: this.fontSizes.map((fontSize) => {
+                        return {
+                            name: `${fontSize}`,
+                            text: `${fontSize}`,
+                            action(editor: MDEditor): void {
+                                editor.insert((selected: string) => {
+                                    const content = selected || vm.$t('editor.text.fontsize.resize');
+
+                                    const finalText = content
+                                        .split('\n')
+                                        .map((paragraph: any) => {
+                                            if (!paragraph) {
+                                                return '';
+                                            } else if (
+                                                paragraph.charAt(0) === '|' || // table
+                                                paragraph.charAt(0) === '!' || // image
+                                                paragraph.charAt(0) === '`' || // code block
+                                                paragraph === '------------------------------------'
+                                            ) {
+                                                return paragraph;
+                                            } else {
+                                                return `<span style="font-size:${fontSize}px;">${paragraph}</span>`;
+                                            }
+                                        })
+                                        .join('\n');
+
+                                    return {
+                                        text: finalText,
+                                        selected: content
+                                    };
+                                });
+                            }
+                        };
+                    })
+                }
+            },
+            subsuper: {
+                title: this.$t('editor.text.subsuper.title'),
+                text: 'T',
+                menus: [
+                    {
+                        name: this.$t('editor.text.superscript'),
+                        text: this.$t('editor.text.superscript'),
                         action(editor: MDEditor): void {
                             editor.insert((selected: string) => {
-                                const content = selected || `resize`;
-
-                                const finalText = content
-                                    .split('\n')
-                                    .map((paragraph) => {
-                                        if (!paragraph) {
-                                            return '';
-                                        } else if (
-                                            paragraph.charAt(0) === '|' || // table
-                                            paragraph.charAt(0) === '!' || // image
-                                            paragraph.charAt(0) === '`' || // code block
-                                            paragraph === '------------------------------------'
-                                        ) {
-                                            return paragraph;
-                                        } else {
-                                            return `<span style="font-size:${fontSize}px;">${paragraph}</span>`;
-                                        }
-                                    })
-                                    .join('\n');
+                                const content = selected || vm.$t('editor.text.superscript').toLowerCase();
 
                                 return {
-                                    text: finalText,
+                                    text: `<sup>${content}</sup>`,
                                     selected: content
                                 };
                             });
                         }
-                    };
-                })
-            }
-        },
-        subsuper: {
-            title: 'Superscript/Subscript',
-            text: 'T',
-            menus: [
-                {
-                    name: 'Superscript',
-                    text: 'Superscript',
-                    action(editor: MDEditor): void {
-                        editor.insert((selected: string) => {
-                            const content = selected || `superscript`;
+                    },
+                    {
+                        name: this.$t('editor.text.subscript'),
+                        text: this.$t('editor.text.subscript'),
+                        action(editor: MDEditor): void {
+                            editor.insert((selected: string) => {
+                                const content = selected || vm.$t('editor.text.subscript').toLowerCase();
 
-                            return {
-                                text: `<sup>${content}</sup>`,
-                                selected: content
-                            };
-                        });
+                                return {
+                                    text: `<sub>${content}</sub>`,
+                                    selected: content
+                                };
+                            });
+                        }
                     }
-                },
-                {
-                    name: 'Subscript',
-                    text: 'Subscript',
-                    action(editor: MDEditor): void {
-                        editor.insert((selected: string) => {
-                            const content = selected || `subscript`;
+                ]
+            },
+            addLink: {
+                title: this.$t('editor.text.addLink.title'),
+                icon: 'v-md-icon-link',
+                menus: [
+                    {
+                        name: this.$t('editor.text.addLink.external.newTab'),
+                        text: this.$t('editor.text.addLink.external.newTab'),
+                        action(editor: MDEditor): void {
+                            editor.insert((selected: string) => {
+                                const content = selected || vm.$t('editor.text.addLink.text');
 
-                            return {
-                                text: `<sub>${content}</sub>`,
-                                selected: content
-                            };
-                        });
+                                return {
+                                    text: `<a href='http://' target='_blank'>${content}</a>`,
+                                    selected: content
+                                };
+                            });
+                        }
+                    },
+                    {
+                        name: this.$t('editor.text.addLink.external.sameTab'),
+                        text: this.$t('editor.text.addLink.external.sameTab'),
+                        action(editor: MDEditor): void {
+                            editor.insert((selected: string) => {
+                                const content = selected || vm.$t('editor.text.addLink.text');
+
+                                return {
+                                    text: `<a href='http://' target='_self'>${content}</a>`,
+                                    selected: content
+                                };
+                            });
+                        }
+                    },
+                    {
+                        name: this.$t('editor.text.addLink.dynamic'),
+                        text: this.$t('editor.text.addLink.dynamic'),
+                        action(editor: MDEditor): void {
+                            editor.insert((selected: string) => {
+                                const content = selected || vm.$t('editor.text.addLink.text');
+
+                                return {
+                                    text: `<a panel='panel-id-here'>${content}</a>`,
+                                    selected: content
+                                };
+                            });
+                        }
                     }
-                }
-            ]
-        },
-        addLink: {
-            title: 'Insert Link',
-            icon: 'v-md-icon-link',
-            menus: [
-                {
-                    name: 'Add External Link (New Tab)',
-                    text: 'Add External Link (New Tab)',
-                    action(editor: MDEditor): void {
-                        editor.insert((selected: string) => {
-                            const content = selected || `link text`;
+                ]
+            },
+            wetToolbar: {
+                title: this.$t('editor.text.wetToolbar.title'),
+                text: this.$t('editor.text.wetToolbar.text'),
+                action: (editor: MDEditor): void => {
+                    this.wetComponentsVisible = !this.wetComponentsVisible;
 
-                            return {
-                                text: `<a href='http://' target='_blank'>${content}</a>`,
-                                selected: content
-                            };
-                        });
+                    if (this.wetComponentsVisible) {
+                        // Hate using setTimeout, but it seems to be necessary for this scroll to work.
+                        setTimeout(() => {
+                            document
+                                .getElementById('WETDashboard')
+                                ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        }, 100);
                     }
-                },
-                {
-                    name: 'Add External Link (Same Tab)',
-                    text: 'Add External Link (Same Tab)',
-                    action(editor: MDEditor): void {
-                        editor.insert((selected: string) => {
-                            const content = selected || `link text`;
 
-                            return {
-                                text: `<a href='http://' target='_self'>${content}</a>`,
-                                selected: content
-                            };
-                        });
+                    if (editor !== undefined) {
+                        this.editor = editor;
                     }
-                },
-                {
-                    name: 'Add Dynamic Link',
-                    text: 'Add Dynamic Link',
-                    action(editor: MDEditor): void {
-                        editor.insert((selected: string) => {
-                            const content = selected || `link text`;
-
-                            return {
-                                text: `<a panel='panel-id-here'>${content}</a>`,
-                                selected: content
-                            };
-                        });
-                    }
-                }
-            ]
-        },
-        wetToolbar: {
-            title: 'WET Components',
-            text: this.pageLang === 'en' ? 'Components' : 'Composantes',
-            action: (editor: MDEditor): void => {
-                this.wetComponentsVisible = !this.wetComponentsVisible;
-
-                if (this.wetComponentsVisible) {
-                    // Hate using setTimeout, but it seems to be necessary for this scroll to work.
-                    setTimeout(() => {
-                        document
-                            .getElementById('WETDashboard')
-                            ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                    }, 100);
-                }
-
-                if (editor !== undefined) {
-                    this.editor = editor;
                 }
             }
-        }
-    };
+        };
+    }
 
     toolbarOptions = `undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code ${
         window.location.href.includes('index-ca') ? '| wetToolbar' : ''

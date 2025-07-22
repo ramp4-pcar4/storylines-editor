@@ -15,6 +15,7 @@ import '@kangc/v-md-editor/lib/style/codemirror-editor.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 import '@kangc/v-md-editor/lib/theme/style/github.css';
 import enUS from '@kangc/v-md-editor/lib/lang/en-US';
+import frFR from '@kangc/v-md-editor/lib/lang/fr-FR';
 import hljs from 'highlight.js';
 
 // Resources for the codemirror editor
@@ -40,10 +41,11 @@ import 'codemirror/addon/scroll/simplescrollbars.css';
 import 'codemirror/lib/codemirror.css';
 
 VueMarkdownEditor.Codemirror = Codemirror;
-VueMarkdownEditor.lang.use('en-US', enUS);
 VueMarkdownEditor.use(githubTheme, {
     Hljs: hljs
 });
+export const langMap = { 'en-US': enUS, 'fr-FR': frFR };
+export { VueMarkdownEditor };
 
 import { createVfm } from 'vue-final-modal';
 import 'vue-final-modal/style.css';
