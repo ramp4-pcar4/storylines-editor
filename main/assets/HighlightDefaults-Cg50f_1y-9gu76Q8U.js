@@ -1,0 +1,1 @@
+import{cX as e}from"./main-D7vwjMDX.js";const t=new e("cyan"),a=1,l=.25,n=new e("black"),r=.4,w=.2,c=.25,m="default",s="temporary",p=new e("yellow");export{s as c,a as e,c as l,p as m,l as n,n as o,r,t as s,w as t,m as w};
