@@ -968,12 +968,6 @@ export default class MetadataEditorV extends Vue {
                 }
             });
         }
-
-        console.log(
-            'metadata-editor.vue -> created(): ',
-            this.productStore.sourceCounts,
-            this.productStore.configFileStructure
-        );
     }
 
     handleSessionTimeout(): void {
@@ -1462,7 +1456,6 @@ export default class MetadataEditorV extends Vue {
                                 this.uuid = this.changeUuid;
 
                                 // Reset source counts.
-                                console.log('metadata-editor.vue -> renameProduct(): reset source counts');
                                 this.productStore.sourceCounts = {};
 
                                 this.configFileStructureHelper(this.productStore.configFileStructure.zip).then(() => {
@@ -1532,7 +1525,6 @@ export default class MetadataEditorV extends Vue {
                 this.productStore.decrementSourceCount(config.introSlide.backgroundImage);
                 this.productStore.sourceCounts[uploadSource] += oppositeSourceCount;
                 config.introSlide.backgroundImage = uploadSource;
-                console.log(`productStore -> uploadAsset()`, this.productStore.sourceCounts);
             }
         } else {
             if (config.introSlide.logo.src !== uploadSource) {
@@ -1540,7 +1532,6 @@ export default class MetadataEditorV extends Vue {
                 this.productStore.decrementSourceCount(config.introSlide.logo.src);
                 this.productStore.sourceCounts[uploadSource] += oppositeSourceCount;
                 config.introSlide.logo.src = uploadSource;
-                console.log(`productStore -> uploadAsset()`, this.productStore.sourceCounts);
             }
         }
     }

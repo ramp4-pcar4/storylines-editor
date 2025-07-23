@@ -553,8 +553,6 @@ export default class SlideTocV extends Vue {
             this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][oppositeLang]));
             this.$emit('slides-updated', this.slides);
             this.$emit('slide-change', index, currLang);
-
-            console.log('slide-toc.vue -> copyConfigFromOtherLang() -> ', this.productStore.sourceCounts);
         }, 300);
     }
 
@@ -601,7 +599,6 @@ export default class SlideTocV extends Vue {
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
         this.$emit('scroll-to-element', index + 1);
-        console.log(`slide-toc.vue -> copySlide(): ${this.productStore.sourceCounts}`);
     }
 
     removeSlide(index: number): void {

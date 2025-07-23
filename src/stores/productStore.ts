@@ -98,7 +98,6 @@ export const useProductStore = defineStore('product', {
         // Incremements the source count for the provided source. If it doesn't exist, the source is also added to the object.
         incrementSourceCount(src: string): void {
             this.sourceCounts[src] ? (this.sourceCounts[src] += 1) : (this.sourceCounts[src] = 1);
-            console.log(`productStore -> incrementSourceCount()`, this.sourceCounts, src);
         },
 
         // Decrements the source count for the provided source. If the count is 0, the source is removed.
@@ -120,7 +119,6 @@ export const useProductStore = defineStore('product', {
                     this.configFileStructure?.zip.remove(relativePath);
                 }
             }
-            console.log(`productStore -> decrementSourceCount()`, this.sourceCounts);
         },
 
         // Recursively calls `decrementSourceCount` on a panel. Will ensure correct source counts for panels with children.
@@ -234,7 +232,6 @@ export const useProductStore = defineStore('product', {
                     }
                 });
             });
-            console.log(`productStore.ts -> findSources():`, this.sourceCounts);
         },
         // Given a Storylines config, replace instances of the current UUID with a new UUID.
         renameSources(config: StoryRampConfig, prevUuid: string, changeUuid: string): void {
