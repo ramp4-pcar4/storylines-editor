@@ -99,16 +99,16 @@ export const useLockStore = defineStore('lock', {
                     }
 
                     if (data.status === 'fail') {
-                        this.socket.removeEventListener('message', handleMessage);
+                        this.socket?.removeEventListener('message', handleMessage);
                         reject(new Error(data.message || 'Failed to lock storyline.'));
                     } else if (data.status === 'success') {
-                        this.socket.removeEventListener('message', handleMessage);
+                        this.socket?.removeEventListener('message', handleMessage);
                         this.uuid = renameUuid;
                         resolve();
                     }
                 };
 
-                this.socket.addEventListener('message', handleMessage);
+                this.socket?.addEventListener('message', handleMessage);
             });
         },
         // Unlocks the curent storyline for this user. Only to be called on session end.
@@ -127,8 +127,8 @@ export const useLockStore = defineStore('lock', {
                 overrideTime !== undefined
                     ? overrideTime
                     : import.meta.env.VITE_APP_CURR_ENV
-                    ? Number(import.meta.env.VITE_SESSION_END) * 60
-                    : 1800; //  This value is in seconds!!! Don't mix up the units!!!
+                      ? Number(import.meta.env.VITE_SESSION_END) * 60
+                      : 1800; //  This value is in seconds!!! Don't mix up the units!!!
             clearInterval(this.timeInterval);
             // Update the time remaining every second.
             this.timeInterval = setInterval(() => {

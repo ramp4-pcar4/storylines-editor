@@ -1,7 +1,5 @@
 <template>
     <div class="block my-3">
-        <!-- Metadata Editor -->
-
         <!-- Slideshow caption -->
         <div class="mt-5 mb-8">
             <label class="respected-standard-label" for="slideshowCaption">{{
@@ -125,7 +123,7 @@
                             </button>
                         </td>
                         <td style="text-align: left !important" class="truncate">
-                            {{ idx + 1 }}. {{ item.title || $t('editor.slideshow.noTitle') }}
+                            {{ idx + 1 }}. {{ (item as any).title || $t('editor.slideshow.noTitle') }}
                         </td>
                         <td>{{ $t(`editor.slide.panel.type.${item.type}`) }}</td>
                         <td :class="{ 'rounded-br': idx === panel.items.length - 1 }">
@@ -352,7 +350,6 @@ export default class SlideshowEditorV extends Vue {
     newSlideType: 'text' | 'image' | 'chart' | 'map' = 'text';
     editingStatus: 'none' | 'edit' | 'create' = 'none';
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onTypeInput(e: any): void {
         this.newSlideType = e.target.value;
     }
@@ -435,11 +432,9 @@ export default class SlideshowEditorV extends Vue {
         let itemConfig;
 
         if (add) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             itemConfig = (this.$refs.slideEditor as any).panel;
             this.panel.items.push(itemConfig);
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             itemConfig = (this.$refs.slideEditor as any).panel;
         }
 
@@ -485,30 +480,36 @@ label {
     text-align: left !important;
     width: fit-content !important;
 }
+
 select {
     border: 1px black solid;
     background: white;
     padding: 0.25rem 0.5rem;
 }
+
 .table-header th {
     text-align: center;
     background-color: #ddd;
     padding: 5px 10px;
 }
+
 .table-contents td {
     text-align: center;
     padding: 5px 10px;
 }
+
 .table-contents:hover {
     background-color: #eee;
     cursor: pointer;
 }
+
 .table-add-row th {
     vertical-align: top;
     text-align: center;
     border-top: 1px solid #ddd;
     padding: 5px;
 }
+
 .table-add-row input[type='text'],
 .table-add-row select,
 .table-add-row button {

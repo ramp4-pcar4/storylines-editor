@@ -165,8 +165,6 @@ export default class VideoEditorV extends Vue {
 
                 // retrieve existing video file
                 const assetSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
-                const filename = this.panel.src.replace(/^.*[\\/]/, '');
-
                 const assetFile = this.productStore.configFileStructure.zip.file(assetSrc);
                 if (assetFile) {
                     this.videoPreviewPromise = assetFile.async('blob').then((res: Blob) => {

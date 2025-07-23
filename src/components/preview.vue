@@ -157,7 +157,7 @@ export default class StoryPreviewV extends Vue {
             this.configFileStructure = window.props.configFileStructure;
             // This broadcast channel will be used to communicate regarding sessions with the main editor tab
             this.broadcast = new BroadcastChannel(window.props.secret);
-            localStorage.setItem(this.localStorageKey, true);
+            localStorage.setItem(this.localStorageKey, 'true');
 
             this.broadcast.onmessage = (e) => {
                 const msg = e.data;
@@ -215,7 +215,7 @@ export default class StoryPreviewV extends Vue {
                 document.onkeydown = () => this.extendSession();
             }
             // Link stylesheets from the config, if any
-            if (this.config.stylesheets) {
+            if (this.config?.stylesheets) {
                 this.addStylesheets(this.config.stylesheets);
             }
             this.loadStatus = 'loaded';
@@ -234,7 +234,7 @@ export default class StoryPreviewV extends Vue {
             const user = userStore.userProfile.userName;
             // attempt to fetch saved config file from the server (TODO: setup as express route?)
             fetch(this.apiUrl + `/retrieve/${this.uid}/latest`, {
-                headers: { user, preview: true }
+                headers: { user, preview: 'true' } as HeadersInit
             }).then((res: Response) => {
                 if (res.status === 404) {
                     Message.error(this.$t('editor.warning.uuidNotFound', { uuid: this.uid }));
@@ -293,7 +293,6 @@ export default class StoryPreviewV extends Vue {
                     });
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 fetch(this.apiUrl + `/retrieveMessages`).then((res: any) => {
                     axios
                         .post(import.meta.env.VITE_APP_NET_API_URL + '/api/log/create', {
@@ -328,7 +327,7 @@ export default class StoryPreviewV extends Vue {
     addStylesheets(paths: string[]): void {
         paths.forEach(async (path) => {
             const filePath = path.split('/').slice(1).join('/');
-            const styleFile = this.configFileStructure.zip.file(filePath);
+            const styleFile = this.configFileStructure?.zip.file(filePath);
             if (styleFile) {
                 const styles = await styleFile.async('text');
                 const styleEl = document.createElement('style');

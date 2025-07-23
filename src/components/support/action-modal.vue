@@ -30,7 +30,6 @@
 <script lang="ts">
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import { VueFinalModal } from 'vue-final-modal';
-// import { Options } from 'vue-property-decorator';
 
 @Options({
     components: {
