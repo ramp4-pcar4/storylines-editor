@@ -1,0 +1,1 @@
+import{an as u}from"./main-O0jfiq4b.js";function l(r,n){return r===null?n:new u({url:r.field("url")})}export{l as n};
