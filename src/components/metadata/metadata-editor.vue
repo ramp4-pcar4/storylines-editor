@@ -2271,6 +2271,7 @@ export default class MetadataEditorV extends Vue {
                 // Generate an image preview.
                 this.metadata.logoPreview = URL.createObjectURL(uploadedFile);
                 this.metadata.logoName = uploadedFile.name;
+                (e.target as HTMLInputElement).value = '';
                 break;
             case 'introBg':
                 this.introBgImage = uploadedFile;
@@ -2278,6 +2279,7 @@ export default class MetadataEditorV extends Vue {
                 // Generate an image preview.
                 this.metadata.introBgPreview = URL.createObjectURL(uploadedFile);
                 this.metadata.introBgName = uploadedFile.name;
+                (e.target as HTMLInputElement).value = '';
                 break;
             default:
                 console.error('onFileChange received invalid source.');
