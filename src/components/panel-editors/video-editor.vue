@@ -315,7 +315,6 @@ export default class VideoEditorV extends Vue {
     saveChanges(): void {
         if (this.edited && this.videoPreview) {
             // save all changes to panel config (cannot directly set to avoid prop mutate)
-            console.log('SAVING PROPERLY');
             this.panel.title = this.videoPreview.title;
             this.panel.videoType = this.videoPreview.videoType;
 
