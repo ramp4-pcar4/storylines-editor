@@ -1,1 +1,0 @@
-import{b as t}from"./dom-BYU3NyXf-Yzb49i3L.js";function e(n){return n[n.openProp||"open"]}function o(n){requestAnimationFrame(()=>{n.transitionEl&&t(n.transitionEl,n.transitionProp,()=>{e(n)?n.onBeforeOpen():n.onBeforeClose()},()=>{e(n)?n.onOpen():n.onClose()})})}export{o as t};

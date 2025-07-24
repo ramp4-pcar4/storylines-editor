@@ -1,1 +1,0 @@
-import{hY as n,hZ as o,i2 as c}from"./main-D7vwjMDX.js";const l={validationContainer:"validation-container"},r=({scale:a,status:i,id:s,icon:t,message:e})=>n`<div class=${o(l.validationContainer)}><calcite-input-message aria-live=polite .icon=${t} id=${s??c} .scale=${a} .status=${i}>${e}</calcite-input-message></div>`;export{r};
