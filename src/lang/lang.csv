@@ -257,6 +257,7 @@ editor.slides.copyAll,Copy all,1,Copier tout,1
 editor.slides.copyAll.confirm,Are you sure you want to copy all slides?,1,Êtes-vous sûr de vouloir copier toutes les diapositives ?,0
 editor.slides.copy,Copy,1,Copier,1
 editor.slides.slide,Slide,1,Diapositive,1
+editor.slides.toc.selectSlide,Use arrow keys to navigate between panes,1,Utilisez les touches fléchées pour naviguer entre les volets,0
 editor.slides.toc.closeToC,Close table of content sidebar,1,Fermer la barre latérale du sommaire,1
 editor.slides.toc.noSlides,No Slides,1,Pas de diapositives,0
 editor.slides.toc.selectNewSlideMessage,Select 'New Blank Slide' to add your first slide.,1,Sélectionnez « Nouvelle diapositive vierge » pour ajouter votre première diapositive.,0
@@ -305,6 +306,7 @@ editor.slides.panelNumber,Panel {num},1,Panneau {num},0
 editor.slides.panel.body,Panel body,1,Corps du panneau,1
 editor.slides.panel.title,Panel title,1,Titre du panneau,1
 editor.slides.panel.textEntry,Panel text entry,1,Saisie de texte dans le panneau,1
+editor.slides.panel.toc,Press enter or space to access ToC panel,1,Appuyez sur Entrée ou sur la barre d'espace pour accéder au table des matières,0
 editor.slide.panel.type.text,Text,1,Texte,1
 editor.slide.panel.type.image,Image,1,Image,1
 editor.slide.panel.type.slideshow,Slideshow,1,Diaporama,1

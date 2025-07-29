@@ -48,6 +48,7 @@ import { applyTextAlign } from '@/utils/styleUtils';
 import WETDashboardItemV from '../support/wet-dashboard-item.vue';
 import WETComponents from '../support/wet-component-templates.json';
 import DOMPurify from 'dompurify';
+import tippy from 'tippy.js';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;
@@ -121,6 +122,26 @@ export default class TextEditorV extends Vue {
         const makeButtonInteractive = (el: HTMLElement) => {
             el.setAttribute('tabindex', '0');
 
+            // Show tooltips for toolbar items when focused upon
+            el.addEventListener('focus', () => {
+                const tooltip = el.querySelector('.v-md-editor__tooltip') as HTMLElement;
+                if (!tooltip) return;
+
+                // for calculating tooltip position
+                const rect = el.getBoundingClientRect();
+
+                tooltip.style.left = '0px';
+                tooltip.style.top = rect.height + 5 + 'px';
+                tooltip.style.display = 'block';
+            });
+
+            // Hide tooltips when toolbar item loses focus
+            el.addEventListener('blur', () => {
+                const tooltip = el.querySelector('.v-md-editor__tooltip') as HTMLElement;
+                if (!tooltip) return;
+                tooltip.style.display = 'none';
+            });
+
             if (!el.dataset.keyboardEnabled) {
                 el.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -190,10 +211,74 @@ export default class TextEditorV extends Vue {
             });
         };
 
+        // Allow tabbing for TOC area
+        const initializeTOCTabbing = (tocContainer: HTMLElement | null) => {
+            if (!tocContainer) return;
+
+            tocContainer.setAttribute('tabindex', '0');
+            tocContainer.dataset.keyboardEnabled = 'false';
+
+            let tooltip: any = null;
+            tocContainer.addEventListener('focus', () => {
+                if (tocContainer.offsetWidth > 10) {
+                    tooltip ??= tippy(tocContainer, {
+                        content: this.$t('editor.slides.panel.toc'),
+                        trigger: 'manual',
+                        placement: 'top'
+                    });
+                    tooltip.show();
+                }
+            });
+
+            tocContainer.addEventListener('keydown', (e: KeyboardEvent) => {
+                if ((e.key === 'Enter' || e.key === ' ') && tocContainer.dataset.keyboardEnabled === 'false') {
+                    e.preventDefault();
+                    const tocItems = tocContainer.querySelectorAll<HTMLElement>('.v-md-editor__toc-nav-item');
+                    // Enable tabbing for each TOC item
+                    makeTOCItemsInteractive(tocItems);
+
+                    // Focus onto the first TOC item
+                    tocContainer.dataset.keyboardEnabled = 'true';
+                    (tocItems[0] as HTMLElement)?.focus();
+                }
+            });
+            // Reset TOC items’ tabbing state when focus leaves the TOC container
+            tocContainer.addEventListener('focusout', (e: FocusEvent) => {
+                const relatedTarget = e.relatedTarget as HTMLElement | null;
+                if (!relatedTarget || !tocContainer.contains(relatedTarget)) {
+                    const tocItems = tocContainer.querySelectorAll<HTMLElement>('.v-md-editor__toc-nav-item');
+                    tocItems.forEach((item) => {
+                        item.removeAttribute('tabindex');
+                        item.dataset.keyboardEnabled = '';
+                    });
+                    tocContainer.dataset.keyboardEnabled = 'false';
+                }
+                tooltip?.hide();
+            });
+        };
+
+        const makeTOCItemsInteractive = (tocItems: NodeListOf<HTMLElement>) => {
+            tocItems.forEach((item: HTMLElement) => {
+                item.setAttribute('tabindex', '0');
+                if (item.dataset.keyboardEnabled) return;
+
+                item.addEventListener('keydown', (e: KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        item.click();
+                    }
+                });
+                item.dataset.keyboardEnabled = 'true';
+            });
+        };
+
         const patchEverything = () => {
             const buttons = toolbar.querySelectorAll('[role="button"], button, .v-md-editor__toolbar-item');
             buttons.forEach(makeButtonInteractive);
             makeDropdownItemsInteractive();
+
+            const tocContainer = this.$el.querySelector('.v-md-editor__toc-nav');
+            initializeTOCTabbing(tocContainer);
         };
 
         const observer = new MutationObserver(patchEverything);
@@ -515,5 +600,14 @@ label {
 
 :deep(.cm-header) {
     color: blue !important;
+}
+
+:deep(.v-md-editor__toc-nav) {
+    padding-left: 0.3rem !important;
+}
+
+:deep(.v-md-editor__toc-nav-item:focus) {
+    font-weight: bolder;
+    outline: none;
 }
 </style>
