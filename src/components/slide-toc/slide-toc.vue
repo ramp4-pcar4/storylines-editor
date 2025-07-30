@@ -177,7 +177,6 @@
                                     <slide-toc-button
                                         :element="element"
                                         selectedLang="en"
-                                        :currentSlide="currentSlide"
                                         :isMobileSidebar="isMobileSidebar"
                                         :isActiveSlide="slideIndex === index"
                                         @selectSlide="selectSlide(index, 'en')"
@@ -229,7 +228,6 @@
                                     <slide-toc-button
                                         :element="element"
                                         selectedLang="fr"
-                                        :currentSlide="currentSlide"
                                         :isMobileSidebar="isMobileSidebar"
                                         :isActiveSlide="slideIndex === index"
                                         @selectSlide="selectSlide(index, 'fr')"
@@ -409,8 +407,6 @@ import { useProductStore } from '@/stores/productStore';
 })
 export default class SlideTocV extends Vue {
     @Prop() slides!: MultiLanguageSlide[];
-    @Prop() currentSlide!: Slide | string;
-    @Prop() slideIndex!: number;
     @Prop() lang!: string;
     @Prop() closeSidebar!: () => void;
     @Prop({ default: false }) isMobileSidebar!: boolean;
@@ -433,6 +429,10 @@ export default class SlideTocV extends Vue {
         ],
         includeInToc: true
     };
+
+    get slideIndex(): number {
+        return this.productStore.slideIndex;
+    }
 
     /**
      * Determines if a particular config is empty.
