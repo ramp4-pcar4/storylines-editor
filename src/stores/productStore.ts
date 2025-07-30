@@ -24,6 +24,8 @@ interface ProductState {
     configFileStructure: ConfigFileStructure;
     configs: { [key: string]: StoryRampConfig | undefined };
     configLang: string;
+    currentSlide: Slide | string; // TODO: move this into the editor store when metadata refactor is complete #281
+    slideIndex: number; // TODO: move this into the editor store when metadata refactor is complete #281
     sourceCounts: SourceCounts;
     debounceTimer: ReturnType<typeof setTimeout> | null;
     i18n: any;
@@ -35,6 +37,9 @@ export const useProductStore = defineStore('product', {
         configs: { en: undefined, fr: undefined },
         configLang: 'en',
         sourceCounts: {},
+        // TODO: move currentSlide + slideIndex into the editor store when metadata refactor is complete if it makes more sense #281
+        currentSlide: '',
+        slideIndex: -1,
 
         // Debounce timer used for updateSaveStatus only.
         // IMPORTANT: Avoid using stateStore's handlePotentialChange() directly, this timer may cause issues with change detection and saving to the configs variable.
