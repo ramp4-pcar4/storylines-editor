@@ -178,11 +178,10 @@
 <script lang="ts">
 import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide, SupportedLanguages } from '@/definitions';
 import { useProductStore } from '@/stores/productStore';
-import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import TocOptions from './toc-options.vue';
 import { useEditorStore } from '@/stores/editorStore';
 
+import TocOptions from './toc-options.vue';
 import TextEditorIcon from '@/assets/text-editor.svg?raw';
 import ImageEditorIcon from '@/assets/image-editor.svg?raw';
 import MapEditorIcon from '@/assets/map-editor.svg?raw';
@@ -204,7 +203,6 @@ export default class SlideTocV extends Vue {
     @Prop() isActiveSlide!: boolean;
 
     productStore = useProductStore();
-
     oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
 

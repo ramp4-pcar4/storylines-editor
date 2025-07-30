@@ -120,7 +120,7 @@
                 :key="`new-editor-${chartIdx}`"
                 :plugin="true"
                 :lang="lang"
-                :title="$t('editor.chart.label.newTitle', { num: chartIdx })"
+                :title="defaultChartTitle"
                 @cancel="() => $vfm.close('highcharts-create-modal')"
                 @saved="createNewChart"
             />
@@ -131,11 +131,12 @@
 <script lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import { ChartConfig, ChartPanel, HighchartsConfig, PanelType, SlideshowChartPanel } from '@/definitions';
+import { ChartConfig, ChartPanel, HighchartsConfig, PanelType, Slide, SlideshowChartPanel } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import { useProductStore } from '@/stores/productStore';
-
+import { useEditorStore } from '@/stores/editorStore';
 import { applyTextAlign } from '@/utils/styleUtils';
+
 import ChartPreviewV from '../support/chart-preview.vue';
 import ConfirmationModalV from '../support/confirmation-modal.vue';
 import draggable from 'vuedraggable';
@@ -162,6 +163,7 @@ export default class ChartEditorV extends Vue {
     @Prop({ default: false }) dynamicSelected!: boolean;
 
     productStore = useProductStore();
+    editorStore = useEditorStore();
 
     edited = false;
     oldChartName = '';
@@ -173,6 +175,16 @@ export default class ChartEditorV extends Vue {
     editingConfig: HighchartsConfig | null = null;
     editingName: string | null = null;
     storylinesChartConfigsRefs = [] as any[];
+
+    // compute unique default chart title when creating new highchart
+    get defaultChartTitle(): string {
+        const slideTitle = (this.editorStore.currentSlide as Slide).title;
+        const slideIdx = this.editorStore.selectedSlideIndex + 1;
+        const chartNum = this.$t('editor.chart.label.newTitle', { num: this.chartIdx });
+        return slideTitle
+            ? `${slideTitle} - ${chartNum}`
+            : `${this.$t('editor.slides.slide')} ${slideIdx} - ${chartNum}`;
+    }
 
     mounted(): void {
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
@@ -369,6 +381,7 @@ export default class ChartEditorV extends Vue {
             this.highchartsChartConfigs.splice(idx, 1);
         }
         this.onChartsEdited();
+        this.chartIdx -= 1;
     }
 
     moveChart(index: number, moveLeft: boolean): void {

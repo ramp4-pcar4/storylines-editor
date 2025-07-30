@@ -40,8 +40,8 @@ import cloneDeep from 'clone-deep';
 interface ProductState {
     configFileStructure: ConfigFileStructure;
     configs: { [key: string]: StoryRampConfig | undefined };
-    currentSlide: Slide | string;
     slidesWorkingCopy: MultiLanguageSlide[];
+    configLang: string;
     sourceCounts: SourceCounts;
     debounceTimer: ReturnType<typeof setTimeout> | null;
     i18n: any;
@@ -49,7 +49,6 @@ interface ProductState {
     temporaryMetadataCopy: MetadataContent;
     uuid: string;
     user: string;
-    i18n: any;
     logoImage: undefined | File;
     introBgImage: undefined | File;
     apiUrl: string;
@@ -61,9 +60,6 @@ export const useProductStore = defineStore('product', {
         configFileStructure: {} as ConfigFileStructure,
         configs: { en: undefined, fr: undefined },
         sourceCounts: {},
-
-        currentSlide: '' as Slide | '',
-
         slidesWorkingCopy: [] as MultiLanguageSlide[],
 
         // Debounce timer used for updateSaveStatus only.
@@ -112,7 +108,6 @@ export const useProductStore = defineStore('product', {
             dateModified: '',
             schemaVersion: ''
         } as MetadataContent,
-        i18n: useI18n(),
         uuid: '',
         user: computed(() => useUserStore().userProfile.userName || 'Guest'),
         logoImage: undefined as undefined | File,
