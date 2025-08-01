@@ -80,8 +80,17 @@
             <br />
         </div>
 
+        <!-- Loading spinner for when product is still being fetched -->
+        <div v-if="editorStore.loadStatus !== 'loaded'" class="flex flex-col justify-center items-center p-10">
+            <div class="py-10 text-l text-center">{{ $t('editor.editMetadata.loading') }}</div>
+            <spinner size="50px" color="#009cd1"></spinner>
+        </div>
+
         <!-- No slides message -->
-        <div v-if="slides.length === 0" class="text-center px-6 py-6">
+        <div
+            v-if="productStore.slides.length === 0 && editorStore.loadStatus === 'loaded'"
+            class="text-center px-6 py-6"
+        >
             <h4 class="text-lg font-bold">
                 {{ $t('editor.slides.toc.noSlides') }}
             </h4>
@@ -89,13 +98,13 @@
         </div>
 
         <!-- Slide list -->
-        <ul class="toc-slide-list">
+        <ul v-if="editorStore.loadStatus === 'loaded'" class="toc-slide-list">
             <!-- Slide -->
             <!-- Dragging is turned off on mobile version as you can't scroll otherwise (component would think a scroll === a drag) -->
             <draggable
                 :disabled="isMobileSidebar"
-                :list="slides"
-                @update="$emit('slides-updated', slides)"
+                :list="productStore.slides"
+                @update="$emit('slides-updated')"
                 :item-key="getSlideId"
                 v-focus-list
             >
@@ -177,7 +186,6 @@
                                     <slide-toc-button
                                         :element="element"
                                         selectedLang="en"
-                                        :currentSlide="currentSlide"
                                         :isMobileSidebar="isMobileSidebar"
                                         :isActiveSlide="slideIndex === index"
                                         @selectSlide="selectSlide(index, 'en')"
@@ -229,7 +237,6 @@
                                     <slide-toc-button
                                         :element="element"
                                         selectedLang="fr"
-                                        :currentSlide="currentSlide"
                                         :isMobileSidebar="isMobileSidebar"
                                         :isActiveSlide="slideIndex === index"
                                         @selectSlide="selectSlide(index, 'fr')"
@@ -324,10 +331,10 @@
                                     class="slide-toc-button rotate-180 transform h-auto grow-0 mt-auto"
                                     :class="{
                                         'toc-popup-button border-none bg-transparent': isMobileSidebar,
-                                        'text-gray-400 cursor-not-allowed': index == slides.length - 1
+                                        'text-gray-400 cursor-not-allowed': index == productStore.slides.length - 1
                                     }"
                                     @click.stop="moveDown(index)"
-                                    :disabled="index == slides.length - 1"
+                                    :disabled="index == productStore.slides.length - 1"
                                     v-tippy="{
                                         delay: '200',
                                         placement: 'right',
@@ -388,6 +395,8 @@ import SlideTocButton from '@/components/slide-toc/slide-toc-button.vue';
 import { BasePanel, ChartPanel, ImagePanel, MultiLanguageSlide, Slide, TextPanel, VideoPanel } from '@/definitions';
 import cloneDeep from 'clone-deep';
 import { VueFinalModal } from 'vue-final-modal';
+import { useEditorStore } from '@/stores/editorStore';
+import { VueSpinnerOval } from 'vue3-spinners';
 
 import Message from 'vue-m-message';
 import { Options, Prop, Vue } from 'vue-property-decorator';
@@ -404,18 +413,18 @@ import { useProductStore } from '@/stores/productStore';
         'confirmation-modal': ConfirmationModalV,
         'vue-final-modal': VueFinalModal,
         draggable,
-        SlideTocButton
+        SlideTocButton,
+        spinner: VueSpinnerOval
     }
 })
 export default class SlideTocV extends Vue {
-    @Prop() slides!: MultiLanguageSlide[];
-    @Prop() currentSlide!: Slide | string;
     @Prop() slideIndex!: number;
     @Prop() lang!: string;
     @Prop() closeSidebar!: () => void;
     @Prop({ default: false }) isMobileSidebar!: boolean;
 
     productStore = useProductStore();
+    editorStore = useEditorStore();
 
     defaultBlankSlide: Slide = {
         title: '',
@@ -440,7 +449,7 @@ export default class SlideTocV extends Vue {
      * @param lang Specific config in slide to check ('en' or 'fr')
      */
     configEmpty(index: number, lang: keyof MultiLanguageSlide): boolean {
-        const slide: MultiLanguageSlide = this.slides[index];
+        const slide: MultiLanguageSlide = this.productStore.slides[index];
         return JSON.stringify(slide[lang]) === JSON.stringify(this.defaultBlankSlide);
     }
 
@@ -457,13 +466,13 @@ export default class SlideTocV extends Vue {
      * Adds a new slide at the end of the current list.
      */
     addNewSlide(): void {
-        this.slides.push({
+        this.productStore.slides.push({
             en: JSON.parse(JSON.stringify(this.defaultBlankSlide)),
             fr: JSON.parse(JSON.stringify(this.defaultBlankSlide))
         });
-        this.selectSlide(this.slides.length - 1, this.lang);
-        this.$emit('slides-updated', this.slides);
-        this.$emit('scroll-to-element', this.slides.length - 1);
+        this.selectSlide(this.productStore.slides.length - 1, this.lang);
+        this.$emit('slides-updated', this.productStore.slides);
+        this.$emit('scroll-to-element', this.productStore.slides.length - 1);
     }
 
     /**
@@ -474,11 +483,13 @@ export default class SlideTocV extends Vue {
     deleteConfig(slides: MultiLanguageSlide, currLang: 'en' | 'fr'): void {
         slides[currLang]?.panel.forEach((panel: BasePanel) => this.productStore.removeSourceCounts(panel));
         slides[currLang] = undefined;
-        this.$emit('slides-updated', this.slides);
+        this.$emit('slides-updated', this.productStore.slides);
     }
 
     // Assumes that you've already checked that the other lang DOES have a config.
     copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): void {
+        console.log(' ');
+        console.log('copyConfigFromOtherLang()');
         const oppositeLang = currLang === 'en' ? 'fr' : 'en';
         // Called on each image/video panel in the opposite lang's config (at the provided index)
         // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
@@ -544,19 +555,25 @@ export default class SlideTocV extends Vue {
             }
         };
 
-        this.slides[index][oppositeLang]?.panel.forEach((panel) => {
+        this.productStore.slides[index][oppositeLang].panel.forEach((panel) => {
             this.productStore.panelHelper(panel, oppositeToSharedFolder, oppositeLang);
         });
 
         // TODO: find better alternative to setTimeout. This code MUST execute after the callback above executes on each
         // panel in the opposite lang's slide. Otherwise it will copy the contents of the opposite config before its
-        // src values are updated
+        // src values are updated (update: now panelHelper is in store, so we can make it return a Promise, and execute
+        // the below code once it resolves)
         setTimeout(() => {
-            (this.slides[index][currLang] as Slide).panel.forEach((panel) =>
+            this.productStore.slides[index][currLang].panel.forEach((panel) =>
                 this.productStore.removeSourceCounts(panel)
             );
-            this.slides[index][currLang] = JSON.parse(JSON.stringify(this.slides[index][oppositeLang]));
-            this.$emit('slides-updated', this.slides);
+            this.productStore.slides[index][currLang] = JSON.parse(
+                JSON.stringify(this.productStore.slides[index][oppositeLang])
+            );
+
+            console.log('slides-updated emitted');
+            this.$emit('slides-updated');
+            console.log('slide-change emittedf');
             this.$emit('slide-change', index, currLang);
         }, 300);
     }
@@ -568,14 +585,14 @@ export default class SlideTocV extends Vue {
      */
     createNewConfig(index: number, currLang: 'en' | 'fr'): void {
         // Before wiping the slides, remove source counts as necessary.
-        this.slides[index][currLang]!.panel.forEach((panel: BasePanel) => {
+        this.productStore.slides[index][currLang]!.panel.forEach((panel: BasePanel) => {
             // Remove source counts for each panel in the current config
             this.productStore.removeSourceCounts(panel);
         });
 
-        this.slides[index][currLang] = JSON.parse(JSON.stringify(this.defaultBlankSlide));
+        this.productStore.slides[index][currLang] = JSON.parse(JSON.stringify(this.defaultBlankSlide));
 
-        this.$emit('slides-updated', this.slides);
+        this.$emit('slides-updated', this.productStore.slides);
         this.$emit('slide-change', index, currLang);
     }
 
@@ -599,18 +616,26 @@ export default class SlideTocV extends Vue {
                 this.productStore.sourceCounts[source] += 1;
             }
         };
-        this.slides[index]?.en?.panel.forEach((panel) => this.productStore.panelHelper(panel, incrementSourceCounts));
-        this.slides[index]?.fr?.panel.forEach((panel) => this.productStore.panelHelper(panel, incrementSourceCounts));
+        this.productStore.slides[index].en.panel.forEach((panel) =>
+            this.productStore.panelHelper(panel, incrementSourceCounts)
+        );
+        this.productStore.slides[index].fr.panel.forEach((panel) =>
+            this.productStore.panelHelper(panel, incrementSourceCounts)
+        );
 
         // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
-        this.slides.splice(index + 1, 0, cloneDeep(this.slides[index]));
-        this.$emit('slides-updated', this.slides);
+        this.productStore.slides.splice(index + 1, 0, cloneDeep(this.productStore.slides[index]));
+        this.$emit('slides-updated', this.productStore.slides);
         this.selectSlide(index + 1, this.lang);
         Message.success(this.$t('editor.slide.copy.success'));
         this.$emit('scroll-to-element', index + 1);
     }
 
     removeSlide(index: number): void {
+        console.log(' ');
+        console.log('removeSlide()');
+        console.log('index');
+        console.log(index);
         if (index === this.slideIndex) {
             this.selectSlide(-1, this.lang);
             // this.$emit('slide-change', -1);
@@ -618,15 +643,15 @@ export default class SlideTocV extends Vue {
 
         // Before removing the slide, updated the sources for the panels.
         this.removeSourceCounts(index);
-
-        this.slides.splice(index, 1);
-        this.selectSlide(this.slides.length - 1, this.lang);
-        this.$emit('slides-updated', this.slides);
+        this.productStore.slides.splice(index, 1);
+        this.$emit('slides-updated', this.productStore.slides);
     }
 
     removeSourceCounts(deletedIndex: number): void {
-        let panelEn = this.slides.find((slide: MultiLanguageSlide, idx: number) => idx === deletedIndex)?.en?.panel;
-        let panelFr = this.slides.find((slide: MultiLanguageSlide, idx: number) => idx === deletedIndex)?.fr?.panel;
+        let panelEn = this.productStore.slides.find((slide: MultiLanguageSlide, idx: number) => idx === deletedIndex)
+            ?.en?.panel;
+        let panelFr = this.productStore.slides.find((slide: MultiLanguageSlide, idx: number) => idx === deletedIndex)
+            ?.fr?.panel;
 
         panelEn?.forEach((p: BasePanel) => this.productStore.removeSourceCounts(p));
         panelFr?.forEach((p: BasePanel) => this.productStore.removeSourceCounts(p));
@@ -638,13 +663,13 @@ export default class SlideTocV extends Vue {
     }
 
     moveDown(index: number): void {
-        this.slides.splice(index + 1, 0, this.slides.splice(index, 1)[0]);
+        this.productStore.slides.splice(index + 1, 0, this.productStore.slides.splice(index, 1)[0]);
         this.$emit('scroll-to-element', index + 1);
-        this.$emit('slides-updated', this.slides);
+        this.$emit('slides-updated', this.productStore.slides);
     }
 
     getSlideId(slide: MultiLanguageSlide): string {
-        return 'slide' + this.slides.indexOf(slide);
+        return 'slide' + this.productStore.slides.indexOf(slide);
     }
 
     resizeMobile(): void {

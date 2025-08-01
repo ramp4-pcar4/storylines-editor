@@ -201,7 +201,7 @@ export default class StoryPreviewV extends Vue {
                 }
             };
             const minsRemaining = window.props.timeRemaining / 60;
-            const warnMins = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
+            const warnMins = 3; // import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
             if (minsRemaining <= warnMins) {
                 // Preview tab was opened with < the amount of time remaining in a session timeout that we have to show the warning
                 // Therefore, display warning immediately and do not track activity.

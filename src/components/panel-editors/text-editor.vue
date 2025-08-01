@@ -13,6 +13,7 @@
                 :left-toolbar="toolbarOptions"
                 :toolbar="toolbar"
                 @fullscreen-change="onFullscreenChange"
+                ref="mdEditor"
             ></v-md-editor>
         </div>
         <!-- WET Component Dashboard. Only accessible if using the Canada.ca template. -->
@@ -48,6 +49,8 @@ import { applyTextAlign } from '@/utils/styleUtils';
 import WETDashboardItemV from '../support/wet-dashboard-item.vue';
 import WETComponents from '../support/wet-component-templates.json';
 import DOMPurify from 'dompurify';
+
+import VueMarkdownEditor from '@kangc/v-md-editor/lib/codemirror-editor';
 
 interface MDEditor {
     insert(callback: (selected: string) => { text: string; selected: string }): void;

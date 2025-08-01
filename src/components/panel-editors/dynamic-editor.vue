@@ -47,18 +47,6 @@
                             @ok="() => removeSlide(item.panel as any, idx)"
                         />
                     </tr>
-                    <tr class="table-add-row">
-                        <td class="flex flex-col items-center">
-                            <input
-                                id="panelId"
-                                class="respected-standard-input"
-                                type="text"
-                                :placeholder="$t('dynamic.panel.enterID')"
-                                v-model="newSlideName"
-                                :aria-label="$t('dynamic.panel.enterID')"
-                            />
-                        </td>
-                    </tr>
 
                     <tr class="table-add-row">
                         <td class="flex flex-col items-center">
