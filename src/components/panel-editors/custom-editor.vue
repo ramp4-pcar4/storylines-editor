@@ -67,6 +67,17 @@ import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
 
+const panelTypeToSchemaKey = {
+    text: 'textPanel',
+    map: 'mapPanel',
+    video: 'multimediaVideo',
+    chart: 'dqvchartPanel',
+    dynamic: 'dynamicPanel',
+    image: 'multimediaImage'
+} as const;
+
+type PanelType = keyof typeof panelTypeToSchemaKey;
+
 @Options({
     components: {
         'json-editor': Vue3JsonEditor
@@ -100,6 +111,14 @@ export default class CustomEditorV extends Vue {
             };
 
             this.updatedConfig = this.config;
+
+            const checkValidation = this.validator.validate(this.updatedConfig, this.storylinesSchema as any);
+            if (checkValidation.errors.length !== 0) {
+                // adding defaults for existing products that have missing required properties
+                this.normalizeConfig(this.config, this.storylinesSchema.$defs.slide, this.storylinesSchema, true);
+                // correct value types in config to match schema definitions.
+                this.normalizeConfig(this.config, this.storylinesSchema.$defs.slide, this.storylinesSchema, false);
+            }
             this.validate();
         });
 
@@ -110,6 +129,97 @@ export default class CustomEditorV extends Vue {
                 textarea.setAttribute('aria-label', this.$t('editor.slides.advanced.editor'));
             }
         });
+    }
+
+    // Helper function that either fills in missing required values or coerces incorrect types into the expected type format.
+    defaultValues(type: string, value?: any) {
+        switch (type) {
+            case 'array':
+                return Array.isArray(value) ? value : [];
+            case 'string':
+                return value !== undefined && value !== null ? String(value) : '';
+            case 'number':
+                return isNaN(Number(value)) ? 0 : Number(value);
+            case 'boolean':
+                if (value === 'true' || value === true) return true;
+                if (value === 'false' || value === false) return false;
+                return Boolean(value);
+            default:
+                return value;
+        }
+    }
+
+    // Helper function that resolves a $ref in a JSON Schema to its actual schema definition.
+    resolveSchemaRef(schemaPart: any, rootSchema: any) {
+        if (!schemaPart) return null;
+        if (schemaPart.$ref) {
+            const path = schemaPart.$ref.replace(/^#\//, '').split('/');
+            return path.reduce((acc: any, part: any) => acc && acc[part], rootSchema);
+        }
+        return schemaPart;
+    }
+
+    /**
+     * Recursively normalizes a config object against the JSON Schema definition.
+     * For older products where required types may be missing or of the wrong type.
+     *
+     * Supports two modes:
+     *  - Injecting missing required fields with default values (`injectRequired = true`)
+     *  - Coercing existing values to the correct types (`injectRequired = false`)
+     */
+    normalizeConfig(config: any, schema: any, rootSchema: any, injectRequired: boolean) {
+        if (!schema || typeof schema !== 'object' || !config) return;
+
+        const fields = injectRequired ? schema.required || [] : Object.keys(config);
+        const properties = schema.properties || {};
+
+        for (const key of fields) {
+            if (!properties[key]) continue;
+
+            // resolve $ref if property references another schema definition
+            const resolvedSchema = this.resolveSchemaRef(properties[key], rootSchema);
+
+            // inject default values for missing required fields
+            if (injectRequired && !(key in config)) {
+                config[key] = this.defaultValues(resolvedSchema.type, resolvedSchema.default);
+                continue;
+            }
+            // coerce value to the correct type if incorrect
+            else if (resolvedSchema.type && !(typeof config[key] === resolvedSchema.type)) {
+                config[key] = this.defaultValues(resolvedSchema.type, config[key]);
+            }
+            // special case for video types, because it currently shows schema errors if it's an empty
+            else if (key === 'videoType' && config[key] === '') {
+                if (config['src'].startsWith('http')) {
+                    config[key] = 'external';
+                } else {
+                    config[key] = 'local';
+                }
+            }
+
+            const value = config[key];
+
+            // if value is an array (e.g., panel), normalize each item
+            if (Array.isArray(value) && resolvedSchema.items) {
+                for (const item of value) {
+                    const schemaKey = panelTypeToSchemaKey[item?.type as PanelType];
+                    const itemSchema = schemaKey ? rootSchema.$defs?.[schemaKey] : resolvedSchema.items;
+                    if (itemSchema) this.normalizeConfig(item, itemSchema, rootSchema, injectRequired);
+                }
+            } else if (typeof value === 'object' && value !== null) {
+                this.normalizeConfig(value, resolvedSchema, rootSchema, injectRequired);
+            }
+        }
+
+        // if current config has an `items` array (e.g., for slideshows and dynamic panels), recurse into them as well
+        if (Array.isArray(config?.items)) {
+            for (const nestedItem of config.items) {
+                const nestedSchema = nestedItem?.type
+                    ? rootSchema.$defs?.[`${panelTypeToSchemaKey[nestedItem.type as PanelType]}`]
+                    : null;
+                if (nestedSchema) this.normalizeConfig(nestedItem, nestedSchema, rootSchema, injectRequired);
+            }
+        }
     }
 
     // returns true if no validation errors, false if errors
