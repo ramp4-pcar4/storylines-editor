@@ -4,10 +4,10 @@
         class="flex gap-2 px-2 rounded-md bg-transparent hover:bg-gray-200"
         :disabled="!element[selectedLang]"
         :class="{
-            'selected-toc-config-item': element[selectedLang] === currentSlide,
+            'selected-toc-config-item': element[selectedLang] === productStore.currentSlide,
             'py-1': !isMobileSidebar,
             'py-2': isMobileSidebar,
-            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === currentSlide,
+            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === productStore.currentSlide,
             'cursor-not-allowed border-2 border-red-400': !element[selectedLang]
         }"
         @click.stop="
@@ -162,8 +162,9 @@
 <script lang="ts">
 import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
-import TocOptions from './toc-options.vue';
+import { useProductStore } from '@/stores/productStore';
 
+import TocOptions from './toc-options.vue';
 import TextEditorIcon from '@/assets/text-editor.svg?raw';
 import ImageEditorIcon from '@/assets/image-editor.svg?raw';
 import MapEditorIcon from '@/assets/map-editor.svg?raw';
@@ -181,10 +182,10 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
 export default class SlideTocV extends Vue {
     @Prop() selectedLang!: 'en' | 'fr';
     @Prop() element!: MultiLanguageSlide;
-    @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
     @Prop() isActiveSlide!: boolean;
 
+    productStore = useProductStore();
     oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
 

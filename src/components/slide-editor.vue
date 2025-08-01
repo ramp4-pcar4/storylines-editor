@@ -573,10 +573,8 @@ import { useProductStore } from '@/stores/productStore';
 })
 export default class SlideEditorV extends Vue {
     config: StoryRampConfig | undefined = undefined;
-    @Prop() currentSlide!: Slide;
     @Prop() lang!: string;
     @Prop() uid!: string;
-    @Prop() slideIndex!: number;
     @Prop() isLast!: boolean;
     @Prop() otherLangSlide!: Slide;
 
@@ -605,6 +603,14 @@ export default class SlideEditorV extends Vue {
         loading: 'loading-page',
         dynamic: 'dynamic-editor'
     };
+
+    get slideIndex(): number {
+        return this.productStore.slideIndex;
+    }
+
+    get currentSlide(): Slide {
+        return this.productStore.currentSlide as Slide;
+    }
 
     mounted() {
         this.langTranslate = this.$t(`editor.lang.${this.lang}`);
