@@ -70,6 +70,7 @@
                     {{ $t('story.date') }}
                     {{ config.dateModified }}
                 </div>
+                <div class="footer-padding" v-if="footerPadding" :style="footerPaddingStyle"></div>
             </div>
         </div>
         <div v-else></div>
@@ -91,6 +92,7 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
 import Message from 'vue-m-message';
 import { Options, Vue } from 'vue-property-decorator';
 import { ConfigFileStructure, StoryRampConfig } from '@/definitions';
@@ -114,6 +116,15 @@ export default class StoryPreviewV extends Vue {
     configFileStructure: ConfigFileStructure | undefined = undefined;
     savedProduct = false;
     loadStatus = 'loading';
+    footerPadding = computed(
+        () => !window.location.href.includes('index-ca-en.html') && !window.location.href.includes('index-ca-fr.html')
+    );
+    lastSlideHeight = 0;
+    footerPaddingStyle = computed(() => {
+        this.measure();
+        const h = `calc(100dvh - ${this.lastSlideHeight + this.extraHeight}px)`;
+        return { height: h };
+    });
     activeChapterIndex = -1;
     lang = 'en';
     headerHeight = 0;
@@ -127,6 +138,16 @@ export default class StoryPreviewV extends Vue {
     confirmationTimeout: NodeJS.Timeout | undefined = undefined; // the timer to show the session extension confirmation modal
     totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
     localStorageKey = 'preview-broadcast-channel';
+    extraHeight = 0;
+
+    measure(): void {
+        const nav = document.getElementById('h-navbar');
+        const header = document.getElementById('story-header');
+        this.extraHeight = nav ? nav.offsetHeight : 0; //horizontal navbar
+        this.extraHeight += header ? header.offsetHeight : 0; //header
+        console.log(this.extraHeight);
+        this.extraHeight += 40 + 56 + 60 - 20; //bottom padding of story, context in footer, date modified, some extra padding
+    }
 
     extendSession(showPopup?: boolean): void {
         // Only send message to other BroadcastChannel if preview is connected to editor
@@ -146,6 +167,7 @@ export default class StoryPreviewV extends Vue {
     }
 
     async mounted() {
+        window.addEventListener('resize', this.measure);
         this.uid = this.$route.params.uid as string;
         this.lang = this.$route.params.lang as string;
         const lockStore = useLockStore();
@@ -367,6 +389,11 @@ export default class StoryPreviewV extends Vue {
         const headerH = document.getElementById('story-header');
         if (headerH) {
             this.headerHeight = headerH.clientHeight;
+        }
+        const slides = document.querySelectorAll('.story-slide');
+        const lastSlide = slides[slides.length - 1] as HTMLElement;
+        if (lastSlide) {
+            this.lastSlideHeight = lastSlide.offsetHeight;
         }
     }
 }
