@@ -97,6 +97,12 @@
                 :list="slides"
                 @update="$emit('slides-updated', slides)"
                 :item-key="getSlideId"
+                v-tippy="{
+                    trigger: 'focus',
+                    delay: '200',
+                    placement: 'top',
+                    content: $t('editor.slides.toc.selectSlide')
+                }"
                 v-focus-list
             >
                 <template #item="{ element, index }">
