@@ -452,8 +452,6 @@
                 <slide-toc
                     class="flex-1"
                     :slides="slides"
-                    :currentSlide="currentSlide"
-                    :slideIndex="slideIndex"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
@@ -468,8 +466,6 @@
                 <!-- Bigger buttons, more visual dividers, more colors -->
                 <slide-toc
                     :slides="slides"
-                    :currentSlide="currentSlide"
-                    :slideIndex="slideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="$vfm.open('metadata-edit-modal')"
@@ -485,13 +481,11 @@
                 <slide-editor
                     class="editor-area w-full"
                     ref="slide"
-                    :currentSlide="currentSlide"
                     :otherLangSlide="
-                        slides[slideIndex]?.[slides.find((slide) => slide.fr === currentSlide) ? 'en' : 'fr']
+                        slides[productStore.slideIndex]?.[slides.find((slide) => slide.fr === productStore.currentSlide) ? 'en' : 'fr']
                     "
-                    :lang="slides.find((slide) => slide.fr === currentSlide) ? 'fr' : 'en'"
-                    :slideIndex="slideIndex"
-                    :isLast="slideIndex === slides.length - 1"
+                    :lang="slides.find((slide) => slide.fr === productStore.currentSlide) ? 'fr' : 'en'"
+                    :isLast="productStore.slideIndex === slides.length - 1"
                     :uid="uuid"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
@@ -555,8 +549,6 @@ export default class EditorV extends Vue {
     uuid = '';
     logoImage: undefined | File = undefined;
     loadSlides: undefined | MultiLanguageSlide[] = undefined;
-    currentSlide: Slide | string = '';
-    slideIndex = -1;
     helpSections: HelpSection[] = [];
     helpMd = '';
     originalTextArray: string[] = [];
@@ -641,7 +633,7 @@ export default class EditorV extends Vue {
         }
 
         // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
-        this.currentSlide = {
+        this.productStore.currentSlide = {
             title: '',
             panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
         };
@@ -653,16 +645,17 @@ export default class EditorV extends Vue {
 
         setTimeout(() => {
             if (index === -1 || !this.loadSlides) {
-                this.currentSlide = '';
+                this.productStore.currentSlide = '';
             } else {
                 const selectedLang = newLang as keyof MultiLanguageSlide;
                 const selectedSlide = this.loadSlides[index][selectedLang];
 
                 // If the requested language config for a slide doesn't exist, open the other language
                 // This edge case should ONLY pop up while using the "Next/Previous Slide" buttons
-                this.currentSlide = selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
+                this.productStore.currentSlide =
+                    selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
             }
-            this.slideIndex = index;
+            this.productStore.slideIndex = index;
             (this.$refs.slide as SlideEditorV).panelIndex = 0;
             (this.$refs.slide as SlideEditorV).advancedEditorView = false;
         }, 5);
@@ -674,10 +667,10 @@ export default class EditorV extends Vue {
     updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
         const configLang = this.productStore.configLang;
 
-        this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+        this.productStore.currentSlide = slideConfig;
+        this.slides[this.productStore.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
 
-        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
+        this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.productStore.slideIndex] =
             slideConfig;
 
         // save changes emitted from advanced editor
@@ -691,9 +684,10 @@ export default class EditorV extends Vue {
      */
     updateSlides(slides: MultiLanguageSlide[]): void {
         this.loadSlides = slides;
-        this.slideIndex = this.loadSlides.findIndex(
+        this.productStore.slideIndex = this.loadSlides.findIndex(
             (bothSlides) =>
-                (this.currentSlide as Slide) === bothSlides['en'] || (this.currentSlide as Slide) === bothSlides['fr']
+                (this.productStore.currentSlide as Slide) === bothSlides['en'] ||
+                (this.productStore.currentSlide as Slide) === bothSlides['fr']
         );
         this.productStore.configs.en!.slides = this.slides.map((slides) => slides.en!);
         this.productStore.configs.fr!.slides = this.slides.map((slides) => slides.fr!);
@@ -746,7 +740,7 @@ export default class EditorV extends Vue {
     }
 
     exportProduct(): void {
-        if (this.$refs.slide != null && this.currentSlide !== '') {
+        if (this.$refs.slide != null && this.productStore.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
@@ -759,7 +753,7 @@ export default class EditorV extends Vue {
      */
     preview(language: string): void {
         // save current slide final changes before previewing product
-        if (this.$refs.slide != null && this.currentSlide !== '') {
+        if (this.$refs.slide != null && this.productStore.currentSlide !== '') {
             (this.$refs.slide as SlideEditorV).saveChanges();
         }
 
