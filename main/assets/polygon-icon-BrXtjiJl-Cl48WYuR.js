@@ -1,0 +1,1 @@
+import{fh as t,fo as l,fA as n,fr as o}from"./main-DK5A1thH.js";const r={},s={xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"};function a(f,e){return l(),n("svg",s,e[0]||(e[0]=[o("path",{d:"M0 0h24v24H0z",fill:"none"},null,-1),o("path",{d:"M3 6l6-3 6 3 6-3v12l-6 3-6-3-6 3z"},null,-1)]))}const d=t(r,[["render",a]]);export{d as default};
