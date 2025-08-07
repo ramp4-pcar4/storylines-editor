@@ -104,7 +104,7 @@
                     <!-- Whole-slide options -->
                     <div class="respected-standard-options-area mt-3">
                         <!-- Center slide content -->
-                        <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
+                        <div class="flex flex-row items-center">
                             <input
                                 type="checkbox"
                                 id="centerSlide"
@@ -119,7 +119,7 @@
                         </div>
 
                         <!-- Include slide in ToC -->
-                        <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
+                        <div class="flex flex-row items-center">
                             <input
                                 type="checkbox"
                                 id="inToc"
@@ -406,8 +406,7 @@
                 <div v-if="!advancedEditorView" class="respected-standard-options-area mt-3">
                     <!-- Make the current panel the full slide -->
                     <div
-                        class="flex flex-row"
-                        :class="{ 'items-center': !currentRoute.includes('index-ca') }"
+                        class="flex flex-row items-center"
                         v-if="determineEditorType(currentSlide.panel[0]) !== 'dynamic'"
                     >
                         <input
@@ -428,13 +427,13 @@
                                 }
                             "
                         />
-                        <label class="ml-0" for="fullSlide">
+                        <label class="ml-0" :class="{ 'pt-1': currentRoute.includes('index-ca') }" for="fullSlide">
                             <span class="font-semibold ml-0">{{ $t('editor.slides.makeFull') }}</span>
                         </label>
                     </div>
 
                     <!-- Center panel content -->
-                    <div class="flex flex-row" :class="{ 'items-center': !currentRoute.includes('index-ca') }">
+                    <div class="flex flex-row items-center">
                         <input
                             type="checkbox"
                             id="centerPanel"
@@ -443,7 +442,7 @@
                             :disabled="centerSlide"
                             @change.stop="toggleCenterPanel()"
                         />
-                        <label class="ml-0" for="centerPanel">
+                        <label class="ml-0" :class="{ 'pt-1': currentRoute.includes('index-ca') }" for="centerPanel">
                             <span class="font-semibold">{{ $t('editor.slides.centerPanel') }}</span>
                         </label>
                     </div>
