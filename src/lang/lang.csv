@@ -362,7 +362,6 @@ editor.returnTop,Include return to top navigation,1,Inclure le retour en haut de
 editor.sameConfig,Same across configurations,1,Identique dans toutes les configurations,1
 editor.sameConfig.info,"Determines whether the table of contents orientation and return-to-top navigation are shared across English and French configurations.",1,"Détermine si l'orientation de la table des matières et la navigation de retour en haut de page sont communes aux configurations anglaise 
 et française.",1
-editor.sameConfig.tooltip,"Navigation and layout settings are currently synchronized. They can be customized per language on the next page in the metadata editor.",1,Les paramètres de navigation et de mise en page sont actuellement synchronisés. Ils peuvent être personnalisés par langue à la page suivante dans l'éditeur de métadonnées.,1
 editor.landing.greeting,Hello,1,Bonjour,1
 editor.month.january,January,1,Janvier,0
 editor.month.february,February,1,Février,0
