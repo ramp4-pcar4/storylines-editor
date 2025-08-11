@@ -458,7 +458,7 @@
                     @slide-change="selectSlide"
                     @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
                     @slides-updated="updateSlides"
-                    @open-metadata-modal="$vfm.open('metadata-edit-modal')"
+                    @open-metadata-modal="openMetadataModal"
                     :lang="productStore.configLang"
                 ></slide-toc>
             </div>
@@ -609,6 +609,17 @@ export default class EditorV extends Vue {
 
     beforeDestroy(): void {
         window.removeEventListener('beforeunload', this.beforeWindowUnload);
+    }
+
+    /**
+     * Opens the metadata editing modal for the currently selected slide language.
+     */
+    openMetadataModal() {
+        const newMetadata = this.productStore.configs[this.productStore.configLang];
+        if (!newMetadata) return;
+
+        Object.assign(this.metadata, newMetadata);
+        this.$vfm.open('metadata-edit-modal');
     }
 
     /**

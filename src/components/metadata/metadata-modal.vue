@@ -46,7 +46,6 @@
             <div class="mx-4">
                 <metadata-content
                     :metadata="metadata"
-                    :createNew="false"
                     @metadata-changed="(key: string, value: string) => $emit('metadata-changed', key, value)"
                     @image-changed="(event: Event, type: string) => $emit('image-changed', event, type)"
                     @image-source-changed="(event: Event, type: string) => $emit('image-source-changed', event, type)"
