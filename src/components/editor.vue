@@ -220,6 +220,7 @@
                                 name: 'editor',
                                 params: { lang: currentRoute.includes('#/en') ? 'fr' : 'en', uid: uuid }
                             }"
+                            @click="productStore.configLang = currentRoute.includes('#/en') ? 'fr' : 'en'"
                             class="respected-standard-link-button px-2"
                         >
                             <a>
@@ -238,7 +239,9 @@
                             <span
                                 tabindex="0"
                                 class="font-semibold text-lg line-clamp-1 leading-snug"
-                                :class="{ italic: !metadata.title }"
+                                :class="{
+                                    italic: !productStore.configs[$route.params.lang as SupportedLanguages]?.title
+                                }"
                                 v-truncate="{
                                     options: {
                                         delay: '200',
@@ -248,12 +251,19 @@
                                         touch: ['hold', 500]
                                     }
                                 }"
-                                >{{ metadata.title || $t('editor.untitledProject') }}</span
+                                >{{
+                                    productStore.configs[$route.params.lang as SupportedLanguages]?.title ||
+                                    $t('editor.untitledProject')
+                                }}</span
                             >
                             <span
                                 tabindex="0"
                                 class="line-clamp-1"
-                                :class="metadata.title ? 'text-xs' : ''"
+                                :class="
+                                    productStore.configs[$route.params.lang as SupportedLanguages]?.title
+                                        ? 'text-xs'
+                                        : ''
+                                "
                                 v-truncate="{
                                     options: {
                                         delay: '200',
@@ -458,7 +468,7 @@
                     @slide-change="selectSlide"
                     @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
                     @slides-updated="updateSlides"
-                    @open-metadata-modal="$vfm.open('metadata-edit-modal')"
+                    @open-metadata-modal="$emit('open-metadata-modal')"
                     :lang="productStore.configLang"
                 ></slide-toc>
             </div>
