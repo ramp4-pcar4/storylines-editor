@@ -581,7 +581,7 @@ label {
 }
 
 :deep(.v-md-icon-link::before) {
-    content: '\1F517';
+    content: '\1F517\fe0e';
 }
 
 :deep(.v-md-editor__tooltip) {
