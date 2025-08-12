@@ -580,8 +580,8 @@ label {
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
-:deep(.v-md-icon-link::before) {
-    content: '\1F517';
+:deep(.v-md-icon-link::before){
+  content: '\1F517\fe0e'
 }
 
 :deep(.v-md-editor__tooltip) {
