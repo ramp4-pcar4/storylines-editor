@@ -1,0 +1,1 @@
+import{I as e}from"./enums-DBi1-Mm2-CUS1pvQe.js";function r(c){switch(c){case e.BYTE:case e.UNSIGNED_BYTE:return 1;case e.SHORT:case e.UNSIGNED_SHORT:case e.HALF_FLOAT:return 2;case e.FLOAT:case e.INT:case e.UNSIGNED_INT:return 4}}export{r as a};
