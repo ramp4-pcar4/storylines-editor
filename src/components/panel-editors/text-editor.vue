@@ -9,6 +9,7 @@
         >
             <v-md-editor
                 v-model="panel.content"
+                :include-level="[1, 2, 3, 4]"
                 height="400px"
                 :left-toolbar="toolbarOptions"
                 :toolbar="toolbar"
