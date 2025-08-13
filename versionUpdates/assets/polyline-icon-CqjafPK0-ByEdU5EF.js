@@ -1,0 +1,1 @@
+import{fh as n,fo as r,fA as t,fr as e}from"./main-BrXQBr3M.js";const s={},l={xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"};function a(f,o){return r(),t("svg",l,o[0]||(o[0]=[e("path",{d:"M0 0h24v24H0z",fill:"none"},null,-1),e("path",{d:"M5 17l3-3 4 4 8-8","stroke-width":"2",fill:"none",stroke:"currentColor"},null,-1)]))}const c=n(s,[["render",a]]);export{c as default};

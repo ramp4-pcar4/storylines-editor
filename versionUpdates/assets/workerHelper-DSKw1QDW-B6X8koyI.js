@@ -1,0 +1,1 @@
+import{c as f,h as t}from"./InterleavedLayout-DcHoXu73-C0HUpEXg.js";function n(u,r){return r.push(u.buffer),{buffer:u.buffer,layout:new t(u.layout)}}function o(u){return new f(u.layout).createView(u.buffer)}export{o as n,n as u};
