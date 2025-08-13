@@ -28,6 +28,15 @@ timeslider.play,Play,1,Lecture,1
 timeslider.pause,Pause,1,Pause,1
 fullscreen.activate,Enter Fullscreen,1,Afficher le mode plein écran,1
 fullscreen.deactivate,Exit Fullscreen,1,Quitter le mode plein écran,1
+chart.viewFullscreen,View in full screen,1,Plein Écran,1
+chart.printChart,Print chart,1,Imprimer,1
+chart.downloadPNG,Download PNG,1,Télécharger PNG,1
+chart.downloadJPEG,Download JPEG,1,Télécharger JPEG,1
+chart.downloadPDF,Download PDF,1,Télécharger PDF,1
+chart.downloadSVG,Download SVG,1,Télécharger SVG,1
+chart.downloadCSV,Download CSV,1,Télécharger CSV,1
+chart.downloadXLS,Download XLS,1,Télécharger XLS,1
+chart.viewData,View data table,1,Afficher le tableau de données,1
 editor.lang.en,English,1,Anglais,1
 editor.lang.fr,French,1,Français,1
 editor.ok,Ok,1,D'accord,1
