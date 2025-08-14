@@ -66,14 +66,34 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { TimeSliderConfig } from '@/definitions';
-import { Prop, Vue } from 'vue-property-decorator';
 
-export default class TimeSliderEditorV extends Vue {
-    @Prop() config!: TimeSliderConfig;
-    @Prop() error!: boolean;
-}
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = defineProps<{
+    config: TimeSliderConfig;
+    error: boolean;
+}>();
+
+const emit = defineEmits(['time-slider-changed']);
+
+// =========================================
+// Definitions
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss" scoped>

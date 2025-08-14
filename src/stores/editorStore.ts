@@ -9,6 +9,8 @@ import { defineStore } from 'pinia';
 import { vfm } from '../plugins/vfm/index';
 import router from '../router';
 
+import { Slide } from '@/definitions';
+
 interface EditorState {
     loadExisting: boolean;
     reloadExisting: boolean;
@@ -118,7 +120,7 @@ export const useEditorStore = defineStore('editor', {
             // We prompt the user to extend the session when session warn minutes have passed.
             const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
             const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-            const timeBuffer = isFirefox ? 2000 : 0;
+            const timeBuffer = isFirefox ? 5000 : 0;
             lockStore.confirmationTimeout = setTimeout(
                 () => {
                     console.log('confirmation timeout');

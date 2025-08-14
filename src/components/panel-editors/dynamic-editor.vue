@@ -25,7 +25,7 @@
         </div>
         <!-- Text Section -->
         <div v-if="editingStatus === 'text'">
-            <component :is="'text-editor'" key="text" :panel="panel" :lang="lang"></component>
+            <component :is="textSection" key="text" :panel="panel" :lang="lang"></component>
         </div>
         <!-- Panel section -->
         <div v-if="editingStatus === 'panels'">
@@ -174,7 +174,7 @@
                                 </div>
                             </td>
 
-                            <confirmation-modal
+                            <ConfirmationModalV
                                 :name="`delete-item-${idx}`"
                                 :message="$t('dynamic.panel.remove')"
                                 @ok="() => removeSlide(item as any, idx)"
@@ -193,7 +193,7 @@
                                     v-model="newSlideName"
                                     :aria-label="$t('dynamic.panel.enterID')"
                                 />
-                                <p v-if="idUsed" class="text-red-500">{{ $t('dynamic.panel.idTaken') }}</p>
+                                <p v-if="idUsed()" class="text-red-500">{{ $t('dynamic.panel.idTaken') }}</p>
                             </td>
                             <!-- New panel type input -->
                             <td>
@@ -218,7 +218,7 @@
                                     class="respected-standard-button respected-gray-border-button respected-thin-button justify-self-start"
                                     @click="createNewSlide"
                                     :aria-label="$t('dynamic.panel.add')"
-                                    :disabled="idUsed || !newSlideName"
+                                    :disabled="idUsed() || !newSlideName"
                                 >
                                     {{ $t('dynamic.panel.add') }}
                                 </button>
@@ -254,7 +254,7 @@
                 <!-- Actual panel editor -->
                 <component
                     ref="slide"
-                    :is="editors[determineEditorType(panel.children[editingSlide].panel)]"
+                    :is="dynamicPanelEditor"
                     :key="editingSlide + determineEditorType(panel.children[editingSlide].panel)"
                     :panel="panel.children[editingSlide].panel"
                     :lang="lang"
@@ -267,8 +267,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import {
     BasePanel,
     BaseStartingConfig,
@@ -277,6 +276,7 @@ import {
     DynamicPanel,
     PanelType
 } from '@/definitions';
+import { getCurrentInstance, ref, useTemplateRef } from 'vue';
 import { applyTextAlign } from '@/utils/styleUtils';
 
 import ChartEditorV from './chart-editor.vue';
@@ -288,170 +288,186 @@ import SlideshowEditorV from './slideshow-editor.vue';
 import ConfirmationModalV from '../support/confirmation-modal.vue';
 import { useProductStore } from '@/stores/productStore';
 
-@Options({
-    components: {
-        'chart-editor': ChartEditorV,
-        'image-editor': ImageEditorV,
-        'text-editor': TextEditorV,
-        'slideshow-editor': SlideshowEditorV,
-        'dynamic-editor': DynamicEditorV,
-        'map-editor': MapEditorV,
-        'video-editor': VideoEditorV,
-        'confirmation-modal': ConfirmationModalV
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = defineProps<{
+    panel: DynamicPanel;
+    lang: string;
+    centerSlide: boolean;
+    dynamicSelected: boolean;
+}>();
+
+const emit = defineEmits(['slide-edit']);
+
+// =========================================
+// Definitions
+
+const { $nextTick } = getCurrentInstance()!.proxy!;
+
+const editors: Record<string, any> = {
+    text: TextEditorV,
+    image: ImageEditorV,
+    slideshow: SlideshowEditorV,
+    chart: ChartEditorV,
+    map: MapEditorV,
+    video: VideoEditorV
+};
+
+const productStore = useProductStore();
+
+const slide = useTemplateRef('slide');
+
+const startingConfig: DefaultConfigs = JSON.parse(JSON.stringify(BaseStartingConfig));
+
+const editingStatus = ref('text');
+const editingSlide = ref(-1);
+
+const newSlideName = ref('');
+const newSlideType = ref('text');
+
+const textSection = ref<any>(TextEditorV);
+const dynamicPanelEditor = ref<any>(null);
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+function idUsed(): boolean {
+    return props.panel.children.some((ch: DynamicChildItem) => ch.id === newSlideName.value);
+}
+
+function moveChildUp(index: number): void {
+    if (index === 0) {
+        return;
     }
-})
-export default class DynamicEditorV extends Vue {
-    @Prop() panel!: DynamicPanel;
-    @Prop() lang!: string;
-    @Prop() centerSlide!: boolean;
-    @Prop() dynamicSelected!: boolean;
+    const item = JSON.parse(JSON.stringify(props.panel.children[index]));
+    props.panel.children.splice(index, 1);
+    props.panel.children.splice(index - 1, 0, item);
 
-    productStore = useProductStore();
-
-    editors: Record<string, string> = {
-        text: 'text-editor',
-        image: 'image-editor',
-        slideshow: 'slideshow-editor',
-        chart: 'chart-editor',
-        map: 'map-editor',
-        video: 'video-editor'
-    };
-
-    startingConfig: DefaultConfigs = JSON.parse(JSON.stringify(BaseStartingConfig));
-
-    editingStatus = 'text';
-    editingSlide = -1;
-
-    newSlideName = '';
-    newSlideType = 'text';
-
-    get idUsed(): boolean {
-        return this.panel.children.some((ch: DynamicChildItem) => ch.id === this.newSlideName);
-    }
-
-    moveChildUp(index: number): void {
-        if (index === 0) {
-            return;
-        }
-        const item = JSON.parse(JSON.stringify(this.panel.children[index]));
-        this.panel.children.splice(index, 1);
-        this.panel.children.splice(index - 1, 0, item);
-
-        // Just in case we decide to allow it: handling edge case where a child
-        // being edited is moved. In that case, ensure focus remains on that child
-        if (this.editingSlide !== -1) {
-            // If child being edited is current child
-            if (this.editingSlide === index) {
-                this.editingSlide -= 1;
-                // If child being edited is previous child (shift it down)
-            } else if (this.editingSlide === index - 1) {
-                this.editingSlide += 1;
-            }
-        }
-    }
-
-    moveChildDown(index: number): void {
-        if (index === this.panel.children.length - 1) {
-            return;
-        }
-
-        const item = JSON.parse(JSON.stringify(this.panel.children[index]));
-        this.panel.children.splice(index, 1);
-        this.panel.children.splice(index + 1, 0, item);
-
-        // Just in case we decide to allow it: handling edge case where a child
-        // being edited is moved. In that case, ensure focus remains on that child
-        if (this.editingSlide !== -1) {
-            // If child being edited is current child
-            if (this.editingSlide === index) {
-                this.editingSlide += 1;
-                // If child being edited is next child (shift it up)
-            } else if (this.editingSlide === index + 1) {
-                this.editingSlide -= 1;
-            }
-        }
-    }
-
-    changePanel(target: string): void {
-        if (this.editingStatus !== 'text') {
-            this.saveChanges();
-        }
-        this.editingStatus = target;
-    }
-
-    switchSlide(idx: number): void {
-        if (idx === -1 && this.editingSlide !== -1) {
-            // user pressed Done, so apply styles to the last active slide
-            const editedPanel = this.panel.children[this.editingSlide].panel;
-            applyTextAlign(editedPanel, this.centerSlide, this.dynamicSelected);
-            this.editingSlide = -1;
-        } else {
-            // Save slide changes if necessary and switch to the newly selected slide.
-            this.saveChanges();
-            this.editingSlide = idx;
-
-            // After switching the edit status, scroll to the add button.
-            this.$nextTick(() => {
-                document.getElementById('editor-area')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            });
-        }
-    }
-
-    removeSlide(panel: BasePanel, index?: number): void {
-        // Update source counts based on which panel is removed.
-        this.productStore.removeSourceCounts(panel);
-
-        if (index !== undefined) {
-            // Remove the panel itself.
-            this.panel.children = this.panel.children.filter((panel: DynamicChildItem, idx: number) => idx !== index);
-
-            // If the slide being removed is the currently selected slide, unselect it.
-            if (this.editingSlide === index) {
-                this.editingSlide = -1;
-            }
-        }
-    }
-
-    createNewSlide(): void {
-        if (!this.newSlideName) return;
-
-        const newConfig = {
-            id: this.newSlideName,
-            panel: JSON.parse(JSON.stringify(this.startingConfig[this.newSlideType as keyof DefaultConfigs]))
-        };
-        this.editingSlide = this.panel.children.length;
-        // this.editingMode = false;
-        this.newSlideName = '';
-        this.panel.children.push(newConfig);
-    }
-
-    determineEditorType(panel: BasePanel): string {
-        // Determine whether the slideshow consists of only charts. If so, display the chart editor.
-        if (panel.type === 'slideshowChart') return PanelType.Chart;
-
-        // Determine whether the slideshow consists of only images. If so, display the image editor.
-        if (panel.type === 'slideshowImage') return PanelType.Image;
-
-        if (panel.type !== PanelType.Slideshow) return panel.type;
-
-        // Otherwise display the slideshow editor.
-        return PanelType.Slideshow;
-    }
-
-    saveChanges(): void {
-        console.log(' ');
-        console.log('dynamicEditor - saveChanges()');
-        console.log('slide ref');
-        console.log(this.$refs.slide);
-        if (
-            this.editingSlide !== -1 &&
-            this.$refs.slide !== undefined &&
-            typeof (this.$refs.slide as ImageEditorV | ChartEditorV)?.saveChanges === 'function'
-        ) {
-            (this.$refs.slide as ImageEditorV | ChartEditorV).saveChanges();
+    // Just in case we decide to allow it: handling edge case where a child
+    // being edited is moved. In that case, ensure focus remains on that child
+    if (editingSlide.value !== -1) {
+        // If child being edited is current child
+        if (editingSlide.value === index) {
+            editingSlide.value -= 1;
+            // If child being edited is previous child (shift it down)
+        } else if (editingSlide.value === index - 1) {
+            editingSlide.value += 1;
         }
     }
 }
+
+function moveChildDown(index: number): void {
+    if (index === props.panel.children.length - 1) {
+        return;
+    }
+
+    const item = JSON.parse(JSON.stringify(props.panel.children[index]));
+    props.panel.children.splice(index, 1);
+    props.panel.children.splice(index + 1, 0, item);
+
+    // Just in case we decide to allow it: handling edge case where a child
+    // being edited is moved. In that case, ensure focus remains on that child
+    if (editingSlide.value !== -1) {
+        // If child being edited is current child
+        if (editingSlide.value === index) {
+            editingSlide.value += 1;
+            // If child being edited is next child (shift it up)
+        } else if (editingSlide.value === index + 1) {
+            editingSlide.value -= 1;
+        }
+    }
+}
+
+function changePanel(target: string): void {
+    if (editingStatus.value !== 'text') {
+        saveChanges();
+    }
+    editingStatus.value = target;
+}
+
+function switchSlide(idx: number): void {
+    if (idx === -1 && editingSlide.value !== -1) {
+        // user pressed Done, so apply styles to the last active slide
+        const editedPanel = props.panel.children[editingSlide.value].panel;
+        dynamicPanelEditor.value = null;
+        applyTextAlign(editedPanel, props.centerSlide, props.dynamicSelected);
+        editingSlide.value = -1;
+    } else {
+        // Save slide changes if necessary and switch to the newly selected slide.
+        saveChanges();
+        editingSlide.value = idx;
+        dynamicPanelEditor.value = editors[determineEditorType(props.panel.children[editingSlide.value].panel)];
+
+        // After switching the edit status, scroll to the add button.
+        $nextTick(() => {
+            document.getElementById('editor-area')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
+    }
+}
+
+function removeSlide(panel: BasePanel, index?: number): void {
+    // Update source counts based on which panel is removed.
+    productStore.removeSourceCounts(panel);
+
+    if (index !== undefined) {
+        // Remove the panel itself.
+        props.panel.children = props.panel.children.filter((panel: DynamicChildItem, idx: number) => idx !== index);
+
+        // If the slide being removed is the currently selected slide, unselect it.
+        if (editingSlide.value === index) {
+            editingSlide.value = -1;
+        }
+    }
+}
+
+function createNewSlide(): void {
+    if (!newSlideName.value) return;
+
+    const newConfig = {
+        id: newSlideName.value,
+        panel: JSON.parse(JSON.stringify(startingConfig[newSlideType.value as keyof DefaultConfigs]))
+    };
+    editingSlide.value = props.panel.children.length;
+    // this.editingMode = false;
+    newSlideName.value = '';
+    props.panel.children.push(newConfig);
+}
+
+function determineEditorType(panel: BasePanel): string {
+    // Determine whether the slideshow consists of only charts. If so, display the chart editor.
+    if (panel.type === 'slideshowChart') return PanelType.Chart;
+
+    // Determine whether the slideshow consists of only images. If so, display the image editor.
+    if (panel.type === 'slideshowImage') return PanelType.Image;
+
+    if (panel.type !== PanelType.Slideshow) return panel.type;
+
+    // Otherwise display the slideshow editor.
+    return PanelType.Slideshow;
+}
+
+function saveChanges(): void {
+    if (
+        editingSlide.value !== -1 &&
+        slide.value !== undefined &&
+        typeof (slide.value as typeof ImageEditorV | typeof ChartEditorV)?.saveChanges === 'function'
+    ) {
+        (slide.value as typeof ImageEditorV | typeof ChartEditorV).saveChanges();
+    }
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss">

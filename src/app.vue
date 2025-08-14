@@ -4,31 +4,48 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Vue, Watch } from 'vue-property-decorator';
-import { RouteLocationNormalized } from 'vue-router';
+<script setup lang="ts">
 import { useUserStore } from './stores/userStore';
 import { useLockStore } from './stores/lockStore';
+import { getCurrentInstance, onMounted, watch } from 'vue';
 
-export default class App extends Vue {
-    @Watch('$route', { immediate: true })
-    onRouteUpdate(to: RouteLocationNormalized): void {
-        this.$i18n.locale = (to.params.lang as string) ?? 'en';
-        if (to.params.lang) {
-            document.title = this.$t(to.meta.title);
-        }
-    }
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    mounted(): void {
-        const userStore = useUserStore(this.$pinia);
-        // We can mock the user's profile for local development here if needed.
-        if (import.meta.env.VITE_APP_CURR_ENV) {
-            userStore.fetchUserProfile();
-        }
-        const lockStore = useLockStore();
-        lockStore.initConnection(); // start the handshake with the web socket server as soon as the app starts to save time
+// =========================================
+// Definitions
+
+const { $pinia, $route, $i18n } = getCurrentInstance()!.proxy!;
+
+// =========================================
+// Watchers
+
+watch($route, () => {
+    $i18n.locale = ($route.params.lang as string) ?? 'en';
+    if ($route.params.lang) {
+        document.title = $i18n.t($route.meta.title);
     }
-}
+});
+
+// =========================================
+// Lifecycle functions
+
+onMounted(() => {
+    const userStore = useUserStore($pinia);
+    // We can mock the user's profile for local development here if needed.
+    if (import.meta.env.VITE_APP_CURR_ENV) {
+        userStore.fetchUserProfile();
+    }
+    const lockStore = useLockStore();
+    lockStore.initConnection(); // start the handshake with the web socket server as soon as the app starts to save time
+});
+
+// =========================================
+// Component functions
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss">
