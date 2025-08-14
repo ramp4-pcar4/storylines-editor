@@ -1,1 +1,0 @@
-import{ct as f}from"./main-DK5A1thH.js";function s(t,e,n=0){const r=f(t,0,i);for(let o=0;o<4;o++)e[n+o]=Math.floor(256*u(r*l[o]))}function c(t,e=0){let n=0;for(let r=0;r<4;r++)n+=t[e+r]*a[r];return n}const l=[1,256,65536,16777216],a=[1/256,1/65536,1/16777216,1/4294967296],i=c(new Uint8ClampedArray([255,255,255,255]));function u(t){return t-Math.floor(t)}export{c as a,s as l};

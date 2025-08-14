@@ -1,1 +1,0 @@
-import{j2 as o}from"./main-DK5A1thH.js";function f(e,r){let t;if(typeof e=="string")t=o(e+`-seed(${r})`);else{let n=12;t=e^r;do t=107*(t>>8^t)+n|0;while(--n!=0)}return(1+t/(1<<31))/2}function u(e){return Math.floor(f(e,i)*l)}const i=53290320,l=10;export{f,u as r};
