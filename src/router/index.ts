@@ -1,6 +1,7 @@
 import LandingV from '@/components/landing.vue';
 import HomeV from '@/components/home.vue';
 import MetadataEditorV from '@/components/metadata/metadata-editor.vue';
+import EditorV from '@/components/editor.vue';
 import StoryPreviewV from '@/components/preview.vue';
 import { createRouter, createWebHashHistory, RouteLocation, RouteLocationNormalized } from 'vue-router';
 
@@ -48,7 +49,7 @@ const routes = [
     {
         path: '/:lang/editor-main/:uid',
         name: 'editor',
-        component: MetadataEditorV,
+        component: EditorV,
         props: true,
         meta: { title: 'editor.window.title' }
     },
