@@ -66,7 +66,7 @@
                             @click="
                                 renameMode = !renameMode;
                                 editorStore.changeUuid = '';
-                                warning = editorStore.warning === 'rename' ? 'none' : editorStore.warning;
+                                editorStore.warning = editorStore.warning === 'rename' ? 'none' : editorStore.warning;
                             "
                         >
                             {{ renameMode ? $t('editor.cancel') : $t('editor.changeUuid') }}
@@ -123,7 +123,7 @@
 
                             <!-- If config is loading, display a small spinner. -->
                             <div class="inline-flex align-middle mb-1" v-if="checkingUuid || processingRename">
-                                <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                                <VueSpinnerOval size="24px" color="#009cd1" class="mx-2 my-auto"></VueSpinnerOval>
                             </div>
                         </div>
                         <!-- UUID entry (default) -->
@@ -187,7 +187,7 @@
                                 </div>
                                 <!-- If config is loading, display a small spinner. -->
                                 <div class="inline-flex align-middle ml-1 mb-1" v-if="checkingUuid && !editExisting">
-                                    <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                                    <VueSpinnerOval size="24px" color="#009cd1" class="mx-2 my-auto"></VueSpinnerOval>
                                 </div>
                                 <!-- Load UUID button -->
                                 <!-- Load storyline with the given UUID, if it exists on the server, and also
@@ -221,7 +221,7 @@
                             </p>
                             <!-- Spinner -->
                             <div class="align-middle mb-1">
-                                <spinner size="65px" thickness="20" color="#009cd1" class="mx-2 my-auto"></spinner>
+                                <VueSpinnerOval size="65px" thickness="20" color="#009cd1" class="mx-2 my-auto" />
                             </div>
                             <!-- Cancel load button -->
                             <div class="flex">
@@ -455,10 +455,10 @@
                                 <!-- The form -->
                                 <!-- If editingMetadata === false, form is read-only; if true, it can be edited -->
                                 <!-- New projects can only be in edit mode; existing projects can be in both -->
-                                <metadata-content
+                                <MetadataContentV
                                     :createNew="true && !editExisting"
                                     :editing="editorStore.editingMetadata"
-                                ></metadata-content>
+                                ></MetadataContentV>
                                 <!-- Save/discard changes buttons (existing only) -->
                                 <div v-if="editorStore.editingMetadata && editExisting" class="flex gap-3 mt-2">
                                     <!-- Save changes -->
@@ -542,7 +542,7 @@
                 >
                     <!-- If config is loading, display a small spinner. -->
                     <div class="inline-flex align-middle ml-1 mb-1" v-if="loadingIntoEditor">
-                        <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                        <VueSpinnerOval size="24px" color="#009cd1" class="mx-2 my-auto"></VueSpinnerOval>
                     </div>
                     <button
                         :disabled="
@@ -573,7 +573,7 @@
                     </button>
                 </div>
 
-                <confirmation-modal
+                <ConfirmationModalV
                     :name="`confirm-uuid-overwrite`"
                     :message="
                         $t('editor.confirmOverwrite', {
@@ -585,7 +585,7 @@
             </div>
         </div>
 
-        <confirmation-modal
+        <ConfirmationModalV
             :name="`confirm-extend-session-editor`"
             :message="
                 $t('editor.extendSession', {
@@ -600,41 +600,44 @@
     </div>
 </template>
 
-<script lang="ts">
-import ActionModal from '@/components/support/action-modal.vue';
-import { Save, useStateStore } from '@/stores/stateStore';
-import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { useStateStore } from '@/stores/stateStore';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
 import { debounce } from 'throttle-debounce';
-import {
-    ConfigFileStructure,
-    MetadataContent,
-    MultiLanguageSlide,
-    Slide,
-    SourceCounts,
-    StoryRampConfig,
-    TextPanel
-} from '@/definitions';
+import { ConfigFileStructure, MetadataContent, Slide, SourceCounts, StoryRampConfig, TextPanel } from '@/definitions';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { useUserStore } from '../../stores/userStore';
 
-import JSZip from 'jszip';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
 import Message from 'vue-m-message';
-import SlideEditorV from '../slide-editor.vue';
-import SlideTocV from '../slide-toc/slide-toc.vue';
 import MetadataContentV from './metadata-content.vue';
-import MetadataModalV from './metadata-modal.vue';
 import ConfirmationModalV from '../support/confirmation-modal.vue';
-import EditorV from '../editor.vue';
 
-import cloneDeep from 'clone-deep';
 import { useLockStore } from '@/stores/lockStore';
 import { useProductStore } from '@/stores/productStore';
 import { useEditorStore } from '@/stores/editorStore';
+
+import { computed, getCurrentInstance, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        editExisting?: boolean;
+    }>(),
+    { editExisting: true }
+);
+
+const emit = defineEmits([]);
+
+// =========================================
+// Definitions
 
 interface RouteParams {
     uid: string;
@@ -656,387 +659,382 @@ interface History {
     created: string;
 }
 
-@Options({
-    components: {
-        ActionModal,
-        Editor: EditorV,
-        'confirmation-modal': ConfirmationModalV,
-        'metadata-content': MetadataContentV,
-        'metadata-modal': MetadataModalV,
-        spinner: VueSpinnerOval,
-        'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV
+const { $route, $router, $i18n, $nextTick, $el, $vfm } = getCurrentInstance()!.proxy!;
+
+const { t } = useI18n();
+
+const currentRoute = computed(() => window.location.href);
+
+const checkingUuid = ref(false);
+const loadingIntoEditor = ref(false);
+const currLang = ref('en'); // page language
+const showDropdown = ref(false);
+const highlightedIndex = ref(-1);
+
+const lockStore = useLockStore();
+const stateStore = useStateStore();
+const productStore = useProductStore();
+const editorStore = useEditorStore();
+
+const storylineHistory = ref([] as History[]);
+const selectedHistory = ref(null as History | null);
+const showHistory = ref(false);
+
+// Form properties.
+const uuid = ref('');
+const renameMode = ref(false); // if currently in rename mode
+const processingRename = ref(false); // only true while we're waiting for the server to process a rename
+const defaultBlankSlide: Slide = {
+    title: '',
+    backgroundImage: '',
+    panel: [
+        {
+            type: 'text',
+            title: '',
+            content: ''
+        } as TextPanel,
+        {
+            type: 'text',
+            title: '',
+            content: ''
+        } as TextPanel
+    ]
+};
+// add more required metadata fields to here as needed
+const reqFields = ref<{ uuid: boolean }>({
+    uuid: true
+});
+const totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
+
+// =========================================
+// Watchers
+
+watch(
+    () => stateStore.isChanged,
+    () => {
+        editorStore.editorUnsavedChanges = stateStore.isChanged;
     }
-})
-export default class MetadataEditorV extends Vue {
-    @Prop({ default: true }) editExisting!: boolean; // true if editing existing storylines product, false if new product
+);
 
-    currentRoute = window.location.href;
-    checkingUuid = false;
-    loadingIntoEditor = false;
-    currLang = 'en'; // page language
-    showDropdown = false;
-    highlightedIndex = -1;
+watch(
+    () => stateStore.reconcileToggler,
+    () => {
+        const newConfigs = stateStore.addChangesToNewSave(stateStore.getCurrentChangeLocation());
 
-    lockStore = useLockStore();
-    stateStore = useStateStore();
-    productStore = useProductStore();
-    editorStore = useEditorStore();
+        productStore.configs.en = newConfigs.en;
+        productStore.configs.fr = newConfigs.fr;
+    }
+);
 
-    storylineHistory: History[] = [];
-    selectedHistory: History | null = null;
-    showHistory = false;
+// =========================================
+// Lifecycle functions
 
-    // Saving properties.
+onMounted(() => {
+    import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
+        productStore.latestSchemaVersion = StorylinesSchema.version;
+    });
+    currLang.value = ($route.params.lang as string) || 'en';
+    editorStore.editingMetadata = !props.editExisting;
+});
 
-    @Watch('stateStore.isChanged')
-    onChanged() {
-        this.editorStore.editorUnsavedChanges = this.stateStore.isChanged;
+onBeforeMount(() => {
+    // Ensure that all product and editor data is cleared beforehand, just in case
+    productStore.clearData();
+    editorStore.loadExisting = props.editExisting;
+    // Generate UUID for new product
+    productStore.uuid = ($route.params.uid as string) ?? (editorStore.loadExisting ? undefined : uuidv4());
+
+    // Automatically load in the product data if the uuid is included in the url
+    if ($route.params.uid as string) {
+        handleUuidLoad();
     }
 
-    @Watch('stateStore.reconcileToggler')
-    onReconciliationRequest() {
-        const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-
-        this.productStore.configs.en = newConfigs.en;
-        this.productStore.configs.fr = newConfigs.fr;
+    // set any metadata default values for creating new product
+    if (!editorStore.loadExisting) {
+        // set current date as default
+        const curDate = new Date();
+        const year = curDate.getFullYear();
+        const month = (curDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = curDate.getDate().toString().padStart(2, '0');
+        productStore.metadata.dateModified = `${year}-${month}-${day}`;
+        // set vertical as the default table of contents orientation
+        productStore.metadata.tocOrientation = 'vertical';
+        productStore.metadata.returnTop = true;
+        productStore.metadata.sameConfig = true;
     }
+});
 
-    // Form properties.
-    uuid = '';
-    renameMode = false; // if currently in rename mode
-    processingRename = false; // only true while we're waiting for the server to process a rename
-    defaultBlankSlide: Slide = {
-        title: '',
-        backgroundImage: '',
-        panel: [
-            {
-                type: 'text',
-                title: '',
-                content: ''
-            } as TextPanel,
-            {
-                type: 'text',
-                title: '',
-                content: ''
-            } as TextPanel
-        ]
-    };
-    // add more required metadata fields to here as needed
-    reqFields: { uuid: boolean } = {
-        uuid: true
-    };
-    totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
+onBeforeUnmount(() => {
+    document.body.classList.remove('editor-mode');
+});
 
-    mounted(): void {
-        import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
-            this.productStore.latestSchemaVersion = StorylinesSchema.version;
+// =========================================
+// Component functions
+
+/**
+ * Open current editor config as a new Storylines product in new tab.
+ * Note: Preview button on metadata editor will only show when editing an existing product, not when creating a new one
+ * This is a design decision, can change if we decide that people would want to preview new products for some reason
+ */
+function preview(): void {
+    // save current metadata final changes before previewing product
+    productStore.saveMetadata(false);
+    setTimeout(() => {
+        const routeData = $router.resolve({
+            name: 'preview',
+            params: { lang: editorStore.configLang, uid: productStore.uuid }
         });
-        this.currLang = (this.$route.params.lang as string) || 'en';
-        this.editorStore.editingMetadata = !this.editExisting;
-    }
-
-    beforeDestroy(): void {
-        document.body.classList.remove('editor-mode');
-    }
-
-    created(): void {
-        // Ensure that all product and editor data is cleared beforehand, just in case
-        this.productStore.clearData();
-        this.editorStore.loadExisting = this.editExisting;
-        // Generate UUID for new product
-        this.productStore.uuid =
-            (this.$route.params.uid as string) ?? (this.editorStore.loadExisting ? undefined : uuidv4());
-
-        // Automatically load in the product data if the uuid is included in the url
-        if (this.$route.params.uid as string) {
-            this.handleUuidLoad();
-        }
-
-        // set any metadata default values for creating new product
-        if (!this.editorStore.loadExisting) {
-            // set current date as default
-            const curDate = new Date();
-            const year = curDate.getFullYear();
-            const month = (curDate.getMonth() + 1).toString().padStart(2, '0');
-            const day = curDate.getDate().toString().padStart(2, '0');
-            this.productStore.metadata.dateModified = `${year}-${month}-${day}`;
-            // set vertical as the default table of contents orientation
-            this.productStore.metadata.tocOrientation = 'vertical';
-            this.productStore.metadata.returnTop = true;
-            this.productStore.metadata.sameConfig = true;
-        }
-    }
-
-    /**
-     * Open current editor config as a new Storylines product in new tab.
-     * Note: Preview button on metadata editor will only show when editing an existing product, not when creating a new one
-     * This is a design decision, can change if we decide that people would want to preview new products for some reason
-     */
-    preview(): void {
-        // save current metadata final changes before previewing product
-        this.productStore.saveMetadata(false);
-        setTimeout(() => {
-            const routeData = this.$router.resolve({
-                name: 'preview',
-                params: { lang: this.editorStore.configLang, uid: this.productStore.uuid }
-            });
-            const previewTab = window.open(routeData.href, '_blank');
-            (previewTab as Window).props = {
-                configs: this.productStore.configs,
-                configFileStructure: this.productStore.configFileStructure,
-                secret: this.lockStore.secret,
-                timeRemaining: this.lockStore.timeRemaining
-            };
-        }, 5);
-    }
-
-    fetchHistory(): Promise<void> {
-        // Note: This part probably doesn't need an manual abort() trigger to kill on load cancel,
-        // as the history should be much smaller and quicker to fetch than the config
-
-        if (this.productStore.uuid === undefined || this.productStore.uuid === '') {
-            return;
-        }
-        this.editorStore.loadStatus = 'loading';
-        const secret = this.lockStore.secret;
-        return fetch(this.productStore.apiUrl + `/history/${this.productStore.uuid}`, {
-            headers: { user: this.productStore.user, secret }
-        }).then((res: Response) => {
-            if (res.status === 404) {
-                // Product not found.
-                this.editorStore.loadStatus = 'waiting';
-            } else {
-                this.editorStore.loadStatus = 'loaded';
-                res.json().then((json) => {
-                    this.storylineHistory = json;
-                });
-            }
-        });
-    }
-
-    selectHistory(selected: any): void {
-        this.selectedHistory = selected;
-    }
-
-    formatDate(created: string): string {
-        const date = new Date(created);
-        const estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
-        const options: Intl.DateTimeFormatOptions = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,
-            timeZone: 'America/Toronto'
+        const previewTab = window.open(routeData.href, '_blank');
+        (previewTab as Window).props = {
+            configs: productStore.configs,
+            configFileStructure: productStore.configFileStructure,
+            secret: lockStore.secret,
+            timeRemaining: lockStore.timeRemaining
         };
+    }, 5);
+}
 
-        return new Intl.DateTimeFormat('en-US', options).format(estDate);
+function fetchHistory(): Promise<void> {
+    // Note: This part probably doesn't need an manual abort() trigger to kill on load cancel,
+    // as the history should be much smaller and quicker to fetch than the config
+
+    if (productStore.uuid === undefined || productStore.uuid === '') {
+        return Promise.resolve();
     }
-
-    loadHistory(): void {
-        if (this.selectedHistory) {
-            this.productStore.loadVersion(this.selectedHistory.hash);
+    editorStore.loadStatus = 'loading';
+    const secret = lockStore.secret;
+    return fetch(productStore.apiUrl + `/history/${productStore.uuid}`, {
+        headers: { user: productStore.user, secret }
+    }).then((res: Response) => {
+        if (res.status === 404) {
+            // Product not found.
+            editorStore.loadStatus = 'waiting';
+        } else {
+            editorStore.loadStatus = 'loaded';
+            res.json().then((json) => {
+                storylineHistory.value = json;
+            });
         }
+    });
+}
+
+function selectHistory(selected: any): void {
+    selectedHistory.value = selected;
+}
+
+function formatDate(created: string): string {
+    const date = new Date(created);
+    const estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'America/Toronto'
+    };
+
+    return new Intl.DateTimeFormat('en-US', options).format(estDate);
+}
+
+function loadHistory(): void {
+    if (selectedHistory.value) {
+        productStore.loadVersion(selectedHistory.value.hash);
+    }
+}
+
+async function renameProduct(): Promise<void> {
+    if (!productStore.configFileStructure) {
+        return;
     }
 
-    async renameProduct(): Promise<void> {
-        console.log(' ');
-        console.log('renameProduct()');
-        if (!this.productStore.configFileStructure) {
-            return;
-        }
+    const prevUuid = productStore.configFileStructure.uuid;
 
-        const prevUuid = this.productStore.configFileStructure.uuid;
+    // Fetch the two existing configuration files.
+    const enFile = productStore.configFileStructure.zip.file(`${prevUuid}_en.json`);
+    const frFile = productStore.configFileStructure.zip.file(`${prevUuid}_fr.json`);
 
-        // Fetch the two existing configuration files.
-        const enFile = this.productStore.configFileStructure.zip.file(`${prevUuid}_en.json`);
-        const frFile = this.productStore.configFileStructure.zip.file(`${prevUuid}_fr.json`);
+    if (enFile && frFile) {
+        processingRename.value = true;
 
-        if (enFile && frFile) {
-            this.processingRename = true;
-
-            // Fetch the contents of the two configuration files, and perform a find/replace on the UUID for each source.
-            const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
-            const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
-            [englishConfig, frenchConfig].forEach((config) =>
-                this.productStore.renameSources(config, prevUuid, this.editorStore.changeUuid)
-            );
-            // Convert the two configuration files into string format.
-            const convertedEnglish = JSON.stringify(englishConfig, null, 4);
-            const convertedFrench = JSON.stringify(frenchConfig, null, 4);
-
-            // First, hit the Express server `rename` endpoint to perform the `rename` syscall on the file system.
-            // Before doing so, we transfer the existing lock to the new uuid
-            this.lockStore
-                .transferLock(this.editorStore.changeUuid)
-                .then(async () => {
-                    await axios
-                        .post(this.productStore.apiUrl + `/rename`, {
-                            user: this.productStore.user,
-                            previousUuid: prevUuid,
-                            newUuid: this.editorStore.changeUuid,
-                            configs: { en: convertedEnglish, fr: convertedFrench }
-                        })
-                        .then(async (_res: AxiosResponse) => {
-                            // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
-                            if (import.meta.env.VITE_APP_NET_API_URL) {
-                                await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
-                                    uuid: prevUuid,
-                                    changeUuid: this.editorStore.changeUuid
-                                });
-                            }
-
-                            // After the server and database have been updated, re-build configFileStructure,
-                            // save the new config files to the server and fetch the new Git history.
-                            if (this.productStore.configFileStructure.zip) {
-                                // Remove the current configuration files from the ZIP folder.
-                                this.productStore.configFileStructure.zip.remove(enFile.name);
-                                this.productStore.configFileStructure.zip.remove(frFile.name);
-
-                                // Re-add the configuration files to the ZIP with the new UUID.
-                                this.productStore.configFileStructure.zip.file(
-                                    `${this.editorStore.changeUuid}_en.json`,
-                                    convertedEnglish
-                                );
-                                this.productStore.configFileStructure.zip.file(
-                                    `${this.editorStore.changeUuid}_fr.json`,
-                                    convertedFrench
-                                );
-
-                                // Iterate through the RAMP configuration files and rename them using the new UUID.
-                                const configPromises: Promise<void>[] = [];
-                                this.productStore.configFileStructure.zip
-                                    .folder('ramp-config/')
-                                    ?.forEach((relativePath, file) => {
-                                        configPromises.push(this.renameMapConfig(file.name, prevUuid));
-                                    });
-
-                                // Wait for map configuration files to be renamed.
-                                await Promise.all(configPromises);
-
-                                this.uuid = this.editorStore.changeUuid;
-
-                                // Reset source counts.
-                                this.productStore.sourceCounts = {};
-
-                                this.productStore
-                                    .configFileStructureHelper(this.productStore.configFileStructure.zip)
-                                    .then(() => {
-                                        this.fetchHistory();
-                                        this.renameMode = this.processingRename = false;
-                                    });
-                            }
-                        })
-                        .catch((err) => {
-                            /** If the server returns a 500 error for whatever reason (most likely due to file in use),
-                             * roll back the UUID to the previous value and display an error message.
-                             */
-                            if (err.status === 500) {
-                                Message.error(this.$t('editor.warning.renameFailed'));
-                                this.productStore.uuid = prevUuid;
-                                this.processingRename = false;
-                                return;
-                            }
-                        });
-                })
-                .catch(() => {
-                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                    this.productStore.uuid = prevUuid;
-                    this.processingRename = false;
-                    return;
-                });
-        }
-    }
-
-    // Provided with the path of a RAMP configuration file, rename it in the JSZip object using the new UUID.
-    renameMapConfig(oldPath: string, prevUuid: string): Promise<void> {
-        return new Promise((resolve) => {
-            this.productStore.configFileStructure.zip
-                .file(oldPath)
-                ?.async('string')
-                .then((res: string) => {
-                    // Remove the old config file.
-                    this.productStore.configFileStructure.zip.remove(oldPath);
-
-                    // Get the new config name.
-                    const newFile = oldPath.replace(`/${prevUuid}-map-`, `/${this.editorStore.changeUuid}-map-`);
-
-                    // Re-add the config to the ZIP with the new name.
-                    this.productStore.configFileStructure.zip.file(newFile, res);
-                    resolve();
-                });
-        });
-    }
-
-    discardMetadataUpdates(): void {
-        this.productStore.metadata = JSON.parse(JSON.stringify(this.productStore.temporaryMetadataCopy));
-        this.editorStore.editingMetadata = false;
-        this.editorStore.editorUnsavedChanges = false; // TODO: Does this cause false negatives? (maybe not if we don't have discarding for vfm)
-    }
-
-    /**
-     * Checks if the UUID is invalid due to being blank or containing illegal characters.
-     */
-    isUuidInvalid(rename: boolean): 'blank' | 'badChar' | null {
-        if (!rename && !this.productStore.uuid && !this.editorStore.loadExisting) {
-            return 'blank';
-        }
-
-        // All reserved characters in URLs. The user can't use these for their UUID
-        const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
-        const illegalCharsContained = illegalChars.filter((badChar) =>
-            (rename ? this.editorStore.changeUuid : this.productStore.uuid).includes(badChar)
+        // Fetch the contents of the two configuration files, and perform a find/replace on the UUID for each source.
+        const englishConfig = await enFile?.async('string').then((res: string) => JSON.parse(res));
+        const frenchConfig = await frFile?.async('string').then((res: string) => JSON.parse(res));
+        [englishConfig, frenchConfig].forEach((config) =>
+            productStore.renameSources(config, prevUuid, editorStore.changeUuid)
         );
+        // Convert the two configuration files into string format.
+        const convertedEnglish = JSON.stringify(englishConfig, null, 4);
+        const convertedFrench = JSON.stringify(frenchConfig, null, 4);
 
-        if (illegalCharsContained.length) {
-            return 'badChar';
-        }
+        // First, hit the Express server `rename` endpoint to perform the `rename` syscall on the file system.
+        // Before doing so, we transfer the existing lock to the new uuid
+        lockStore
+            .transferLock(editorStore.changeUuid)
+            .then(async () => {
+                await axios
+                    .post(productStore.apiUrl + `/rename`, {
+                        user: productStore.user,
+                        previousUuid: prevUuid,
+                        newUuid: editorStore.changeUuid,
+                        configs: { en: convertedEnglish, fr: convertedFrench }
+                    })
+                    .then(async (_res: AxiosResponse) => {
+                        // Once the server has processed the renaming, update the UUID in the database if not in dev mode.
+                        if (import.meta.env.VITE_APP_NET_API_URL) {
+                            await axios.post(import.meta.env.VITE_APP_NET_API_URL + '/api/version/update', {
+                                uuid: prevUuid,
+                                changeUuid: editorStore.changeUuid
+                            });
+                        }
 
-        return null;
-    }
+                        // After the server and database have been updated, re-build configFileStructure,
+                        // save the new config files to the server and fetch the new Git history.
+                        if (productStore.configFileStructure.zip) {
+                            // Remove the current configuration files from the ZIP folder.
+                            productStore.configFileStructure.zip.remove(enFile.name);
+                            productStore.configFileStructure.zip.remove(frFile.name);
 
-    checkUuid(rename?: boolean): void {
-        if (rename || !this.editorStore.loadExisting) this.checkingUuid = true;
+                            // Re-add the configuration files to the ZIP with the new UUID.
+                            productStore.configFileStructure.zip.file(
+                                `${editorStore.changeUuid}_en.json`,
+                                convertedEnglish
+                            );
+                            productStore.configFileStructure.zip.file(
+                                `${editorStore.changeUuid}_fr.json`,
+                                convertedFrench
+                            );
 
-        if (!this.editorStore.loadExisting || rename) {
-            const errorType = this.isUuidInvalid(!!rename);
-            if (errorType) {
-                this.editorStore.error = true;
-                this.editorStore.warning = errorType;
-                this.checkingUuid = false;
+                            // Iterate through the RAMP configuration files and rename them using the new UUID.
+                            const configPromises: Promise<void>[] = [];
+                            productStore.configFileStructure.zip
+                                .folder('ramp-config/')
+                                ?.forEach((relativePath, file) => {
+                                    configPromises.push(renameMapConfig(file.name, prevUuid));
+                                });
+
+                            // Wait for map configuration files to be renamed.
+                            await Promise.all(configPromises);
+
+                            uuid.value = editorStore.changeUuid;
+
+                            // Reset source counts.
+                            productStore.sourceCounts = {};
+
+                            productStore.configFileStructureHelper(productStore.configFileStructure.zip).then(() => {
+                                fetchHistory();
+                                renameMode.value = processingRename.value = false;
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        /** If the server returns a 500 error for whatever reason (most likely due to file in use),
+                         * roll back the UUID to the previous value and display an error message.
+                         */
+                        if (err.status === 500) {
+                            Message.error(t('editor.warning.renameFailed'));
+                            productStore.uuid = prevUuid;
+                            processingRename.value = false;
+                            return;
+                        }
+                    });
+            })
+            .catch(() => {
+                Message.error(t('editor.editMetadata.message.error.unauthorized'));
+                productStore.uuid = prevUuid;
+                processingRename.value = false;
                 return;
-            }
+            });
+    }
+}
 
-            this.fetchUuidCheck(!!rename);
-        }
-        this.editorStore.warning = 'none';
-        this.highlightedIndex = -1;
+// Provided with the path of a RAMP configuration file, rename it in the JSZip object using the new UUID.
+function renameMapConfig(oldPath: string, prevUuid: string): Promise<void> {
+    return new Promise((resolve) => {
+        productStore.configFileStructure.zip
+            .file(oldPath)
+            ?.async('string')
+            .then((res: string) => {
+                // Remove the old config file.
+                productStore.configFileStructure.zip.remove(oldPath);
+
+                // Get the new config name.
+                const newFile = oldPath.replace(`/${prevUuid}-map-`, `/${editorStore.changeUuid}-map-`);
+
+                // Re-add the config to the ZIP with the new name.
+                productStore.configFileStructure.zip.file(newFile, res);
+                resolve();
+            });
+    });
+}
+
+function discardMetadataUpdates(): void {
+    productStore.metadata = JSON.parse(JSON.stringify(productStore.temporaryMetadataCopy));
+    editorStore.editingMetadata = false;
+    editorStore.editorUnsavedChanges = false; // TODO: Does this cause false negatives? (maybe not if we don't have discarding for vfm)
+}
+
+/**
+ * Checks if the UUID is invalid due to being blank or containing illegal characters.
+ */
+function isUuidInvalid(rename: boolean): 'blank' | 'badChar' | null {
+    if (!rename && !productStore.uuid && !editorStore.loadExisting) {
+        return 'blank';
     }
 
-    /**
-     * Debounce the fetch call to help prevent console spamming.
-     */
-    fetchUuidCheck = debounce(600, (rename: boolean) => {
-        if (this.isUuidInvalid(rename)) {
+    // All reserved characters in URLs. The user can't use these for their UUID
+    const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
+    const illegalCharsContained = illegalChars.filter((badChar) =>
+        (rename ? editorStore.changeUuid : productStore.uuid).includes(badChar)
+    );
+
+    if (illegalCharsContained.length) {
+        return 'badChar';
+    }
+
+    return null;
+}
+
+function checkUuid(rename?: boolean): void {
+    if (rename || !editorStore.loadExisting) checkingUuid.value = true;
+
+    if (!editorStore.loadExisting || rename) {
+        const errorType = isUuidInvalid(!!rename);
+        if (errorType) {
+            editorStore.error = true;
+            editorStore.warning = errorType;
+            checkingUuid.value = false;
             return;
         }
-        // If renaming, show the loading spinner while we check whether the UUID is taken.
-        fetch(
-            this.productStore.apiUrl + `/check/${rename ? this.editorStore.changeUuid : this.productStore.uuid}`
-        ).then((res: Response) => {
-            if (res.status !== 404) {
-                this.editorStore.warning = rename ? 'rename' : 'uuid';
 
-                if (!this.editorStore.loadExisting) {
-                    this.error = true;
+        fetchUuidCheck(!!rename);
+    }
+    editorStore.warning = 'none';
+    highlightedIndex.value = -1;
+}
+
+/**
+ * Debounce the fetch call to help prevent console spamming.
+ */
+const fetchUuidCheck = debounce(600, (rename: boolean) => {
+    if (isUuidInvalid(rename)) {
+        return;
+    }
+    // If renaming, show the loading spinner while we check whether the UUID is taken.
+    fetch(productStore.apiUrl + `/check/${rename ? editorStore.changeUuid : productStore.uuid}`).then(
+        (res: Response) => {
+            if (res.status !== 404) {
+                editorStore.warning = rename ? 'rename' : 'uuid';
+
+                if (!editorStore.loadExisting) {
+                    editorStore.error = true;
                 }
             }
 
-            if (rename || !this.editorStore.loadExisting) this.checkingUuid = false;
+            if (rename || !editorStore.loadExisting) checkingUuid.value = false;
 
-            fetch(this.productStore.apiUrl + `/retrieveMessages`)
+            fetch(productStore.apiUrl + `/retrieveMessages`)
                 .then((res: any) => {
                     if (res.ok) return res.json();
                 })
@@ -1048,248 +1046,239 @@ export default class MetadataEditorV extends Vue {
                         .catch((error: any) => console.log(error.response || error));
                 })
                 .catch((error: any) => console.log(error.response || error));
-        });
-    });
-
-    /**
-     * React to param changes in URL.
-     */
-    beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
-        this.$i18n.locale = to.params.lang as string;
-        document.onmousemove = () => undefined;
-        document.onkeydown = () => undefined;
-
-        const isProductLoaded = this.editorStore.loadStatus == 'loaded';
-        const newUuidAdded =
-            !from.params.uid && !!to.params.uid && isProductLoaded && to.params.uid != this.productStore.uuid;
-        const uuidRemoved = !!from.params.uid && !to.params.uid;
-        const uuidModified = !!from.params.uid && !!to.params.uid && to.params.uid !== from.params.uid;
-
-        // Unlock the product in one of the three scenarios:
-        // - if the `from` route contains a uuid, and the `to` route doesn't, we unlock only if there is a product
-        //   already loaded in that is different
-        // - if the `from` route doesn't contain a uuid, and the `to` route does, we unlock
-        // - if the `from` route and the `to` route both contain uuids, we should unlock when they are different
-        if (newUuidAdded || uuidRemoved || uuidModified) {
-            this.lockStore.unlockStoryline();
-            clearTimeout(this.lockStore.confirmationTimeout);
-            clearTimeout(this.lockStore.endTimeout);
         }
+    );
+});
+
+/**
+ * React to param changes in URL.
+ */
+function beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
+    $i18n.locale = to.params.lang as string;
+    document.onmousemove = () => undefined;
+    document.onkeydown = () => undefined;
+
+    const isProductLoaded = editorStore.loadStatus == 'loaded';
+    const newUuidAdded = !from.params.uid && !!to.params.uid && isProductLoaded && to.params.uid != productStore.uuid;
+    const uuidRemoved = !!from.params.uid && !to.params.uid;
+    const uuidModified = !!from.params.uid && !!to.params.uid && to.params.uid !== from.params.uid;
+
+    // Unlock the product in one of the three scenarios:
+    // - if the `from` route contains a uuid, and the `to` route doesn't, we unlock only if there is a product
+    //   already loaded in that is different
+    // - if the `from` route doesn't contain a uuid, and the `to` route does, we unlock
+    // - if the `from` route and the `to` route both contain uuids, we should unlock when they are different
+    if (newUuidAdded || uuidRemoved || uuidModified) {
+        lockStore.unlockStoryline();
+        clearTimeout(lockStore.confirmationTimeout);
+        clearTimeout(lockStore.endTimeout);
+    }
+    next();
+}
+
+function checkRequiredFields(): boolean {
+    // check if all required metadata fields are non-empty
+    console.log('PRODUCTSTORE UUID', JSON.parse(JSON.stringify(productStore.uuid)));
+
+    reqFields.value.uuid = Boolean(productStore.uuid);
+    if (Object.values(reqFields.value).some((field: boolean) => !field)) {
+        Message.error(t('editor.editMetadata.message.error.requiredFieldsNotFilled'));
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Called when 'next' button is pressed on metadata page to continue to main editor.
+ *
+ */
+function continueToEditor(): void {
+    loadingIntoEditor.value = true;
+
+    // Needed in order to show the loading spinner at all
+    // Although it shows, it's still frozen (since app's really just lagging until editor's in)
+    setTimeout(() => {
+        if (!checkRequiredFields()) {
+            return;
+        }
+        if (editorStore.loadExisting) {
+            if (
+                productStore.configs[editorStore.configLang] !== undefined &&
+                productStore.uuid === productStore.configFileStructure.uuid
+            ) {
+                productStore.loadEditor = true;
+                productStore.saveMetadata(false).then(() => {
+                    $router.push({ name: 'editor', params: { uid: productStore.uuid } });
+                });
+            } else {
+                Message.error(t('editor.editMetadata.message.error.noConfig'));
+            }
+        } else if (!productStore.uuid) {
+            Message.error(t('editor.warning.mustEnterUuid'));
+            editorStore.error = true;
+        } else {
+            // We have a new product that is going to the main editor route, so its UUID is now locked.
+            // Therefore, we also lock it in the server so that another user does not create a new product
+            // with the same UUID until the user's session is in progress.
+            lockStore
+                .lockStoryline(productStore.uuid)
+                .then(() => {
+                    // Only generate config if not already present or UUID mismatch
+                    if (
+                        !productStore.configs[editorStore.configLang] ||
+                        productStore.uuid !== productStore.configFileStructure?.uuid
+                    ) {
+                        productStore.generateNewConfig();
+                    } else {
+                        // Else config already exists and matches UUID, skip generation
+                        // Update each zip file with their latest changes before loading
+                        productStore.saveMetadata();
+
+                        const writeConfigFile = (lang: 'en' | 'fr') => {
+                            const configJson = JSON.stringify(productStore.configs[lang], null, 4);
+                            productStore.configFileStructure.zip.file(`${productStore.uuid}_${lang}.json`, configJson);
+                        };
+
+                        (['en', 'fr'] as const).forEach((lang) => writeConfigFile(lang));
+
+                        editorStore.changeLang(currLang.value);
+                        editorStore.correctUuid();
+                    }
+                })
+                .catch(() => {
+                    editorStore.error = true;
+                    Message.error(t('editor.editMetadata.message.error.unauthorized'));
+                })
+                .finally(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                });
+        }
+    }, 25);
+}
+
+function beforeRouteLeave(
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: (cont?: boolean) => void
+): void {
+    const curEditor = $route.name === 'editor';
+    const confirmationMessage = t('editor.leaveWarning');
+    const stay =
+        !editorStore.sessionExpired &&
+        editorStore.editorUnsavedChanges &&
+        curEditor &&
+        !window.confirm(confirmationMessage);
+    const exitingProduct = to.name !== 'editor';
+    const isProductLoaded = !!to.params.uid || editorStore.loadStatus == 'loaded';
+
+    // This component is going bye-bye, so we need to do some clean up so that timers cannot fire later.
+    clearTimeout(lockStore.confirmationTimeout);
+    clearTimeout(lockStore.endTimeout);
+    document.onmousemove = () => undefined;
+    document.onkeydown = () => undefined;
+
+    // Ensure that we are unlocking a product when a) we are going from the metadata-editor to the home page, and b)
+    // there is a product currently loaded into the metadata-editor
+    if (exitingProduct && isProductLoaded) {
+        // Unlock the storyline for other users if we are exiting the product e.g. by navigating to a different route.
+        lockStore.unlockStoryline();
+        productStore.clearData();
+    }
+
+    if (stay) {
+        next(false);
+    } else {
         next();
     }
+}
 
-    checkRequiredFields(): boolean {
-        // check if all required metadata fields are non-empty
-        this.reqFields.uuid = !!this.productStore.uuid;
-        if (Object.values(this.reqFields).some((field: boolean) => !field)) {
-            Message.error(this.$t('editor.editMetadata.message.error.requiredFieldsNotFilled'));
-            return false;
+async function handleUuidEnter(): Promise<void> {
+    if (props.editExisting) {
+        handleUuidLoad();
+    } else {
+        // UUID is not taken and is not blank so we proceed to editor-main
+        if (!editorStore.error) {
+            continueToEditor();
+        } else if (editorStore.warning !== 'none') {
+            Message.error(t(`editor.warning.${editorStore.warning}`));
         }
-        return true;
-    }
-
-    /**
-     * Called when 'next' button is pressed on metadata page to continue to main editor.
-     *
-     */
-    continueToEditor(): void {
-        console.log(' ');
-        console.log('continueToEditor()');
-        this.loadingIntoEditor = true;
-
-        // Needed in order to show the loading spinner at all
-        // Although it shows, it's still frozen (since app's really just lagging until editor's in)
-        setTimeout(() => {
-            if (!this.checkRequiredFields()) {
-                return;
-            }
-            if (this.editorStore.loadExisting) {
-                if (
-                    this.productStore.configs[this.editorStore.configLang] !== undefined &&
-                    this.productStore.uuid === this.productStore.configFileStructure.uuid
-                ) {
-                    this.loadEditor = true;
-                    this.productStore.saveMetadata(false).then(() => {
-                        this.$router.push({ name: 'editor', params: { uid: this.productStore.uuid } });
-                    });
-                } else {
-                    Message.error(this.$t('editor.editMetadata.message.error.noConfig'));
-                }
-            } else if (!this.productStore.uuid) {
-                Message.error(this.$t('editor.warning.mustEnterUuid'));
-                this.editorStore.error = true;
-            } else {
-                // We have a new product that is going to the main editor route, so its UUID is now locked.
-                // Therefore, we also lock it in the server so that another user does not create a new product
-                // with the same UUID until the user's session is in progress.
-                this.lockStore
-                    .lockStoryline(this.productStore.uuid)
-                    .then(() => {
-                        // Only generate config if not already present or UUID mismatch
-                        if (
-                            !this.productStore.configs[this.editorStore.configLang] ||
-                            this.productStore.uuid !== this.productStore.configFileStructure?.uuid
-                        ) {
-                            this.productStore.generateNewConfig();
-                        } else {
-                            // Else config already exists and matches UUID, skip generation
-                            // Update each zip file with their latest changes before loading
-                            this.saveMetadata();
-
-                            const writeConfigFile = (lang: 'en' | 'fr') => {
-                                const configJson = JSON.stringify(this.productStore.configs[lang], null, 4);
-                                this.productStore.configFileStructure.zip.file(
-                                    `${this.productStore.uuid}_${lang}.json`,
-                                    configJson
-                                );
-                            };
-
-                            (['en', 'fr'] as const).forEach((lang) => writeConfigFile(lang));
-
-                            this.editorStore.changeLang(this.currLang);
-                            this.editorStore.correctUuid();
-                        }
-                    })
-                    .catch(() => {
-                        this.editorStore.error = true;
-                        Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                    })
-                    .finally(() => {
-                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-                    });
-            }
-        }, 25);
-    }
-
-    beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
-        console.log(' ');
-        console.log('metadata - beforeRouteLeave()');
-        const curEditor = this.$route.name === 'editor';
-        const confirmationMessage = this.$t('editor.leaveWarning');
-        const stay =
-            !this.editorStore.sessionExpired &&
-            this.editorStore.editorUnsavedChanges &&
-            curEditor &&
-            !window.confirm(confirmationMessage);
-        const exitingProduct = to.name !== 'editor';
-        const isProductLoaded = !!to.params.uid || this.editorStore.loadStatus == 'loaded';
-
-        // This component is going bye-bye, so we need to do some clean up so that timers cannot fire later.
-        clearTimeout(this.lockStore.confirmationTimeout);
-        clearTimeout(this.lockStore.endTimeout);
-        document.onmousemove = () => undefined;
-        document.onkeydown = () => undefined;
-
-        // Ensure that we are unlocking a product when a) we are going from the metadata-editor to the home page, and b)
-        // there is a product currently loaded into the metadata-editor
-        if (exitingProduct && isProductLoaded) {
-            // Unlock the storyline for other users if we are exiting the product e.g. by navigating to a different route.
-            this.lockStore.unlockStoryline();
-            this.productStore.clearData();
-        }
-
-        if (stay) {
-            next(false);
-        } else {
-            next();
-        }
-    }
-
-    async handleUuidEnter(): Promise<void> {
-        if (this.editExisting) {
-            this.handleUuidLoad();
-        } else {
-            // UUID is not taken and is not blank so we proceed to editor-main
-            if (!this.editorStore.error) {
-                this.continueToEditor();
-            } else if (this.editorStore.warning !== 'none') {
-                Message.error(this.$t(`editor.warning.${this.editorStore.warning}`));
-            }
-        }
-    }
-
-    handleUuidLoad(): void {
-        if (this.productStore.uuid) {
-            this.productStore
-                .generateRemoteConfig()
-                .then(this.fetchHistory)
-                .then(() => {
-                    Message.success(this.$t('editor.editMetadata.message.successfulLoad'));
-                });
-        } else {
-            this.editorStore.error = true;
-            this.editorStore.warning = 'blank';
-            Message.error(this.$t(`editor.warning.${this.editorStore.warning}`));
-        }
-    }
-
-    highlightNext(): void {
-        if (this.highlightedIndex < this.getStorylines.length - 1) {
-            this.highlightedIndex++;
-            this.scrollIntoView();
-        }
-    }
-
-    highlightPrevious(): void {
-        if (this.highlightedIndex > 0) {
-            this.highlightedIndex--;
-            this.scrollIntoView();
-        }
-    }
-
-    selectHighlighted(): void {
-        if (this.highlightedIndex !== -1) {
-            const selectedStoryline = this.getStorylines[this.highlightedIndex];
-            this.selectUuid(selectedStoryline.uuid);
-        }
-    }
-
-    scrollIntoView(): void {
-        this.$nextTick(() => {
-            const container = this.$el.querySelector('.overflow-y-auto');
-            const activeItem = container.querySelector('li.bg-gray-300');
-            if (activeItem) container.scrollTop = activeItem.offsetTop - container.offsetTop;
-        });
-    }
-
-    get getStorylines() {
-        const userStore = useUserStore();
-        const userStorylines = userStore.userProfile?.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
-        const allStorylines =
-            userStore.userProfile?.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
-        let combined = [...userStorylines, ...allStorylines];
-
-        if (this.productStore.uuid) {
-            combined = combined.filter(
-                (storyline) =>
-                    storyline.uuid.toLowerCase().includes(this.productStore.uuid.toLowerCase()) ||
-                    (storyline.titleEN &&
-                        storyline.titleEN.toLowerCase().includes(this.productStore.uuid.toLowerCase())) ||
-                    (storyline.titleFR &&
-                        storyline.titleFR.toLowerCase().includes(this.productStore.uuid.toLowerCase()))
-            );
-        }
-
-        return combined;
-    }
-
-    getTitle(storyline: { titleEN: string; titleFR: string }): string {
-        return this.editorStore.configLang === 'en' ? storyline.titleEN : storyline.titleFR;
-    }
-
-    selectUuid(uuid: string): void {
-        this.productStore.uuid = uuid;
-        this.showDropdown = false;
-    }
-
-    /**
-     * Opens the metadata editing modal for the currently selected slide language.
-     */
-    openMetadataModal() {
-        this.loadConfig(this.productStore.configs[this.productStore.configLang]);
-        this.$vfm.open('metadata-edit-modal');
     }
 }
+
+function handleUuidLoad(): void {
+    if (productStore.uuid) {
+        productStore
+            .generateRemoteConfig()
+            .then(fetchHistory)
+            .then(() => {
+                Message.success(t('editor.editMetadata.message.successfulLoad'));
+            });
+    } else {
+        editorStore.error = true;
+        editorStore.warning = 'blank';
+        Message.error(t(`editor.warning.${editorStore.warning}`));
+    }
+}
+
+function highlightNext(): void {
+    if (highlightedIndex.value < getStorylines.value.length - 1) {
+        highlightedIndex.value++;
+        scrollIntoView();
+    }
+}
+
+function highlightPrevious(): void {
+    if (highlightedIndex.value > 0) {
+        highlightedIndex.value--;
+        scrollIntoView();
+    }
+}
+
+function selectHighlighted(): void {
+    if (highlightedIndex.value !== -1) {
+        const selectedStoryline = getStorylines.value[highlightedIndex.value];
+        selectUuid(selectedStoryline.uuid);
+    }
+}
+
+function scrollIntoView(): void {
+    $nextTick(() => {
+        const container = $el.querySelector('.overflow-y-auto');
+        const activeItem = container.querySelector('li.bg-gray-300');
+        if (activeItem) container.scrollTop = activeItem.offsetTop - container.offsetTop;
+    });
+}
+
+const getStorylines = computed(() => {
+    const userStore = useUserStore();
+    const userStorylines = userStore.userProfile?.storylines?.map((s) => ({ ...s, isUserStoryline: true })) || [];
+    const allStorylines =
+        userStore.userProfile?.allStorylines?.filter((s) => !userStorylines.some((u) => u.uuid === s.uuid)) || [];
+    let combined = [...userStorylines, ...allStorylines];
+
+    if (productStore.uuid) {
+        combined = combined.filter(
+            (storyline) =>
+                storyline.uuid.toLowerCase().includes(productStore.uuid.toLowerCase()) ||
+                (storyline.titleEN && storyline.titleEN.toLowerCase().includes(productStore.uuid.toLowerCase())) ||
+                (storyline.titleFR && storyline.titleFR.toLowerCase().includes(productStore.uuid.toLowerCase()))
+        );
+    }
+
+    return combined;
+});
+
+function getTitle(storyline: { titleEN: string; titleFR: string }): string {
+    return editorStore.configLang === 'en' ? storyline.titleEN : storyline.titleFR;
+}
+
+function selectUuid(uuid: string): void {
+    productStore.uuid = uuid;
+    showDropdown.value = false;
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss">

@@ -27,13 +27,33 @@
     </li>
 </template>
 
-<script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { ImageFile } from '@/definitions';
 
-export default class ImagePreviewV extends Vue {
-    @Prop() imageFile!: ImageFile;
-}
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = defineProps<{
+    imageFile: ImageFile;
+}>();
+
+const emit = defineEmits(['delete']);
+
+// =========================================
+// Definitions
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss" scoped>

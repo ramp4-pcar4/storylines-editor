@@ -2,7 +2,7 @@
     <div class="my-8 mx-4 overflow-hidden w-full">
         <div class="relative text-center w-full grabbable">
             <button
-                class="bg-white absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
+                class="respected-standard-button respected-transparent-button respected-thin-button absolute h-6 w-6 leading-5 top-1 right-1"
                 @click="() => $emit('delete', file)"
                 :content="$t('editor.video.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
@@ -53,23 +53,40 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { VideoFile } from '@/definitions';
-import MarkdownIt from 'markdown-it';
 
-export default class VideoPreviewV extends Vue {
-    @Prop() file!: VideoFile;
-    @Prop() fileType!: string;
-    @Prop() lang!: string;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    md = new MarkdownIt({ html: true });
-    langs = { en: 'English', fr: 'French' } as Record<string, string>;
+const props = defineProps<{
+    file: VideoFile;
+    fileType: string;
+    lang: string;
+}>();
 
-    expandTranscript = false;
-    rawTranscript = '';
-    transcriptContent = '';
-}
+defineEmits(['delete']);
+
+// =========================================
+// Definitions
+
+// Doesn't seem to be used. Leaving it in case it actually is
+//const md = new MarkdownIt({ html: true });
+
+const langs = { en: 'English', fr: 'French' } as Record<string, string>;
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss" scoped>
