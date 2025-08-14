@@ -30,6 +30,7 @@ import { useEditorStore } from './editorStore';
 import router from '../router';
 import { vfm } from '../plugins/vfm/index';
 import cloneDeep from 'clone-deep';
+import { ref } from 'vue';
 
 interface ProductState {
     configFileStructure: ConfigFileStructure;
@@ -41,8 +42,8 @@ interface ProductState {
     metadata: MetadataContent;
     temporaryMetadataCopy: MetadataContent;
     uuid: string;
-    user: string;
-    i18n: any;
+    user: typeof ref<string>;
+    loadEditor: boolean;
     logoImage: undefined | File;
     introBgImage: undefined | File;
     apiUrl: string;
@@ -97,6 +98,7 @@ export const useProductStore = defineStore('product', {
             schemaVersion: ''
         } as MetadataContent,
         i18n: useI18n(),
+        loadEditor: false,
         uuid: '',
         user: computed(() => useUserStore().userProfile.userName || 'Guest'),
         logoImage: undefined as undefined | File,

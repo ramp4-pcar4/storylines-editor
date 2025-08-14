@@ -47,7 +47,7 @@
                 item-key="name"
             >
                 <template #item="{ element, index }">
-                    <ChartPreview
+                    <ChartPreviewV
                         :key="`${element.name}-${index}`"
                         :chart="element"
                         :chartVersion="chartVersions[element.name]"
@@ -61,7 +61,7 @@
                         "
                         @delete="$vfm.open(`${element.name}-${index}`)"
                         @captionEdit="onChartsEdited"
-                    ></ChartPreview>
+                    ></ChartPreviewV>
                 </template>
             </draggable>
         </ul>
@@ -125,292 +125,312 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
-import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ChartConfig, ChartPanel, HighchartsConfig, PanelType, SlideshowChartPanel } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import { useProductStore } from '@/stores/productStore';
+import { getCurrentInstance, onMounted, ref } from 'vue';
 
 import { applyTextAlign } from '@/utils/styleUtils';
 import ChartPreviewV from '../support/chart-preview.vue';
-import ConfirmationModalV from '../support/confirmation-modal.vue';
 import draggable from 'vuedraggable';
 
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
+import { useI18n } from 'vue-i18n';
+
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        panel: ChartPanel | SlideshowChartPanel;
+        lang: string;
+        allowMany?: boolean;
+        centerSlide?: boolean;
+        dynamicSelected?: boolean;
+    }>(),
+    {
+        allowMany: true,
+        centerSlide: false,
+        dynamicSelected: false
+    }
+);
+
+const emit = defineEmits(['slide-edit']);
+
+// =========================================
+// Definitions
 
 dataModule(Highcharts);
 
-@Options({
-    components: {
-        ActionModal,
-        ChartPreview: ChartPreviewV,
-        'confirmation-modal': ConfirmationModalV,
-        'vue-final-modal': VueFinalModal,
-        draggable
+const { $vfm } = getCurrentInstance()!.proxy!;
+const { t } = useI18n();
+
+const productStore = useProductStore();
+
+const edited = ref(false);
+const oldChartName = ref('');
+const chartIdx = ref(1);
+
+const storylinesChartConfigs = ref([] as Array<ChartConfig>);
+const highchartsChartConfigs = ref([] as Array<HighchartsConfig>);
+const chartVersions = ref({} as Record<string, number>);
+const editingConfig = ref(null as HighchartsConfig | null);
+const editingName = ref(null as string | null);
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+onMounted(() => {
+    applyTextAlign(props.panel, props.centerSlide, props.dynamicSelected);
+
+    // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
+    const charts =
+        props.panel.type === PanelType.SlideshowChart
+            ? (props.panel.items as Array<ChartPanel>)
+            : props.panel.src
+              ? [props.panel]
+              : [];
+
+    // fetch single existing chart config from ZIP
+    if (props.panel.type === PanelType.Chart && props.panel.src) {
+        fetchChartConfig(props.panel, 0, props.panel.config?.title?.text);
     }
-})
-export default class ChartEditorV extends Vue {
-    @Prop() panel!: ChartPanel | SlideshowChartPanel;
-    @Prop() lang!: string;
-    @Prop({ default: true }) allowMany!: boolean;
-    @Prop({ default: false }) centerSlide!: boolean;
-    @Prop({ default: false }) dynamicSelected!: boolean;
 
-    productStore = useProductStore();
-
-    edited = false;
-    oldChartName = '';
-    chartIdx = 1;
-
-    storylinesChartConfigs = [] as Array<ChartConfig>;
-    highchartsChartConfigs = [] as Array<HighchartsConfig>;
-    chartVersions: Record<string, number> = {};
-    editingConfig: HighchartsConfig | null = null;
-    editingName: string | null = null;
-
-    mounted(): void {
-        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
-
-        // This allows us to access the chart(s) using one consistent variable instead of needing to check panel type.
-        const charts =
-            this.panel.type === PanelType.SlideshowChart
-                ? (this.panel.items as Array<ChartPanel>)
-                : this.panel.src
-                  ? [this.panel]
-                  : [];
-
-        // fetch single existing chart config from ZIP
-        if (this.panel.type === PanelType.Chart && this.panel.src) {
-            this.fetchChartConfig(this.panel, 0, this.panel.config?.title?.text);
+    if (props.centerSlide && props.dynamicSelected) {
+        for (const c in charts) {
+            charts[c].customStyles += 'text-align: left;';
         }
-
-        if (this.centerSlide && this.dynamicSelected) {
-            for (const c in charts) {
-                charts[c].customStyles += 'text-align: left;';
-            }
-        } else if (!this.centerSlide && this.dynamicSelected) {
-            for (const c in charts) {
-                charts[c].customStyles = (charts[c].customStyles || '').replace('text-align: left;', '');
-            }
-        }
-
-        // fetch multiple existing chart configs from ZIP
-        if (this.panel.type === PanelType.SlideshowChart) {
-            let idx = 0;
-            charts.forEach((chart: ChartPanel) => {
-                this.fetchChartConfig(chart, idx, chart.name);
-            });
+    } else if (!props.centerSlide && props.dynamicSelected) {
+        for (const c in charts) {
+            charts[c].customStyles = (charts[c].customStyles || '').replace('text-align: left;', '');
         }
     }
 
-    fetchChartConfig(chart: ChartPanel | { config?: any; src?: string }, idx: number, chartName?: string) {
-        const chartSrc = chartName
-            ? `charts/${this.lang}/${chartName}.json`
-            : chart.src
-            ? chart.src.substring(chart.src.indexOf('/') + 1)
-            : '';
-
-        let highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
-
-        // If not found, create file from config
-        if (!highchartsJson && chartName) {
-            const title = chartName;
-            this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(chart.config, null, 4));
-            highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
-        }
-
-        if (highchartsJson) {
-            highchartsJson.async('string').then((res: string) => {
-                this.highchartsChartConfigs.push(JSON.parse(res));
-                this.extractStorylinesChartConfig(chart as ChartPanel, idx);
-                idx += 1;
-            });
-        }
-        this.chartIdx += 1;
-    }
-
-    openEditor(name: string) {
-        console.log(' ');
-        console.log('openEditor()');
-        const idx = this.highchartsChartConfigs.findIndex((cfg) => cfg.title.text === name);
-        if (idx !== -1) {
-            console.log('open highcharts edit modal');
-            this.editingConfig = this.highchartsChartConfigs[idx];
-            this.editingName = name;
-            this.$vfm.open('highcharts-edit-modal');
-        }
-        this.oldChartName = name;
-    }
-
-    createNewChart(newConfig: HighchartsConfig): void {
-        const chartSrc = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${newConfig.title?.text}.json`;
-
-        // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
-        if (this.productStore.sourceExists(chartSrc)) {
-            alert(
-                this.$t('editor.chart.label.nameExists', {
-                    name: newConfig.title?.text
-                })
-            );
-            return;
-        } else {
-            const title = newConfig.title?.text;
-            const chartConfig = {
-                name: title,
-                src: chartSrc
-            };
-
-            this.productStore.incrementSourceCount(chartSrc);
-
-            // Add chart config to ZIP file.
-            this.productStore.configFileStructure.charts[this.lang].file(
-                `${title}.json`,
-                JSON.stringify(newConfig, null, 4)
-            );
-            this.storylinesChartConfigs.push(chartConfig);
-            this.chartVersions[title] = 0;
-            this.highchartsChartConfigs.push(newConfig);
-        }
-        this.onChartsEdited();
-        this.$vfm.close('highcharts-create-modal');
-        this.chartIdx += 1;
-    }
-
-    extractStorylinesChartConfig(chart: ChartPanel, chartIdx: number): void {
-        let chartName = '';
-        // extract chart name
-        if (this.highchartsChartConfigs[chartIdx]?.title.text) {
-            chartName = this.highchartsChartConfigs[chartIdx]?.title.text;
-        } else if (chart.options && chart.options.title) {
-            chartName = chart.options.title;
-        } else {
-            const path = chart.src.match(/.*\/(.*)$/);
-            chartName = path ? path[1].replace(/\.[^/.]+$/, '').replace(/\./g, ' ') : chart.src;
-        }
-        // save storylines chart config
-        this.storylinesChartConfigs.push({
-            name: chartName,
-            ...chart
+    // fetch multiple existing chart configs from ZIP
+    if (props.panel.type === PanelType.SlideshowChart) {
+        let idx = 0;
+        charts.forEach((chart: ChartPanel) => {
+            fetchChartConfig(chart, idx, chart.name);
         });
-        this.chartVersions[chartName] = 0;
+    }
+});
+
+// =========================================
+// Component functions
+
+function fetchChartConfig(chart: ChartPanel | { config?: any; src?: string }, idx: number, chartName?: string) {
+    const chartSrc = chartName
+        ? `charts/${props.lang}/${chartName}.json`
+        : chart.src
+          ? chart.src.substring(chart.src.indexOf('/') + 1)
+          : '';
+
+    let highchartsJson = productStore.configFileStructure.zip.file(chartSrc);
+
+    // If not found, create file from config
+    if (!highchartsJson && chartName) {
+        const title = chartName;
+        productStore.configFileStructure.charts[props.lang].file(
+            `${title}.json`,
+            JSON.stringify(chart.config, null, 4)
+        );
+        highchartsJson = productStore.configFileStructure.zip.file(chartSrc);
     }
 
-    saveChart(name: string, updatedConfig: HighchartsConfig): void {
-        const idx = this.storylinesChartConfigs.findIndex((c) => c.name === name);
-        if (idx !== -1) {
-            if (updatedConfig.title?.text !== this.oldChartName) {
-                // Check to ensure chart does not rename to an existing chart title
-                const newName = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${updatedConfig.title?.text}.json`;
-                if (this.productStore.sourceCounts[newName] > 0) {
-                    alert(
-                        this.$t('editor.chart.label.nameExists', {
-                            name: updatedConfig.title?.text
-                        })
-                    );
-                    return;
-                }
-
-                // Remove old chart config from ZIP file and add in new one.
-                const oldName = `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${this.oldChartName}.json`;
-                this.productStore.sourceCounts[oldName] -= 1;
-                delete this.chartVersions[this.oldChartName];
-                if (this.productStore.sourceCounts[oldName] === 0) {
-                    this.productStore.configFileStructure.charts[this.lang].remove(`${this.oldChartName}.json`);
-                }
-
-                if (this.productStore.sourceCounts[newName]) {
-                    this.productStore.sourceCounts[newName] += 1;
-                } else {
-                    this.productStore.sourceCounts[newName] = 1;
-                }
-            }
-
-            const newTitle = updatedConfig.title.text;
-            // Add updated chart config to ZIP
-            this.productStore.configFileStructure.charts[this.lang].file(
-                `${newTitle}.json`,
-                JSON.stringify(updatedConfig, null, 4)
-            );
-
-            // Update local copies of Highcharts + Storylines chart configs
-            this.storylinesChartConfigs[idx] = {
-                name: updatedConfig.title?.text,
-                src: `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${newTitle}.json`
-            };
-            this.chartVersions[newTitle] = (this.chartVersions[newTitle] || 0) + 1;
-
-            this.highchartsChartConfigs[idx] = updatedConfig;
-        }
-        this.onChartsEdited();
+    if (highchartsJson) {
+        highchartsJson.async('string').then((res: string) => {
+            highchartsChartConfigs.value.push(JSON.parse(res));
+            extractStorylinesChartConfig(chart as ChartPanel, idx);
+            idx += 1;
+        });
     }
-
-    deleteChart(chart: ChartConfig): void {
-        const idx = this.storylinesChartConfigs.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
-        if (idx !== -1) {
-            // Remove the chart from the config file.
-            this.productStore.sourceCounts[
-                `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`
-            ] -= 1;
-            if (
-                this.productStore.sourceCounts[
-                    `${this.productStore.configFileStructure.uuid}/charts/${this.lang}/${chart.name}.json`
-                ] === 0
-            ) {
-                this.productStore.configFileStructure.charts[this.lang].remove(`${chart.name}.json`);
-            }
-            this.storylinesChartConfigs.splice(idx, 1);
-            this.highchartsChartConfigs.splice(idx, 1);
-        }
-        this.onChartsEdited();
-    }
-
-    saveChanges(): void {
-        if (this.edited) {
-            // Delete the existing properties so we can rebuild the object.
-            Object.keys(this.panel).forEach((key) => {
-                // @ts-ignore
-                delete this.panel[key];
-            });
-
-            // Handle case where every chart is deleted.
-            if (this.storylinesChartConfigs.length === 0) {
-                this.panel.type = PanelType.Chart;
-                (this.panel as ChartPanel).src = '';
-            } else if (this.storylinesChartConfigs.length === 1) {
-                this.panel.type = PanelType.Chart;
-
-                // Grab the one chart config from the array.
-                const newChart = this.storylinesChartConfigs[0];
-
-                // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
-                Object.keys(newChart).forEach((key) => {
-                    // @ts-ignore
-                    (this.panel as ChartPanel)[key] = newChart[key];
-                });
-            } else {
-                this.panel.type = PanelType.SlideshowChart;
-
-                // Turn each of the chart configs into a chart panel and add them to the slideshow.
-                (this.panel as SlideshowChartPanel).items = this.storylinesChartConfigs.map((chart: ChartConfig) => {
-                    return {
-                        ...chart,
-                        type: PanelType.Chart
-                    } as ChartPanel;
-                });
-            }
-        }
-
-        this.edited = false;
-    }
-
-    onChartsEdited(): void {
-        this.edited = true;
-        this.saveChanges();
-        this.$emit('slide-edit', 'Chart editor');
-    }
+    chartIdx.value += 1;
 }
+
+function openEditor(name: string) {
+    const idx = highchartsChartConfigs.value.findIndex((cfg) => cfg.title.text === name);
+    if (idx !== -1) {
+        editingConfig.value = highchartsChartConfigs.value[idx];
+        editingName.value = name;
+        $vfm.open('highcharts-edit-modal');
+    }
+    oldChartName.value = name;
+}
+
+function createNewChart(newConfig: HighchartsConfig): void {
+    const chartSrc = `${productStore.configFileStructure.uuid}/charts/${props.lang}/${newConfig.title?.text}.json`;
+
+    // Check to see if a chart already exists with the provided name. If so, alert the user and re-prompt.
+    if (productStore.sourceExists(chartSrc)) {
+        alert(
+            t('editor.chart.label.nameExists', {
+                name: newConfig.title?.text
+            })
+        );
+        return;
+    } else {
+        const title = newConfig.title?.text;
+        const chartConfig = {
+            name: title,
+            src: chartSrc
+        };
+
+        productStore.incrementSourceCount(chartSrc);
+
+        // Add chart config to ZIP file.
+        productStore.configFileStructure.charts[props.lang].file(`${title}.json`, JSON.stringify(newConfig, null, 4));
+        storylinesChartConfigs.value.push(chartConfig);
+        chartVersions.value[title] = 0;
+        highchartsChartConfigs.value.push(newConfig);
+    }
+    onChartsEdited();
+    $vfm.close('highcharts-create-modal');
+    chartIdx.value += 1;
+}
+
+function extractStorylinesChartConfig(chart: ChartPanel, chartIdx: number): void {
+    let chartName = '';
+    // extract chart name
+    if (highchartsChartConfigs.value[chartIdx]?.title.text) {
+        chartName = highchartsChartConfigs.value[chartIdx]?.title.text;
+    } else if (chart.options && chart.options.title) {
+        chartName = chart.options.title;
+    } else {
+        const path = chart.src.match(/.*\/(.*)$/);
+        chartName = path ? path[1].replace(/\.[^/.]+$/, '').replace(/\./g, ' ') : chart.src;
+    }
+    // save storylines chart config
+    storylinesChartConfigs.value.push({
+        name: chartName,
+        ...chart
+    });
+    chartVersions.value[chartName] = 0;
+}
+
+function saveChart(name: string, updatedConfig: HighchartsConfig): void {
+    const idx = storylinesChartConfigs.value.findIndex((c) => c.name === name);
+    if (idx !== -1) {
+        if (updatedConfig.title?.text !== oldChartName.value) {
+            // Check to ensure chart does not rename to an existing chart title
+            const newName = `${productStore.configFileStructure.uuid}/charts/${props.lang}/${updatedConfig.title?.text}.json`;
+            if (productStore.sourceCounts[newName] > 0) {
+                alert(
+                    t('editor.chart.label.nameExists', {
+                        name: updatedConfig.title?.text
+                    })
+                );
+                return;
+            }
+
+            // Remove old chart config from ZIP file and add in new one.
+            const oldName = `${productStore.configFileStructure.uuid}/charts/${props.lang}/${oldChartName.value}.json`;
+            productStore.sourceCounts[oldName] -= 1;
+            delete chartVersions.value[oldChartName.value];
+            if (productStore.sourceCounts[oldName] === 0) {
+                productStore.configFileStructure.charts[props.lang].remove(`${oldChartName.value}.json`);
+            }
+
+            if (productStore.sourceCounts[newName]) {
+                productStore.sourceCounts[newName] += 1;
+            } else {
+                productStore.sourceCounts[newName] = 1;
+            }
+        }
+
+        const newTitle = updatedConfig.title.text;
+        // Add updated chart config to ZIP
+        productStore.configFileStructure.charts[props.lang].file(
+            `${newTitle}.json`,
+            JSON.stringify(updatedConfig, null, 4)
+        );
+
+        // Update local copies of Highcharts + Storylines chart configs
+        storylinesChartConfigs.value[idx] = {
+            name: updatedConfig.title?.text,
+            src: `${productStore.configFileStructure.uuid}/charts/${props.lang}/${newTitle}.json`
+        };
+        chartVersions.value[newTitle] = (chartVersions.value[newTitle] || 0) + 1;
+
+        highchartsChartConfigs.value[idx] = updatedConfig;
+    }
+    onChartsEdited();
+}
+
+function deleteChart(chart: ChartConfig): void {
+    const idx = storylinesChartConfigs.value.findIndex((chartFile: ChartConfig) => chartFile.name === chart.name);
+    if (idx !== -1) {
+        // Remove the chart from the config file.
+        productStore.sourceCounts[`${productStore.configFileStructure.uuid}/charts/${props.lang}/${chart.name}.json`] -=
+            1;
+        if (
+            productStore.sourceCounts[
+                `${productStore.configFileStructure.uuid}/charts/${props.lang}/${chart.name}.json`
+            ] === 0
+        ) {
+            productStore.configFileStructure.charts[props.lang].remove(`${chart.name}.json`);
+        }
+        storylinesChartConfigs.value.splice(idx, 1);
+        highchartsChartConfigs.value.splice(idx, 1);
+    }
+    onChartsEdited();
+}
+
+function saveChanges(): void {
+    if (edited.value) {
+        // Delete the existing properties so we can rebuild the object.
+        Object.keys(props.panel).forEach((key) => {
+            // @ts-ignore
+            delete props.panel[key];
+        });
+
+        // Handle case where every chart is deleted.
+        if (storylinesChartConfigs.value.length === 0) {
+            props.panel.type = PanelType.Chart;
+            (props.panel as ChartPanel).src = '';
+        } else if (storylinesChartConfigs.value.length === 1) {
+            props.panel.type = PanelType.Chart;
+
+            // Grab the one chart config from the array.
+            const newChart = storylinesChartConfigs.value[0];
+
+            // Sort of gross, but required to update the panel config as we're not allowed to directly manipulate props.
+            Object.keys(newChart).forEach((key) => {
+                // @ts-ignore
+                (props.panel as ChartPanel)[key] = newChart[key];
+            });
+        } else {
+            props.panel.type = PanelType.SlideshowChart;
+
+            // Turn each of the chart configs into a chart panel and add them to the slideshow.
+            (props.panel as SlideshowChartPanel).items = storylinesChartConfigs.value.map((chart: ChartConfig) => {
+                return {
+                    ...chart,
+                    type: PanelType.Chart
+                } as ChartPanel;
+            });
+        }
+    }
+
+    edited.value = false;
+}
+
+function onChartsEdited(): void {
+    edited.value = true;
+    saveChanges();
+    emit('slide-edit', 'Chart editor');
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss">

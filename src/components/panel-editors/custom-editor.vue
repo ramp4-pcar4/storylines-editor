@@ -45,7 +45,7 @@
                 </ul>
             </div>
         </div>
-        <json-editor
+        <Vue3JsonEditor
             v-model="config"
             lang="en"
             :mode="'text'"
@@ -58,103 +58,115 @@
                 }
             "
             @json-change="(json: any) => onJsonChange(json)"
-        ></json-editor>
+        ></Vue3JsonEditor>
     </div>
 </template>
 
-<script lang="ts">
-import { computed } from 'vue';
-import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
-
+import { computed, getCurrentInstance, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useEditorStore } from '@/stores/editorStore';
 
-@Options({
-    components: {
-        'json-editor': Vue3JsonEditor
-    }
-})
-export default class CustomEditorV extends Vue {
-    editorStore = useEditorStore();
-    config = computed(() => this.editorStore.currentSlide);
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    edited = false;
-    jsonError = '';
-    validator: Validator = new Validator();
-    validatorErrors: any = [];
-    showErrors = false;
+const emit = defineEmits(['title-edit', 'slide-edit', 'config-edited']);
 
-    storylinesSchema: Record<string, any> = {};
+// =========================================
+// Definitions
 
-    mounted(): void {
-        console.log(' ');
-        console.log('mounted');
-        import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
-            this.storylinesSchema = {
-                ...StorylinesSchema.$defs.slide,
-                $defs: StorylinesSchema.$defs,
-                additionalProperties: StorylinesSchema.additionalProperties
-            };
+const { $nextTick, $el } = getCurrentInstance()!.proxy!;
+const { t } = useI18n();
 
-            this.validate();
-        });
+const editorStore = useEditorStore();
+const config = computed(() => editorStore.currentSlide);
 
-        // selects the <textarea> inside json-editor and add label attribute dynamically
-        this.$nextTick(() => {
-            const textarea = this.$el.querySelector('textarea.jsoneditor-text');
-            if (textarea) {
-                textarea.setAttribute('aria-label', this.$t('editor.slides.advanced.editor'));
-            }
-        });
-    }
+const edited = ref(false);
 
-    // returns true if no validation errors, false if errors
-    validate(validateJson?: any): boolean {
-        // TODO: add any missing properties in schema as required (e.g. chart options)
-        const checkConfig = validateJson ?? this.config;
+const jsonError = ref('');
+const validator: Validator = new Validator();
+const validatorErrors = ref([] as any[]);
+const showErrors = ref(false);
 
-        const checkValidation = this.validator.validate(checkConfig, this.storylinesSchema as any);
-        this.validatorErrors = checkValidation.errors;
-        if (this.jsonError) {
-            this.validatorErrors.push(this.jsonError);
-            return false;
+const storylinesSchema = ref({} as Record<string, any>);
+
+// =========================================
+// Watchers
+
+onMounted(() => {
+    import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
+        storylinesSchema.value = {
+            ...StorylinesSchema.$defs.slide,
+            $defs: StorylinesSchema.$defs,
+            additionalProperties: StorylinesSchema.additionalProperties
+        };
+
+        validate();
+    });
+
+    // selects the <textarea> inside json-editor and add label attribute dynamically
+    $nextTick(() => {
+        const textarea = $el.querySelector('textarea.jsoneditor-text');
+        if (textarea) {
+            textarea.setAttribute('aria-label', t('editor.slides.advanced.editor'));
         }
-        return this.validatorErrors.length === 0;
+    });
+});
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+// returns true if no validation errors, false if errors
+function validate(validateJson?: any): boolean {
+    // TODO: add any missing properties in schema as required (e.g. chart options)
+    const checkConfig = validateJson ?? config.value;
+
+    const checkValidation = validator.validate(checkConfig, storylinesSchema.value as any);
+    validatorErrors.value = checkValidation.errors;
+    if (jsonError.value) {
+        validatorErrors.value.push(jsonError.value);
+        return false;
     }
+    return validatorErrors.value.length === 0;
+}
 
-    onJsonChange(json: any): void {
-        console.log(' ');
-        console.log('onJSONChange');
-        this.jsonError = '';
-        const valid = this.validate(json);
-        this.edited = true;
-        console.log('slide-edit emitted');
-        this.$emit('slide-edit');
-        console.log('title-edit');
-        this.$emit('title-edit', json.title);
+function onJsonChange(json: any): void {
+    jsonError.value = '';
+    const valid = validate(json);
+    edited.value = true;
+    emit('slide-edit');
+    emit('title-edit', json.title);
 
-        // if there are no validation errors update the slide config
-        if (valid) {
-            // json editor library does not contain 2-way v-model binding so need to set manually
-            this.editorStore.currentSlide = json;
-            this.edited = true;
-            this.$emit('slide-edit');
-            this.$emit('config-edited');
-        }
-    }
-
-    saveChanges(): void {
-        console.log('  ');
-        console.log('custom-editor: saveChanges');
-        this.edited = false;
-
-        // If the user saves or leaves the advanced editor page with errors, give them a warning.
-        if (this.validatorErrors.length !== 0) {
-            alert(this.$t('editor.slides.advanced.error'));
-        }
+    // if there are no validation errors update the slide config
+    if (valid) {
+        // json editor library does not contain 2-way v-model binding so need to set manually
+        editorStore.currentSlide = json;
+        edited.value = true;
+        emit('slide-edit');
+        emit('config-edited');
     }
 }
+
+function saveChanges(): void {
+    // emit('config-edited', updatedConfig.value);
+    edited.value = false;
+
+    // If the user saves or leaves the advanced editor page with errors, give them a warning.
+    if (validatorErrors.value.length !== 0) {
+        alert(t('editor.slides.advanced.error'));
+    }
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss" scoped>

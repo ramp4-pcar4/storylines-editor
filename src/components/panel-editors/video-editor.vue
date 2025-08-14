@@ -1,6 +1,6 @@
 <template>
     <div class="block">
-        <!-- Upload video area -->
+        <!-- Video title -->
         <div class="flex flex-col mt-4 align-center w-full text-left">
             <label class="respected-standard-label text-label" for="videoTitle">{{ $t('editor.video.title') }}</label>
             <input
@@ -12,10 +12,15 @@
             />
         </div>
 
-        <!-- Option 1: upload video file -->
+        <!-- Option 1: upload video file area -->
         <div
-            class="upload-video flex justify-center text-center m-5 p-12 bg-gray-100 border-4 border-dashed border-gray-300"
+            class="upload-video flex justify-center text-center m-5 p-12 border-4 border-dashed"
             :class="{ dragging: isDragging }"
+            style="
+                background-color: #f3f4f6 !important;
+                border-color: #d1d5db !important;
+                border-radius: 5px !important;
+            "
             @dragover.prevent="() => (dragging = true)"
             @dragleave.prevent="() => (dragging = false)"
             @drop.prevent="dropVideo($event)"
@@ -101,7 +106,7 @@
         >
             <VideoPreview
                 :key="`${videoPreview.id}`"
-                :file="videoPreview"
+                :file="videoPreview as VideoFile"
                 :fileType="fileType"
                 :lang="lang"
                 @delete="deleteVideo"
@@ -148,12 +153,12 @@
                                 ref="videoCaptionInput"
                                 accept=".vtt"
                             />
-                            <input
-                                class="file-input-button"
-                                type="button"
+                            <button
+                                class="respected-standard-button respected-gray-border-button"
                                 @click="inputCaptionFile"
-                                :value="$t('editor.video.label.chooseFile')"
-                            />
+                            >
+                                {{ $t('editor.video.label.chooseFile') }}
+                            </button>
                             <p class="line-clamp-2">
                                 {{ $t('editor.video.label.captions.uploaded') }}:
                                 {{ videoPreview.caption ? videoPreview.caption.split('/').at(-1) : 'N/A' }}
@@ -227,12 +232,12 @@
                                 ref="videoTranscriptInput"
                                 accept=".html,.md"
                             />
-                            <input
-                                class="file-input-button"
-                                type="button"
+                            <button
+                                class="respected-standard-button respected-gray-border-button"
                                 @click="inputTranscriptFile"
-                                :value="$t('editor.video.label.chooseFile')"
-                            />
+                            >
+                                {{ $t('editor.video.label.chooseFile') }}
+                            </button>
                             <p class="line-clamp-2 w-3/5">
                                 {{ $t('editor.video.label.transcript.uploaded') }}:
                                 {{ videoPreview.transcript ? videoPreview.transcript.split('/').at(-1) : 'N/A' }}
@@ -273,257 +278,289 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { VideoFile, VideoPanel } from '@/definitions';
 import { applyTextAlign } from '@/utils/styleUtils';
+import { getCurrentInstance, onMounted, ref, useTemplateRef } from 'vue';
+import draggable from 'vuedraggable';
 
 import Message from 'vue-m-message';
-import draggable from 'vuedraggable';
-import VideoPreviewV from '../support/video-preview.vue';
+import VideoPreview from '../support/video-preview.vue';
 
 import { useProductStore } from '@/stores/productStore';
 
-@Options({
-    components: {
-        VideoPreview: VideoPreviewV,
-        draggable
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        panel: VideoPanel;
+        lang: string;
+        centerSlide?: boolean;
+        dynamicSelected?: boolean;
+    }>(),
+    {
+        centerSlide: false,
+        dynamicSelected: false
     }
-})
-export default class VideoEditorV extends Vue {
-    @Prop() panel!: VideoPanel;
-    @Prop() lang!: string;
-    @Prop({ default: false }) centerSlide!: boolean;
-    @Prop({ default: false }) dynamicSelected!: boolean;
+);
+const emit = defineEmits(['slide-edit']);
 
-    productStore = useProductStore();
-    dragging = false;
-    edited = false;
+// =========================================
+// Definitions
 
-    fileType = '';
-    fileSizeLimit = 75; // File size limit in MB
-    videoPreviewLoading = false;
-    videoPreviewPromise = undefined as Promise<VideoFile> | undefined;
-    videoPreview = {} as VideoFile | Record<string, never>;
-    slideshowCaption = '';
+const { proxy } = getCurrentInstance()!;
 
-    get isDragging(): boolean {
-        return this.dragging;
-    }
+const productStore = useProductStore();
+const dragging = ref(false);
+const edited = ref(false);
 
-    mounted(): void {
-        if (this.panel.src) {
-            if (this.panel.videoType === 'local') {
-                this.videoPreviewLoading = true;
+const fileType = ref('');
+const fileSizeLimit = ref(75); // File size limit in MB
+const videoPreviewLoading = ref(false);
+const videoPreviewPromise = ref<Promise<VideoFile> | undefined>(undefined as Promise<VideoFile> | undefined);
+const videoPreview = ref({} as VideoFile | Record<string, never>);
+const slideshowCaption = ref('');
 
-                // retrieve existing video file
-                const assetSrc = `${this.panel.src.substring(this.panel.src.indexOf('/') + 1)}`;
-                const assetFile = this.productStore.configFileStructure.zip.file(assetSrc);
-                if (assetFile) {
-                    this.videoPreviewPromise = assetFile.async('blob').then((res: Blob) => {
-                        return {
-                            ...this.panel,
-                            id: this.panel.src,
-                            src: URL.createObjectURL(res)
-                        } as VideoFile;
-                    });
-                }
-                // attempt to load in video to preview in editor
-                this.videoPreviewPromise?.then((res) => {
-                    this.videoPreview = res;
-                    this.videoPreviewLoading = false;
+const fileInput = useTemplateRef('videoFileInput');
+const videoTranscriptInput = useTemplateRef('videoTranscriptInput');
+const videoCaptionInput = useTemplateRef('videoCaptionInput');
+const videoUrl = useTemplateRef('videoUrl');
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+onMounted(() => {
+    if (props.panel.src) {
+        if (props.panel.videoType === 'local') {
+            videoPreviewLoading.value = true;
+
+            // retrieve existing video file
+            const assetSrc = `${props.panel.src.substring(props.panel.src.indexOf('/') + 1)}`;
+            const assetFile = productStore.configFileStructure.zip.file(assetSrc);
+            if (assetFile) {
+                videoPreviewPromise.value = assetFile.async('blob').then((res: Blob) => {
+                    return {
+                        ...props.panel,
+                        id: props.panel.src,
+                        src: URL.createObjectURL(res)
+                    } as VideoFile;
                 });
-
-                this.slideshowCaption = this.panel.caption as string;
-            } else {
-                // existing file is a URL format
-                this.videoPreview = {
-                    id: this.panel.src,
-                    title: this.panel.title,
-                    videoType: this.panel.videoType === 'YouTube' ? 'YouTube' : 'external',
-                    src: this.panel.src
-                };
             }
-            this.videoPreview.caption = this.panel.caption ?? '';
-            this.videoPreview.transcript = this.panel.transcript ?? '';
-        }
-        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
-    }
+            // attempt to load in video to preview in editor
+            videoPreviewPromise.value?.then((res) => {
+                videoPreview.value = res;
+                videoPreviewLoading.value = false;
+            });
 
-    inputCaptionFile() {
-        document.querySelector('#caption-input').click();
-    }
-
-    inputTranscriptFile() {
-        document.querySelector('#transcript-input').click();
-    }
-
-    // adds an uploaded file that is either a: video, transcript or captions
-    async addUploadedFile(file: File, type: string): Promise<void> {
-        const { inSharedAsset, newAssetName, uploadSource } = await this.productStore.addUploadedFile(file);
-
-        // check if source file is creating a new video or uploading captions/transcript for current video
-        if (type === 'src') {
-            const fileSrc = URL.createObjectURL(file);
-            const assetName = inSharedAsset ? newAssetName : file.name;
-            this.videoPreview = {
-                id: uploadSource,
-                title: assetName,
-                videoType: 'local',
-                src: fileSrc
+            slideshowCaption.value = props.panel.caption as string;
+        } else {
+            // existing file is a URL format
+            videoPreview.value = {
+                id: props.panel.src,
+                title: props.panel.title,
+                videoType: props.panel.videoType === 'YouTube' ? 'YouTube' : 'external',
+                src: props.panel.src
             };
-            this.findFileType(assetName);
-        } else {
-            this.videoPreview[type as 'caption' | 'transcript'] = uploadSource;
         }
-        this.edited = true;
-        this.$emit('slide-edit');
+        videoPreview.value.caption = props.panel.caption ?? '';
+        videoPreview.value.transcript = props.panel.transcript ?? '';
     }
+    applyTextAlign(props.panel, props.centerSlide, props.dynamicSelected);
+});
 
-    onFileChange(e: Event): void {
-        const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+// =========================================
+// Component functions
 
-        // Block files which are too big
-        if (file.size > this.fileSizeLimit * 1024 * 1024) {
-            Message.error(
-                this.$t('editor.video.sizeExceeded') +
-                    ' ' +
-                    this.$t('editor.video.label.sizeLimit', { size: this.fileSizeLimit })
-            );
-            return;
-        }
+function isDragging(): boolean {
+    return dragging.value;
+}
 
-        this.addUploadedFile(file, 'src').then(this.onVideoEdited);
-    }
+function inputCaptionFile() {
+    (document?.querySelector('#caption-input') as HTMLInputElement)?.click();
+}
 
-    findFileType(file: string): void {
-        if (this.videoPreview.videoType === 'external' || this.videoPreview.videoType === 'local') {
-            const fileName = file.substring(file.lastIndexOf('/') + 1);
-            const ext = fileName.split('.').pop();
-            this.fileType = `video/${ext}`;
-        }
-    }
+function inputTranscriptFile() {
+    (document?.querySelector('#transcript-input') as HTMLInputElement)?.click();
+}
 
-    // extract the video ID from YouTube link (we need to convert to embed link)
-    extractYoutubeId(url: string): string | null {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return match && match[2].length === 11 ? match[2] : null;
-    }
+// adds an uploaded file that is either a: video, transcript or captions
+async function addUploadedFile(file: File, type: string): Promise<void> {
+    const { inSharedAsset, newAssetName, uploadSource } = await productStore.addUploadedFile(file);
 
-    uploadVideoUrl(): void {
-        // TODO: might need to improve upon detecting YT link depending on cases
-        let url = (this.$refs.videoUrl as HTMLInputElement).value as string;
-
-        // handle shortened URL case
-        if (url.toLowerCase().includes('youtu.be')) {
-            url = url.replace('youtu.be/', 'www.youtube.com/watch?v=');
-        }
-
-        const isYoutube = url.toLowerCase().includes('youtube');
-
-        // change YT link to embed format
-        if (isYoutube) {
-            // extract and restructure YT url to be embeddable
-            // const videoId = this.extractYoutubeId(url);
-            // // TODO: add error handling for invalid URLs
-            // url = 'https://www.youtube.com/embed/' + (videoId as string);
-            url = url.replace('/watch?v=', '/embed/');
-        }
-        this.videoPreview = {
-            id: url,
-            title: this.videoPreview.title || url,
-            videoType: url.includes('youtube') ? 'YouTube' : 'external',
-            src: url
+    // check if source file is creating a new video or uploading captions/transcript for current video
+    if (type === 'src') {
+        const fileSrc = URL.createObjectURL(file);
+        const assetName = inSharedAsset ? newAssetName : file.name;
+        videoPreview.value = {
+            id: uploadSource,
+            title: assetName,
+            videoType: 'local',
+            src: fileSrc
         };
-        this.edited = true;
-        this.$emit('slide-edit');
-        this.onVideoEdited();
+        findFileType(assetName);
+    } else {
+        videoPreview.value[type as 'caption' | 'transcript'] = uploadSource;
+    }
+    edited.value = true;
+    emit('slide-edit');
+}
+
+function onFileChange(e: Event): void {
+    const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+
+    // Block files which are too big
+    if (file.size > fileSizeLimit.value * 1024 * 1024) {
+        Message.error(
+            proxy!.$t('editor.video.sizeExceeded') +
+                ' ' +
+                proxy!.$t('editor.video.label.sizeLimit', { size: fileSizeLimit.value })
+        );
+        return;
     }
 
-    updateCaptions(e: Event): void {
-        const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        if (file.name.split('.').at(-1) === 'vtt') {
-            this.addUploadedFile(file, 'caption').then(() => {
-                this.onVideoEdited();
-            });
-        } else {
-            Message.error(this.$t('editor.video.caption.error'));
-        }
-    }
+    addUploadedFile(file, 'src').then(onVideoEdited);
+}
 
-    updateTranscript(e: Event): void {
-        const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-        if (['html', 'md'].includes(file.name.split('.').at(-1))) {
-            this.addUploadedFile(file, 'transcript').then(() => {
-                this.onVideoEdited();
-            });
-        } else {
-            Message.error(this.$t('editor.video.transcript.error'));
-        }
-    }
-
-    dropVideo(e: DragEvent): void {
-        if (e.dataTransfer !== null) {
-            const file = [...e.dataTransfer.files][0];
-            this.addUploadedFile(file, 'src').then(() => {
-                this.dragging = false;
-                this.onVideoEdited();
-            });
-        }
-    }
-
-    deleteVideo(): void {
-        if (this.videoPreview.videoType === 'local') {
-            const videoSource = this.videoPreview.id;
-
-            this.productStore.decrementSourceCount(videoSource);
-            if (!this.productStore.sourceExists(videoSource)) {
-                URL.revokeObjectURL(this.videoPreview.src);
-            }
-        }
-        (this.$refs.videoFileInput as HTMLInputElement).value = '';
-        this.videoPreview = {};
-        this.onVideoEdited();
-    }
-
-    deleteCaption(): void {
-        if (this.videoPreview.caption) {
-            this.productStore.decrementSourceCount(this.videoPreview.caption);
-            this.videoPreview.caption = '';
-            (this.$refs.videoCaptionInput as HTMLInputElement).value = '';
-            this.onVideoEdited();
-        }
-    }
-
-    deleteTranscript(): void {
-        if (this.videoPreview.transcript) {
-            this.productStore.decrementSourceCount(this.videoPreview.transcript);
-            this.videoPreview.transcript = '';
-            (this.$refs.videoTranscriptInput as HTMLInputElement).value = '';
-            this.onVideoEdited();
-        }
-    }
-
-    saveChanges(): void {
-        if (this.edited && this.videoPreview) {
-            // save all changes to panel config (cannot directly set to avoid prop mutate)
-            this.panel.title = this.videoPreview.title;
-            this.panel.videoType = this.videoPreview.videoType;
-
-            this.panel.src = this.videoPreview.videoType === 'local' ? this.videoPreview.id : this.videoPreview.src;
-            this.panel.caption = this.videoPreview.caption ? this.videoPreview.caption : '';
-            this.panel.transcript = this.videoPreview.transcript ? this.videoPreview.transcript : '';
-        }
-        this.edited = false;
-    }
-
-    onVideoEdited(): void {
-        this.edited = true;
-        this.saveChanges();
-        this.$emit('slide-edit', 'Video editor');
+function findFileType(file: string): void {
+    if (videoPreview.value.videoType === 'external' || videoPreview.value.videoType === 'local') {
+        const fileName = file.substring(file.lastIndexOf('/') + 1);
+        const ext = fileName.split('.').pop();
+        fileType.value = `video/${ext}`;
     }
 }
+
+// extract the video ID from YouTube link (we need to convert to embed link)
+function extractYoutubeId(url: string): string | null {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+}
+
+function uploadVideoUrl(): void {
+    // TODO: might need to improve upon detecting YT link depending on cases
+    let url = (videoUrl.value as HTMLInputElement).value as string;
+
+    // handle shortened URL case
+    if (url.toLowerCase().includes('youtu.be')) {
+        url = url.replace('youtu.be/', 'www.youtube.com/watch?v=');
+    }
+
+    const isYoutube = url.toLowerCase().includes('youtube');
+
+    // change YT link to embed format
+    if (isYoutube) {
+        // extract and restructure YT url to be embeddable
+        // const videoId = this.extractYoutubeId(url);
+        // // TODO: add error handling for invalid URLs
+        // url = 'https://www.youtube.com/embed/' + (videoId as string);
+        url = url.replace('/watch?v=', '/embed/');
+    }
+    videoPreview.value = {
+        id: url,
+        title: videoPreview.value.title || url,
+        videoType: url.includes('youtube') ? 'YouTube' : 'external',
+        src: url
+    };
+    edited.value = true;
+    emit('slide-edit');
+    onVideoEdited();
+}
+
+function updateCaptions(e: Event): void {
+    const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+    if (file.name.split('.').at(-1) === 'vtt') {
+        addUploadedFile(file, 'caption').then(() => {
+            onVideoEdited();
+        });
+    } else {
+        Message.error(proxy!.$t('editor.video.caption.error'));
+    }
+}
+
+function updateTranscript(e: Event): void {
+    const file = Array.from((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+    // @ts-ignore
+    if (['html', 'md'].includes(file.name.split('.').at(-1))) {
+        addUploadedFile(file, 'transcript').then(() => {
+            onVideoEdited();
+        });
+    } else {
+        Message.error(proxy!.$t('editor.video.transcript.error'));
+    }
+}
+
+function dropVideo(e: DragEvent): void {
+    if (e.dataTransfer !== null) {
+        const file = [...e.dataTransfer.files][0];
+        addUploadedFile(file, 'src').then(() => {
+            dragging.value = false;
+            onVideoEdited();
+        });
+    }
+}
+
+function deleteVideo(): void {
+    if (videoPreview.value.videoType === 'local') {
+        const videoSource = videoPreview.value.id;
+
+        productStore.decrementSourceCount(videoSource);
+        if (!productStore.sourceExists(videoSource)) {
+            URL.revokeObjectURL(videoPreview.value.src);
+        }
+    }
+    (fileInput.value as HTMLInputElement).value = '';
+    videoPreview.value = {};
+    onVideoEdited();
+}
+
+function deleteCaption(): void {
+    if (videoPreview.value.caption) {
+        productStore.decrementSourceCount(videoPreview.value.caption);
+        videoPreview.value.caption = '';
+        (videoCaptionInput.value as HTMLInputElement).value = '';
+        onVideoEdited();
+    }
+}
+
+function deleteTranscript(): void {
+    if (videoPreview.value.transcript) {
+        productStore.decrementSourceCount(videoPreview.value.transcript);
+        videoPreview.value.transcript = '';
+        (videoTranscriptInput.value as HTMLInputElement).value = '';
+        onVideoEdited();
+    }
+}
+
+function saveChanges(): void {
+    if (edited.value && videoPreview.value) {
+        // save all changes to panel config (cannot directly set to avoid prop mutate)
+        props.panel.title = videoPreview.value.title;
+        props.panel.videoType = videoPreview.value.videoType;
+
+        props.panel.src = videoPreview.value.videoType === 'local' ? videoPreview.value.id : videoPreview.value.src;
+        props.panel.caption = videoPreview.value.caption ? videoPreview.value.caption : '';
+        props.panel.transcript = videoPreview.value.transcript ? videoPreview.value.transcript : '';
+    }
+    edited.value = false;
+}
+
+function onVideoEdited(): void {
+    edited.value = true;
+    saveChanges();
+    emit('slide-edit', 'Video editor');
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({
+    saveChanges
+});
 </script>
 
 <style lang="scss" scoped>

@@ -154,16 +154,17 @@
         </div>
         <div v-else class="ml-auto flex my-auto">
             <!-- ::lang:: options dropdown menu -->
-            <toc-options :copy-allowed="!!element[oppositeLang]" @copy="$emit('copy')" @clear="$emit('clear')" />
+            <TocOptions :copy-allowed="!!element[oppositeLang]" @copy="$emit('copy')" @clear="$emit('clear')" />
         </div>
     </button>
 </template>
 
-<script lang="ts">
-import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted, onUpdated, ref } from 'vue';
+import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide, SupportedLanguages } from '@/definitions';
 import TocOptions from './toc-options.vue';
 import { useEditorStore } from '@/stores/editorStore';
+import { useI18n } from 'vue-i18n';
 
 import TextEditorIcon from '@/assets/text-editor.svg?raw';
 import ImageEditorIcon from '@/assets/image-editor.svg?raw';
@@ -174,107 +175,127 @@ import AudioEditorIcon from '@/assets/audio-editor.svg?raw';
 import SlideshowEditorIcon from '@/assets/slideshow-editor.svg?raw';
 import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
 
-@Options({
-    components: {
-        TocOptions
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        selectedLang: SupportedLanguages;
+        element: MultiLanguageSlide;
+        isMobileSidebar?: boolean;
+        isActiveSlide: boolean;
+    }>(),
+    {
+        isMobileSidebar: false
     }
-})
-export default class SlideTocV extends Vue {
-    @Prop() selectedLang!: 'en' | 'fr';
-    @Prop() element!: MultiLanguageSlide;
-    @Prop({ default: false }) isMobileSidebar!: boolean;
-    @Prop() isActiveSlide!: boolean;
+);
 
-    oppositeLang: 'en' | 'fr' = 'fr';
-    content: string | undefined = '';
+const emit = defineEmits(['select-slide', 'close-sidebar', 'create-config', 'copy-config', 'copy', 'clear']);
 
-    editorStore = useEditorStore();
+// =========================================
+// Definitions
 
-    textEditorIcon = TextEditorIcon;
-    imageEditorIcon = ImageEditorIcon;
-    mapEditorIcon = MapEditorIcon;
-    chartEditorIcon = ChartEditorIcon;
-    videoEditorIcon = VideoEditorIcon;
-    audioEditorIcon = AudioEditorIcon;
-    slideshowEditorIcon = SlideshowEditorIcon;
-    dynamicEditorIcon = DynamicEditorIcon;
+const { t } = useI18n();
 
-    createMiniIconTooltip(panelIndex: number, element: MultiLanguageSlide, panel: BasePanel) {
-        // Function to escape HTML sequences
-        // panel.title is user input, and therefore a potential attack vector
-        const escapeHTML = (text: string) => {
-            if (!text) return text;
-            return text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        };
+const editorStore = useEditorStore();
 
-        // Max length of the title (starting on the second line of the tooltip). Title will truncate after.
-        // maxLength == 130 is around 2 and a half lines
-        const maxLength = 130;
+const oppositeLang = computed(() => (props.selectedLang === 'en' ? 'fr' : 'en'));
+const content = ref('' as string | undefined);
 
-        return `<p style="justify-self: left; text-align: left"><strong>${
-            (element[this.selectedLang] as Slide).panel.length > 1
-                ? this.$t('editor.slides.panelNumber', { num: panelIndex + 1 })
-                : this.$t('editor.slides.fullscreenPanel')
-        }: ${this.$t(`editor.slide.panel.type.${panel?.type}`)}</strong><br/>${
-            (panel as any).title
-                ? '"' +
-                  escapeHTML((panel as any).title).substring(0, maxLength) +
-                  (((panel as any).title as string)?.length > maxLength ? '...' : '') +
-                  '"'
-                : 'No title'
-        }</p>`;
-    }
+const textEditorIcon = TextEditorIcon;
+const imageEditorIcon = ImageEditorIcon;
+const mapEditorIcon = MapEditorIcon;
+const chartEditorIcon = ChartEditorIcon;
+const videoEditorIcon = VideoEditorIcon;
+const audioEditorIcon = AudioEditorIcon;
+const slideshowEditorIcon = SlideshowEditorIcon;
+const dynamicEditorIcon = DynamicEditorIcon;
 
-    updateContent(): void {
-        if (this.element[this.selectedLang]?.title) {
-            this.content = this.element[this.selectedLang]?.title;
-        } else if (this.element[this.selectedLang]?.title === '') {
-            this.content =
-                this.selectedLang === 'en'
-                    ? this.$t('editor.slides.toc.newENGSlideText')
-                    : this.$t('editor.slides.toc.newFRSlideText');
-        } else {
-            this.content =
-                this.selectedLang === 'en'
-                    ? this.$t('editor.slide.toc.noENGslide')
-                    : this.$t('editor.slide.toc.noFRSlide');
-        }
-    }
+// =========================================
+// Watchers
 
-    mounted(): void {
-        this.oppositeLang = this.selectedLang === 'en' ? 'fr' : 'en';
-        this.updateContent();
-    }
+// =========================================
+// Lifecycle functions
 
-    updated(): void {
-        this.updateContent();
-    }
+onMounted(() => {
+    updateContent();
+});
 
-    determinePanelImage(type: PanelType): string {
-        if (!type) return '';
+onUpdated(() => {
+    updateContent();
+});
 
-        const panelIcons: Record<PanelType, string> = {
-            [PanelType.Text]: this.textEditorIcon,
-            [PanelType.Image]: this.imageEditorIcon,
-            [PanelType.Map]: this.mapEditorIcon,
-            [PanelType.Chart]: this.chartEditorIcon,
-            [PanelType.Video]: this.videoEditorIcon,
-            [PanelType.Audio]: this.audioEditorIcon,
-            [PanelType.Slideshow]: this.slideshowEditorIcon,
-            [PanelType.SlideshowImage]: this.imageEditorIcon,
-            [PanelType.SlideshowChart]: this.chartEditorIcon,
-            [PanelType.Dynamic]: this.dynamicEditorIcon,
-            [PanelType.Loading]: ''
-        };
+// =========================================
+// Component functions
 
-        return panelIcons[type] ?? '';
+function createMiniIconTooltip(panelIndex: number, element: MultiLanguageSlide, panel: BasePanel) {
+    // Function to escape HTML sequences
+    // panel.title is user input, and therefore a potential attack vector
+    const escapeHTML = (text: string) => {
+        if (!text) return text;
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    // Max length of the title (starting on the second line of the tooltip). Title will truncate after.
+    // maxLength == 130 is around 2 and a half lines
+    const maxLength = 130;
+
+    return `<p style="justify-self: left; text-align: left"><strong>${
+        (props.element[props.selectedLang] as Slide).panel.length > 1
+            ? t('editor.slides.panelNumber', { num: panelIndex + 1 })
+            : t('editor.slides.fullscreenPanel')
+    }: ${t(`editor.slide.panel.type.${panel?.type}`)}</strong><br/>${
+        (panel as any).title
+            ? '"' +
+              escapeHTML((panel as any).title).substring(0, maxLength) +
+              (((panel as any).title as string)?.length > maxLength ? '...' : '') +
+              '"'
+            : 'No title'
+    }</p>`;
+}
+
+function updateContent(): void {
+    if (props.element[props.selectedLang]?.title) {
+        content.value = props.element[props.selectedLang]?.title;
+    } else if (props.element[props.selectedLang]?.title === '') {
+        content.value =
+            props.selectedLang === 'en'
+                ? t('editor.slides.toc.newENGSlideText')
+                : t('editor.slides.toc.newFRSlideText');
+    } else {
+        content.value =
+            props.selectedLang === 'en' ? t('editor.slide.toc.noENGslide') : t('editor.slide.toc.noFRSlide');
     }
 }
+
+function determinePanelImage(type: PanelType): string {
+    if (!type) return '';
+
+    const panelIcons: Record<PanelType, string> = {
+        [PanelType.Text]: textEditorIcon,
+        [PanelType.Image]: imageEditorIcon,
+        [PanelType.Map]: mapEditorIcon,
+        [PanelType.Chart]: chartEditorIcon,
+        [PanelType.Video]: videoEditorIcon,
+        [PanelType.Audio]: audioEditorIcon,
+        [PanelType.Slideshow]: slideshowEditorIcon,
+        [PanelType.SlideshowImage]: imageEditorIcon,
+        [PanelType.SlideshowChart]: chartEditorIcon,
+        [PanelType.Dynamic]: dynamicEditorIcon,
+        [PanelType.Loading]: ''
+    };
+
+    return panelIcons[type] ?? '';
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss" scoped>

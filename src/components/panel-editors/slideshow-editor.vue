@@ -162,7 +162,7 @@
         <button
             class="respected-standard-button w-full lg:w-4/5 max-h-96 bg-gray-100 border border-gray-400 hover:bg-gray-200"
             style="margin-top: 1.25rem; justify-content: start !important"
-            @click="this.changeEditStatus()"
+            @click="changeEditStatus()"
         >
             <svg
                 height="18px"
@@ -201,7 +201,7 @@
                     </h2>
                     <p v-if="editingStatus === 'edit'" class="font-semibold text-md text-gray-500">
                         {{
-                            `#${editingIdx + 1} - ` + (panel.items[editingIdx].title || $t('editor.slideshow.noTitle'))
+                            `#${editingIdx + 1} - ` + (panel.items[editingIdx]?.title || $t('editor.slideshow.noTitle'))
                         }}
                     </p>
                 </div>
@@ -266,7 +266,6 @@
                 </button>
             </div>
 
-            <!--            <hr class="border-solid border-t-2 border-gray-300 my-2" />-->
             <div>
                 <div class="mt-3" v-if="editingStatus === 'create'">
                     <!-- Creating new slide -->
@@ -292,7 +291,7 @@
                     <!-- Editing existing slide-->
                     <component
                         ref="slideEditor"
-                        :is="editors[panel.items[editingIdx].type]"
+                        :is="slideEditorType"
                         :panel="panel.items[editingIdx]"
                         :lang="lang"
                         :key="editingIdx + panel.items[editingIdx].type"
@@ -304,8 +303,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { BasePanel, BaseStartingConfig, DefaultConfigs, PanelType, SlideshowPanel } from '@/definitions';
 
 import ChartEditorV from './chart-editor.vue';
@@ -315,172 +313,189 @@ import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
 
 import { useProductStore } from '@/stores/productStore';
+import { getCurrentInstance, ref, useTemplateRef } from 'vue';
 
-@Options({
-    components: {
-        'chart-editor': ChartEditorV,
-        'image-editor': ImageEditorV,
-        'text-editor': TextEditorV,
-        'map-editor': MapEditorV,
-        'video-editor': VideoEditorV
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = defineProps<{
+    panel: SlideshowPanel;
+    lang: string;
+}>();
+
+const emit = defineEmits(['slide-edit']);
+
+// =========================================
+// Definitions
+
+const { $nextTick } = getCurrentInstance()!.proxy!;
+
+const slideEditor = useTemplateRef('slideEditor');
+const slideEditorType = ref<any>(null);
+
+const productStore = useProductStore();
+const editors: Record<string, any> = {
+    text: TextEditorV,
+    image: ImageEditorV,
+    chart: ChartEditorV,
+    map: MapEditorV,
+    video: VideoEditorV
+};
+
+const startingConfig: DefaultConfigs = {
+    ...JSON.parse(JSON.stringify(BaseStartingConfig)),
+    slideshow: {
+        type: PanelType.Slideshow,
+        items: []
+    },
+    map: {
+        type: PanelType.Map,
+        config: '',
+        title: '',
+        scrollguard: true // default to ON for slideshows. Allows users to use the cursor to switch slides.
     }
-})
-export default class SlideshowEditorV extends Vue {
-    @Prop() panel!: SlideshowPanel;
-    @Prop() lang!: string;
+};
 
-    productStore = useProductStore();
+const editingIdx = ref(-1);
+const newSlideType = ref('text' as 'text' | 'image' | 'chart' | 'map');
+const editingStatus = ref('none' as 'none' | 'edit' | 'create');
 
-    editors: Record<string, string> = {
-        text: 'text-editor',
-        image: 'image-editor',
-        chart: 'chart-editor',
-        map: 'map-editor',
-        video: 'video-editor'
-    };
+// =========================================
+// Watchers
 
-    startingConfig: DefaultConfigs = {
-        ...JSON.parse(JSON.stringify(BaseStartingConfig)),
-        slideshow: {
-            type: PanelType.Slideshow,
-            items: []
-        },
-        map: {
-            type: PanelType.Map,
-            config: '',
-            title: '',
-            scrollguard: true // default to ON for slideshows. Allows users to use the cursor to switch slides.
-        }
-    };
+// =========================================
+// Lifecycle functions
 
-    editingIdx = -1;
-    newSlideName = '';
-    newSlideType: 'text' | 'image' | 'chart' | 'map' = 'text';
-    editingStatus: 'none' | 'edit' | 'create' = 'none';
+// =========================================
+// Component functions
 
-    onTypeInput(e: any): void {
-        this.newSlideType = e.target.value;
+function onTypeInput(e: any): void {
+    newSlideType.value = e.target.value;
+}
+
+function editItem(idx: number): void {
+    // Save slide changes if neccessary and switch to the newly selected slide.
+    saveChanges();
+    editingIdx.value = idx;
+    editingStatus.value = 'edit';
+    slideEditorType.value = editors[props.panel.items[editingIdx.value].type];
+
+    // After switching the edit status, scroll to the add button.
+    $nextTick(() => {
+        document.getElementById('create-and-edit-area')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+}
+
+function deleteItem(item: number): void {
+    const panel = props.panel.items.find((panel: BasePanel, idx: number) => idx === item);
+
+    // Update source counts based on which panel is removed.
+    productStore.removeSourceCounts(panel as BasePanel);
+
+    // Remove the panel itself.
+    props.panel.items = props.panel.items.filter((panel: BasePanel, idx: number) => idx !== item);
+
+    // If the slide being removed is the currently selected slide, unselect it.
+    if (editingIdx.value === item) {
+        editingIdx.value = -1;
+        editingStatus.value = 'none';
     }
+}
 
-    editItem(idx: number): void {
-        // Save slide changes if neccessary and switch to the newly selected slide.
-        this.saveChanges();
-        this.editingIdx = idx;
-        this.editingStatus = 'edit';
-
-        // After switching the edit status, scroll to the add button.
-        this.$nextTick(() => {
-            document.getElementById('create-and-edit-area')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        });
-    }
-
-    deleteItem(item: number): void {
-        const panel = this.panel.items.find((panel: BasePanel, idx: number) => idx === item);
-
-        // Update source counts based on which panel is removed.
-        this.productStore.removeSourceCounts(panel as BasePanel);
-
-        // Remove the panel itself.
-        this.panel.items = this.panel.items.filter((panel: BasePanel, idx: number) => idx !== item);
-
-        // If the slide being removed is the currently selected slide, unselect it.
-        if (this.editingIdx === item) {
-            this.editingIdx = -1;
-            this.editingStatus = 'none';
-        }
-    }
-
-    moveSlideUp(index: number): void {
-        if (index === 0) {
-            return;
-        }
-
-        const item = JSON.parse(JSON.stringify(this.panel.items[index]));
-
-        this.panel.items.splice(index, 1);
-        this.panel.items.splice(index - 1, 0, item);
-
-        // Just in case we decide to allow it: handling edge case where a slide
-        // being edited is moved. In that case, ensure focus remains on that slide
-        if (this.editingStatus === 'edit') {
-            // If slide being edited is current slide
-            if (this.editingIdx === index) {
-                this.editingIdx -= 1;
-                // If slide being edited is previous slide (shift it down)
-            } else if (this.editingIdx === index - 1) {
-                this.editingIdx += 1;
-            }
-        }
-    }
-
-    moveSlideDown(index: number): void {
-        if (index === this.panel.items.length - 1) {
-            return;
-        }
-
-        const item = JSON.parse(JSON.stringify(this.panel.items[index]));
-
-        this.panel.items.splice(index, 1);
-        this.panel.items.splice(index + 1, 0, item);
-
-        // Just in case we decide to allow it: handling edge case where a slide
-        // being edited is moved. In that case, ensure focus remains on that slide
-        if (this.editingStatus === 'edit') {
-            // If slide being edited is current slide
-            if (this.editingIdx === index) {
-                this.editingIdx += 1;
-                // If slide being edited is next slide (shift it up)
-            } else if (this.editingIdx === index + 1) {
-                this.editingIdx -= 1;
-            }
-        }
-    }
-
-    saveItem(add = false): void {
-        let itemConfig;
-
-        if (add) {
-            itemConfig = (this.$refs.slideEditor as any).panel;
-            this.panel.items.push(itemConfig);
-        } else {
-            itemConfig = (this.$refs.slideEditor as any).panel;
-        }
-
-        if (itemConfig.type !== PanelType.Text) {
-            if (
-                this.$refs.slideEditor !== undefined &&
-                typeof (this.$refs.slideEditor as ImageEditorV | ChartEditorV).saveChanges === 'function'
-            ) {
-                (this.$refs.slideEditor as ImageEditorV | ChartEditorV).saveChanges();
-
-                if (itemConfig.type === PanelType.Map) {
-                    this.$emit('slide-edit');
-                }
-            }
-        }
-
-        this.editingStatus = 'none';
-    }
-
-    saveChanges(): void {
+function moveSlideUp(index: number): void {
+    if (index === 0) {
         return;
     }
 
-    changeEditStatus(): void {
-        if (this.editingStatus === 'create') {
-            this.editingStatus = 'none';
-        } else {
-            this.editingStatus = 'create';
+    const item = JSON.parse(JSON.stringify(props.panel.items[index]));
 
-            // After switching the edit status, scroll to the add button.
-            this.$nextTick(() => {
-                document
-                    .getElementById('create-and-edit-area')
-                    ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            });
+    props.panel.items.splice(index, 1);
+    props.panel.items.splice(index - 1, 0, item);
+
+    // Just in case we decide to allow it: handling edge case where a slide
+    // being edited is moved. In that case, ensure focus remains on that slide
+    if (editingStatus.value === 'edit') {
+        // If slide being edited is current slide
+        if (editingIdx.value === index) {
+            editingIdx.value -= 1;
+            // If slide being edited is previous slide (shift it down)
+        } else if (editingIdx.value === index - 1) {
+            editingIdx.value += 1;
         }
     }
 }
+
+function moveSlideDown(index: number): void {
+    if (index === props.panel.items.length - 1) {
+        return;
+    }
+
+    const item = JSON.parse(JSON.stringify(props.panel.items[index]));
+
+    props.panel.items.splice(index, 1);
+    props.panel.items.splice(index + 1, 0, item);
+
+    // Just in case we decide to allow it: handling edge case where a slide
+    // being edited is moved. In that case, ensure focus remains on that slide
+    if (editingStatus.value === 'edit') {
+        // If slide being edited is current slide
+        if (editingIdx.value === index) {
+            editingIdx.value += 1;
+            // If slide being edited is next slide (shift it up)
+        } else if (editingIdx.value === index + 1) {
+            editingIdx.value -= 1;
+        }
+    }
+}
+
+function saveItem(add = false): void {
+    let itemConfig;
+
+    if (add) {
+        itemConfig = props.panel.items[editingIdx.value];
+        props.panel.items.push(itemConfig);
+    } else {
+        itemConfig = props.panel.items[editingIdx.value];
+    }
+
+    if (itemConfig.type !== PanelType.Text) {
+        if (
+            slideEditor.value !== undefined &&
+            typeof (slideEditor.value as typeof ImageEditorV | typeof ChartEditorV).saveChanges === 'function'
+        ) {
+            (slideEditor.value as typeof ImageEditorV | typeof ChartEditorV).saveChanges();
+
+            if (itemConfig.type === PanelType.Map) {
+                emit('slide-edit');
+            }
+        }
+    }
+
+    editingStatus.value = 'none';
+}
+
+function saveChanges(): void {
+    return;
+}
+
+function changeEditStatus(): void {
+    if (editingStatus.value === 'create') {
+        editingStatus.value = 'none';
+    } else {
+        editingStatus.value = 'create';
+
+        // After switching the edit status, scroll to the add button.
+        $nextTick(() => {
+            document.getElementById('create-and-edit-area')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
+    }
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss" scoped>

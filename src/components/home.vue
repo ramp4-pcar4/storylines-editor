@@ -147,7 +147,7 @@
                 </div>
             </div>
 
-            <vue-final-modal
+            <VueFinalModal
                 modalId="admin-upload-modal"
                 content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl mx-4 p-7 bg-white border rounded-lg"
                 class="flex justify-center items-center"
@@ -311,7 +311,7 @@
 
                     <div class="modal-footer">
                         <div class="inline-flex align-middle self-center" v-if="loading">
-                            <spinner size="24px" color="#009cd1" class="mx-2 my-auto"></spinner>
+                            <VueSpinnerOval size="24px" color="#009cd1" class="mx-2 my-auto"></VueSpinnerOval>
                         </div>
                         <button
                             type="submit"
@@ -326,7 +326,7 @@
                         </button>
                     </div>
                 </div>
-            </vue-final-modal>
+            </VueFinalModal>
 
             <h2 class="pt-8 pb-5 text-2xl font-semibold">{{ $t('editor.previousProducts') }}</h2>
             <table class="shadow-lg bg-white w-full pr-0 mr-0 mb-10">
@@ -425,8 +425,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { Storyline, UserProfile, useUserStore } from '../stores/userStore';
 import { useLockStore } from '../stores/lockStore';
 import { VueFinalModal } from 'vue-final-modal';
@@ -434,376 +433,409 @@ import { AxiosResponse } from 'axios';
 import { VueSpinnerOval } from 'vue3-spinners';
 import { throttle } from 'throttle-debounce';
 import JSZip from 'jszip';
-import { fromEvent } from 'file-selector';
+import { FileWithPath, fromEvent } from 'file-selector';
+import { computed, getCurrentInstance, onMounted, ref, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import axios from 'axios';
 import Message from 'vue-m-message';
 
-@Options({
-    components: {
-        'vue-final-modal': VueFinalModal,
-        spinner: VueSpinnerOval
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        // true if user was redirected here due to session expiring, false otherwise
+        sessionExpired?: boolean;
+    }>(),
+    {
+        sessionExpired: false
     }
-})
-export default class HomeV extends Vue {
-    @Prop({ default: false }) sessionExpired!: boolean; // true if user was redirected here due to session expiring, false otherwise
+);
 
-    userStore = useUserStore();
-    lockStore = useLockStore();
-    currLang = 'en';
-    sourceFile = 'index.html#';
-    profile: UserProfile = {};
-    showExpired = false;
-    apiUrl = import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040';
-    productZip: string | File = '';
-    productUploadName = '';
-    productUuid = '';
-    loading = false;
-    dragging = false;
-    error = false;
-    checkingUuid = false;
-    warning = 'none';
+const emits = defineEmits([]);
 
-    mounted(): void {
-        this.currLang = (this.$route.params.lang as string) || 'en';
-        this.sourceFile = window.location.href.split('/').find((s) => s.includes('#')) as string;
-        // If the user was redirected here due to session end, show session end popup.
-        if (this.sessionExpired) {
-            this.showExpired = true;
-        }
-        this.obtainUserProfile();
+// =========================================
+// Definitions
+
+// Avoid ts errors
+interface ExtendedFile extends File {
+    filePath: string;
+    relativePath: string;
+}
+
+const { t } = useI18n();
+
+const productZipInput = useTemplateRef('productZipInput');
+const productFolderInput = useTemplateRef('productFolderInput');
+
+const userStore = useUserStore();
+const lockStore = useLockStore();
+
+const currLang = ref('en');
+const sourceFile = ref('index.html#');
+const profile = ref<UserProfile>({});
+const showExpired = ref(false);
+const apiUrl = import.meta.env.VITE_APP_CURR_ENV ? import.meta.env.VITE_APP_API_URL : 'http://localhost:6040';
+const productZip = ref<string | File>('');
+const productUploadName = ref('');
+const productUuid = ref('');
+const loading = ref(false);
+const dragging = ref(false);
+const error = ref(false);
+const checkingUuid = ref(false);
+const warning = ref('none');
+
+const { $route, $router, $vfm } = getCurrentInstance()!.proxy!;
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+onMounted(() => {
+    currLang.value = ($route.params.lang as string) || 'en';
+    sourceFile.value = window.location.href.split('/').find((s) => s.includes('#')) as string;
+    // If the user was redirected here due to session end, show session end popup.
+    if (props.sessionExpired) {
+        showExpired.value = true;
     }
+    obtainUserProfile();
+});
 
-    obtainUserProfile(): void {
-        this.userStore
-            .fetchUserProfile()
-            .then(() => {
-                if (this.userStore.userProfile) {
-                    this.profile = JSON.parse(JSON.stringify(this.userStore.userProfile));
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }
+// =========================================
+// Component functions
 
-    get userName(): string {
-        return this.profile?.userName || 'Guest';
-    }
-
-    get userStorylines(): Array<Storyline> {
-        return (
-            this.profile?.storylines?.sort(
-                (a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
-            ) || []
-        );
-    }
-
-    get isDragging(): boolean {
-        return this.dragging;
-    }
-
-    dateFormatter(date: string | null): string {
-        if (date) {
-            const d = new Date(date);
-            const months = [
-                this.$t('editor.month.january'),
-                this.$t('editor.month.february'),
-                this.$t('editor.month.march'),
-                this.$t('editor.month.april'),
-                this.$t('editor.month.may'),
-                this.$t('editor.month.june'),
-                this.$t('editor.month.july'),
-                this.$t('editor.month.august'),
-                this.$t('editor.month.september'),
-                this.$t('editor.month.october'),
-                this.$t('editor.month.november'),
-                this.$t('editor.month.december')
-            ];
-            const hour = d.getHours().toString().padStart(2, '0');
-            const minute = d.getMinutes().toString().padStart(2, '0');
-
-            if (this.currLang === 'en') {
-                return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' ' + hour + ':' + minute;
-            } else {
-                return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hour + ':' + minute;
+function obtainUserProfile(): void {
+    userStore
+        .fetchUserProfile()
+        .then(() => {
+            if (userStore.userProfile) {
+                profile.value = JSON.parse(JSON.stringify(userStore.userProfile));
             }
-        }
-        return '';
-    }
-
-    editProduct(uuid: string): void {
-        this.$router.push({ name: 'editor', params: { uid: uuid } });
-    }
-
-    productZipUploaded(e: Event): void {
-        const uploadedFiles = (e.target as HTMLInputElement).files as ArrayLike<File>;
-        if (uploadedFiles.length > 0) {
-            if (uploadedFiles.length > 1) {
-                Message.info(this.$t('editor.adminUpload.oneFileOnly'));
-            }
-            const fileUploaded = uploadedFiles[0];
-            if (fileUploaded.type === 'application/x-zip-compressed') {
-                this.productZip = fileUploaded;
-                this.productUploadName = fileUploaded.name;
-            } else {
-                Message.error(this.$t('editor.adminUpload.incorrectType'));
-            }
-        } else {
-            this.productZip = '';
-            this.productUploadName = '';
-        }
-    }
-
-    clickZipUpload() {
-        this.$refs['productZipInput'].click();
-    }
-
-    clickFolderUpload() {
-        this.$refs['productFolderInput'].click();
-    }
-
-    productFolderUploaded(e: Event): void {
-        const uploadedFiles = (e.target as HTMLInputElement).files as ArrayLike<File>;
-        uploadedFiles.forEach((file) => {
-            // Add filePath property to each file
-            file.filePath = file.webkitRelativePath;
+        })
+        .catch((error) => {
+            console.error(error);
         });
-        this.uploadFolderHelper(uploadedFiles);
-    }
+}
 
-    productDropped(e: Event): void {
-        if (e.dataTransfer !== null) {
-            const fileUploaded = e.dataTransfer.files[0];
-            if (e.dataTransfer.files.length > 1) {
-                Message.info(this.$t('editor.adminUpload.oneFileOnly'));
-            }
+const userName = computed(() => profile.value?.userName || 'Guest');
 
-            if (fileUploaded.type === 'application/x-zip-compressed') {
-                this.productZip = fileUploaded;
-                this.productUploadName = fileUploaded.name;
-            } else {
-                fromEvent(e).then((files) => {
-                    files.forEach((file) => {
-                        // Remove initial slash. Creating new property because others are read only
-                        file.filePath = file.relativePath.split('/').slice(1).join('/');
-                    });
-                    this.uploadFolderHelper(files);
-                });
-            }
-            this.dragging = false;
+const userStorylines = computed(
+    () =>
+        profile.value?.storylines?.sort(
+            (a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+        ) || []
+);
+
+const isDragging = computed(() => dragging.value);
+
+function dateFormatter(date: string | null): string {
+    if (date) {
+        const d = new Date(date);
+        const months = [
+            t('editor.month.january'),
+            t('editor.month.february'),
+            t('editor.month.march'),
+            t('editor.month.april'),
+            t('editor.month.may'),
+            t('editor.month.june'),
+            t('editor.month.july'),
+            t('editor.month.august'),
+            t('editor.month.september'),
+            t('editor.month.october'),
+            t('editor.month.november'),
+            t('editor.month.december')
+        ];
+        const hour = d.getHours().toString().padStart(2, '0');
+        const minute = d.getMinutes().toString().padStart(2, '0');
+
+        if (currLang.value === 'en') {
+            return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' ' + hour + ':' + minute;
+        } else {
+            return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hour + ':' + minute;
         }
     }
+    return '';
+}
 
-    uploadFolderHelper(uploadedFiles: Array<File>): void {
-        if (uploadedFiles.length > 0) {
-            const configZip = new JSZip();
-            let containsEnConfig = false;
-            let containsFrConfig = false;
-            let folderUuidEn = '';
-            let folderUuidFr = '';
-            configZip.folder('ramp-config');
-            configZip.folder('assets/en');
-            configZip.folder('assets/fr');
-            configZip.folder('charts');
-            configZip.folder('styles');
+function editProduct(uuid: string): void {
+    $router.push({ name: 'editor', params: { uid: uuid } });
+}
 
-            uploadedFiles.forEach((file) => {
-                if (file.name.includes('_en.json')) {
-                    containsEnConfig = true;
-                    folderUuidEn = file.name.split('_en.json')[0];
-                }
+function productZipUploaded(e: Event): void {
+    const uploadedFiles = (e.target as HTMLInputElement).files as ArrayLike<File>;
+    if (uploadedFiles.length > 0) {
+        if (uploadedFiles.length > 1) {
+            Message.info(t('editor.adminUpload.oneFileOnly'));
+        }
+        const fileUploaded = uploadedFiles[0];
+        if (fileUploaded.type === 'application/x-zip-compressed') {
+            productZip.value = fileUploaded;
+            productUploadName.value = fileUploaded.name;
+        } else {
+            Message.error(t('editor.adminUpload.incorrectType'));
+        }
+    } else {
+        productZip.value = '';
+        productUploadName.value = '';
+    }
+}
 
-                if (file.name.includes('_fr.json')) {
-                    containsFrConfig = true;
-                    folderUuidFr = file.name.split('_fr.json')[0];
-                }
+function clickZipUpload() {
+    productZipInput.value?.click();
+}
+
+function clickFolderUpload() {
+    productFolderInput.value?.click();
+}
+
+function productFolderUploaded(e: Event): void {
+    const uploadedFiles = (e.target as HTMLInputElement).files as ArrayLike<File>;
+    Array.from(uploadedFiles).forEach((file) => {
+        // Add filePath property to each file
+        (file as ExtendedFile).filePath = file.webkitRelativePath;
+    });
+    uploadFolderHelper(Array.from(uploadedFiles) as ExtendedFile[]);
+}
+
+function productDropped(e: DragEvent): void {
+    if (e.dataTransfer !== null) {
+        const fileUploaded = e.dataTransfer.files[0];
+        if (e.dataTransfer.files.length > 1) {
+            Message.info(t('editor.adminUpload.oneFileOnly'));
+        }
+
+        if (fileUploaded.type === 'application/x-zip-compressed') {
+            productZip.value = fileUploaded;
+            productUploadName.value = fileUploaded.name;
+        } else {
+            fromEvent(e).then((files) => {
+                files.forEach((file) => {
+                    // Remove initial slash. Creating new property because others are read only
+                    (file as ExtendedFile).filePath = (file as ExtendedFile).relativePath.split('/').slice(1).join('/');
+                });
+                uploadFolderHelper(files as ExtendedFile[]);
             });
+        }
+        dragging.value = false;
+    }
+}
 
-            // Ensure that there exists a json config for each lang
-            if (!(containsEnConfig && containsFrConfig && folderUuidEn === folderUuidFr)) {
-                Message.error(this.$t('editor.adminUpload.folder.invalidStructure'));
-                return;
+function uploadFolderHelper(uploadedFiles: ExtendedFile[]): void {
+    if (uploadedFiles.length > 0) {
+        const configZip = new JSZip();
+        let containsEnConfig = false;
+        let containsFrConfig = false;
+        let folderUuidEn = '';
+        let folderUuidFr = '';
+        configZip.folder('ramp-config');
+        configZip.folder('assets/en');
+        configZip.folder('assets/fr');
+        configZip.folder('charts');
+        configZip.folder('styles');
+
+        uploadedFiles.forEach((file) => {
+            if (file.name.includes('_en.json')) {
+                containsEnConfig = true;
+                folderUuidEn = file.name.split('_en.json')[0];
             }
 
-            for (const file of uploadedFiles) {
-                // Ignore git files
-                if (!file.filePath.includes('.git')) {
-                    // If this file is not within a valid subfolder, the folder is not valid strcture
-                    if (
-                        ['ramp-config', 'styles', 'assets', 'charts'].every(
-                            (str) => file.filePath.split('/')[1] !== str
-                        )
-                    ) {
-                        if (
-                            file.filePath.split('/')[1] !== `${folderUuidEn}_en.json` &&
-                            file.filePath.split('/')[1] !== `${folderUuidEn}_fr.json`
-                        ) {
-                            Message.error(this.$t('editor.adminUpload.folder.invalidStructure'));
-                            return;
-                        }
-                    }
+            if (file.name.includes('_fr.json')) {
+                containsFrConfig = true;
+                folderUuidFr = file.name.split('_fr.json')[0];
+            }
+        });
 
-                    // If this files highest parent is not the same as the names of the config files, the folder is not
-                    // valid structure
-                    if (file.filePath.split('/')[0] !== folderUuidEn) {
-                        Message.error(this.$t('editor.adminUpload.folder.invalidStructure'));
+        // Ensure that there exists a json config for each lang
+        if (!(containsEnConfig && containsFrConfig && folderUuidEn === folderUuidFr)) {
+            Message.error(t('editor.adminUpload.folder.invalidStructure'));
+            return;
+        }
+
+        for (const file of uploadedFiles) {
+            // Ignore git files
+            if (!(file as ExtendedFile).filePath?.includes('.git')) {
+                // If this file is not within a valid subfolder, the folder is not valid strcture
+                if (
+                    ['ramp-config', 'styles', 'assets', 'charts'].every(
+                        (str) => (file as ExtendedFile).filePath?.split('/')[1] !== str
+                    )
+                ) {
+                    if (
+                        (file as ExtendedFile).filePath?.split('/')[1] !== `${folderUuidEn}_en.json` &&
+                        (file as ExtendedFile).filePath?.split('/')[1] !== `${folderUuidEn}_fr.json`
+                    ) {
+                        Message.error(t('editor.adminUpload.folder.invalidStructure'));
                         return;
                     }
+                }
 
-                    configZip.file(file.filePath.split('/').slice(1).join('/'), file);
+                // If this files highest parent is not the same as the names of the config files, the folder is not
+                // valid structure
+                if ((file as ExtendedFile).filePath?.split('/')[0] !== folderUuidEn) {
+                    Message.error(t('editor.adminUpload.folder.invalidStructure'));
+                    return;
+                }
+
+                if ((file as ExtendedFile).filePath !== undefined) {
+                    configZip.file((file as ExtendedFile).filePath!.split('/').slice(1).join('/'), file);
                 }
             }
-
-            configZip.generateAsync({ type: 'blob' }).then((content: Blob) => {
-                this.productZip = content;
-                this.productUploadName = folderUuidEn;
-            });
-        } else {
-            this.productZip = '';
-            this.productUploadName = '';
         }
+
+        configZip.generateAsync({ type: 'blob' }).then((content: Blob) => {
+            productZip.value = content as string | File;
+            productUploadName.value = folderUuidEn;
+        });
+    } else {
+        productZip.value = '';
+        productUploadName.value = '';
+    }
+}
+
+const checkUuid = throttle(300, (): void => {
+    // All reserved characters in URLs. The user can't use these for their UUID
+    const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
+    const illegalCharsContained = illegalChars.filter((badChar) => productUuid.value.includes(badChar));
+
+    if (illegalCharsContained.length) {
+        error.value = true;
+        checkingUuid.value = false;
+        warning.value = 'badChar';
+        return;
+    } else {
+        error.value = false;
     }
 
-    checkUuid = throttle(300, (): void => {
-        // All reserved characters in URLs. The user can't use these for their UUID
-        const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
-        const illegalCharsContained = illegalChars.filter((badChar) => this.productUuid.includes(badChar));
-
-        if (illegalCharsContained.length) {
-            this.error = true;
-            this.checkingUuid = false;
-            this.warning = 'badChar';
-            return;
+    fetch(apiUrl + `/check/${productUuid.value}`).then((res: Response) => {
+        if (res.status !== 404) {
+            error.value = true;
+            warning.value = 'uuid';
         } else {
-            this.error = false;
+            error.value = false;
         }
-
-        fetch(this.apiUrl + `/check/${this.productUuid}`).then((res: Response) => {
-            if (res.status !== 404) {
-                this.error = true;
-                this.warning = 'uuid';
-            } else {
-                this.error = false;
-            }
-            this.checkingUuid = false;
-        });
-
-        if (this.error === false) {
-            this.warning = 'none';
-        }
+        checkingUuid.value = false;
     });
 
-    uploadZip(): void {
-        if (this.productUuid && this.productZip) {
-            // Need to use UUID provided by user
-            const zipFileName = `${this.productUuid}.zip`;
-            this.productZip = new File([this.productZip], zipFileName, { type: 'application/x-zip-compressed' });
-            this.loading = true;
-            this.lockStore
-                .lockStoryline(this.productUuid)
-                .then(() => {
-                    const formData = new FormData();
-                    formData.append('data', this.productZip);
-                    const headers = {
-                        'Content-Type': 'multipart/form-data',
-                        user: this.userName,
-                        secret: this.lockStore.secret
-                    };
-                    axios
-                        .post(this.apiUrl + `/upload/${this.productUuid}`, formData, { headers })
-                        .then((res: AxiosResponse) => {
-                            const responseData = res.data;
-                            const commitHash = responseData.commitHash; // commit hash of the git commit
-                            axios
-                                .post(this.apiUrl + `/admin-rename`, {
-                                    user: this.userName,
-                                    newUuid: this.productUuid,
-                                    secret: this.lockStore.secret
-                                })
-                                .then(() => {
-                                    if (
-                                        import.meta.env.VITE_APP_NET_API_URL &&
-                                        import.meta.env.VITE_APP_CURR_ENV &&
-                                        this.productUuid
-                                    ) {
-                                        axios
-                                            .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
-                                                uuid: this.productUuid,
-                                                titleEn: '',
-                                                titleFr: ''
-                                            })
-                                            .then(() => {
-                                                formData.append('uuid', this.productUuid);
-                                                formData.append('titleEn', '');
-                                                formData.append('titleFr', '');
-                                                formData.append('commitHash', commitHash);
-                                                formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
-                                                axios
-                                                    .post(
-                                                        import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
-                                                        formData
-                                                    )
-                                                    .then(() => {
-                                                        Message.success(this.$t('editor.adminUpload.successfulUpload'));
-                                                        this.lockStore.unlockStoryline();
-                                                        this.closeModal();
-                                                        this.loading = false;
-                                                        this.obtainUserProfile();
-                                                    })
-                                                    .catch((error) => {
-                                                        console.error(error);
-                                                        this.lockStore.unlockStoryline();
-                                                        this.closeModal();
-                                                        this.loading = false;
-                                                    });
-                                            })
-                                            .catch((error) => {
-                                                console.error(error);
-                                                this.lockStore.unlockStoryline();
-                                                this.closeModal();
-                                                this.loading = false;
-                                            });
-                                    } else {
-                                        Message.success(this.$t('editor.adminUpload.successfulUpload'));
-                                        this.lockStore.unlockStoryline();
-                                        this.closeModal();
-                                        this.loading = false;
-                                        this.obtainUserProfile();
-                                    }
-                                })
-                                .catch(() => {
-                                    Message.error(this.$t('editor.warning.renameFailed'));
-                                    this.lockStore.unlockStoryline();
-                                    this.closeModal();
-                                    this.loading = false;
-                                });
-                        })
-                        .catch(() => {
-                            Message.error(this.$t('editor.editMetadata.message.error.failedZipFile'));
-                            this.lockStore.unlockStoryline();
-                            this.closeModal();
-                            this.loading = false;
-                        });
-                })
-                .catch(() => {
-                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                });
-        } else {
-            Message.error(this.$t('editor.adminUpload.missingInput'));
-        }
+    if (error.value === false) {
+        warning.value = 'none';
     }
+});
 
-    closeModal(): void {
-        this.$vfm.close('admin-upload-modal');
-        const fileInput = document.querySelector('#product-zip-file');
-        (fileInput as HTMLInputElement).value = '';
-        this.productUuid = '';
-        this.productZip = '';
-        this.productZipName = '';
-        this.error = false;
-        this.warning = 'none';
+function uploadZip(): void {
+    if (productUuid.value && productZip.value) {
+        // Need to use UUID provided by user
+        const zipFileName = `${productUuid.value}.zip`;
+        productZip.value = new File([productZip.value], zipFileName, { type: 'application/x-zip-compressed' });
+        loading.value = true;
+        lockStore
+            .lockStoryline(productUuid.value)
+            .then(() => {
+                const formData = new FormData();
+                formData.append('data', productZip.value);
+                const headers = {
+                    'Content-Type': 'multipart/form-data',
+                    user: userName,
+                    secret: lockStore.secret
+                };
+                axios
+                    // @ts-ignore
+                    .post(apiUrl + `/upload/${productUuid.value}`, formData, { headers })
+                    .then((res: AxiosResponse) => {
+                        const responseData = res.data;
+                        const commitHash = responseData.commitHash; // commit hash of the git commit
+                        axios
+                            .post(apiUrl + `/admin-rename`, {
+                                user: userName.value,
+                                newUuid: productUuid.value,
+                                secret: lockStore.secret
+                            })
+                            .then(() => {
+                                if (
+                                    import.meta.env.VITE_APP_NET_API_URL &&
+                                    import.meta.env.VITE_APP_CURR_ENV &&
+                                    productUuid.value
+                                ) {
+                                    axios
+                                        .post(import.meta.env.VITE_APP_NET_API_URL + '/api/user/register', {
+                                            uuid: productUuid.value,
+                                            titleEn: '',
+                                            titleFr: ''
+                                        })
+                                        .then(() => {
+                                            formData.append('uuid', productUuid.value);
+                                            formData.append('titleEn', '');
+                                            formData.append('titleFr', '');
+                                            formData.append('commitHash', commitHash);
+                                            formData.delete('data'); // Remove the data from the form so that we don't pass it into the .NET API
+                                            axios
+                                                .post(
+                                                    import.meta.env.VITE_APP_NET_API_URL + '/api/version/commit',
+                                                    formData
+                                                )
+                                                .then(() => {
+                                                    Message.success(t('editor.adminUpload.successfulUpload'));
+                                                    lockStore.unlockStoryline();
+                                                    closeModal();
+                                                    loading.value = false;
+                                                    obtainUserProfile();
+                                                })
+                                                .catch((error) => {
+                                                    console.error(error);
+                                                    lockStore.unlockStoryline();
+                                                    closeModal();
+                                                    loading.value = false;
+                                                });
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                            lockStore.unlockStoryline();
+                                            closeModal();
+                                            loading.value = false;
+                                        });
+                                } else {
+                                    Message.success(t('editor.adminUpload.successfulUpload'));
+                                    lockStore.unlockStoryline();
+                                    closeModal();
+                                    loading.value = false;
+                                    obtainUserProfile();
+                                }
+                            })
+                            .catch(() => {
+                                Message.error(t('editor.warning.renameFailed'));
+                                lockStore.unlockStoryline();
+                                closeModal();
+                                loading.value = false;
+                            });
+                    })
+                    .catch(() => {
+                        Message.error(t('editor.editMetadata.message.error.failedZipFile'));
+                        lockStore.unlockStoryline();
+                        closeModal();
+                        loading.value = false;
+                    });
+            })
+            .catch(() => {
+                Message.error(t('editor.editMetadata.message.error.unauthorized'));
+            });
+    } else {
+        Message.error(t('editor.adminUpload.missingInput'));
     }
+}
+
+function closeModal(): void {
+    $vfm.close('admin-upload-modal');
+    const fileInput = document.querySelector('#product-zip-file');
+    (fileInput as HTMLInputElement).value = '';
+    productUuid.value = '';
+    productZip.value = '';
+    // TODO: What is this? It doesn't exist.
+    // productZipName = '';
+    error.value = false;
+    warning.value = 'none';
 }
 </script>
 

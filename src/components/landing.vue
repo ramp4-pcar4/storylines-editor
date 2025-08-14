@@ -55,29 +55,42 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { useUserStore } from '../stores/userStore';
+import { computed, getCurrentInstance, onBeforeMount } from 'vue';
 
-export default class LandingV extends Vue {
-    url = window.location.href;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    beforeCreate(): void {
-        // Automatically choose lang and re-route when the user is using Canada.ca template
-        if (this.url.includes('index-ca')) {
-            const lang = this.url.includes('index-ca-en') ? 'en' : 'fr';
-            this.$router.push({
-                name: 'home',
-                params: { lang }
-            });
-        }
+// =========================================
+// Definitions
+
+const url = window.location.href;
+const { $router } = getCurrentInstance()!.proxy!;
+const userStore = useUserStore();
+
+const userName = computed(() => userStore.userProfile?.userName || 'Guest');
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+onBeforeMount(() => {
+    // Automatically choose lang and re-route when the user is using Canada.ca template
+    if (url.includes('index-ca')) {
+        const lang = url.includes('index-ca-en') ? 'en' : 'fr';
+        $router.push({
+            name: 'home',
+            params: { lang }
+        });
     }
+});
 
-    get userName(): string {
-        const userStore = useUserStore();
-        return userStore.userProfile?.userName || 'Guest';
-    }
-}
+// =========================================
+// Component functions
 </script>
 
 <style lang="scss">

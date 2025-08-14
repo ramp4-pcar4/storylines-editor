@@ -413,113 +413,133 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { MetadataContent } from '@/definitions';
-import { Options, Prop, Vue } from 'vue-property-decorator';
+import { getCurrentInstance } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ColourPickerInput from '../support/colour-picker-input.vue';
 import { useProductStore } from '@/stores/productStore';
+import Message from 'vue-m-message';
 
-@Options({
-    components: {
-        ColourPickerInput: ColourPickerInput
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        editing?: boolean;
+        createNew?: boolean;
+    }>(),
+    {
+        editing: true,
+        createNew: true
     }
-})
-export default class MetadataEditorV extends Vue {
-    @Prop({ default: true }) editing!: boolean;
-    @Prop({ default: true }) createNew!: boolean;
+);
 
-    productStore = useProductStore();
+// =========================================
+// Definitions
 
-    openFileSelector(where = 'logoUpload'): void {
-        document.getElementById(where)?.click();
-    }
+const productStore = useProductStore();
+const { t } = useI18n();
 
-    metadataChanged(event: Event): void {
-        this.productStore.updateMetadata(
-            (event.target as HTMLInputElement).name,
-            (event.target as HTMLInputElement).value
-        );
-    }
+// =========================================
+// Watchers
 
-    removeLogo(): void {
-        this.productStore.metadata.logoName = '';
-        this.productStore.metadata.logoPreview = '';
-        this.productStore.decrementSourceCount('Logo');
-    }
+// =========================================
+// Lifecycle functions
 
-    removeIntroBackground(): void {
-        this.productStore.metadata.introBgName = '';
-        this.productStore.metadata.introBgPreview = '';
-        this.productStore.decrementSourceCount('Background');
-    }
+// =========================================
+// Component functions
 
-    onImageSourceInput(e: InputEvent, src: string): void {
-        const isImgUrl = (url: string) => {
-            const img = new Image();
-            img.src = url;
-            return new Promise((resolve) => {
-                img.onerror = () => resolve(false);
-                img.onload = () => resolve(true);
+function openFileSelector(where = 'logoUpload'): void {
+    document.getElementById(where)?.click();
+}
+
+function metadataChanged(event: Event): void {
+    productStore.updateMetadata((event.target as HTMLInputElement).name, (event.target as HTMLInputElement).value);
+}
+
+function removeLogo(): void {
+    productStore.metadata.logoName = '';
+    productStore.metadata.logoPreview = '';
+    productStore.decrementSourceCount('Logo');
+}
+
+function removeIntroBackground(): void {
+    productStore.metadata.introBgName = '';
+    productStore.metadata.introBgPreview = '';
+    productStore.decrementSourceCount('Background');
+}
+
+function onImageSourceInput(e: InputEvent, src: string): void {
+    const isImgUrl = (url: string) => {
+        const img = new Image();
+        img.src = url;
+        return new Promise((resolve) => {
+            img.onerror = () => resolve(false);
+            img.onload = () => resolve(true);
+        });
+    };
+
+    switch (src) {
+        case 'logo':
+            productStore.metadata.logoName = (e.target as HTMLInputElement).value;
+
+            isImgUrl(productStore.metadata.logoName).then((res) => {
+                if (res) {
+                    productStore.metadata.logoPreview = productStore.metadata.logoName;
+                    Message.success(t('editor.editMetadata.message.imageSuccessfulLoad'));
+                } else {
+                    productStore.metadata.logoPreview = 'error';
+                    Message.error(t('editor.editMetadata.message.error.imageFailedLoad'));
+                }
             });
-        };
 
-        switch (src) {
-            case 'logo':
-                this.productStore.metadata.logoName = (e.target as HTMLInputElement).value;
+            break;
+        case 'introBg':
+            productStore.metadata.introBgName = (e.target as HTMLInputElement).value;
 
-                isImgUrl(this.productStore.metadata.logoName).then((res) => {
-                    if (res) {
-                        this.productStore.metadata.logoPreview = this.productStore.metadata.logoName;
-                        Message.success(this.$t('editor.editMetadata.message.imageSuccessfulLoad'));
-                    } else {
-                        this.productStore.metadata.logoPreview = 'error';
-                        Message.error(this.$t('editor.editMetadata.message.error.imageFailedLoad'));
-                    }
-                });
-
-                break;
-            case 'introBg':
-                this.productStore.metadata.introBgName = (e.target as HTMLInputElement).value;
-
-                isImgUrl(this.productStore.metadata.introBgName).then((res) => {
-                    if (res) {
-                        this.productStore.metadata.introBgPreview = this.productStore.metadata.introBgName;
-                        Message.success(this.$t('editor.editMetadata.message.imageSuccessfulLoad'));
-                    } else {
-                        this.productStore.metadata.introBgPreview = 'error';
-                        Message.error(this.$t('editor.editMetadata.message.error.imageFailedLoad'));
-                    }
-                });
-                break;
-            default:
-                console.error('onImageSourceInput received invalid source.');
-        }
-    }
-
-    onFileChange(e: Event, src: string): void {
-        // Retrieve the uploaded file.
-        const uploadedFile = ((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
-
-        switch (src) {
-            case 'logo':
-                this.productStore.logoImage = uploadedFile;
-
-                // Generate an image preview.
-                this.productStore.metadata.logoPreview = URL.createObjectURL(uploadedFile);
-                this.productStore.metadata.logoName = uploadedFile.name;
-                break;
-            case 'introBg':
-                this.productStore.introBgImage = uploadedFile;
-
-                // Generate an image preview.
-                this.productStore.metadata.introBgPreview = URL.createObjectURL(uploadedFile);
-                this.productStore.metadata.introBgName = uploadedFile.name;
-                break;
-            default:
-                console.error('onFileChange received invalid source.');
-        }
+            isImgUrl(productStore.metadata.introBgName).then((res) => {
+                if (res) {
+                    productStore.metadata.introBgPreview = productStore.metadata.introBgName;
+                    Message.success(t('editor.editMetadata.message.imageSuccessfulLoad'));
+                } else {
+                    productStore.metadata.introBgPreview = 'error';
+                    Message.error(t('editor.editMetadata.message.error.imageFailedLoad'));
+                }
+            });
+            break;
+        default:
+            console.error('onImageSourceInput received invalid source.');
     }
 }
+
+function onFileChange(e: Event, src: string): void {
+    // Retrieve the uploaded file.
+    const uploadedFile = ((e.target as HTMLInputElement).files as ArrayLike<File>)[0];
+
+    switch (src) {
+        case 'logo':
+            productStore.logoImage = uploadedFile;
+
+            // Generate an image preview.
+            productStore.metadata.logoPreview = URL.createObjectURL(uploadedFile);
+            productStore.metadata.logoName = uploadedFile.name;
+            break;
+        case 'introBg':
+            productStore.introBgImage = uploadedFile;
+
+            // Generate an image preview.
+            productStore.metadata.introBgPreview = URL.createObjectURL(uploadedFile);
+            productStore.metadata.introBgName = uploadedFile.name;
+            break;
+        default:
+            console.error('onFileChange received invalid source.');
+    }
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss">

@@ -9,6 +9,8 @@ import { defineStore } from 'pinia';
 import { vfm } from '../plugins/vfm/index';
 import router from '../router';
 
+import { Slide } from '@/definitions';
+
 interface EditorState {
     loadExisting: boolean;
     reloadExisting: boolean;

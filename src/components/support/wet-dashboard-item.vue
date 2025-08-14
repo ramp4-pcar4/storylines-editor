@@ -10,8 +10,21 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = defineProps<{
+    editor: MDEditor;
+    component: WETComponentObject;
+    context?: string;
+}>();
+
+// =========================================
+// Definitions
 
 interface MDEditor {
     insert(
@@ -26,28 +39,36 @@ interface WETComponentObject {
     html: string;
 }
 
-export default class WETDashboardItemV extends Vue {
-    @Prop() editor!: MDEditor;
-    @Prop() component!: WETComponentObject;
-    @Prop() context!: string;
+const { t } = useI18n();
 
-    insertText() {
-        this.editor.insert((selected: string) => {
-            const content = selected || this.$t('editor.enterText');
+// =========================================
+// Watchers
 
-            // Scroll back up to the text editor so the user can see that the component has been added.
-            (this.editor as any).$el.parentElement.scrollIntoView({
-                block: 'start',
-                behavior: 'smooth'
-            });
+// =========================================
+// Lifecycle functions
 
-            return {
-                text: this.component.html.replace('$$$selected$$$', content), // replace $$$selected$$$ in the template with the selected or default text
-                selected: content
-            };
+// =========================================
+// Component functions
+
+function insertText() {
+    props.editor.insert((selected: string) => {
+        const content = selected || t('editor.enterText');
+
+        // Scroll back up to the text editor so the user can see that the component has been added.
+        (props.editor as any).$el.parentElement.scrollIntoView({
+            block: 'start',
+            behavior: 'smooth'
         });
-    }
+
+        return {
+            text: props.component.html.replace('$$$selected$$$', content), // replace $$$selected$$$ in the template with the selected or default text
+            selected: content
+        };
+    });
 }
+
+// =========================================
+// Component exposes
 </script>
 
 <style scoped lang="scss">
