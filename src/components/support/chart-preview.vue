@@ -78,8 +78,8 @@
     </li>
 </template>
 
-<script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import { ChartConfig } from '@/definitions';
 import { useProductStore } from '@/stores/productStore';
 
@@ -88,27 +88,49 @@ import dataModule from 'highcharts/modules/data';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
 
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = defineProps<{
+    chart: ChartConfig;
+    lang: string;
+    index: number;
+    chartVersion: number;
+}>();
+
+const emit = defineEmits(['delete', 'captionEdit', 'edit']);
+
+// =========================================
+// Definitions
+
 dataModule(Highcharts);
 exporting(Highcharts);
 exportData(Highcharts);
 
-export default class ChartPreviewV extends Vue {
-    @Prop() chart!: ChartConfig;
-    @Prop() lang!: string;
-    @Prop() index!: number;
-    @Prop() chartVersion!: number;
+const productStore = useProductStore();
 
-    productStore = useProductStore();
+const loading = ref(true);
+// Unused?
+// const chartIdx = ref(0);
+const chartName = ref('');
 
-    loading = true;
-    chartIdx = 0;
-    chartName = '';
+// =========================================
+// Watchers
 
-    mounted(): void {
-        this.chartName = this.chart.name || '';
-        this.loading = false;
-    }
-}
+// =========================================
+// Lifecycle functions
+
+onMounted(() => {
+    chartName.value = props.chart.name || '';
+    loading.value = false;
+});
+
+// =========================================
+// Component functions
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss" scoped>

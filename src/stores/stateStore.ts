@@ -184,8 +184,6 @@ export const useStateStore = defineStore('state', {
          * @param origin A string indicating where the change come from. Useful for determining origin of changes for undo/redo functionality
          */
         handlePotentialChange(newConfigs: Save, origin?: string): boolean {
-            console.log(' ');
-            console.log('handePotentialChange()');
             newConfigs.en!.slides = newConfigs.en!.slides.map((slide) => {
                 if (slide && Object.keys(slide)?.length) {
                     return purgeFalses(slide);
@@ -299,7 +297,6 @@ export const useStateStore = defineStore('state', {
                 differentFromBase: true,
                 affectedSlides: affectedSlides
             });
-            console.log('changes detected');
             this.isChanged = true;
             return true;
         },
@@ -397,8 +394,6 @@ export const useStateStore = defineStore('state', {
          * @param savedConfigs Configs with all the changes, to be saved.
          */
         save(savedConfigs: Save): void {
-            console.log(' ');
-            console.log('stateStore save');
             // Clear out any key-value properties with empty values
 
             savedConfigs.en!.slides = savedConfigs.en!.slides.map((slide) => {
@@ -443,6 +438,9 @@ export const useStateStore = defineStore('state', {
             return this.stateChangesList[loc]?.affectedSlides ?? undefined;
         },
 
+        /**
+         * Returns the slides affected by the change being undone or redone, if any. If neither undoing nor redoing, returns undefined.
+         */
         getAffectedSlidesByUndoRedo(): AffectedSlideInfo[] | undefined {
             if (!this.undoing && !this.redoing) return undefined;
 

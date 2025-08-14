@@ -45,17 +45,17 @@
                 @input="stateStore.overrideChangeState(true)"
             ></div>
         </div>
-        <vue-final-modal
+        <VueFinalModal
             modalId="time-slider-edit-modal"
             content-class="flex flex-col max-w-xl mx-4 p-4 bg-white border rounded-lg space-y-2"
             class="flex justify-center items-center"
         >
             <h2 slot="header" class="text-xl font-bold">{{ $t('editor.map.timeslider.edit') }}</h2>
-            <time-slider-editor
+            <TimeSliderEditorV
                 :config="timeSliderConf"
                 :error="timeSliderError"
                 @time-slider-changed="onTimeSliderInput"
-            ></time-slider-editor>
+            ></TimeSliderEditorV>
             <div class="w-full flex justify-end">
                 <button
                     class="respected-standard-button respected-black-bg-button"
@@ -66,13 +66,12 @@
                     {{ $t('editor.done') }}
                 </button>
             </div>
-        </vue-final-modal>
+        </VueFinalModal>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useStateStore } from '@/stores/stateStore';
-import { Options, Prop, Vue } from 'vue-property-decorator';
 import { MapPanel, TimeSliderConfig } from '@/definitions';
 import { applyTextAlign } from '@/utils/styleUtils';
 import { VueFinalModal } from 'vue-final-modal';
@@ -81,171 +80,196 @@ import TimeSliderEditorV from '../support/time-slider-editor.vue';
 import { createInstance as createRampEditorInstance } from 'ramp-config-editor_editeur-config-pcar';
 import 'ramp-config-editor_editeur-config-pcar/style.css';
 import { useProductStore } from '@/stores/productStore';
+import { getCurrentInstance, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
 
-@Options({
-    components: {
-        'time-slider-editor': TimeSliderEditorV,
-        'vue-final-modal': VueFinalModal
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        panel: MapPanel;
+        lang: string;
+        centerSlide?: boolean;
+        dynamicSelected?: boolean;
+    }>(),
+    {
+        centerSlide: false,
+        dynamicSelected: false
     }
-})
-export default class MapEditorV extends Vue {
-    @Prop() panel!: MapPanel;
-    @Prop() lang!: string;
-    @Prop({ default: false }) centerSlide!: boolean;
-    @Prop({ default: false }) dynamicSelected!: boolean;
+);
 
-    stateStore = useStateStore();
-    productStore = useProductStore();
+const emit = defineEmits(['slide-edit']);
 
-    // config editor
-    rampEditorApi: any = '';
-    currLang = 'en';
+// =========================================
+// Definitions
 
-    // For creating new files.
-    newFileName = '';
+const { $vfm, $route } = getCurrentInstance()!.proxy!;
 
-    // TimeSlider
-    usingTimeSlider = false;
-    timeSliderError = false;
-    timeSliderConf: TimeSliderConfig = { range: [], start: [], attribute: '' };
-    status = 'default';
-    strippedFileName = '';
+const stateStore = useStateStore();
+const productStore = useProductStore();
 
-    mounted(): void {
-        this.currLang = (this.$route.params.lang as string) || 'en';
-        this.usingTimeSlider = !!this.panel.timeSlider;
-        this.status = this.panel.config !== '' ? 'default' : 'creating';
-        this.strippedFileName = this.panel.config !== '' ? this.panel.config.split('/')[2].split('.')[0] : '';
+const editor = useTemplateRef('editor');
 
-        this.timeSliderConf = JSON.parse(
-            JSON.stringify({
-                range: this.panel.timeSlider?.range ?? [1000, new Date().getFullYear()],
-                start: this.panel.timeSlider?.start ?? [1000, new Date().getFullYear()],
-                attribute: this.panel.timeSlider?.attribute ?? ''
-            })
-        );
-        window.addEventListener('ramp4-config-edited', this.onConfigEdit);
-        this.validateTimeSlider();
+// config editor
+const rampEditorApi = ref('' as any);
+const currLang = ref('en');
 
-        if (this.status === 'creating') {
-            this.createNewConfig();
-        }
+// For creating new files.
+// const newFileName = ref('');
 
-        applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
-        this.openEditor();
-    }
+// TimeSlider
+const usingTimeSlider = ref(false);
+const timeSliderError = ref(false);
+const timeSliderConf = ref({ range: [], start: [], attribute: '' } as TimeSliderConfig);
+const status = ref('default');
+const strippedFileName = ref('');
 
-    beforeUnmount(): void {
-        this.$emit('slide-edit', 'Kill map editor');
-    }
+// =========================================
+// Watchers
 
-    beforeDestroy(): void {
-        window.removeEventListener('ramp4-config-edited', this.onConfigEdit);
-    }
+// =========================================
+// Lifecycle functions
 
-    createNewConfig(): void {
-        // Update the path to the new file.
-        const uuid = this.productStore.configFileStructure.uuid;
-        this.panel.config = `${uuid}/ramp-config/${uuid}-map-${this.getNumberOfMaps() + 1}.json`;
-        this.strippedFileName = this.panel.config.split('/')[2].split('.')[0];
+onMounted(() => {
+    currLang.value = ($route.params.lang as string) || 'en';
+    usingTimeSlider.value = !!props.panel.timeSlider;
+    status.value = props.panel.config !== '' ? 'default' : 'creating';
+    strippedFileName.value = props.panel.config !== '' ? props.panel.config.split('/')[2].split('.')[0] : '';
 
-        this.productStore.incrementSourceCount(this.panel.config);
+    timeSliderConf.value = JSON.parse(
+        JSON.stringify({
+            range: props.panel.timeSlider?.range ?? [1000, new Date().getFullYear()],
+            start: props.panel.timeSlider?.start ?? [1000, new Date().getFullYear()],
+            attribute: props.panel.timeSlider?.attribute ?? ''
+        })
+    );
+    window.addEventListener('ramp4-config-edited', onConfigEdit);
+    validateTimeSlider();
 
-        // Create the new map configuration file in the ZIP folder. Copies the `config-default.json` file from the `ramp-editor` folder and renames it.
-        this.productStore.configFileStructure.rampConfig.file(
-            `${this.strippedFileName}.json`,
-            JSON.stringify(defaultConfig, null, 4)
-        );
-
-        // Display the normal edit page now.
-        this.status = 'default';
+    if (status.value === 'creating') {
+        createNewConfig();
     }
 
-    openEditor(): void {
-        if (this.panel.config === '') {
-            return;
-        }
-        // Fetch the map configuration and load it into the editor.
-        this.status = 'editing';
+    applyTextAlign(props.panel, props.centerSlide, props.dynamicSelected);
+    openEditor();
+});
 
-        if (this.panel.config) {
-            // Check if the config file exists in the ZIP folder first.
-            const assetSrc = `${this.panel.config.substring(this.panel.config.indexOf('/') + 1)}`;
-            const configFile = this.productStore.configFileStructure.zip.file(assetSrc);
+onBeforeUnmount(() => {
+    emit('slide-edit', 'Kill map editor');
+    window.removeEventListener('ramp4-config-edited', onConfigEdit);
+});
 
-            if (configFile) {
-                configFile.async('string').then((res: string) => {
-                    const conf = JSON.parse(res);
-                    this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
-                    this.rampEditorApi.setLanguage(this.currLang);
-                });
-            } else {
-                // If it does not exist in the ZIP folder, try and fetch from server.
-                fetch(this.panel.config).then((data) => {
-                    data.json().then((res) => {
-                        let stringResponse = JSON.stringify(res);
-                        const conf = JSON.parse(stringResponse);
-                        this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
-                        this.rampEditorApi.setLanguage(this.currLang);
-                    });
-                });
-            }
-        }
+// =========================================
+// Component functions
+
+function createNewConfig(): void {
+    // Update the path to the new file.
+    const uuid = productStore.configFileStructure.uuid;
+    props.panel.config = `${uuid}/ramp-config/${uuid}-map-${getNumberOfMaps() + 1}.json`;
+    strippedFileName.value = props.panel.config.split('/')[2].split('.')[0];
+
+    productStore.incrementSourceCount(props.panel.config);
+
+    // Create the new map configuration file in the ZIP folder. Copies the `config-default.json` file from the `ramp-editor` folder and renames it.
+    productStore.configFileStructure.rampConfig.file(
+        `${strippedFileName.value}.json`,
+        JSON.stringify(defaultConfig, null, 4)
+    );
+
+    // Display the normal edit page now.
+    status.value = 'default';
+}
+
+function openEditor(): void {
+    if (props.panel.config === '') {
+        return;
     }
+    // Fetch the map configuration and load it into the editor.
+    status.value = 'editing';
 
-    saveTimeSlider(): void {
-        if (!this.timeSliderError || !this.usingTimeSlider) {
-            this.panel.timeSlider = this.usingTimeSlider ? this.timeSliderConf : undefined;
-        }
-        this.$emit('slide-edit', 'Map editor time slider');
-        this.$vfm.close('time-slider-edit-modal');
-    }
+    if (props.panel.config) {
+        // Check if the config file exists in the ZIP folder first.
+        const assetSrc = `${props.panel.config.substring(props.panel.config.indexOf('/') + 1)}`;
+        const configFile = productStore.configFileStructure.zip.file(assetSrc);
 
-    saveChanges(): void {
-        // Add map config to ZIP file.
-        this.productStore.configFileStructure.rampConfig.file(
-            `${this.strippedFileName}.json`,
-            JSON.stringify(this.rampEditorApi.getConfig(), null, 4)
-        );
-    }
-
-    onConfigEdit(): void {
-        this.$emit('slide-edit', 'Map editor');
-    }
-
-    onTimeSliderInput(property: 'range' | 'start' | 'attribute' | 'layers', index: number, value: string): void {
-        if (property === 'layers') {
-            if (!value || value === '') {
-                delete this.timeSliderConf['layers'];
-            } else {
-                this.timeSliderConf['layers'] = value.split(',').map((layerId) => {
-                    return layerId.trim();
-                });
-            }
+        if (configFile) {
+            configFile.async('string').then((res: string) => {
+                const conf = JSON.parse(res);
+                rampEditorApi.value = createRampEditorInstance(editor.value, conf);
+                rampEditorApi.value.setLanguage(currLang.value);
+            });
         } else {
-            property === 'attribute'
-                ? (this.timeSliderConf[property] = value)
-                : (this.timeSliderConf[property][index] = Number(value));
+            // If it does not exist in the ZIP folder, try and fetch from server.
+            fetch(props.panel.config).then((data) => {
+                data.json().then((res) => {
+                    let stringResponse = JSON.stringify(res);
+                    const conf = JSON.parse(stringResponse);
+                    rampEditorApi.value = createRampEditorInstance(editor.value, conf);
+                    rampEditorApi.value.setLanguage(currLang.value);
+                });
+            });
         }
-        this.validateTimeSlider();
-    }
-
-    validateTimeSlider(): void {
-        this.timeSliderError =
-            this.timeSliderConf.range.some((val) => val < 0 || !Number.isInteger(val)) ||
-            this.timeSliderConf.start.some((val) => val < 0 || !Number.isInteger(val)) ||
-            this.timeSliderConf.range[1] < this.timeSliderConf.range[0] ||
-            this.timeSliderConf.start[1] < this.timeSliderConf.start[0];
-    }
-
-    getNumberOfMaps(): number {
-        let n = 0;
-        this.productStore.configFileStructure.rampConfig.forEach((_f) => {
-            n += 1;
-        });
-        return n;
     }
 }
+
+function saveTimeSlider(): void {
+    if (!timeSliderError.value || !usingTimeSlider.value) {
+        props.panel.timeSlider = usingTimeSlider.value ? timeSliderConf.value : undefined;
+    }
+    emit('slide-edit', 'Map editor time slider');
+    $vfm.close('time-slider-edit-modal');
+}
+
+function saveChanges(): void {
+    // Add map config to ZIP file.
+    productStore.configFileStructure.rampConfig.file(
+        `${strippedFileName.value}.json`,
+        JSON.stringify(rampEditorApi.value.getConfig(), null, 4)
+    );
+}
+
+function onConfigEdit(): void {
+    emit('slide-edit', 'Map editor');
+}
+
+function onTimeSliderInput(property: 'range' | 'start' | 'attribute' | 'layers', index: number, value: string): void {
+    if (property === 'layers') {
+        if (!value || value === '') {
+            delete timeSliderConf.value['layers'];
+        } else {
+            timeSliderConf.value['layers'] = value.split(',').map((layerId) => {
+                return layerId.trim();
+            });
+        }
+    } else {
+        property === 'attribute'
+            ? (timeSliderConf.value[property] = value)
+            : (timeSliderConf.value[property][index] = Number(value));
+    }
+    validateTimeSlider();
+}
+
+function validateTimeSlider(): void {
+    timeSliderError.value =
+        timeSliderConf.value.range.some((val) => val < 0 || !Number.isInteger(val)) ||
+        timeSliderConf.value.start.some((val) => val < 0 || !Number.isInteger(val)) ||
+        timeSliderConf.value.range[1] < timeSliderConf.value.range[0] ||
+        timeSliderConf.value.start[1] < timeSliderConf.value.start[0];
+}
+
+function getNumberOfMaps(): number {
+    let n = 0;
+    productStore.configFileStructure.rampConfig.forEach((_f) => {
+        n += 1;
+    });
+    return n;
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss" scoped>

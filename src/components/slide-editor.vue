@@ -113,7 +113,7 @@
                         <input
                             type="text"
                             id="slideTitle"
-                            v-model="editorStore.currentSlide.title"
+                            v-model="(editorStore.currentSlide as Slide).title"
                             :placeholder="$t('editor.slides.addSlideTitle')"
                             class="respected-standard-input w-full lg:w-2/3"
                         />
@@ -477,7 +477,7 @@
                         </label>
                     </div>
                 </div>
-                <custom-editor
+                <CustomEditorV
                     ref="editor"
                     @slide-edit="$emit('slide-edit')"
                     @config-edited="
@@ -496,7 +496,7 @@
                         }
                     "
                     v-if="advancedEditorView"
-                ></custom-editor>
+                />
                 <component
                     ref="editor"
                     :is="editors[determineEditorType((editorStore.currentSlide as Slide).panel[panelIndex])]"
@@ -508,14 +508,14 @@
                     :dynamicSelected="dynamicSelected"
                     @slide-edit="$emit('slide-edit')"
                     v-else
-                ></component>
+                />
             </div>
         </div>
         <div v-else class="h-fit mt-4 text-center">
             <h4 class="text-lg font-bold">{{ $t('editor.slides.selectHeader') }}</h4>
             <p class="text-sm font-semibold text-gray-500">{{ $t('editor.slides.select') }}.</p>
         </div>
-        <action-modal
+        <ActionModal
             :name="`change-slide-${editorStore.selectedSlideIndex}`"
             :title="
                 $t('editor.slides.changePanelType.title', {
@@ -524,25 +524,25 @@
             "
             :message="$t('editor.slides.changePanelType.message')"
             @ok="
-                determineEditorType(editorStore.currentSlide.panel[panelIndex]) === 'map' &&
-                (editorStore.currentSlide.panel[panelIndex] as MapPanel).shared
+                determineEditorType((editorStore.currentSlide as Slide).panel[panelIndex]) === 'map' &&
+                ((editorStore.currentSlide as Slide).panel[panelIndex] as MapPanel).shared
                     ? $emit('slide-change-shared-map', { index: panelIndex, lang: langTranslate })
                     : '';
 
-                changePanelType(determineEditorType(editorStore.currentSlide.panel[panelIndex]), newType);
+                changePanelType(determineEditorType((editorStore.currentSlide as Slide).panel[panelIndex]), newType);
                 toggleCenterPanel();
                 toggleCenterSlide();
             "
             @Cancel="cancelTypeChange"
         />
-        <action-modal
+        <ActionModal
             :name="`one-panel-only-${editorStore.selectedSlideIndex}`"
             :title="$t('editor.slides.changeToOnePanel.title')"
             :message="$t('editor.slides.changeToOnePanel.message')"
             @ok="toggleOnePanelOnly()"
             @Cancel="onePanelOnly = false"
         />
-        <multi-option-modal
+        <MultiOptionModal
             :name="`one-to-two-panels-${editorStore.selectedSlideIndex}`"
             :title="$t('editor.slides.addBlankPanel.title')"
             :message="$t('editor.slides.addBlankPanel.message')"
@@ -556,12 +556,10 @@
     </div>
 </template>
 
-<script lang="ts">
-import { computed } from 'vue';
+<script setup lang="ts">
+import { computed, onMounted, useTemplateRef, watch } from 'vue';
 import ActionModal from '@/components/support/action-modal.vue';
 import MultiOptionModal from '@/components/support/multi-option-modal.vue';
-import { useStateStore } from '@/stores/stateStore';
-import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     BasePanel,
     BaseStartingConfig,
@@ -572,7 +570,6 @@ import {
     Slide,
     SlideshowChartPanel,
     SlideshowImagePanel,
-    StoryRampConfig,
     SupportedLanguages,
     TextPanel
 } from '@/definitions';
@@ -592,306 +589,332 @@ import { toRaw } from 'vue';
 import { useProductStore } from '@/stores/productStore';
 import { useEditorStore } from '@/stores/editorStore';
 
-@Options({
-    components: {
-        MultiOptionModal,
-        ActionModal,
-        'chart-editor': ChartEditorV,
-        'custom-editor': CustomEditorV,
-        'image-editor': ImageEditorV,
-        'text-editor': TextEditorV,
-        'map-editor': MapEditorV,
-        'video-editor': VideoEditorV,
-        'slideshow-editor': SlideshowEditorV,
-        'loading-page': LoadingPageV,
-        'dynamic-editor': DynamicEditorV
-    }
-})
-export default class SlideEditorV extends Vue {
-    config: StoryRampConfig | undefined = undefined;
-    @Prop() uid!: string;
-    @Prop() isLast!: boolean;
-    @Prop() otherLangSlide!: Slide;
+import { useI18n } from 'vue-i18n';
 
-    productStore = useProductStore();
-    editorStore = useEditorStore();
+import { ref } from 'vue';
 
-    panelIndex = 0;
-    advancedEditorView = false;
-    newType = '';
-    onePanelOnly = false;
-    centerSlide = false;
-    centerPanel = false;
-    includeInToc = (this.editorStore.currentSlide as Slide).includeInToc ?? false;
-    dynamicSelected = false;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    stateStore = useStateStore();
+const props = defineProps<{
+    uid: string;
+    isLast: boolean;
+    otherLangSlide?: Slide;
+}>();
 
-    currentRoute = window.location.href;
-    langTranslate = '';
+const emit = defineEmits([
+    'slide-change',
+    'scroll-to-element',
+    'slide-edit',
+    'custom-slide-updated',
+    'slide-change-shared-map'
+]);
 
-    editors: Record<string, string> = {
-        text: 'text-editor',
-        image: 'image-editor',
-        slideshow: 'slideshow-editor',
-        chart: 'chart-editor',
-        map: 'map-editor',
-        video: 'video-editor',
-        loading: 'loading-page',
-        dynamic: 'dynamic-editor'
+// =========================================
+// Definitions
+
+const panelIndex = ref(0);
+const advancedEditorView = ref(false);
+
+const productStore = useProductStore();
+const editorStore = useEditorStore();
+
+const { t } = useI18n();
+
+const editor = useTemplateRef('editor');
+const typeSelector = useTemplateRef('typeSelector');
+
+const newType = ref('');
+const onePanelOnly = ref(false);
+const centerSlide = ref(false);
+const centerPanel = ref(false);
+const includeInToc = ref(true);
+const dynamicSelected = ref(false);
+const currentRoute = computed(() => window.location.href);
+const langTranslate = ref('');
+const currentSlide = computed(() => editorStore.currentSlide as Slide);
+
+const editors: Record<string, any> = {
+    text: TextEditorV,
+    image: ImageEditorV,
+    slideshow: SlideshowEditorV,
+    chart: ChartEditorV,
+    map: MapEditorV,
+    video: VideoEditorV,
+    loading: LoadingPageV,
+    dynamic: DynamicEditorV
+};
+
+// =========================================
+// Watchers
+
+watch(
+    currentSlide,
+    () => {
+        if ((editorStore.currentSlide as Slide) && (editorStore.currentSlide as Slide).panel) {
+            onePanelOnly.value = (editorStore.currentSlide as Slide).panel.length === 1;
+            langTranslate.value = t(`editor.lang.${editorStore.selectedSlideLang}`);
+            centerPanel.value = (editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerPanel') ?? false;
+            centerSlide.value =
+                (onePanelOnly.value
+                    ? determineEditorType((editorStore.currentSlide as Slide).panel[0]) === 'dynamic'
+                        ? (editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideRight')
+                        : (editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideFull')
+                    : (editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideRight') &&
+                      (editorStore.currentSlide as Slide).panel[1]?.cssClasses?.includes('centerSlideLeft')) ?? false;
+            includeInToc.value = (editorStore.currentSlide as Slide).includeInToc ?? true;
+            dynamicSelected.value = determineEditorType((editorStore.currentSlide as Slide).panel[panelIndex.value]) === 'dynamic';
+        }
+    },
+    { deep: true }
+);
+
+// =========================================
+// Lifecycle functions
+
+onMounted(() => {
+    langTranslate.value = t(`editor.lang.${editorStore.selectedSlideLang}`);
+});
+
+// =========================================
+// Component functions
+
+/**
+ * Determines whether a given panel has been modified from the default configuration of its type.
+ *
+ * @param {BasePanel} panel The panel to analyze.
+ * @returns {boolean} Whether panel has been modified.
+ */
+function panelModified(panel: BasePanel): boolean {
+    saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
+    const prevType = (editorStore.currentSlide as Slide).panel[panelIndex.value].type;
+    const uuid = productStore.configFileStructure.uuid;
+
+    let startingConfig = {
+        ...JSON.parse(JSON.stringify(BaseStartingConfig)),
+        dynamic: {
+            type: PanelType.Dynamic,
+            title:
+                (editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                    ? ((editorStore.currentSlide as Slide).panel[0] as TextPanel).title
+                    : '',
+            titleTag: '',
+            content:
+                (editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                    ? ((editorStore.currentSlide as Slide).panel[0] as TextPanel).content
+                    : '',
+            children: []
+        },
+        map: {
+            type: PanelType.Map,
+            config: `${uuid}/ramp-config/${uuid}-map-${getNumberOfMaps()}.json`,
+            title: '',
+            scrollguard: false
+        }
     };
 
-    currentSlide = computed(() => this.editorStore.currentSlide);
+    const oldStartingConfig = startingConfig[panel.type as keyof DefaultConfigs];
+    let newConfig = Object.assign({}, toRaw(panel));
+    newConfig.customStyles = newConfig.customStyles || undefined;
+    return JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig);
+}
 
-    mounted() {
-        this.langTranslate = this.$t(`editor.lang.${this.editorStore.selectedSlideLang}`);
-    }
-
-    @Watch('editorStore.currentSlide', { deep: true })
-    onSlideChange(): void {
-        if (this.currentSlide && this.currentSlide.panel) {
-            this.onePanelOnly = this.currentSlide.panel.length === 1;
-            this.langTranslate = this.$t(`editor.lang.${this.editorStore.selectedSlideLang}`);
-            this.centerPanel = this.currentSlide.panel[0]?.cssClasses?.includes('centerPanel') ?? false;
-            this.centerSlide =
-                (this.onePanelOnly
-                    ? this.determineEditorType((this.editorStore.currentSlide as Slide).panel[0]) === 'dynamic'
-                        ? (this.editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideRight')
-                        : (this.editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideFull')
-                    : (this.editorStore.currentSlide as Slide).panel[0]?.cssClasses?.includes('centerSlideRight') &&
-                      (this.editorStore.currentSlide as Slide).panel[1]?.cssClasses?.includes('centerSlideLeft')) ??
-                false;
-            this.includeInToc = (this.editorStore.currentSlide as Slide).includeInToc ?? false;
-            this.dynamicSelected =
-                this.determineEditorType((this.editorStore.currentSlide as Slide).panel[this.panelIndex]) === 'dynamic';
+function changePanelType(prevType: string, newType: string): void {
+    let startingConfig = {
+        ...JSON.parse(JSON.stringify(BaseStartingConfig)),
+        dynamic: {
+            type: PanelType.Dynamic,
+            title:
+                (editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                    ? ((editorStore.currentSlide as Slide).panel[0] as TextPanel).title
+                    : '',
+            titleTag: '',
+            content:
+                (editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
+                    ? ((editorStore.currentSlide as Slide).panel[0] as TextPanel).content
+                    : '',
+            children: []
         }
-    }
+    };
 
-    /**
-     * Determines whether a given panel has been modified from the default configuration of its type.
-     *
-     * @param {BasePanel} panel The panel to analyze.
-     * @returns {boolean} Whether panel has been modified.
-     */
-    panelModified(panel: BasePanel): boolean {
-        this.saveChanges(); // Used to capture unsaved changes before comparing with the corresponding default config
-        const prevType = (this.editorStore.currentSlide as Slide).panel[this.panelIndex].type;
-        const uuid = this.productStore.configFileStructure.uuid;
+    // When switching to a dynamic panel, remove the secondary panel.
+    if (newType === 'dynamic') {
+        // Remove source content of both panels
+        (editorStore.currentSlide as Slide).panel.forEach((panel: BasePanel) => productStore.removeSourceCounts(panel));
+        panelIndex.value = 0;
+        (editorStore.currentSlide as Slide)['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
+        dynamicSelected.value = true;
+    } else {
+        // Remove source content of panel having its type swapped
+        productStore.removeSourceCounts((editorStore.currentSlide as Slide).panel[panelIndex.value]);
 
-        let startingConfig = {
-            ...JSON.parse(JSON.stringify(BaseStartingConfig)),
-            dynamic: {
-                type: PanelType.Dynamic,
-                title:
-                    (this.editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
-                        ? ((this.editorStore.currentSlide as Slide).panel[0] as TextPanel).title
-                        : '',
-                titleTag: '',
-                content:
-                    (this.editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
-                        ? ((this.editorStore.currentSlide as Slide).panel[0] as TextPanel).content
-                        : '',
-                children: []
-            },
-            map: {
-                type: PanelType.Map,
-                config: `${uuid}/ramp-config/${uuid}-map-${this.getNumberOfMaps()}.json`,
-                title: '',
-                scrollguard: false
-            }
-        };
-
-        const oldStartingConfig = startingConfig[panel.type as keyof DefaultConfigs];
-        let newConfig = Object.assign({}, toRaw(panel));
-        newConfig.customStyles = newConfig.customStyles || undefined;
-        return JSON.stringify(oldStartingConfig) !== JSON.stringify(newConfig);
-    }
-
-    changePanelType(prevType: string, newType: string): void {
-        let startingConfig = {
-            ...JSON.parse(JSON.stringify(BaseStartingConfig)),
-            dynamic: {
-                type: PanelType.Dynamic,
-                title:
-                    (this.editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
-                        ? ((this.editorStore.currentSlide as Slide).panel[0] as TextPanel).title
-                        : '',
-                titleTag: '',
-                content:
-                    (this.editorStore.currentSlide as Slide).panel[0] && prevType === 'text'
-                        ? ((this.editorStore.currentSlide as Slide).panel[0] as TextPanel).content
-                        : '',
-                children: []
-            }
-        };
-
-        // When switching to a dynamic panel, remove the secondary panel.
-        if (newType === 'dynamic') {
-            // Remove source content of both panels
-            (this.editorStore.currentSlide as Slide).panel.forEach((panel: BasePanel) =>
-                this.productStore.removeSourceCounts(panel)
-            );
-            this.panelIndex = 0;
-            (this.editorStore.currentSlide as Slide)['panel'] = [startingConfig[newType as keyof DefaultConfigs]];
-            this.dynamicSelected = true;
-        } else {
-            // Remove source content of panel having its type swapped
-            this.productStore.removeSourceCounts((this.editorStore.currentSlide as Slide).panel[this.panelIndex]);
-
-            // Switching panel type when dynamic panels are not involved.
-            (this.editorStore.currentSlide as Slide).panel[this.panelIndex] =
-                startingConfig[newType as keyof DefaultConfigs];
-        }
-    }
-
-    saveChanges(): void {
-        if (
-            this.$refs.editor != null &&
-            typeof (this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV | TextEditorV)
-                .saveChanges === 'function'
-        ) {
-            (
-                this.$refs.editor as ImageEditorV | ChartEditorV | VideoEditorV | CustomEditorV | TextEditorV
-            ).saveChanges();
-        }
-    }
-
-    selectSlide(index: number, lang?: SupportedLanguages): void {
-        this.$emit('slide-change', index, lang);
-        this.$emit('scroll-to-element', index);
-    }
-
-    cancelTypeChange(): void {
-        (this.$refs.typeSelector as HTMLSelectElement).value = this.determineEditorType(
-            (this.editorStore.currentSlide as Slide).panel[this.panelIndex]
-        );
-    }
-
-    determineEditorType(panel: BasePanel): string {
-        // Determine whether the slideshow consists of only charts. If so, display the chart editor.
-        if (panel.type === 'slideshowChart') return PanelType.Chart;
-
-        // Determine whether the slideshow consists of only images. If so, display the image editor.
-        if (panel.type === 'slideshowImage') return PanelType.Image;
-
-        if (panel.type !== PanelType.Slideshow) return panel.type;
-
-        // Otherwise display the slideshow editor.
-        return PanelType.Slideshow;
-    }
-
-    toggleOnePanelOnly(addToWhichSide?: 'left' | 'right'): void {
-        this.saveChanges();
-
-        if (this.onePanelOnly) {
-            (this.editorStore.currentSlide as Slide)['panel'] = [
-                (this.editorStore.currentSlide as Slide).panel[this.panelIndex]
-            ];
-            this.panelIndex = 0;
-        } else {
-            (this.editorStore.currentSlide as Slide)['panel'] = [
-                ...(addToWhichSide === 'right'
-                    ? [Object.assign({}, (this.editorStore.currentSlide as Slide).panel[0])]
-                    : []),
-                Object.assign(
-                    {},
-                    {
-                        type: PanelType.Text,
-                        title: '',
-                        content: ''
-                    }
-                ),
-                ...(addToWhichSide === 'left'
-                    ? [Object.assign({}, (this.editorStore.currentSlide as Slide).panel[0])]
-                    : [])
-            ];
-            this.panelIndex = addToWhichSide === 'left' ? 0 : 1;
-        }
-        if (this.centerPanel) {
-            this.toggleCenterPanel();
-        }
-        if (this.centerSlide) {
-            this.toggleCenterSlide();
-        }
-    }
-
-    toggleCenterSlide(): void {
-        if (this.determineEditorType((this.editorStore.currentSlide as Slide).panel[this.panelIndex]) === 'dynamic') {
-            const dynamicPanel = (this.editorStore.currentSlide as Slide).panel[0] as DynamicPanel;
-
-            (this.editorStore.currentSlide as Slide).panel[0].cssClasses = this.centerSlide
-                ? 'centerSlideRight'
-                : ((this.editorStore.currentSlide as Slide).panel[0].cssClasses || '').replace('centerSlideRight', '');
-
-            (dynamicPanel.children ?? []).forEach((child) => {
-                const panel = child.panel;
-                if (panel.type === 'image' || panel.type === 'chart' || /^slideshow/.test(panel.type)) {
-                    const slideshowPanel =
-                        panel.type === 'slideshowImage'
-                            ? (panel as SlideshowImagePanel)
-                            : panel.type === 'slideshowChart'
-                              ? (panel as SlideshowChartPanel)
-                              : panel;
-                    applyTextAlign(slideshowPanel, this.centerSlide, true);
-                } else {
-                    applyTextAlign(panel, this.centerSlide, true);
-                }
-            });
-        } else if (this.onePanelOnly || (this.editorStore.currentSlide as Slide).panel.length === 1) {
-            if (this.centerSlide) {
-                (this.editorStore.currentSlide as Slide).panel[0].cssClasses = 'centerSlideFull';
-            } else {
-                (this.editorStore.currentSlide as Slide).panel[0].cssClasses = (
-                    (this.editorStore.currentSlide as Slide).panel[0].cssClasses || ''
-                ).replace('centerSlideRight', '');
-                (this.editorStore.currentSlide as Slide).panel[0].cssClasses = (
-                    (this.editorStore.currentSlide as Slide).panel[0].cssClasses || ''
-                ).replace('centerSlideLeft', '');
-                (this.editorStore.currentSlide as Slide).panel[0].cssClasses = (
-                    (this.editorStore.currentSlide as Slide).panel[0].cssClasses || ''
-                ).replace('centerSlideFull', '');
-            }
-        } else {
-            if (this.centerSlide) {
-                (this.editorStore.currentSlide as Slide).panel[0].cssClasses = 'centerSlideRight';
-                (this.editorStore.currentSlide as Slide).panel[1].cssClasses = 'centerSlideLeft';
-            } else {
-                (this.editorStore.currentSlide as Slide).panel[0].cssClasses = (
-                    (this.editorStore.currentSlide as Slide).panel[0].cssClasses || ''
-                ).replace('centerSlideRight', '');
-                (this.editorStore.currentSlide as Slide).panel[1].cssClasses = (
-                    (this.editorStore.currentSlide as Slide).panel[1].cssClasses || ''
-                ).replace('centerSlideLeft', '');
-            }
-        }
-    }
-
-    toggleCenterPanel(): void {
-        if (this.centerPanel) {
-            for (const p in (this.editorStore.currentSlide as Slide).panel) {
-                (this.editorStore.currentSlide as Slide).panel[p].cssClasses = 'centerPanel';
-            }
-        } else {
-            for (const p in (this.editorStore.currentSlide as Slide).panel) {
-                (this.editorStore.currentSlide as Slide).panel[p].cssClasses = (
-                    (this.editorStore.currentSlide as Slide).panel[p].cssClasses || ''
-                ).replace('centerPanel', '');
-            }
-        }
-    }
-
-    getNumberOfMaps(): number {
-        let n = 0;
-        this.productStore.configFileStructure.rampConfig.forEach((_f) => {
-            n += 1;
-        });
-        return n;
-    }
-
-    toggleIncludeInToc(): void {
-        (this.editorStore.currentSlide as Slide).includeInToc = this.includeInToc ?? false;
+        // Switching panel type when dynamic panels are not involved.
+        (editorStore.currentSlide as Slide).panel[panelIndex.value] = startingConfig[newType as keyof DefaultConfigs];
     }
 }
+
+function saveChanges(): void {
+    if (
+        editor.value != null &&
+        typeof (
+            editor.value as
+                | typeof ImageEditorV
+                | typeof ChartEditorV
+                | typeof VideoEditorV
+                | typeof CustomEditorV
+                | typeof TextEditorV
+        ).saveChanges === 'function'
+    ) {
+        (
+            editor.value as
+                | typeof ImageEditorV
+                | typeof ChartEditorV
+                | typeof VideoEditorV
+                | typeof CustomEditorV
+                | typeof TextEditorV
+        ).saveChanges();
+    }
+}
+
+function selectSlide(index: number, lang?: SupportedLanguages): void {
+    emit('slide-change', index, lang);
+    emit('scroll-to-element', index);
+}
+
+function cancelTypeChange(): void {
+    (typeSelector.value as HTMLSelectElement).value = determineEditorType((editorStore.currentSlide as Slide).panel[panelIndex.value]);
+}
+
+function determineEditorType(panel: BasePanel): string {
+    // Determine whether the slideshow consists of only charts. If so, display the chart editor.
+    if (panel.type === 'slideshowChart') return PanelType.Chart;
+
+    // Determine whether the slideshow consists of only images. If so, display the image editor.
+    if (panel.type === 'slideshowImage') return PanelType.Image;
+
+    if (panel.type !== PanelType.Slideshow) return panel.type;
+
+    // Otherwise display the slideshow editor.
+    return PanelType.Slideshow;
+}
+
+function toggleOnePanelOnly(addToWhichSide?: 'left' | 'right'): void {
+    saveChanges();
+
+    if (onePanelOnly.value) {
+        (editorStore.currentSlide as Slide)['panel'] = [(editorStore.currentSlide as Slide).panel[panelIndex.value]];
+        panelIndex.value = 0;
+    } else {
+        (editorStore.currentSlide as Slide)['panel'] = [
+            ...(addToWhichSide === 'right' ? [Object.assign({}, (editorStore.currentSlide as Slide).panel[0])] : []),
+            Object.assign(
+                {},
+                {
+                    type: PanelType.Text,
+                    title: '',
+                    content: ''
+                }
+            ),
+            ...(addToWhichSide === 'left' ? [Object.assign({}, (editorStore.currentSlide as Slide).panel[0])] : [])
+        ];
+        panelIndex.value = addToWhichSide === 'left' ? 0 : 1;
+    }
+    if (centerPanel.value) {
+        toggleCenterPanel();
+    }
+    if (centerSlide.value) {
+        toggleCenterSlide();
+    }
+}
+
+function toggleCenterSlide(): void {
+    if (determineEditorType((editorStore.currentSlide as Slide).panel[panelIndex.value]) === 'dynamic') {
+        const dynamicPanel = (editorStore.currentSlide as Slide).panel[0] as DynamicPanel;
+
+        (editorStore.currentSlide as Slide).panel[0].cssClasses = centerSlide.value
+            ? 'centerSlideRight'
+            : ((editorStore.currentSlide as Slide).panel[0].cssClasses || '').replace('centerSlideRight', '');
+
+        (dynamicPanel.children ?? []).forEach((child) => {
+            const panel = child.panel;
+            if (panel.type === 'image' || panel.type === 'chart' || /^slideshow/.test(panel.type)) {
+                const slideshowPanel =
+                    panel.type === 'slideshowImage'
+                        ? (panel as SlideshowImagePanel)
+                        : panel.type === 'slideshowChart'
+                          ? (panel as SlideshowChartPanel)
+                          : panel;
+                applyTextAlign(slideshowPanel, centerSlide.value, true);
+            } else {
+                applyTextAlign(panel, centerSlide.value, true);
+            }
+        });
+    } else if (onePanelOnly.value || (editorStore.currentSlide as Slide).panel.length === 1) {
+        if (centerSlide.value) {
+            (editorStore.currentSlide as Slide).panel[0].cssClasses = 'centerSlideFull';
+        } else {
+            (editorStore.currentSlide as Slide).panel[0].cssClasses = (editorStore.currentSlide as Slide).panel[0].cssClasses?.replace(
+                'centerSlideRight',
+                ''
+            );
+            (editorStore.currentSlide as Slide).panel[0].cssClasses = (editorStore.currentSlide as Slide).panel[0].cssClasses?.replace(
+                'centerSlideLeft',
+                ''
+            );
+            (editorStore.currentSlide as Slide).panel[0].cssClasses = (editorStore.currentSlide as Slide).panel[0].cssClasses?.replace(
+                'centerSlideFull',
+                ''
+            );
+        }
+    } else {
+        if (centerSlide.value) {
+            (editorStore.currentSlide as Slide).panel[0].cssClasses = 'centerSlideRight';
+            (editorStore.currentSlide as Slide).panel[1].cssClasses = 'centerSlideLeft';
+        } else {
+            (editorStore.currentSlide as Slide).panel[0].cssClasses = ((editorStore.currentSlide as Slide).panel[0].cssClasses || '').replace(
+                'centerSlideRight',
+                ''
+            );
+            (editorStore.currentSlide as Slide).panel[1].cssClasses = ((editorStore.currentSlide as Slide).panel[1].cssClasses || '').replace(
+                'centerSlideLeft',
+                ''
+            );
+        }
+    }
+}
+
+function toggleCenterPanel(): void {
+    if (centerPanel.value) {
+        for (const p in (editorStore.currentSlide as Slide).panel) {
+            (editorStore.currentSlide as Slide).panel[p].cssClasses = 'centerPanel';
+        }
+    } else {
+        for (const p in (editorStore.currentSlide as Slide).panel) {
+            (editorStore.currentSlide as Slide).panel[p].cssClasses = ((editorStore.currentSlide as Slide).panel[p].cssClasses || '').replace(
+                'centerPanel',
+                ''
+            );
+        }
+    }
+}
+
+function getNumberOfMaps(): number {
+    let n = 0;
+    productStore.configFileStructure.rampConfig.forEach((_f) => {
+        n += 1;
+    });
+    return n;
+}
+
+function toggleIncludeInToc(): void {
+    (editorStore.currentSlide as Slide).includeInToc = includeInToc.value ?? false;
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges, panelIndex, advancedEditorView });
 </script>
 
 <style lang="scss" scoped>

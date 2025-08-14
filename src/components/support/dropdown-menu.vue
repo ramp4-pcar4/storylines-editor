@@ -37,13 +37,9 @@ import { nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { createPopper, detectOverflow } from '@popperjs/core';
 import type { Modifier, Placement, State } from '@popperjs/core';
 
-const open = ref<boolean>(false);
-const popper = ref<any>(null);
-const watchers = reactive<Array<Function>>([]);
-
-const el = ref();
-const dropdown = ref<HTMLElement>();
-const dropdownTrigger = ref<Element>();
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
 const props = defineProps({
     position: {
@@ -63,27 +59,28 @@ const props = defineProps({
     ariaLabel: { type: String }
 });
 
+// =========================================
+// Definitions
+
+const open = ref<boolean>(false);
+const popper = ref<any>(null);
+const watchers = reactive<Array<Function>>([]);
+
+const el = ref();
+const dropdown = ref<HTMLElement>();
+const dropdownTrigger = ref<Element>();
+
+// =========================================
+// Watchers
+
 watchers.push(
     watch(open, () => {
         popper.value.update();
     })
 );
 
-const toggleDropdown = () => {
-    open.value = !open.value;
-    (dropdownTrigger.value as any)._tippy.hide();
-};
-
-const focusDropdownTrigger = () => {
-    (dropdownTrigger.value as any)._tippy.setProps({
-        placement: open.value ? props.tooltipPlacementAlt : props.tooltipPlacement
-    });
-    (dropdownTrigger.value as any)._tippy.show();
-};
-
-const blurDropdownTrigger = () => {
-    (dropdownTrigger.value as any)._tippy.hide();
-};
+// =========================================
+// Lifecycle functions
 
 onMounted(() => {
     window.addEventListener(
@@ -178,6 +175,28 @@ onBeforeUnmount(() => {
 
     open.value = false;
 });
+
+// =========================================
+// Component functions
+
+const toggleDropdown = () => {
+    open.value = !open.value;
+    (dropdownTrigger.value as any)._tippy.hide();
+};
+
+const focusDropdownTrigger = () => {
+    (dropdownTrigger.value as any)._tippy.setProps({
+        placement: open.value ? props.tooltipPlacementAlt : props.tooltipPlacement
+    });
+    (dropdownTrigger.value as any)._tippy.show();
+};
+
+const blurDropdownTrigger = () => {
+    (dropdownTrigger.value as any)._tippy.hide();
+};
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss">

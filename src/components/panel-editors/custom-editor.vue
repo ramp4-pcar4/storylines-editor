@@ -45,7 +45,7 @@
                 </ul>
             </div>
         </div>
-        <json-editor
+        <Vue3JsonEditor
             v-model="config"
             lang="en"
             :mode="'text'"
@@ -58,16 +58,29 @@
                 }
             "
             @json-change="(json: any) => onJsonChange(json)"
-        ></json-editor>
+        ></Vue3JsonEditor>
     </div>
 </template>
 
-<script lang="ts">
-import { computed } from 'vue';
-import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
+import { computed, getCurrentInstance, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useEditorStore } from '@/stores/editorStore';
+
+
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const emit = defineEmits(['title-edit', 'slide-edit', 'config-edited']);
+
+// =========================================
+// Definitions
+
+const { $nextTick, $el } = getCurrentInstance()!.proxy!;
+const { t } = useI18n();
 
 const panelTypeToSchemaKey = {
     text: 'textPanel',
@@ -82,187 +95,189 @@ const panelTypeToSchemaKey = {
 } as const;
 type PanelType = keyof typeof panelTypeToSchemaKey;
 
-import { useEditorStore } from '@/stores/editorStore';
+const editorStore = useEditorStore();
+const config = computed(() => editorStore.currentSlide);
 
-@Options({
-    components: {
-        'json-editor': Vue3JsonEditor
-    }
-})
-export default class CustomEditorV extends Vue {
-    editorStore = useEditorStore();
-    config = computed(() => this.editorStore.currentSlide);
+const edited = ref(false);
 
-    edited = false;
-    jsonError = '';
-    validator: Validator = new Validator();
-    validatorErrors: any = [];
-    showErrors = false;
+const jsonError = ref('');
+const validator: Validator = new Validator();
+const validatorErrors = ref([] as any[]);
+const showErrors = ref(false);
 
-    storylinesSchema: Record<string, any> = {};
+const storylinesSchema = ref({} as Record<string, any>);
 
-    mounted(): void {
-        console.log(' ');
-        console.log('mounted');
-        import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
-            this.storylinesSchema = {
-                ...StorylinesSchema.$defs.slide,
-                $defs: StorylinesSchema.$defs,
-                additionalProperties: StorylinesSchema.additionalProperties
-            };
+// =========================================
+// Watchers
 
-            const checkValidation = this.validator.validate(this.config, this.storylinesSchema as any);
-            if (checkValidation.errors.length !== 0) {
-                // adding defaults for existing products that have missing required properties
-                this.normalizeConfig(this.config, this.storylinesSchema.$defs.slide, this.storylinesSchema, true);
-                // correct value types in config to match schema definitions.
-                this.normalizeConfig(this.config, this.storylinesSchema.$defs.slide, this.storylinesSchema, false);
-            }
-            this.validate();
-        });
+onMounted(() => {
+    import('ramp-storylines_demo-scenarios-pcar/dist/StorylinesSchema.json').then((StorylinesSchema) => {
+        storylinesSchema.value = {
+            ...StorylinesSchema.$defs.slide,
+            $defs: StorylinesSchema.$defs,
+            additionalProperties: StorylinesSchema.additionalProperties
+        };
 
-        // selects the <textarea> inside json-editor and add label attribute dynamically
-        this.$nextTick(() => {
-            const textarea = this.$el.querySelector('textarea.jsoneditor-text');
-            if (textarea) {
-                textarea.setAttribute('aria-label', this.$t('editor.slides.advanced.editor'));
-            }
-        });
-    }
-
-    // Helper function that either fills in missing required values or coerces incorrect types into the expected type format.
-    defaultValues(type: string, value?: any) {
-        switch (type) {
-            case 'array':
-                return Array.isArray(value) ? value : [];
-            case 'string':
-                return value !== undefined && value !== null ? String(value) : '';
-            case 'number':
-                return isNaN(Number(value)) ? 0 : Number(value);
-            case 'boolean':
-                if (value === 'true' || value === true) return true;
-                if (value === 'false' || value === false) return false;
-                return Boolean(value);
-            default:
-                return value;
+        const checkValidation = validator.validate(config.value, storylinesSchema.value as any);
+        if (checkValidation.errors.length !== 0) {
+            // adding defaults for existing products that have missing required properties
+            normalizeConfig(config.value, storylinesSchema.value.$defs.slide, storylinesSchema.value, true);
+            // correct value types in config to match schema definitions.
+            normalizeConfig(config.value, storylinesSchema.value.$defs.slide, storylinesSchema.value, false);
         }
-    }
+        validate();
+    });
 
-    // Helper function that resolves a $ref in a JSON Schema to its actual schema definition.
-    resolveSchemaRef(schemaPart: any, rootSchema: any) {
-        if (!schemaPart) return null;
-        if (schemaPart.$ref) {
-            const path = schemaPart.$ref.replace(/^#\//, '').split('/');
-            return path.reduce((acc: any, part: any) => acc && acc[part], rootSchema);
+    // selects the <textarea> inside json-editor and add label attribute dynamically
+    $nextTick(() => {
+        const textarea = $el.querySelector('textarea.jsoneditor-text');
+        if (textarea) {
+            textarea.setAttribute('aria-label', t('editor.slides.advanced.editor'));
         }
-        return schemaPart;
+    });
+});
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+// returns true if no validation errors, false if errors
+function validate(validateJson?: any): boolean {
+    // TODO: add any missing properties in schema as required (e.g. chart options)
+    const checkConfig = validateJson ?? config.value;
+
+    const checkValidation = validator.validate(checkConfig, storylinesSchema.value as any);
+    validatorErrors.value = checkValidation.errors;
+    if (jsonError.value) {
+        validatorErrors.value.push(jsonError.value);
+        return false;
     }
+    return validatorErrors.value.length === 0;
+}
 
-    /**
-     * Recursively normalizes a config object against the JSON Schema definition.
-     * For older products where required types may be missing or of the wrong type.
-     *
-     * Supports two modes:
-     *  - Injecting missing required fields with default values (`injectRequired = true`)
-     *  - Coercing existing values to the correct types (`injectRequired = false`)
-     */
-    normalizeConfig(config: any, schema: any, rootSchema: any, injectRequired: boolean) {
-        if (!schema || typeof schema !== 'object' || !config) return;
+// Helper function that either fills in missing required values or coerces incorrect types into the expected type format.
+function defaultValues(type: string, value?: any) {
+    switch (type) {
+        case 'array':
+            return Array.isArray(value) ? value : [];
+        case 'string':
+            return value !== undefined && value !== null ? String(value) : '';
+        case 'number':
+            return isNaN(Number(value)) ? 0 : Number(value);
+        case 'boolean':
+            if (value === 'true' || value === true) return true;
+            if (value === 'false' || value === false) return false;
+            return Boolean(value);
+        default:
+            return value;
+    }
+}
 
-        const fields = injectRequired ? schema.required || [] : Object.keys(config);
-        const properties = schema.properties || {};
+// Helper function that resolves a $ref in a JSON Schema to its actual schema definition.
+function resolveSchemaRef(schemaPart: any, rootSchema: any) {
+    if (!schemaPart) return null;
+    if (schemaPart.$ref) {
+        const path = schemaPart.$ref.replace(/^#\//, '').split('/');
+        return path.reduce((acc: any, part: any) => acc && acc[part], rootSchema);
+    }
+    return schemaPart;
+}
 
-        for (const key of fields) {
-            if (!properties[key]) continue;
+/**
+ * Recursively normalizes a config object against the JSON Schema definition.
+ * For older products where required types may be missing or of the wrong type.
+ *
+ * Supports two modes:
+ *  - Injecting missing required fields with default values (`injectRequired = true`)
+ *  - Coercing existing values to the correct types (`injectRequired = false`)
+ */
+function normalizeConfig(config: any, schema: any, rootSchema: any, injectRequired: boolean) {
+    if (!schema || typeof schema !== 'object' || !config) return;
 
-            // resolve $ref if property references another schema definition
-            const resolvedSchema = this.resolveSchemaRef(properties[key], rootSchema);
+    const fields = injectRequired ? schema.required || [] : Object.keys(config);
+    const properties = schema.properties || {};
 
-            // inject default values for missing required fields
-            if (injectRequired && !(key in config)) {
-                config[key] = this.defaultValues(resolvedSchema.type, resolvedSchema.default);
-                continue;
+    for (const key of fields) {
+        if (!properties[key]) continue;
+
+        // resolve $ref if property references another schema definition
+        const resolvedSchema = resolveSchemaRef(properties[key], rootSchema);
+
+        // inject default values for missing required fields
+        if (injectRequired && !(key in config)) {
+            config[key] = defaultValues(resolvedSchema.type, resolvedSchema.default);
+            continue;
+        }
+        // coerce value to the correct type if incorrect
+        else if (resolvedSchema.type && !(typeof config[key] === resolvedSchema.type)) {
+            config[key] = defaultValues(resolvedSchema.type, config[key]);
+        }
+        // special case for video types, because it currently shows schema errors if it's an empty
+        else if (key === 'videoType' && config[key] === '') {
+            if (config['src'].startsWith('http')) {
+                config[key] = 'external';
+            } else {
+                config[key] = 'local';
             }
-            // coerce value to the correct type if incorrect
-            else if (resolvedSchema.type && !(typeof config[key] === resolvedSchema.type)) {
-                config[key] = this.defaultValues(resolvedSchema.type, config[key]);
-            }
-            // special case for video types, because it currently shows schema errors if it's an empty
-            else if (key === 'videoType' && config[key] === '') {
-                if (config['src'].startsWith('http')) {
-                    config[key] = 'external';
-                } else {
-                    config[key] = 'local';
+        }
+
+        const value = config[key];
+
+        // if value is an array (e.g., panel), normalize each item
+        if ((Array.isArray(value) && resolvedSchema.items) || Array.isArray(config?.children)) {
+            const configItems = Array.isArray(value) && value.length > 0 ? value : (config?.children ?? []);
+
+            for (const item of configItems) {
+                if (config?.children?.includes(item)) {
+                    const childSchema = rootSchema.$defs?.['dynamicChildItem'];
+                    if (childSchema) normalizeConfig(item, childSchema, rootSchema, injectRequired);
                 }
+
+                const type = item?.type ?? item?.panel?.type;
+                const target = item?.panel?.type ? item.panel : item;
+
+                const schemaKey = panelTypeToSchemaKey[type as PanelType];
+                const itemSchema = schemaKey ? rootSchema.$defs?.[schemaKey] : resolvedSchema.items;
+                if (itemSchema) normalizeConfig(target, itemSchema, rootSchema, injectRequired);
             }
-
-            const value = config[key];
-
-            // if value is an array (e.g., panel), normalize each item
-            if ((Array.isArray(value) && resolvedSchema.items) || Array.isArray(config?.children)) {
-                const configItems = Array.isArray(value) && value.length > 0 ? value : (config?.children ?? []);
-
-                for (const item of configItems) {
-                    if (config?.children?.includes(item)) {
-                        const childSchema = rootSchema.$defs?.['dynamicChildItem'];
-                        if (childSchema) this.normalizeConfig(item, childSchema, rootSchema, injectRequired);
-                    }
-
-                    const type = item?.type ?? item?.panel?.type;
-                    const target = item?.panel?.type ? item.panel : item;
-
-                    const schemaKey = panelTypeToSchemaKey[type as PanelType];
-                    const itemSchema = schemaKey ? rootSchema.$defs?.[schemaKey] : resolvedSchema.items;
-                    if (itemSchema) this.normalizeConfig(target, itemSchema, rootSchema, injectRequired);
-                }
-            } else if (typeof value === 'object' && value !== null) {
-                this.normalizeConfig(value, resolvedSchema, rootSchema, injectRequired);
-            }
-        }
-    }
-
-    // returns true if no validation errors, false if errors
-    validate(validateJson?: any): boolean {
-        // TODO: add any missing properties in schema as required (e.g. chart options)
-        const checkConfig = validateJson ?? this.config;
-
-        const checkValidation = this.validator.validate(checkConfig, this.storylinesSchema as any);
-        this.validatorErrors = checkValidation.errors;
-        if (this.jsonError) {
-            this.validatorErrors.push(this.jsonError);
-            return false;
-        }
-        return this.validatorErrors.length === 0;
-    }
-
-    onJsonChange(json: any): void {
-        console.log(' ');
-        console.log('onJSONChange');
-        this.jsonError = '';
-        const valid = this.validate(json);
-        this.edited = true;
-        this.$emit('slide-edit');
-        this.$emit('title-edit', json.title);
-
-        // if there are no validation errors update the slide config
-        if (valid) {
-            // json editor library does not contain 2-way v-model binding so need to set manually
-            this.editorStore.currentSlide = json;
-            this.edited = true;
-            this.$emit('slide-edit');
-            this.$emit('config-edited');
-        }
-    }
-
-    saveChanges(): void {
-        this.edited = false;
-
-        // If the user saves or leaves the advanced editor page with errors, give them a warning.
-        if (this.validatorErrors.length !== 0) {
-            alert(this.$t('editor.slides.advanced.error'));
+        } else if (typeof value === 'object' && value !== null) {
+            normalizeConfig(value, resolvedSchema, rootSchema, injectRequired);
         }
     }
 }
+
+function onJsonChange(json: any): void {
+    jsonError.value = '';
+    const valid = validate(json);
+    edited.value = true;
+    emit('slide-edit');
+    emit('title-edit', json.title);
+
+    // if there are no validation errors update the slide config
+    if (valid) {
+        // json editor library does not contain 2-way v-model binding so need to set manually
+        editorStore.currentSlide = json;
+        edited.value = true;
+        emit('slide-edit');
+        emit('config-edited');
+    }
+}
+
+function saveChanges(): void {
+    edited.value = false;
+
+    // If the user saves or leaves the advanced editor page with errors, give them a warning.
+    if (validatorErrors.value.length !== 0) {
+        alert(t('editor.slides.advanced.error'));
+    }
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss" scoped>

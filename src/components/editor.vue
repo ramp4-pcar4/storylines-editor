@@ -274,7 +274,7 @@
                                 }}</span
                             >
                             <span v-if="editorStore.editorSaving" class="align-middle inline-block px-1">
-                                <spinner size="16px" color="#009cd1" class="ml-1 mb-1"></spinner>
+                                <VueSpinnerOval size="16px" color="#009cd1" class="ml-1 mb-1"></VueSpinnerOval>
                             </span>
                         </button>
 
@@ -286,7 +286,7 @@
                                 name: 'editor',
                                 params: { lang: currentRoute.includes('#/en') ? 'fr' : 'en', uid: productStore.uuid }
                             }"
-                            @click="productStore.configLang = currentRoute.includes('#/en') ? 'fr' : 'en'"
+                            @click="editorStore.configLang = currentRoute.includes('#/en') ? 'fr' : 'en'"
                             class="respected-standard-link-button px-2"
                         >
                             <a>
@@ -346,7 +346,7 @@
                         <div class="flex items-center flex-nowrap gap-2 justify-between md:justify-start">
                             <slot name="langModal" v-bind="{ unsavedChanges: stateStore.isChanged }"></slot>
                             <!-- Preview dropdown -->
-                            <dropdown-menu
+                            <DropdownMenu
                                 class="flex-shrink-0"
                                 position="bottom-start"
                                 :aria-label="$t('editor.preview')"
@@ -409,7 +409,7 @@
                                 >
                                     {{ $t('editor.lang.fr') }}
                                 </button>
-                            </dropdown-menu>
+                            </DropdownMenu>
 
                             <div class="flex flex-row gap-2">
                                 <!-- Export button -->
@@ -525,20 +525,21 @@
             <!-- Sidebar, desktop version -->
             <div id="sidebar-desktop" class="w-80 flex flex-col flex-shrink-0 border-r border-black editor-toc">
                 <!-- ToC -->
-                <slide-toc
+                <SlideTocV
                     class="flex-1"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="openMetadataModal"
                     :lang="editorStore.configLang"
-                ></slide-toc>
+                ></SlideTocV>
             </div>
             <!-- Sidebar, mobile version -->
             <div id="sidebar-mobile" class="w-0 flex-shrink-0 border-r border-black editor-toc md:hidden">
                 <!-- Mobile ToC -->
                 <!-- Bigger buttons, more visual dividers, more colors -->
-                <slide-toc
+                <SlideTocV
+                    :slideIndex="editorStore.selectedSlideIndex"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
                     @open-metadata-modal="openMetadataModal"
@@ -546,12 +547,12 @@
                     :lang="editorStore.configLang"
                     :closeSidebar="closeSidebar"
                     :isMobileSidebar="true"
-                ></slide-toc>
+                ></SlideTocV>
             </div>
             <!-- Right side -->
             <div class="w-full">
                 <!-- Slide editor -->
-                <slide-editor
+                <SlideEditorV
                     class="editor-area w-full"
                     ref="slide"
                     :otherLangSlide="
@@ -567,18 +568,18 @@
                     @slide-change="selectSlide"
                     @slide-edit="onSlidesEdited()"
                     @custom-slide-updated="updateCustomSlide"
-                ></slide-editor>
+                ></SlideEditorV>
             </div>
         </div>
 
         <!-- Edit metadata modal -->
         <!-- Click Done or outside the modal to save changes LOCALLY. -->
-        <metadata-modal></metadata-modal>
+        <MetadataModalV></MetadataModalV>
         <!-- Help modal -->
-        <help-panel :helpSections="helpSections" :originalTextArray="originalTextArray"></help-panel>
+        <HelpPanelV :helpSections="helpSections" :originalTextArray="originalTextArray"></HelpPanelV>
         <!-- Reload config confirmation modal -->
-        <confirmation-modal :name="`reload-config`" :message="$t('editor.refreshChanges.modal')" @ok="refreshConfig" />
-        <confirmation-modal
+        <ConfirmationModalV :name="`reload-config`" :message="$t('editor.refreshChanges.modal')" @ok="refreshConfig" />
+        <ConfirmationModalV
             :name="`confirm-extend-session-editor`"
             :message="
                 $t('editor.extendSession', {
@@ -593,8 +594,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
 import {
     deepMerge,
     HelpSection,
@@ -604,12 +604,23 @@ import {
     SupportedLanguages,
     TextPanel
 } from '@/definitions';
+import {
+    computed,
+    getCurrentInstance,
+    onBeforeMount,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    useTemplateRef,
+    watch
+} from 'vue';
 import { VueSpinnerOval } from 'vue3-spinners';
 import axios from 'axios';
 import { marked } from 'marked';
 import Message from 'vue-m-message';
 import { saveAs } from 'file-saver';
 import { RouteLocationNormalized } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 import SlideEditorV from './slide-editor.vue';
 import SlideTocV from './slide-toc/slide-toc.vue';
@@ -624,91 +635,104 @@ import { useProductStore } from '@/stores/productStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { useStateStore } from '@/stores/stateStore';
 
-@Options({
-    components: {
-        'metadata-content': MetadataContentV,
-        'confirmation-modal': ConfirmationModalV,
-        spinner: VueSpinnerOval,
-        'slide-editor': SlideEditorV,
-        'slide-toc': SlideTocV,
-        'help-panel': HelpPanelV,
-        'dropdown-menu': DropdownMenu,
-        'metadata-modal': MetadataModalV
-    }
-})
-export default class EditorV extends Vue {
-    @Prop({ default: false }) isMobileSidebar!: boolean;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    currentRoute = window.location.href;
-    productStore = useProductStore();
-    lockStore = useLockStore();
-    editorStore = useEditorStore();
-    stateStore = useStateStore();
+const props = withDefaults(
+    defineProps<{
+        isMobileSidebar?: boolean;
+    }>(),
+    { isMobileSidebar: false }
+);
 
-    // Form properties.
-    logoImage: undefined | File = undefined;
-    loadSlides: undefined | MultiLanguageSlide[] = undefined;
-    helpSections: HelpSection[] = [];
-    helpMd = '';
-    originalTextArray: string[] = [];
-    dropdownButtonWidth = 0;
-    totalTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30;
+const emit = defineEmits([]);
 
-    defaultBlankSlide: Slide = {
-        title: '',
-        panel: [
-            {
-                type: 'text',
-                title: '',
-                content: ''
-            } as TextPanel,
-            {
-                type: 'text',
-                title: '',
-                content: ''
-            } as TextPanel
-        ]
-    };
+// =========================================
+// Definitions
 
-    canUndo = false;
-    canRedo = false;
+const { $route, $router, $i18n, $vfm } = getCurrentInstance()!.proxy!;
+const { t } = useI18n();
 
-    @Watch('stateStore.canUndo')
-    onUndoAbilityUpdate(): void {
-        this.canUndo = this.stateStore.canUndo;
-    }
+// <template> element refs
+const dropdownButton = useTemplateRef('dropdownButton');
+const slide = useTemplateRef('slide');
 
-    @Watch('stateStore.canRedo')
-    onRedoAbilityUpdate(): void {
-        this.canRedo = this.stateStore.canRedo;
-    }
+const currentRoute = computed(() => window.location.href);
+const productStore = useProductStore();
+const lockStore = useLockStore();
+const editorStore = useEditorStore();
+const stateStore = useStateStore();
 
-    @Watch('productStore.slidesWorkingCopy', { deep: true })
-    onSlidesEdited(): void {
-        this.editorStore.updateSaveStatus(true);
-    }
+// Form properties.
+const logoImage = ref<undefined | File>(undefined);
+const loadSlides = ref<undefined | MultiLanguageSlide[]>(undefined);
 
-    /**
-     * Runs whenever we need to update the app's config variables with the current selected save state in the stateStore.
-     * Used for updating immediately after setting undo/redo variables.
-     */
-    @Watch('stateStore.reconcileToggler')
-    onReconciliationRequest(): void {
-        const newConfigs = this.stateStore.addChangesToNewSave(this.stateStore.getCurrentChangeLocation());
-        const affectedSlides = this.stateStore.getAffectedSlidesByUndoRedo();
+const helpSections = ref<HelpSection[]>([]);
+const helpMd = ref('');
+const originalTextArray = ref<string[]>([]);
+const dropdownButtonWidth = ref(0);
+const totalTime = ref(import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_END) : 30);
 
-        this.productStore.configs.en = newConfigs?.en;
-        this.productStore.configs.fr = newConfigs?.fr;
+const defaultBlankSlide: Slide = {
+    title: '',
+    panel: [
+        {
+            type: 'text',
+            title: '',
+            content: ''
+        } as TextPanel,
+        {
+            type: 'text',
+            title: '',
+            content: ''
+        } as TextPanel
+    ]
+};
+
+const canUndo = ref(false);
+const canRedo = ref(false);
+
+// =========================================
+// Watchers
+
+watch(
+    () => stateStore.canUndo,
+    () => (canUndo.value = stateStore.canUndo)
+);
+watch(
+    () => stateStore.canRedo,
+    () => (canRedo.value = stateStore.canRedo)
+);
+
+const onSlidesEdited = () => {
+    editorStore.updateSaveStatus(true);
+};
+watch(() => productStore.slidesWorkingCopy, onSlidesEdited, { deep: true });
+
+const onMetadataEdited = () => {
+    editorStore.updateSaveStatus(true);
+};
+watch(() => productStore.metadata, onMetadataEdited, { deep: true });
+
+watch(
+    () => stateStore.reconcileToggler,
+    () => {
+        const newConfigs = stateStore.addChangesToNewSave(stateStore.getCurrentChangeLocation());
+        const affectedSlides = stateStore.getAffectedSlidesByUndoRedo();
+
+        productStore.configs.en = newConfigs?.en;
+        productStore.configs.fr = newConfigs?.fr;
 
         const engSlides =
-            this.productStore.configs.en?.slides.map((engSlide) => {
+            productStore.configs.en?.slides.map((engSlide) => {
                 return {
                     // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
                     en: engSlide && Object.keys(engSlide).length ? (engSlide as Slide) : undefined
                 };
             }) ?? [];
         const frSlides =
-            this.productStore.configs.fr?.slides.map((frSlide) => {
+            productStore.configs.fr?.slides.map((frSlide) => {
                 return {
                     // "Undefined" slides will be the undefined type while inside Storylines Editor, and {} on save/in file.
                     fr: frSlide && Object.keys(frSlide).length ? (frSlide as Slide) : undefined
@@ -720,417 +744,410 @@ export default class EditorV extends Vue {
             Object.assign({}, engSlides?.[index] || { en: undefined }, frSlides?.[index] || { fr: undefined })
         );
 
-        this.productStore.slidesWorkingCopy = newSlides;
+        productStore.slidesWorkingCopy = newSlides;
 
-        this.updateSlides(false, true);
+        updateSlides(false, true);
 
-        if (this.editorStore.selectedSlideIndex > this.productStore.slidesWorkingCopy.length - 1) {
+        if (editorStore.selectedSlideIndex > productStore.slidesWorkingCopy.length - 1) {
             // If the selected slide index is out of bounds, don't select a slide
-            this.selectSlide(-1);
+            selectSlide(-1);
         } else if (affectedSlides && affectedSlides?.length !== 0) {
             // If available, jump to the slide affected by the undo/redo you did
             // If you undo, jump to the slide whose changes you're doing; if redoing, jump to the slide being redone
-            this.selectSlide(affectedSlides[0].index, affectedSlides[0].lang, affectedSlides[0].panel);
+            selectSlide(affectedSlides[0].index, affectedSlides[0].lang, affectedSlides[0].panel);
         } else if (
-            this.productStore.slidesWorkingCopy[this.editorStore.selectedSlideIndex]?.[
-                this.editorStore.selectedSlideLang
-            ]?.panel.length === 1
+            productStore.slidesWorkingCopy[editorStore.selectedSlideIndex]?.[editorStore.selectedSlideLang]?.panel
+                .length === 1
         ) {
-            this.selectSlide(this.editorStore.selectedSlideIndex, this.editorStore.selectedSlideLang, 0);
+            selectSlide(editorStore.selectedSlideIndex, editorStore.selectedSlideLang, 0);
         } else {
-            this.selectSlide(
-                this.editorStore.selectedSlideIndex,
-                this.editorStore.selectedSlideLang,
-                this.editorStore.selectedPanelIndex
-            );
+            selectSlide(editorStore.selectedSlideIndex, editorStore.selectedSlideLang, editorStore.selectedPanelIndex);
         }
 
         // Also runs updateSaveStatus, so we don't need to emit save-status
         // TODO: This is janky, throwing stuff around like hot potato. Refactor once the core variable refactor PR is merged.
-        this.onMetadataEdited();
+        onMetadataEdited();
+
+        // Indicate that undo/redo is done, if it was happening
+        stateStore.undoing = false;
+        stateStore.redoing = false;
     }
+);
 
-    @Watch('productStore.metadata', { deep: true })
-    onMetadataEdited(): void {
-        // Reload both metadata languages. Start with the other and then the current.
-        const otherLang = this.editorStore.configLang === 'en' ? 'fr' : 'en';
-        if (this.productStore.configs[otherLang]) {
-            this.productStore.useConfig(this.productStore.configs[otherLang] as StoryRampConfig, true);
-        }
-        if (this.productStore.configs[this.editorStore.configLang]) {
-            this.productStore.useConfig(
-                this.productStore.configs[this.editorStore.configLang] as StoryRampConfig,
-                true
-            );
-        }
-        this.editorStore.updateSaveStatus(true);
-        this.stateStore.updateUndoRedoAbility();
-        this.stateStore.undoing = false;
-        this.stateStore.redoing = false;
-    }
+// =========================================
+// Lifecycle functions
 
-    created(): void {
-        this.productStore.uuid = this.$route.params.uid as string;
+onBeforeMount(() => {
+    productStore.uuid = $route.params.uid as string;
 
-        window.addEventListener('beforeunload', this.beforeWindowUnload);
+    window.addEventListener('beforeunload', beforeWindowUnload);
 
-        // Only fetch a product when there isn't one already in the productStore
-        if (this.editorStore.loadStatus === 'waiting') {
-            this.productStore
-                .generateRemoteConfig()
-                .then(() => {
-                    Message.success(this.$t('editor.editMetadata.message.successfulLoad'));
-                    // Need to wait until product data is loaded into store before accessing it
-                    this.restoreProperties();
-                    this.editorStore.loadExisting = true;
-                })
-                .catch(() => {
-                    // Handle any connection/lock errors here
-                    Message.error(this.$t('editor.editMetadata.message.error.unauthorized'));
-                    setTimeout(() => {
-                        this.$router.push({ name: 'home' });
-                    }, 2000);
-                });
-        } else {
-            this.restoreProperties();
-        }
-
-        // extend the session
-        this.editorStore.extendSession(true);
-
-        this.fetchMarkdown();
-    }
-
-    mounted(): void {
-        console.log(' ');
-        console.log('editor mounted');
-        // from https://css-tricks.com/how-to-detect-when-a-sticky-element-gets-pinned/
-        const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-40', e.intersectionRatio < 1), {
-            threshold: [1]
-        });
-
-        observer.observe(document.querySelector('.editor-header') as Element);
-        this.dropdownButtonWidth = (this.$refs.dropdownButton as HTMLElement).offsetWidth ?? 0;
-
-        this.editorStore.registerEditorComponent(this); // store this component in the editorStore
-    }
-
-    beforeDestroy(): void {
-        window.removeEventListener('beforeunload', this.beforeWindowUnload);
-    }
-
-    openMetadataModal() {
-        this.productStore.loadConfig(this.productStore.configs[this.editorStore.configLang]).then(() => {
-            this.$vfm.open('metadata-edit-modal');
-        });
-    }
-
-    /**
-     * Ensure that `loadSlides` and `currentSlide` are up to date with whats in the `productStore`. Essential after saving
-     * and resetting unsaved changes
-     */
-    restoreProperties() {
-        // TODO: When calling refreshConfig, `currentSlide` loses its reference to `slides` within the `productStore`. So
-        // `updateSlides()` would set `slideIndex` to -1. There may be a better workaround
-        const slideIndex = this.editorStore.selectedSlideIndex;
-        this.updateSlides();
-        // TODO: This would open the wrong panel if you were editing the right panel of a slide. We could keep track of
-        // the panel index somewhere and set it as needed
-        this.selectSlide(this.editorStore.selectedSlideIndex !== -1 ? this.editorStore.selectedSlideIndex : slideIndex);
-    }
-
-    refreshConfig(): void {
-        this.editorStore.currentSlide = '';
-        // Re-fetch the product from the server.
-        if (this.editorStore.loadExisting) {
-            this.editorStore.reloadExisting = true;
-            this.productStore.generateRemoteConfig().then(() => {
-                this.restoreProperties();
+    // Only fetch a product when there isn't one already in the productStore
+    if (editorStore.loadStatus === 'waiting') {
+        productStore
+            .generateRemoteConfig()
+            .then(() => {
+                Message.success(t('editor.editMetadata.message.successfulLoad'));
+                // Need to wait until product data is loaded into store before accessing it
+                restoreProperties();
+                editorStore.loadExisting = true;
+            })
+            .catch(() => {
+                // Handle any connection/lock errors here
+                Message.error(t('editor.editMetadata.message.error.unauthorized'));
+                setTimeout(() => {
+                    $router.push({ name: 'home' });
+                }, 2000);
             });
-        } else {
-            this.editorStore.reloadExisting = false;
-            this.productStore.generateNewConfig().then(() => {
-                this.restoreProperties();
-            });
-        }
+    } else {
+        restoreProperties();
     }
 
-    beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
-        this.$i18n.locale = to.params.lang as string;
-        document.onmousemove = () => undefined;
-        document.onkeydown = () => undefined;
+    // extend the session
+    editorStore.extendSession(true);
 
-        // Both `to` and `from` are guaranteed to have a uuid param, unlike in the `metadata-editor` component
-        const uuidChange = to.params.uid !== from.params.uid;
+    fetchMarkdown();
 
-        // Unlock the product when the uuid in the url is updated
-        if (uuidChange) {
-            this.lockStore.unlockStoryline();
-            clearTimeout(this.lockStore.confirmationTimeout);
-            clearTimeout(this.lockStore.endTimeout);
+    // More accurate page height for mobile
+    // Counts the URL bar for mobile browsers (e.g. iOS Safari) so the content doesn't vertically overshoot
+    // and get covered by the URL bar when it's opened
 
-            // Ensures that upon executing the created() hook, the product is fetched from the server
-            this.editorStore.loadStatus = 'waiting';
-            this.editorStore.currentSlide = '';
-        }
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-        next();
-    }
+    window.addEventListener('resize', () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    });
+});
 
-    beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
-        const curEditor = this.$route.name === 'editor';
-        const confirmationMessage = this.$t('editor.leaveWarning');
+onMounted(() => {
+    // from https://css-tricks.com/how-to-detect-when-a-sticky-element-gets-pinned/
+    const observer = new IntersectionObserver(([e]) => e.target.classList.toggle('z-40', e.intersectionRatio < 1), {
+        threshold: [1]
+    });
 
-        const stay =
-            !this.editorStore.sessionExpired &&
-            this.stateStore.isChanged &&
-            curEditor &&
-            !window.confirm(confirmationMessage);
-        // This component is going bye-bye, so we need to do some clean up so that timers cannot fire later.
-        clearTimeout(this.lockStore.confirmationTimeout);
-        clearTimeout(this.lockStore.endTimeout);
-        document.onmousemove = () => undefined;
-        document.onkeydown = () => undefined;
+    observer.observe(document.querySelector('.editor-header') as Element);
+    dropdownButtonWidth.value = (dropdownButton.value as HTMLElement).offsetWidth ?? 0;
 
-        // Always unlock product, regardless of if we're reloading or navigating to a diff page
-        this.lockStore.unlockStoryline();
+    // TODO: Does 'this' still work properly in composition API???
+    editorStore.registerEditorComponent(this); // store this component in the editorStore
+});
 
-        if (stay) {
-            next(false);
-        } else {
-            next();
-        }
-    }
+onBeforeUnmount(() => {
+    window.removeEventListener('beforeunload', beforeWindowUnload);
+});
 
-    /**
-     * Opens the mobile sidebar drawer.
-     */
-    openSidebar(): void {
-        document.getElementById('sidebar-mobile')!.style.width = '20rem';
-        document.getElementById('overlay')!.style.display = 'block'; // Show the overlay
-        document.body.style.overflow = 'hidden'; // Disable background scrolling
-    }
+// =========================================
+// Component functions
 
-    /**
-     * Closes the mobile sidebar drawer.
-     */
-    closeSidebar(): void {
-        document.getElementById('sidebar-mobile')!.style.width = '0px';
-        document.getElementById('overlay')!.style.display = 'none'; // Hide the overlay
-        document.body.style.overflow = ''; // Re-enable background scrolling
-    }
+function openMetadataModal() {
+    productStore.loadConfig(productStore.configs[editorStore.configLang]).then(() => {
+        $vfm.open('metadata-edit-modal');
+    });
+}
+/**
+ * Ensure that `loadSlides` and `currentSlide` are up to date with whats in the `productStore`. Essential after saving
+ * and resetting unsaved changes
+ */
+function restoreProperties() {
+    // TODO: When calling refreshConfig, `currentSlide` loses its reference to `slides` within the `productStore`. So
+    // `updateSlides()` would set `slideIndex` to -1. There may be a better workaround
+    const index = editorStore.selectedSlideIndex;
+    updateSlides();
+    // TODO: This would open the wrong panel if you were editing the right panel of a slide. We could keep track of
+    // the panel index somewhere and set it as needed
+    selectSlide(editorStore.selectedSlideIndex !== -1 ? editorStore.selectedSlideIndex : index);
+}
 
-    /**
-     * Change current slide to selected slide.
-     */
-    selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number): void {
-        const configLang = this.editorStore.configLang;
-
-        // save changes to current slide before changing slides
-        if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as SlideEditorV).saveChanges();
-        }
-
-        // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
-        this.editorStore.currentSlide = {
-            title: '',
-            panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
-        };
-
-        const newLang = lang || configLang || 'en';
-        if (configLang !== newLang) {
-            this.editorStore.changeLang(newLang);
-        }
-
-        setTimeout(() => {
-            if (index === -1 || !this.loadSlides || !this.loadSlides[index] || !this.loadSlides[index]?.[newLang]?.panel) {
-                this.editorStore.currentSlide = '';
-            } else {
-                const selectedLang = newLang as keyof MultiLanguageSlide;
-                const selectedSlide = this.loadSlides[index][selectedLang];
-
-                // If the requested language config for a slide doesn't exist, open the other language
-                // This edge case should ONLY pop up while using the "Next/Previous Slide" buttons
-                this.editorStore.currentSlide =
-                    selectedSlide ?? this.loadSlides[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
-            }
-            this.editorStore.selectedSlideIndex = index;
-            (this.$refs.slide as SlideEditorV).panelIndex = panelIndex ?? 0;
-            this.editorStore.selectedPanelIndex = panelIndex ?? 0;
-            this.editorStore.selectedSlideLang = newLang;
-
-            (this.$refs.slide as SlideEditorV).advancedEditorView = false;
-        }, 5);
-    }
-
-    /**
-     * Update slide for a custom config made through advanced editor.
-     */
-    updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
-        const currentLang = this.editorStore.selectedSlideLang;
-
-        this.productStore.slidesWorkingCopy[this.editorStore.selectedSlideIndex][
-            (lang ?? currentLang) as keyof MultiLanguageSlide
-        ] = this.editorStore.currentSlide as Slide;
-
-        this.productStore.configs[(lang ?? currentLang) as keyof MultiLanguageSlide]!.slides[
-            this.editorStore.selectedSlideIndex
-        ] = this.editorStore.currentSlide as Slide;
-
-        // save changes emitted from advanced editor
-        if (save) {
-            this.productStore.onSave();
-        }
-    }
-
-    /**
-     * Updates slides after adding, removing, or reordering.
-     */
-    updateSlides(dontEmitEvent?: boolean, dontChangeIndex?: boolean): void {
-        this.loadSlides = this.productStore.slidesWorkingCopy;
-        if (!dontChangeIndex && this.editorStore.currentSlide !== '') {
-            this.editorStore.selectedSlideIndex = this.loadSlides.findIndex(
-                (bothSlides) =>
-                    (this.editorStore.currentSlide as Slide) === bothSlides['en'] ||
-                    (this.editorStore.currentSlide as Slide) === bothSlides['fr']
-            );
-        }
-
-        this.productStore.configs.en!.slides = this.productStore.slidesWorkingCopy.map((slides) => slides.en!);
-        this.productStore.configs.fr!.slides = this.productStore.slidesWorkingCopy.map((slides) => slides.fr!);
-
-        if (!dontEmitEvent) {
-            this.editorStore.updateSaveStatus(undefined, 'Slide updated');
-        }
-    }
-
-    /**
-     * Fetch markdown content for help panel.
-     */
-    fetchMarkdown(): void {
-        const helpPath = process.env.NODE_ENV === 'development' ? `../../help/` : `./help/`;
-        const helpFile = `respect-help-${this.$route.params.lang}.md`;
-
-        axios.get(`${helpPath}${helpFile}`).then((r) => {
-            const reg = /^#\s(.*)\n{2}(?:.+|\n(?!\n{2,}))*/gm;
-            const renderer = new marked.Renderer();
-            renderer.image = (href: string, title: string, text: string) => {
-                if (href.indexOf('http') === -1) {
-                    href = helpPath + 'images/' + href;
-                }
-                return `<img src="${href}" alt="${text}">`;
-            };
-            this.helpMd = r.data.replace(new RegExp(String.fromCharCode(13), 'g'), '');
-            let section;
-            while ((section = reg.exec(this.helpMd))) {
-                const info_results = marked(section[0].split('\n').splice(2).join('\n'), { renderer }) as string;
-                this.helpSections.push({
-                    header: section[1],
-                    info: info_results,
-                    drawn: true,
-                    expanded: false
-                });
-                //copy of the original text to refer to after highlighting
-                this.originalTextArray.push(info_results);
-            }
+function refreshConfig(): void {
+    editorStore.currentSlide = '';
+    // Re-fetch the product from the server.
+    if (editorStore.loadExisting) {
+        editorStore.reloadExisting = true;
+        productStore.generateRemoteConfig().then(() => {
+            restoreProperties();
         });
-    }
-
-    /**
-     * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
-     * @param index The index of the slide to scroll to.
-     */
-    scrollToElement(index: number): void {
-        setTimeout(() => {
-            document
-                .getElementById((this.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 10);
-    }
-
-    exportProduct(): void {
-        if (this.$refs.slide != null && this.editorStore.currentSlide !== '') {
-            (this.$refs.slide as SlideEditorV).saveChanges();
-        }
-
-        this.productStore.generateConfig(false);
-
-        this.productStore.configFileStructure.zip.generateAsync({ type: 'blob' }).then(
-            (blob) => {
-                saveAs(blob, `${this.productStore.configFileStructure.uuid}.zip`);
-                Message.success(this.$t('editor.export.success'));
-            },
-            (err) => {
-                Message.error(this.$t('editor.export.error'));
-            }
-        );
-    }
-
-    /**
-     * Open current editor config as a new Storylines product in new tab.
-     * @param language The config language to preview (either 'en' or 'fr')
-     */
-    preview(language: string): void {
-        // save current slide final changes before previewing product
-        if (this.$refs.slide != null && this.editorStore.currentSlide !== '') {
-            (this.$refs.slide as SlideEditorV).saveChanges();
-        }
-
-        const previewConfigs = this.productStore.configs;
-        // Replace undefined slides with empty slides, just like in final save
-        previewConfigs.en!.slides = previewConfigs.en!.slides.map((slide) => {
-            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
+    } else {
+        editorStore.reloadExisting = false;
+        productStore.generateNewConfig().then(() => {
+            restoreProperties();
         });
-        previewConfigs.fr!.slides = previewConfigs.fr!.slides.map((slide) => {
-            return slide ?? JSON.parse(JSON.stringify(this.defaultBlankSlide));
-        });
-        const lockStore = useLockStore();
-
-        setTimeout(() => {
-            const routeData = this.$router.resolve({
-                name: 'preview',
-                params: { lang: language, uid: this.productStore.uuid }
-            });
-            const previewTab = window.open(routeData.href, '_blank');
-            (previewTab as Window).props = {
-                configs: previewConfigs,
-                configFileStructure: this.productStore.configFileStructure,
-                secret: lockStore.secret,
-                timeRemaining: lockStore.timeRemaining
-            };
-        }, 5);
-    }
-
-    saveChanges(): void {
-        console.log(' ');
-        console.log('editor - saveChanges()');
-        // save current slide final changes before generating config file
-        if (this.$refs.slide !== undefined) {
-            (this.$refs.slide as SlideEditorV).saveChanges();
-        }
-
-        this.productStore.onSave().then(this.restoreProperties);
-    }
-
-    beforeWindowUnload(e: BeforeUnloadEvent): void {
-        // show popup if when leaving page with unsaved changes, or with a brand new product
-        if ((this.stateStore.isChanged && !window.confirm()) || !this.editorStore.loadExisting) {
-            e.preventDefault();
-        }
     }
 }
 
-// More accurate page height for mobile
-// Counts the URL bar for mobile browsers (e.g. iOS Safari) so the content doesn't vertically overshoot
-// and get covered by the URL bar when it's opened
+// TODO: This is not used. Remove?
+function beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
+    $i18n.locale = to.params.lang as string;
+    document.onmousemove = () => undefined;
+    document.onkeydown = () => undefined;
 
-let vh = window.innerHeight * 0.01;
-document.documentElement.style.setProperty('--vh', `${vh}px`);
+    // Both `to` and `from` are guaranteed to have a uuid param, unlike in the `metadata-editor` component
+    const uuidChange = to.params.uid !== from.params.uid;
 
-window.addEventListener('resize', () => {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-});
+    // Unlock the product when the uuid in the url is updated
+    if (uuidChange) {
+        lockStore.unlockStoryline();
+        clearTimeout(lockStore.confirmationTimeout);
+        clearTimeout(lockStore.endTimeout);
+
+        // Ensures that upon executing the created() hook, the product is fetched from the server
+        editorStore.loadStatus = 'waiting';
+        editorStore.currentSlide = '';
+    }
+
+    next();
+}
+
+// TODO: This is not used. Remove?
+function beforeRouteLeave(
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: (cont?: boolean) => void
+): void {
+    const curEditor = $route.name === 'editor';
+    const confirmationMessage = t('editor.leaveWarning');
+
+    const stay =
+        !editorStore.sessionExpired && stateStore.isChanged && curEditor && !window.confirm(confirmationMessage);
+    // This component is going bye-bye, so we need to do some clean up so that timers cannot fire later.
+    clearTimeout(lockStore.confirmationTimeout);
+    clearTimeout(lockStore.endTimeout);
+    document.onmousemove = () => undefined;
+    document.onkeydown = () => undefined;
+
+    // Always unlock product, regardless of if we're reloading or navigating to a diff page
+    lockStore.unlockStoryline();
+
+    if (stay) {
+        next(false);
+    } else {
+        next();
+    }
+}
+
+/**
+ * Opens the mobile sidebar drawer.
+ */
+function openSidebar(): void {
+    document.getElementById('sidebar-mobile')!.style.width = '20rem';
+    document.getElementById('overlay')!.style.display = 'block'; // Show the overlay
+    document.body.style.overflow = 'hidden'; // Disable background scrolling
+}
+
+/**
+ * Closes the mobile sidebar drawer.
+ */
+function closeSidebar(): void {
+    document.getElementById('sidebar-mobile')!.style.width = '0px';
+    document.getElementById('overlay')!.style.display = 'none'; // Hide the overlay
+    document.body.style.overflow = ''; // Re-enable background scrolling
+}
+
+/**
+ * Change current slide to selected slide.
+ */
+function selectSlide(index: number, lang?: SupportedLanguages, panelIndex?: number): void {
+    const configLang = editorStore.configLang;
+
+    // save changes to current slide before changing slides
+    if (!slide.value !== undefined) {
+        slide.value?.saveChanges();
+    }
+
+    // Quickly swap to loading page, and then swap to new slide. Allows Vue to re-draw page correctly.
+    editorStore.currentSlide = {
+        title: '',
+        panel: [{ type: 'loading-page' }, { type: 'loading-page' }]
+    };
+
+    const newLang = lang || configLang || 'en';
+    if (configLang !== newLang) {
+        editorStore.changeLang(newLang);
+    }
+
+    setTimeout(() => {
+        if (
+            index === -1 ||
+            !loadSlides.value ||
+            !loadSlides.value[index] ||
+            !loadSlides.value[index]?.[newLang]?.panel
+        ) {
+            editorStore.currentSlide = '';
+        } else {
+            const selectedLang = newLang as keyof MultiLanguageSlide;
+            const selectedSlide = loadSlides.value[index][selectedLang];
+
+            // If the requested language config for a slide doesn't exist, open the other language
+            // This edge case should ONLY pop up while using the "Next/Previous Slide" buttons
+            editorStore.currentSlide =
+                selectedSlide ?? loadSlides.value[index][selectedLang === 'en' ? 'fr' : 'en'] ?? '';
+        }
+        editorStore.selectedSlideIndex = index;
+        editorStore.selectedPanelIndex = panelIndex ?? 0;
+        editorStore.selectedSlideLang = newLang;
+        (slide.value as typeof SlideEditorV).panelIndex = panelIndex ?? 0;
+        (slide.value as typeof SlideEditorV).advancedEditorView = false;
+    }, 5);
+}
+
+/**
+ * Update slide for a custom config made through advanced editor.
+ */
+function updateCustomSlide(slideConfig: Slide, save?: boolean, lang?: string): void {
+    const configLang = editorStore.configLang;
+
+    productStore.slidesWorkingCopy[editorStore.selectedSlideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] =
+        editorStore.currentSlide as Slide;
+
+    if (productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]) {
+        productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[editorStore.selectedSlideIndex] =
+            editorStore.currentSlide as Slide;
+    }
+
+    // save changes emitted from advanced editor
+    if (save) {
+        productStore.onSave();
+    }
+}
+
+/**
+ * Updates slides after adding, removing, or reordering.
+ */
+function updateSlides(dontEmitEvent?: boolean, dontChangeIndex?: boolean): void {
+    loadSlides.value = productStore.slidesWorkingCopy;
+    if (!dontChangeIndex && editorStore.currentSlide !== '') {
+        editorStore.selectedSlideIndex = loadSlides.value!.findIndex(
+            (bothSlides) =>
+                (editorStore.currentSlide as Slide) === bothSlides['en'] ||
+                (editorStore.currentSlide as Slide) === bothSlides['fr']
+        );
+    }
+    productStore.configs.en!.slides = productStore.slidesWorkingCopy.map((slides) => slides.en!);
+    productStore.configs.fr!.slides = productStore.slidesWorkingCopy.map((slides) => slides.fr!);
+
+    if (!dontEmitEvent) {
+        editorStore.updateSaveStatus(undefined, 'Slide updated');
+    }
+}
+
+/**
+ * Fetch markdown content for help panel.
+ */
+function fetchMarkdown(): void {
+    const helpPath = process.env.NODE_ENV === 'development' ? `../../help/` : `./help/`;
+    const helpFile = `respect-help-${$route.params.lang}.md`;
+
+    axios.get(`${helpPath}${helpFile}`).then((r) => {
+        const reg = /^#\s(.*)\n{2}(?:.+|\n(?!\n{2,}))*/gm;
+        const renderer = new marked.Renderer();
+        renderer.image = (href: string, title: string, text: string) => {
+            if (href.indexOf('http') === -1) {
+                href = helpPath + 'images/' + href;
+            }
+            return `<img src="${href}" alt="${text}">`;
+        };
+        helpMd.value = r.data.replace(new RegExp(String.fromCharCode(13), 'g'), '');
+        let section;
+        while ((section = reg.exec(helpMd.value))) {
+            const info_results = marked(section[0].split('\n').splice(2).join('\n'), { renderer }) as string;
+            helpSections.value.push({
+                header: section[1],
+                info: info_results,
+                drawn: true,
+                expanded: false
+            });
+            //copy of the original text to refer to after highlighting
+            originalTextArray.value.push(info_results);
+        }
+    });
+}
+
+/**
+ * Smooth scroll to an element on the table of contents. Will end scroll in the middle of the ToC vertical area, if able.
+ * @param index The index of the slide to scroll to.
+ */
+function scrollToElement(index: number): void {
+    setTimeout(() => {
+        document
+            .getElementById((props.isMobileSidebar ? 'mobile' : '') + 'slide' + index)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 10);
+}
+
+function exportProduct(): void {
+    if (slide.value != null && editorStore.currentSlide !== '') {
+        (slide.value as typeof SlideEditorV).saveChanges();
+    }
+
+    productStore.generateConfig(false);
+
+    productStore.configFileStructure.zip.generateAsync({ type: 'blob' }).then(
+        (blob) => {
+            saveAs(blob, `${productStore.configFileStructure.uuid}.zip`);
+            Message.success(t('editor.export.success'));
+        },
+        (err) => {
+            Message.error(t('editor.export.error'));
+        }
+    );
+}
+
+/**
+ * Open current editor config as a new Storylines product in new tab.
+ * @param language The config language to preview (either 'en' or 'fr')
+ */
+function preview(language: string): void {
+    // save current slide final changes before previewing product
+    if (slide.value != null && editorStore.currentSlide !== '') {
+        slide.value.saveChanges();
+    }
+
+    const previewConfigs = productStore.configs;
+    // Replace undefined slides with empty slides, just like in final save
+    previewConfigs.en!.slides = previewConfigs.en!.slides.map((slide) => {
+        return slide ?? JSON.parse(JSON.stringify(defaultBlankSlide));
+    });
+    previewConfigs.fr!.slides = previewConfigs.fr!.slides.map((slide) => {
+        return slide ?? JSON.parse(JSON.stringify(defaultBlankSlide));
+    });
+    const lockStore = useLockStore();
+
+    setTimeout(() => {
+        const routeData = $router.resolve({
+            name: 'preview',
+            params: { lang: language, uid: productStore.uuid }
+        });
+        const previewTab = window.open(routeData.href, '_blank');
+        (previewTab as Window).props = {
+            configs: previewConfigs,
+            configFileStructure: productStore.configFileStructure,
+            secret: lockStore.secret,
+            timeRemaining: lockStore.timeRemaining
+        };
+    }, 5);
+}
+
+function saveChanges(): void {
+    // save current slide final changes before generating config file
+    if (slide.value !== undefined) {
+        (slide.value as typeof SlideEditorV).saveChanges();
+    }
+
+    productStore.onSave().then(restoreProperties);
+}
+
+function beforeWindowUnload(e: BeforeUnloadEvent): void {
+    // show popup if when leaving page with unsaved changes, or with a brand new product
+    if ((stateStore.isChanged && !window.confirm()) || !editorStore.loadExisting) {
+        e.preventDefault();
+    }
+}
+
+// =========================================
+// Component exposes
+
+defineExpose({ saveChanges });
 </script>
 
 <style lang="scss">
