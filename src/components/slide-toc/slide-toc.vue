@@ -83,7 +83,7 @@
         <!-- Loading spinner for when product is still being fetched -->
         <div v-if="editorStore.loadStatus !== 'loaded'" class="flex flex-col justify-center items-center p-10">
             <div class="py-10 text-l text-center">{{ $t('editor.editMetadata.loading') }}</div>
-            <spinner size="50px" color="#009cd1"></spinner>
+            <VueSpinnerOval size="50px" color="#009cd1" />
         </div>
 
         <!-- No slides message -->
@@ -101,7 +101,7 @@
         <ul v-if="editorStore.loadStatus === 'loaded'" class="toc-slide-list">
             <!-- Slide -->
             <!-- Dragging is turned off on mobile version as you can't scroll otherwise (component would think a scroll === a drag) -->
-            <draggable
+            <Draggable
                 :disabled="isMobileSidebar"
                 :list="productStore.slidesWorkingCopy"
                 @update="$emit('slides-updated')"
@@ -189,7 +189,7 @@
                                 <!-- ENG and FR configs for slide -->
                                 <section class="flex flex-col gap-0.5 text-sm w-64">
                                     <!-- ENG config for slide -->
-                                    <slide-toc-button
+                                    <SlideTocButton
                                         :element="element"
                                         selectedLang="en"
                                         :isMobileSidebar="isMobileSidebar"
@@ -206,7 +206,7 @@
                                         @createConfig="createNewConfig(index, 'en')"
                                     />
                                     <!-- Delete ENG confirmation modal -->
-                                    <action-modal
+                                    <ActionModal
                                         :name="`delete-slide-${index}-en-config`"
                                         :title="
                                             $t('editor.slides.deleteConfig.title', {
@@ -222,7 +222,7 @@
                                         @ok="createNewConfig(index, 'en')"
                                     />
                                     <!-- ENG copy other slide confirmation modal -->
-                                    <action-modal
+                                    <ActionModal
                                         :name="`copy-other-slide-${index}-en-config`"
                                         :title="$t('editor.slides.toc.copySlide.warning.title')"
                                         :message="
@@ -238,7 +238,7 @@
                                     />
                                     <hr v-if="isMobileSidebar" />
                                     <!-- FR config for slide -->
-                                    <slide-toc-button
+                                    <SlideTocButton
                                         :element="element"
                                         selectedLang="fr"
                                         :isMobileSidebar="isMobileSidebar"
@@ -255,7 +255,7 @@
                                         @createConfig="createNewConfig(index, 'fr')"
                                     />
                                     <!-- Delete FR confirmation modal -->
-                                    <action-modal
+                                    <ActionModal
                                         :name="`delete-slide-${index}-fr-config`"
                                         :title="
                                             $t('editor.slides.deleteConfig.title', {
@@ -271,7 +271,7 @@
                                         @ok="createNewConfig(index, 'fr')"
                                     />
                                     <!-- FR copy other slide confirmation modal -->
-                                    <action-modal
+                                    <ActionModal
                                         :name="`copy-other-slide-${index}-fr-config`"
                                         :title="$t('editor.slides.toc.copySlide.warning.title')"
                                         :message="
@@ -368,7 +368,7 @@
                             </div>
                         </div>
                         <!-- Delete slide confirmation modal -->
-                        <action-modal
+                        <ActionModal
                             :name="`delete-slide-${index}`"
                             :title="$t('editor.slides.deleteSlide.title', { num: index + 1 })"
                             :message="
@@ -387,12 +387,12 @@
                         />
                     </li>
                 </template>
-            </draggable>
+            </Draggable>
         </ul>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import ActionModal from '@/components/support/action-modal.vue';
 import JSZip from 'jszip';
 import SlideTocButton from '@/components/slide-toc/slide-toc-button.vue';
@@ -411,363 +411,381 @@ import {
     VideoPanel
 } from '@/definitions';
 import cloneDeep from 'clone-deep';
+import { marked } from 'marked';
 import { VueFinalModal } from 'vue-final-modal';
 import { useEditorStore } from '@/stores/editorStore';
 import { VueSpinnerOval } from 'vue3-spinners';
 
 import Message from 'vue-m-message';
-import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
-import ConfirmationModalV from '../support/confirmation-modal.vue';
+import Draggable from 'vuedraggable';
 
-import SlideEditorV from '../slide-editor.vue';
 import { useProductStore } from '@/stores/productStore';
+import { useI18n } from 'vue-i18n';
+import { onBeforeUnmount, onMounted } from 'vue';
+import use = marked.use;
 
-@Options({
-    components: {
-        ActionModal,
-        'slide-editor': SlideEditorV,
-        'confirmation-modal': ConfirmationModalV,
-        'vue-final-modal': VueFinalModal,
-        draggable,
-        SlideTocButton,
-        spinner: VueSpinnerOval
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        lang: string;
+        closeSidebar?: () => void;
+        isMobileSidebar?: boolean;
+    }>(),
+    {
+        closeSidebar: () => {},
+        isMobileSidebar: false
     }
-})
-export default class SlideTocV extends Vue {
-    @Prop() lang!: string;
-    @Prop() closeSidebar!: () => void;
-    @Prop({ default: false }) isMobileSidebar!: boolean;
+);
 
-    productStore = useProductStore();
-    editorStore = useEditorStore();
+const emit = defineEmits([
+    'slide-change',
+    'slides-updated',
+    'scroll-to-element',
+    'open-metadata-modal',
+    'close-sidebar'
+]);
 
-    defaultBlankSlide: Slide = {
-        title: '',
-        panel: [
-            {
-                type: 'text',
-                title: '',
-                content: ''
-            } as TextPanel,
-            {
-                type: 'text',
-                title: '',
-                content: ''
-            } as TextPanel
-        ],
-        includeInToc: true
-    };
+// =========================================
+// Definitions
 
-    /**
-     * Determines if a particular config is empty.
-     * @param slide Slide object to check.
-     * @param lang Specific config in slide to check ('en' or 'fr')
-     */
-    configEmpty(index: number, lang: keyof MultiLanguageSlide): boolean {
-        const slide: MultiLanguageSlide = this.productStore.slidesWorkingCopy[index];
-        return JSON.stringify(slide[lang]) === JSON.stringify(this.defaultBlankSlide);
-    }
+const { t } = useI18n();
+const productStore = useProductStore();
+const editorStore = useEditorStore();
 
-    /**
-     * Selects a config (english or french) of a particular slide, and opens its editor.
-     * @param index Index of slide to select (usually slide number [in UI] - 1)
-     * @param lang Specific config in slide to select ('en' or 'fr')
-     */
-    selectSlide(index: number, lang: string, panelIndex?: number, done?: Function): void {
-        this.$emit('slide-change', index, lang, panelIndex, done);
-    }
+const defaultBlankSlide: Slide = {
+    title: '',
+    panel: [
+        {
+            type: 'text',
+            title: '',
+            content: ''
+        } as TextPanel,
+        {
+            type: 'text',
+            title: '',
+            content: ''
+        } as TextPanel
+    ],
+    includeInToc: true
+};
 
-    /**
-     * Adds a new slide at the end of the current list.
-     */
-    addNewSlide(): void {
-        this.productStore.slidesWorkingCopy.push({
-            en: JSON.parse(JSON.stringify(this.defaultBlankSlide)),
-            fr: JSON.parse(JSON.stringify(this.defaultBlankSlide))
-        });
-        this.selectSlide(this.productStore.slidesWorkingCopy.length - 1, this.editorStore.selectedSlideLang);
-        this.$emit('slides-updated', this.productStore.slidesWorkingCopy);
-        this.$emit('scroll-to-element', this.productStore.slidesWorkingCopy.length - 1);
-    }
+// =========================================
+// Watchers
 
-    /**
-     * Deletes one of the language configs for a single slide. That config will be undefined after, and the slide will say "(No English/French Config)" or similar.
-     * @param slides A slide, containing an English and French config.
-     * @param currLang The config to delete, either 'en' for English of 'fr' for French.
-     */
-    deleteConfig(slides: MultiLanguageSlide, currLang: 'en' | 'fr'): void {
-        slides[currLang]?.panel.forEach((panel: BasePanel) => this.productStore.removeSourceCounts(panel));
-        slides[currLang] = undefined;
-        this.$emit('slides-updated');
-    }
+// =========================================
+// Lifecycle functions
 
-    /**
-     * Helper function to properly create new configs for any duplicated map panels/sub-panels,
-     * so editing the map panel on the original/duplicated map panel doesn't affect the other.
-     * @param lang The language of the slide config to handle.
-     * @param index The index of the slide config to handle.
-     */
-    async handleMapConfigForOneLang(lang: SupportedLanguages, index: number): Promise<void> {
-        // Need to use for loop, as forEach doesn't handle async properly
-        for (const panel of this.productStore.slidesWorkingCopy[index][lang]?.panel ?? []) {
-            if (panel.type === PanelType.Map) {
-                (panel as MapPanel).config = await this.productStore.duplicateMapConfig((panel as MapPanel).config);
-            } else if (panel.type === PanelType.Slideshow) {
-                // handle buried slideshow panel map configs
-                for (const slideshowItem of (panel as SlideshowPanel).items ?? []) {
-                    if (slideshowItem.type === PanelType.Map) {
-                        (slideshowItem as MapPanel).config = await this.productStore.duplicateMapConfig(
-                            (slideshowItem as MapPanel).config
-                        );
-                    }
+onMounted(() => {
+    window.addEventListener('resize', resizeMobile);
+
+    // More accurate page height for mobile
+    // Counts the URL bar for mobile browsers (e.g. iOS Safari) so the content doesn't vertically overshoot
+    // and get covered by the URL bar when it's opened
+
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+    window.addEventListener('resize', () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    });
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', resizeMobile);
+
+    window.removeEventListener('resize', () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    });
+});
+
+// =========================================
+// Component functions
+
+/**
+ * Determines if a particular config is empty.
+ * @param index Slide number to check.
+ * @param lang Specific config in slide to check ('en' or 'fr')
+ */
+function configEmpty(index: number, lang: keyof MultiLanguageSlide): boolean {
+    const slide: MultiLanguageSlide = productStore.slidesWorkingCopy[index];
+    return JSON.stringify(slide[lang]) === JSON.stringify(defaultBlankSlide);
+}
+
+/**
+ * Selects a config (english or french) of a particular slide, and opens its editor.
+ * @param index Index of slide to select (usually slide number [in UI] - 1)
+ * @param lang Specific config in slide to select ('en' or 'fr')
+ */
+function selectSlide(index: number, lang: string, panelIndex?: number, done?: Function): void {
+    emit('slide-change', index, lang, panelIndex, done);
+}
+
+/**
+ * Adds a new slide at the end of the current list.
+ */
+function addNewSlide(): void {
+    productStore.slidesWorkingCopy.push({
+        en: JSON.parse(JSON.stringify(defaultBlankSlide)),
+        fr: JSON.parse(JSON.stringify(defaultBlankSlide))
+    });
+    selectSlide(productStore.slidesWorkingCopy.length - 1, editorStore.selectedSlideLang);
+    emit('slides-updated', productStore.slidesWorkingCopy);
+    emit('scroll-to-element', productStore.slidesWorkingCopy.length - 1);
+}
+
+/**
+ * Deletes one of the language configs for a single slide. That config will be undefined after, and the slide will say "(No English/French Config)" or similar.
+ * @param slides A slide, containing an English and French config.
+ * @param currLang The config to delete, either 'en' for English of 'fr' for French.
+ */
+function deleteConfig(slides: MultiLanguageSlide, currLang: 'en' | 'fr'): void {
+    slides[currLang]?.panel.forEach((panel: BasePanel) => productStore.removeSourceCounts(panel));
+    slides[currLang] = undefined;
+    emit('slides-updated', productStore.slidesWorkingCopy);
+}
+
+/**
+ * Helper function to properly create new configs for any duplicated map panels/sub-panels,
+ * so editing the map panel on the original/duplicated map panel doesn't affect the other.
+ * @param lang The language of the slide config to handle.
+ * @param index The index of the slide config to handle.
+ */
+async function handleMapConfigForOneLang(lang: SupportedLanguages, index: number): Promise<void> {
+    // Need to use for loop, as forEach doesn't handle async properly
+    for (const panel of productStore.slidesWorkingCopy[index][lang]?.panel ?? []) {
+        if (panel.type === PanelType.Map) {
+            (panel as MapPanel).config = await productStore.duplicateMapConfig((panel as MapPanel).config);
+        } else if (panel.type === PanelType.Slideshow) {
+            // handle buried slideshow panel map configs
+            for (const slideshowItem of (panel as SlideshowPanel).items ?? []) {
+                if (slideshowItem.type === PanelType.Map) {
+                    (slideshowItem as MapPanel).config = await productStore.duplicateMapConfig(
+                        (slideshowItem as MapPanel).config
+                    );
                 }
-            } else if (panel.type === PanelType.Dynamic) {
-                // handle buried dynamic panel map configs
-                for (const dynamicItem of (panel as DynamicPanel).children ?? []) {
-                    if (dynamicItem.panel.type === PanelType.Map) {
-                        (dynamicItem.panel as MapPanel).config = await this.productStore.duplicateMapConfig(
-                            (dynamicItem.panel as MapPanel).config
-                        );
-                    }
+            }
+        } else if (panel.type === PanelType.Dynamic) {
+            // handle buried dynamic panel map configs
+            for (const dynamicItem of (panel as DynamicPanel).children ?? []) {
+                if (dynamicItem.panel.type === PanelType.Map) {
+                    (dynamicItem.panel as MapPanel).config = await productStore.duplicateMapConfig(
+                        (dynamicItem.panel as MapPanel).config
+                    );
                 }
             }
         }
-    }
-
-    // Assumes that you've already checked that the other lang DOES have a config.
-    async copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): Promise<void> {
-        const oppositeLang = currLang === 'en' ? 'fr' : 'en';
-        // Called on each image/video panel in the opposite lang's config (at the provided index)
-        // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
-        // there). However, we must check beforehand whether an asset with the same name and contents already exists
-        // in the shared folder (in which case we do nothing), and if an asset with the same name and different
-        // contents already exists in the shared folder (in which case we give the asset uploaded to the shared
-        // asset folder a unique name)
-        const oppositeToSharedFolder = async (panel: ImagePanel | VideoPanel, oppositeLang: string): Promise<void> => {
-            // Copying to the shared folder isn't currently supported for maps or charts.
-            // TODO: remove this once it is supported
-            if ((panel as BasePanel).type === 'chart' || (panel as BasePanel).type === 'map') {
-                console.warn('Shared asset functionality is not currently supported for maps or charts.');
-                return;
-            }
-
-            if (panel.src) {
-                const assetSrc = panel.src.split('/');
-                const fileName = assetSrc.at(-1);
-                const assetType = fileName?.split('.').at(-1);
-                let inSharedAssets = assetSrc[2] === 'shared';
-                let sharedFileSource = `${this.productStore.configFileStructure.uuid}/assets/shared/${fileName}`;
-
-                // If the asset for this panel refers to the opposite lang's asset folder, we will assume that there
-                // is no asset in the shared asset folder with the same name and contents as this asset. Otherwise
-                // it would have already been moved there upon being uploaded
-                if (!inSharedAssets) {
-                    const oppositeFileSource = panel.src;
-                    const oppositeRelativePath = assetSrc.slice(3).join('/');
-                    let sharedAssetName = fileName;
-                    let compressedFile =
-                        this.productStore.configFileStructure.assets[oppositeLang].file(oppositeRelativePath);
-                    let i = 2;
-
-                    // If an asset with the same name, but different content, is already in the shared folder, we must
-                    // give the asset we are uploading a unique name. Otherwise the existing asset will be overwritten
-                    while (this.productStore.configFileStructure.assets['shared'].file(sharedAssetName as string)) {
-                        sharedAssetName = `${compressedFile?.name.split('.').at(0)}(${i}).${compressedFile?.name
-                            .split('.')
-                            .at(-1)}`;
-                        i++;
-                    }
-                    sharedFileSource = `${this.productStore.configFileStructure.uuid}/assets/shared/${sharedAssetName}`;
-                    await compressedFile?.async(assetType !== 'svg' ? 'blob' : 'text').then((assetFile) => {
-                        if (assetType === 'svg') {
-                            assetFile = new File([assetFile], fileName as string, {
-                                type: 'image/svg+xml'
-                            });
-                        }
-                        this.productStore.configFileStructure.assets[oppositeLang].remove(oppositeRelativePath);
-                        this.productStore.configFileStructure.assets['shared'].file(
-                            sharedAssetName as string,
-                            assetFile
-                        );
-                        this.productStore.sourceCounts[sharedFileSource] =
-                            this.productStore.sourceCounts[oppositeFileSource] ?? 0;
-                        this.productStore.sourceCounts[oppositeFileSource] = 0;
-                        this.productStore.updateToSharedAsset(oppositeFileSource, sharedFileSource, oppositeLang);
-                    });
-                }
-                this.productStore.sourceCounts[sharedFileSource] += 1;
-            } else {
-                this.productStore.sourceCounts[panel.src] += 1;
-            }
-        };
-
-        this.productStore.slidesWorkingCopy[index][oppositeLang]?.panel.forEach((panel) => {
-            this.productStore.panelHelper(panel, oppositeToSharedFolder, oppositeLang);
-        });
-
-        // TODO: find better alternative to setTimeout. This code MUST execute after the callback above executes on each
-        // panel in the opposite lang's slide. Otherwise it will copy the contents of the opposite config before its
-        // src values are updated
-        // (UPDATE: now panelHelper is in store, so we can make it return a Promise, and execute
-        // the below code once it resolves)
-        setTimeout(async () => {
-            (this.productStore.slidesWorkingCopy[index][currLang] as Slide)?.panel.forEach((panel) =>
-                this.productStore.removeSourceCounts(panel)
-            );
-            this.productStore.slidesWorkingCopy[index][currLang] = JSON.parse(
-                JSON.stringify(this.productStore.slidesWorkingCopy[index][oppositeLang])
-            );
-
-            // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
-            await this.handleMapConfigForOneLang(currLang, index);
-
-            this.$emit('slides-updated');
-            this.$emit('slide-change', index, currLang);
-        }, 300);
-    }
-
-    /**
-     * Creates a new blank config for a single language on a particular slide.
-     * @param index The index of the slide to be changed into a blank slide.
-     * @param currLang The language to create a blank config for.
-     */
-    createNewConfig(index: number, currLang: 'en' | 'fr'): void {
-        // Before wiping the slides, remove source counts as necessary.
-        this.productStore.slidesWorkingCopy[index][currLang]!.panel.forEach((panel: BasePanel) => {
-            // Remove source counts for each panel in the current config
-            this.productStore.removeSourceCounts(panel);
-        });
-
-        this.productStore.slidesWorkingCopy[index][currLang] = JSON.parse(JSON.stringify(this.defaultBlankSlide));
-
-        this.$emit('slides-updated');
-        this.$emit('slide-change', index, currLang);
-    }
-
-    /**
-     * Copies an entire slide, creating a new identical slide at the next index.
-     * @param index Index of the slide to copy.
-     */
-    async copySlide(index: number): Promise<void> {
-        // First switch to the slide for which the copy button was pressed. In the case where a new slide is created
-        // and copied right away, this will save changes for it
-        await new Promise<void>((resolve) => {
-            this.selectSlide(index, this.lang, undefined, resolve);
-        });
-
-        // increment source count of each asset in this slide
-        const incrementSourceCounts = (panel: ImagePanel | VideoPanel | ChartPanel) => {
-            const source = !!panel.src
-                ? panel.src
-                : !!(panel as ChartPanel).config
-                  ? (panel as ChartPanel).config
-                  : undefined;
-            if (source) {
-                this.productStore.sourceCounts[source] += 1;
-            }
-        };
-        this.productStore.slidesWorkingCopy[index]?.en?.panel.forEach((panel) =>
-            this.productStore.panelHelper(panel, incrementSourceCounts)
-        );
-        this.productStore.slidesWorkingCopy[index]?.fr?.panel.forEach((panel) =>
-            this.productStore.panelHelper(panel, incrementSourceCounts)
-        );
-
-        // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
-        this.productStore.slidesWorkingCopy.splice(index + 1, 0, cloneDeep(this.productStore.slidesWorkingCopy[index]));
-
-        // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
-        await this.handleMapConfigForOneLang('en', index + 1);
-        await this.handleMapConfigForOneLang('fr', index + 1);
-
-        await new Promise<void>((resolve) => {
-            this.$emit('slides-updated', undefined, undefined, resolve);
-        });
-
-        Message.success(this.$t('editor.slide.copy.success'));
-        this.selectSlide(index + 1, this.editorStore.selectedSlideLang);
-        this.$emit('scroll-to-element', index + 1);
-    }
-
-    /**
-     * Deletes a slide.
-     * @param index Index of the slide to delete.
-     */
-    removeSlide(index: number): void {
-        if (index === this.editorStore.selectedSlideIndex) {
-            this.selectSlide(-1, this.editorStore.selectedSlideLang);
-        }
-
-        // Before removing the slide, updated the sources for the panels.
-        this.removeSourceCounts(index);
-
-        this.productStore.slidesWorkingCopy.splice(index, 1);
-        this.selectSlide(this.productStore.slidesWorkingCopy.length - 1, this.editorStore.selectedSlideLang);
-        this.$emit('slides-updated');
-    }
-
-    removeSourceCounts(deletedIndex: number): void {
-        let panelEn = this.productStore.slidesWorkingCopy.find(
-            (slide: MultiLanguageSlide, idx: number) => idx === deletedIndex
-        )?.en?.panel;
-        let panelFr = this.productStore.slidesWorkingCopy.find(
-            (slide: MultiLanguageSlide, idx: number) => idx === deletedIndex
-        )?.fr?.panel;
-
-        panelEn?.forEach((p: BasePanel) => this.productStore.removeSourceCounts(p));
-        panelFr?.forEach((p: BasePanel) => this.productStore.removeSourceCounts(p));
-    }
-
-    moveUp(index: number): void {
-        this.moveDown(index - 1);
-        this.$emit('scroll-to-element', index - 1);
-    }
-
-    moveDown(index: number): void {
-        this.productStore.slidesWorkingCopy.splice(
-            index + 1,
-            0,
-            this.productStore.slidesWorkingCopy.splice(index, 1)[0]
-        );
-        this.$emit('scroll-to-element', index + 1);
-        this.$emit('slides-updated');
-    }
-
-    getSlideId(slide: MultiLanguageSlide): string {
-        return 'slide' + this.productStore.slidesWorkingCopy.indexOf(slide);
-    }
-
-    resizeMobile(): void {
-        let overlayElement = document.getElementById('overlay');
-        let sidebarElement = document.getElementById('sidebar-mobile');
-
-        if (overlayElement?.style.display != 'none' && window.innerWidth >= 768) {
-            overlayElement!.style.display = 'none';
-        } else if (sidebarElement?.style.width === '20rem' && window.innerWidth < 768) {
-            overlayElement!.style.display = 'block';
-        }
-    }
-    mounted() {
-        window.addEventListener('resize', this.resizeMobile);
-    }
-
-    beforeDestroy() {
-        window.removeEventListener('resize', this.resizeMobile);
     }
 }
 
-// More accurate page height for mobile
-// Counts the URL bar for mobile browsers (e.g. iOS Safari) so the content doesn't vertically overshoot
-// and get covered by the URL bar when it's opened
+// Assumes that you've already checked that the other lang DOES have a config.
+async function copyConfigFromOtherLang(index: number, currLang: keyof MultiLanguageSlide): Promise<void> {
+    const oppositeLang = currLang === 'en' ? 'fr' : 'en';
+    // Called on each image/video panel in the opposite lang's config (at the provided index)
+    // The asset within this panel (assuming one exists) must be moved to the shared folder (if its not already
+    // there). However, we must check beforehand whether an asset with the same name and contents already exists
+    // in the shared folder (in which case we do nothing), and if an asset with the same name and different
+    // contents already exists in the shared folder (in which case we give the asset uploaded to the shared
+    // asset folder a unique name)
+    const oppositeToSharedFolder = async (panel: ImagePanel | VideoPanel, oppositeLang: string): Promise<void> => {
+        // Copying to the shared folder isn't currently supported for maps or charts.
+        // TODO: remove this once it is supported
+        if ((panel as BasePanel).type === 'chart' || (panel as BasePanel).type === 'map') {
+            console.warn('Shared asset functionality is not currently supported for maps or charts.');
+            return;
+        }
 
-let vh = window.innerHeight * 0.01;
-document.documentElement.style.setProperty('--vh', `${vh}px`);
+        if (panel.src) {
+            const assetSrc = panel.src.split('/');
+            const fileName = assetSrc.at(-1);
+            const assetType = fileName?.split('.').at(-1);
+            let inSharedAssets = assetSrc[2] === 'shared';
+            let sharedFileSource = `${productStore.configFileStructure.uuid}/assets/shared/${fileName}`;
 
-window.addEventListener('resize', () => {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-});
+            // If the asset for this panel refers to the opposite lang's asset folder, we will assume that there
+            // is no asset in the shared asset folder with the same name and contents as this asset. Otherwise
+            // it would have already been moved there upon being uploaded
+            if (!inSharedAssets) {
+                const oppositeFileSource = panel.src;
+                const oppositeRelativePath = assetSrc.slice(3).join('/');
+                let sharedAssetName = fileName;
+                let compressedFile = productStore.configFileStructure.assets[oppositeLang].file(oppositeRelativePath);
+                let i = 2;
+
+                // If an asset with the same name, but different content, is already in the shared folder, we must
+                // give the asset we are uploading a unique name. Otherwise the existing asset will be overwritten
+                while (productStore.configFileStructure.assets['shared'].file(sharedAssetName as string)) {
+                    sharedAssetName = `${compressedFile?.name.split('.').at(0)}(${i}).${compressedFile?.name
+                        .split('.')
+                        .at(-1)}`;
+                    i++;
+                }
+                sharedFileSource = `${productStore.configFileStructure.uuid}/assets/shared/${sharedAssetName}`;
+                await compressedFile?.async(assetType !== 'svg' ? 'blob' : 'text').then((assetFile) => {
+                    if (assetType === 'svg') {
+                        assetFile = new File([assetFile], fileName as string, {
+                            type: 'image/svg+xml'
+                        });
+                    }
+                    productStore.configFileStructure.assets[oppositeLang].remove(oppositeRelativePath);
+                    productStore.configFileStructure.assets['shared'].file(sharedAssetName as string, assetFile);
+                    productStore.sourceCounts[sharedFileSource] = productStore.sourceCounts[oppositeFileSource] ?? 0;
+                    productStore.sourceCounts[oppositeFileSource] = 0;
+                    productStore.updateToSharedAsset(oppositeFileSource, sharedFileSource, oppositeLang);
+                });
+            }
+            productStore.sourceCounts[sharedFileSource] += 1;
+        } else {
+            productStore.sourceCounts[panel.src] += 1;
+        }
+    };
+
+    productStore.slidesWorkingCopy[index][oppositeLang]?.panel.forEach((panel) => {
+        productStore.panelHelper(panel, oppositeToSharedFolder, oppositeLang);
+    });
+
+    // TODO: find better alternative to setTimeout. This code MUST execute after the callback above executes on each
+    // panel in the opposite lang's slide. Otherwise it will copy the contents of the opposite config before its
+    // src values are updated (update: now panelHelper is in store, so we can make it return a Promise, and execute
+    // the below code once it resolves)
+    // (UPDATE: now panelHelper is in store, so we can make it return a Promise, and execute
+    // the below code once it resolves)
+    setTimeout(async () => {
+        (productStore.slidesWorkingCopy[index][currLang] as Slide)?.panel.forEach((panel) =>
+            productStore.removeSourceCounts(panel)
+        );
+        productStore.slidesWorkingCopy[index][currLang] = JSON.parse(
+            JSON.stringify(productStore.slidesWorkingCopy[index][oppositeLang])
+        );
+
+        // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
+        await handleMapConfigForOneLang(currLang, index);
+
+        emit('slides-updated');
+        emit('slide-change', index, currLang);
+    }, 300);
+}
+
+/**
+ * Creates a new blank config for a single language on a particular slide.
+ * @param index The index of the slide to be changed into a blank slide.
+ * @param currLang The language to create a blank config for.
+ */
+function createNewConfig(index: number, currLang: 'en' | 'fr'): void {
+    // Before wiping the slides, remove source counts as necessary.
+    productStore.slidesWorkingCopy[index][currLang]!.panel?.forEach((panel: BasePanel) => {
+        // Remove source counts for each panel in the current config
+        productStore.removeSourceCounts(panel);
+    });
+
+    productStore.slidesWorkingCopy[index][currLang] = JSON.parse(JSON.stringify(defaultBlankSlide));
+
+    emit('slides-updated');
+    emit('slide-change', index, currLang);
+}
+
+/**
+ * Copies an entire slide, creating a new identical slide at the next index.
+ * @param index Index of the slide to copy.
+ */
+async function copySlide(index: number): Promise<void> {
+    // First switch to the slide for which the copy button was pressed. In the case where a new slide is created
+    // and copied right away, this will save changes for it
+    await new Promise<void>((resolve) => {
+            selectSlide(index, editorStore.selectedSlideLang, undefined, resolve);
+        });
+
+    // increment source count of each asset in this slide
+    const incrementSourceCounts = (panel: ImagePanel | VideoPanel | ChartPanel) => {
+        const source = !!panel.src
+            ? panel.src
+            : !!(panel as ChartPanel).config
+              ? (panel as ChartPanel).config
+              : undefined;
+        if (source) {
+            productStore.sourceCounts[source] += 1;
+        }
+    };
+    productStore.slidesWorkingCopy[index]?.en?.panel.forEach((panel) =>
+        productStore.panelHelper(panel, incrementSourceCounts)
+    );
+    productStore.slidesWorkingCopy[index]?.fr?.panel.forEach((panel) =>
+        productStore.panelHelper(panel, incrementSourceCounts)
+    );
+
+    // Copy must be created after changes have been saved for the copied slide (via the above call to selectSlide())
+    productStore.slidesWorkingCopy.splice(index + 1, 0, cloneDeep(productStore.slidesWorkingCopy[index]));
+
+    // Create new configs for any duplicated map panels, so editing map panel on original/duplicated map panel doesn't affect the other
+    await handleMapConfigForOneLang('en', index + 1);
+    await handleMapConfigForOneLang('fr', index + 1);
+
+    await new Promise<void>((resolve) => {
+        emit('slides-updated', productStore.slidesWorkingCopy, undefined, resolve);
+    });
+    selectSlide(index + 1, editorStore.selectedSlideLang);
+    Message.success(t('editor.slide.copy.success'));
+    emit('scroll-to-element', index + 1);
+}
+
+/**
+ * Deletes a slide.
+ * @param index Index of the slide to delete.
+ */
+function removeSlide(index: number): void {
+    if (index === editorStore.selectedSlideIndex) {
+        selectSlide(-1, editorStore.selectedSlideLang);
+    }
+
+    // Before removing the slide, update the sources for the panels.
+    removeSourceCounts(index);
+
+    productStore.slidesWorkingCopy.splice(index, 1);
+    emit('slides-updated', productStore.slidesWorkingCopy);
+}
+
+function removeSourceCounts(deletedIndex: number): void {
+    let panelEn = productStore.slidesWorkingCopy.find((slide: MultiLanguageSlide, idx: number) => idx === deletedIndex)
+        ?.en?.panel;
+    let panelFr = productStore.slidesWorkingCopy.find((slide: MultiLanguageSlide, idx: number) => idx === deletedIndex)
+        ?.fr?.panel;
+
+    panelEn?.forEach((p: BasePanel) => productStore.removeSourceCounts(p));
+    panelFr?.forEach((p: BasePanel) => productStore.removeSourceCounts(p));
+}
+
+function moveUp(index: number): void {
+    moveDown(index - 1);
+    emit('scroll-to-element', index - 1);
+}
+
+function moveDown(index: number): void {
+    productStore.slidesWorkingCopy.splice(index + 1, 0, productStore.slidesWorkingCopy.splice(index, 1)[0]);
+    emit('scroll-to-element', index + 1);
+    emit('slides-updated', productStore.slidesWorkingCopy);
+}
+
+function getSlideId(slide: MultiLanguageSlide): string {
+    return 'slide' + productStore.slidesWorkingCopy.indexOf(slide);
+}
+
+function resizeMobile(): void {
+    let overlayElement = document.getElementById('overlay');
+    let sidebarElement = document.getElementById('sidebar-mobile');
+
+    if (overlayElement?.style.display != 'none' && window.innerWidth >= 768) {
+        overlayElement!.style.display = 'none';
+    } else if (sidebarElement?.style.width === '20rem' && window.innerWidth < 768) {
+        overlayElement!.style.display = 'block';
+    }
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="scss" scoped>

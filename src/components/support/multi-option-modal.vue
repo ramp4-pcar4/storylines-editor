@@ -1,5 +1,5 @@
 <template>
-    <vue-final-modal :modalId="name" :clickToClose="false" content-class="" class="flex justify-center items-center">
+    <VueFinalModal :modalId="name" :clickToClose="false" content-class="" class="flex justify-center items-center">
         <div
             class="multi-option-modal flex flex-col max-h-full overflow-y-auto mx-4 p-4 bg-white border rounded-xl space-y-2"
         >
@@ -38,35 +38,57 @@
                 </div>
             </div>
         </div>
-    </vue-final-modal>
+    </VueFinalModal>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { getCurrentInstance } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
+
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
+
+const props = withDefaults(
+    defineProps<{
+        name: string;
+        title: string;
+        message?: string;
+        options: modalOption[];
+        cancelAllowed?: boolean;
+    }>(),
+    {
+        cancelAllowed: false
+    }
+);
+const emit = defineEmits(['Cancel']);
+
+// =========================================
+// Definitions
 
 interface modalOption {
     label: string;
     action: () => void;
 }
 
-@Options({
-    components: {
-        'vue-final-modal': VueFinalModal
-    }
-})
-export default class MetadataEditorV extends Vue {
-    @Prop() name!: string;
-    @Prop() title!: string;
-    @Prop() message!: string | undefined;
-    @Prop() options!: modalOption[];
-    @Prop({ default: false }) cancelAllowed!: boolean;
+const { proxy } = getCurrentInstance()!;
 
-    onCancel(): void {
-        this.$emit('Cancel');
-        this.$vfm.close(this.name);
-    }
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+function onCancel(): void {
+    emit('Cancel');
+    proxy!.$vfm.close(props.name);
 }
+
+// =========================================
+// Component exposes
 </script>
 
 <style scoped lang="css">

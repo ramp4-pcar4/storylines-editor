@@ -17,6 +17,8 @@ import { defineStore } from 'pinia';
 import { vfm } from '../plugins/vfm/index';
 import router from '../router';
 
+import { Slide } from '@/definitions';
+
 interface EditorState {
     loadExisting: boolean;
     reloadExisting: boolean;
@@ -29,7 +31,7 @@ interface EditorState {
     // Debounce timer used for updateSaveStatus only.
     // IMPORTANT: Avoid using stateStore's handlePotentialChange() directly, this timer may cause issues with change detection and saving to the configs variable.
     // Instead, ALWAYS call either updateSaveStatus() (if in metadata-editor) or emit the 'save-status' event instead!
-    debounceTimer: null;
+    debounceTimer: null | ReturnType<typeof setTimeout>;
     editorSaving: boolean;
     configLang: SupportedLanguages;
     selectedPanelIndex: number;
@@ -100,8 +102,6 @@ export const useEditorStore = defineStore('editor', {
         // TODO: do we need to be calling this function when updating the metadata for a new project? We get an "undefined is not valid JSON"
         // error each time changes are detected
         updateSaveStatus(payload: boolean | undefined, origin?: string): void {
-            console.log(' ');
-            console.log('updateSaveStatus()');
             const stateStore = useStateStore();
             const productStore = useProductStore();
 
@@ -128,10 +128,9 @@ export const useEditorStore = defineStore('editor', {
             // We prompt the user to extend the session when session warn minutes have passed.
             const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
             const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-            const timeBuffer = isFirefox ? 2000 : 0;
+            const timeBuffer = isFirefox ? 5000 : 0;
             lockStore.confirmationTimeout = setTimeout(
                 () => {
-                    console.log('confirmation timeout');
                     // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
                     document.onmousemove = () => undefined;
                     document.onkeydown = () => undefined;
@@ -143,7 +142,6 @@ export const useEditorStore = defineStore('editor', {
             // After the timer has run out, if the session was not extended, go back to the landing page (which will unlock the storyline).
             lockStore.endTimeout = setTimeout(
                 () => {
-                    console.log('endtimeout');
                     // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.
                     document.onmousemove = () => undefined;
                     document.onkeydown = () => undefined;
@@ -179,8 +177,6 @@ export const useEditorStore = defineStore('editor', {
         },
 
         clearData(): void {
-            console.log(' ');
-            console.log('editorStore - clearData()');
             this.changeUuid = '';
             this.error = false;
             this.warning = 'none';
@@ -198,9 +194,6 @@ export const useEditorStore = defineStore('editor', {
          * Ensure that `uuid` is a case-sensitive match with the product's uuid on the server
          */
         correctUuid(): Promise<void> {
-            console.log(' ');
-            console.log('correctUuid()');
-
             return new Promise((resolve, reject) => {
                 const productStore = useProductStore();
                 const lockStore = useLockStore();

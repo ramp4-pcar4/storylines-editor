@@ -10,7 +10,7 @@ import JSZip from 'jszip';
 
 import Message from 'vue-m-message';
 import { useI18n } from 'vue-i18n';
-import { computed, Ref } from 'vue';
+import { computed, ComputedRef, Ref } from 'vue';
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
 
@@ -37,6 +37,7 @@ import { useEditorStore } from './editorStore';
 import router from '../router';
 import { vfm } from '../plugins/vfm/index';
 import cloneDeep from 'clone-deep';
+import { ref } from 'vue';
 
 interface ProductState {
     configFileStructure: ConfigFileStructure;
@@ -48,13 +49,14 @@ interface ProductState {
     metadata: MetadataContent;
     temporaryMetadataCopy: MetadataContent;
     uuid: string;
-    user: Ref<string>;
-    i18n: any;
+    user: ComputedRef<string>;
+    loadEditor: boolean;
     logoImage: undefined | File;
     introBgImage: undefined | File;
     apiUrl: string;
     latestSchemaVersion: string;
     loadStatus: string;
+    i18n: ReturnType<typeof useI18n>;
 }
 
 export const useProductStore = defineStore('product', {
@@ -113,6 +115,7 @@ export const useProductStore = defineStore('product', {
             schemaVersion: ''
         } as MetadataContent,
         i18n: useI18n(),
+        loadEditor: false,
         uuid: '',
         user: computed(() => useUserStore().userProfile.userName || 'Guest'),
         logoImage: undefined as undefined | File,

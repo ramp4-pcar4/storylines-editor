@@ -10,7 +10,7 @@ export const useLockStore = defineStore('lock', {
         connected: false,
         received: false,
         timeInterval: undefined as NodeJS.Timeout | undefined,
-        timeRemaining: 100000000000000, // in seconds
+        timeRemaining: 100000000000000, // in SECONDS!!
         broadcast: undefined as BroadcastChannel | undefined,
         confirmationTimeout: undefined as NodeJS.Timeout | undefined, // the timer to show the session extension confirmation modal
         endTimeout: undefined as NodeJS.Timeout | undefined // the timer to kill the session due to timeout
@@ -50,8 +50,6 @@ export const useLockStore = defineStore('lock', {
         // Attempts to lock a storyline for this user.
         // Returns a promise that resolves if the lock was successfully fetched and rejects if it was not.
         async lockStoryline(uuid: string): Promise<void> {
-            console.log(' ');
-            console.log('lockStoryline()');
             // Stop the previous storyline's timer
             clearInterval(this.timeInterval);
 
@@ -88,8 +86,6 @@ export const useLockStore = defineStore('lock', {
             });
         },
         async transferLock(renameUuid: string): Promise<void> {
-            console.log(' ');
-            console.log('transferLock()');
             return new Promise((resolve, reject) => {
                 this.received = false;
                 this.socket?.send(
@@ -117,8 +113,6 @@ export const useLockStore = defineStore('lock', {
         },
         // Unlocks the curent storyline for this user. Only to be called on session end.
         unlockStoryline() {
-            console.log(' ');
-            console.log('unlockStoryline()');
             clearInterval(this.timeInterval);
             if (this.connected) {
                 this.socket!.send(JSON.stringify({ type: 'unlock', uuid: this.uuid, clientId: this.clientId }));
@@ -129,12 +123,12 @@ export const useLockStore = defineStore('lock', {
         },
         // Resets the current session back to a full 30 minutes.
         resetSession(overrideTime?: number) {
-            this.timeRemaining = 300;
-            // overrideTime !== undefined
-            //     ? overrideTime
-            //     : import.meta.env.VITE_APP_CURR_ENV
-            //     ? Number(import.meta.env.VITE_SESSION_END) * 60
-            //     : 1800; //  This value is in seconds!!! Don't mix up the units!!!
+            this.timeRemaining =
+                overrideTime !== undefined
+                    ? overrideTime
+                    : import.meta.env.VITE_APP_CURR_ENV
+                      ? Number(import.meta.env.VITE_SESSION_END) * 60
+                      : 1800; //  This value is in seconds!!! Don't mix up the units!!!
             clearInterval(this.timeInterval);
             // Update the time remaining every second.
             this.timeInterval = setInterval(() => {

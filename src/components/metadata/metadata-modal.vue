@@ -1,5 +1,5 @@
 <template>
-    <vue-final-modal
+    <VueFinalModal
         @click="productStore.saveMetadata(false)"
         modalId="metadata-edit-modal"
         content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl p-7 bg-white border rounded-lg"
@@ -44,30 +44,20 @@
                 </div>
             </div>
             <div class="mx-4">
-                <metadata-content></metadata-content>
+                <MetadataContentV></MetadataContentV>
             </div>
         </div>
-    </vue-final-modal>
+    </VueFinalModal>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import MetadataContentV from './metadata-content.vue';
-import { Options, Prop, Vue } from 'vue-property-decorator';
-import { MetadataContent } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import { useProductStore } from '@/stores/productStore';
 import { useEditorStore } from '@/stores/editorStore';
 
-@Options({
-    components: {
-        'metadata-content': MetadataContentV,
-        'vue-final-modal': VueFinalModal
-    }
-})
-export default class MetadataModalV extends Vue {
-    productStore = useProductStore();
-    editorStore = useEditorStore();
-}
+const productStore = useProductStore();
+const editorStore = useEditorStore();
 </script>
 
 <style lang="scss"></style>
