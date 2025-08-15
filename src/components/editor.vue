@@ -675,7 +675,9 @@ export default class EditorV extends Vue {
         const configLang = this.productStore.configLang;
 
         this.currentSlide = slideConfig;
-        this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+        if (this.slides[this.slideIndex]) {
+            this.slides[this.slideIndex][(lang ?? configLang) as keyof MultiLanguageSlide] = slideConfig;
+        }
 
         this.productStore.configs[(lang ?? configLang) as keyof MultiLanguageSlide]!.slides[this.slideIndex] =
             slideConfig;
