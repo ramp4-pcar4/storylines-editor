@@ -458,7 +458,7 @@
                     @slide-change="selectSlide"
                     @slide-edit="productStore.updateSaveStatus(undefined, 'ToC')"
                     @slides-updated="updateSlides"
-                    @open-metadata-modal="$vfm.open('metadata-edit-modal')"
+                    @open-metadata-modal="$emit('open-metadata-modal')"
                     :lang="productStore.configLang"
                 ></slide-toc>
             </div>

@@ -477,7 +477,6 @@
                                     <!-- New projects can only be in edit mode; existing projects can be in both -->
                                     <metadata-content
                                         :metadata="metadata"
-                                        :createNew="true && !editExisting"
                                         :editing="editingMetadata"
                                         @metadata-changed="updateMetadata"
                                         @image-changed="onFileChange"
@@ -623,6 +622,7 @@
                 @refresh-config="refreshConfig"
                 @export-product="exportProduct"
                 @lang-change="productStore.changeLang"
+                @open-metadata-modal="openMetadataModal"
                 ref="mainEditor"
             >
                 <!-- Metadata editing modal inside the editor -->
@@ -1127,8 +1127,9 @@ export default class MetadataEditorV extends Vue {
 
     /**
      * Generates a new product file for brand new products.
+     * @param uuidCheck Passed to configFileStructureHelper to control UUID validation behavior.
      */
-    generateNewConfig(): void {
+    generateNewConfig(uuidCheck: boolean = true): void {
         const configLang = this.productStore.configLang;
         const configZip = new JSZip();
         // Generate a new configuration file and populate required fields.
@@ -1158,19 +1159,30 @@ export default class MetadataEditorV extends Vue {
         config.slides = [];
 
         const otherLang = this.productStore.oppositeLang;
-        this.productStore.configs[otherLang] = cloneDeep(config);
-        (this.productStore.configs[otherLang] as StoryRampConfig).lang = otherLang;
-        const formattedOtherLangConfig = JSON.stringify(this.productStore.configs[otherLang], null, 4);
+        const baseConfig = (this.productStore.configs[otherLang] = cloneDeep(config));
+        Object.assign(baseConfig, {
+            title: '',
+            lang: this.productStore.oppositeLang,
+            contextLink: '',
+            contextLabel: '',
+            introSlide: {
+                title: '',
+                subtitle: '',
+                logo: { src: '', altText: '' },
+                backgroundImage: ''
+            }
+        });
+        const otherConfig = this.productStore.configs[otherLang] as StoryRampConfig;
+        const formattedOtherLangConfig = JSON.stringify(otherConfig, null, 4);
 
         // Add the newly generated Storylines configuration file to the ZIP file.
-        const fileName = `${this.uuid}_${configLang}.json`;
         const formattedConfigFile = JSON.stringify(config, null, 4);
 
-        configZip.file(fileName, formattedConfigFile);
+        configZip.file(`${this.uuid}_${configLang}.json`, formattedConfigFile);
         configZip.file(`${this.uuid}_${otherLang}.json`, formattedOtherLangConfig);
 
         // Generate the file structure, defer uploading the image until the structure is created.
-        this.configFileStructureHelper(configZip, [this.logoImage, this.introBgImage]);
+        this.configFileStructureHelper(configZip, uuidCheck, [this.logoImage, this.introBgImage]);
     }
 
     configHelper(): StoryRampConfig {
@@ -1583,7 +1595,11 @@ export default class MetadataEditorV extends Vue {
      * Generates or loads a ZIP file and creates required project folders if needed.
      * Returns an object that makes it easy to access any specific folder.
      */
-    async configFileStructureHelper(configZip: typeof JSZip, uploadFiles?: Array<File | undefined>): Promise<void> {
+    async configFileStructureHelper(
+        configZip: typeof JSZip,
+        uuidCheck: boolean = true,
+        uploadFiles?: Array<File | undefined>
+    ): Promise<void> {
         const assetsFolder = configZip.folder('assets');
         const chartsFolder = configZip.folder('charts');
         const rampConfigFolder = configZip.folder('ramp-config');
@@ -1617,7 +1633,7 @@ export default class MetadataEditorV extends Vue {
                 }
             });
         }
-        this.correctUuid();
+        if (uuidCheck) this.correctUuid();
     }
 
     /**
@@ -2130,10 +2146,10 @@ export default class MetadataEditorV extends Vue {
      */
     async swapLang(): Promise<void> {
         await this.saveMetadata(false, true);
-        this.productStore.configLang = this.productStore.oppositeLang;
         if (!this.productStore.configs[this.productStore.configLang]) {
-            return;
+            await this.generateNewConfig(false);
         }
+        this.productStore.configLang = this.productStore.oppositeLang;
         this.loadConfig(this.productStore.configs[this.productStore.configLang]);
     }
 
@@ -2362,7 +2378,26 @@ export default class MetadataEditorV extends Vue {
                 this.lockStore
                     .lockStoryline(this.uuid)
                     .then(() => {
-                        this.generateNewConfig();
+                        // Only generate config if not already present or UUID mismatch
+                        if (
+                            !this.productStore.configs[this.productStore.configLang] ||
+                            this.uuid !== this.productStore.configFileStructure?.uuid
+                        ) {
+                            this.generateNewConfig();
+                        } else {
+                            // Else config already exists and matches UUID, skip generation
+                            // Update each zip file with their latest changes before loading
+                            this.saveMetadata();
+
+                            const writeConfigFile = (lang: 'en' | 'fr') => {
+                                const configJson = JSON.stringify(this.productStore.configs[lang], null, 4);
+                                this.productStore.configFileStructure.zip.file(`${this.uuid}_${lang}.json`, configJson);
+                            };
+
+                            (['en', 'fr'] as const).forEach((lang) => writeConfigFile(lang));
+
+                            this.correctUuid();
+                        }
                     })
                     .catch(() => {
                         this.error = true;
@@ -2485,6 +2520,14 @@ export default class MetadataEditorV extends Vue {
     selectUuid(uuid: string): void {
         this.uuid = uuid;
         this.showDropdown = false;
+    }
+
+    /**
+     * Opens the metadata editing modal for the currently selected slide language.
+     */
+    openMetadataModal() {
+        this.loadConfig(this.productStore.configs[this.productStore.configLang]);
+        this.$vfm.open('metadata-edit-modal');
     }
 }
 </script>

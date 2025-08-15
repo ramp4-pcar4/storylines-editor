@@ -26,24 +26,13 @@
                 <h2 class="text-xl font-bold">{{ $t('editor.metadataForm.layoutAndNav.heading') }}</h2>
                 <!-- Same TOC orientation and return-to-top values across both ENG/FR configs -->
                 <div class="metadata-item">
-                    <div
-                        class="inline-flex gap-2 pt-2"
-                        v-tippy="{
-                            delay: '200',
-                            placement: 'bottom',
-                            content: createNew ? $t('editor.sameConfig.tooltip') : null,
-                            animateFill: true,
-                            touch: ['hold', 500],
-                            offset: [10, 2]
-                        }"
-                    >
+                    <div class="flex gap-2">
                         <input
                             v-show="editing"
                             type="checkbox"
                             id="sameConfig"
                             class="self-center rounded-none cursor-pointer w-4 h-4"
                             v-model="metadata.sameConfig"
-                            :disabled="createNew"
                             @change="metadataChanged"
                         />
                         <label class="respected-standard-label" for="sameConfig">{{ $t('editor.sameConfig') }}</label>
@@ -417,7 +406,6 @@ import ColourPickerInput from '../support/colour-picker-input.vue';
 export default class MetadataEditorV extends Vue {
     @Prop() metadata!: MetadataContent;
     @Prop({ default: true }) editing!: boolean;
-    @Prop({ default: true }) createNew!: boolean;
 
     openFileSelector(where = 'logoUpload'): void {
         document.getElementById(where)?.click();
