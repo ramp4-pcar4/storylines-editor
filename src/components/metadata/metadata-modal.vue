@@ -1,6 +1,6 @@
 <template>
     <vue-final-modal
-        @click="$emit('save-changes')"
+        @click="productStore.saveMetadata(false)"
         modalId="metadata-edit-modal"
         content-class="edit-metadata-content max-h-full overflow-y-auto max-w-xl p-7 bg-white border rounded-lg"
         class="flex justify-center items-center"
@@ -13,7 +13,7 @@
                         <!-- ENG/FR config toggle -->
                         <button
                             class="respected-standard-button respected-gray-border-button respected-thin-button"
-                            @click="$emit('lang-change')"
+                            @click="editorStore.swapLang()"
                             tabindex="0"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
                             </svg>
                             <p>
                                 {{
-                                    productStore.configLang === 'en'
+                                    editorStore.configLang === 'en'
                                         ? $t('editor.frenchConfig')
                                         : $t('editor.englishConfig')
                                 }}
@@ -36,7 +36,7 @@
                         </button>
                         <button
                             class="respected-standard-button respected-black-bg-button respected-thin-button"
-                            @click="$emit('save-changes')"
+                            @click="productStore.saveMetadata(false)"
                         >
                             {{ $t('editor.done') }}
                         </button>
@@ -44,15 +44,7 @@
                 </div>
             </div>
             <div class="mx-4">
-                <metadata-content
-                    :metadata="metadata"
-                    :createNew="false"
-                    @metadata-changed="(key: string, value: string) => $emit('metadata-changed', key, value)"
-                    @image-changed="(event: Event, type: string) => $emit('image-changed', event, type)"
-                    @image-source-changed="(event: Event, type: string) => $emit('image-source-changed', event, type)"
-                    @logo-removed="productStore.decrementSourceCount('Logo')"
-                    @background-removed="productStore.decrementSourceCount('Background')"
-                ></metadata-content>
+                <metadata-content :createNew="false"></metadata-content>
             </div>
         </div>
     </vue-final-modal>
@@ -64,26 +56,17 @@ import { Options, Prop, Vue } from 'vue-property-decorator';
 import { MetadataContent } from '@/definitions';
 import { VueFinalModal } from 'vue-final-modal';
 import { useProductStore } from '@/stores/productStore';
+import { useEditorStore } from '@/stores/editorStore';
 
 @Options({
     components: {
         'metadata-content': MetadataContentV,
         'vue-final-modal': VueFinalModal
-    },
-    emits: [
-        'metadata-changed',
-        'image-changed',
-        'image-source-changed',
-        'logo-removed',
-        'background-removed',
-        'lang-change',
-        'save-changes'
-    ]
+    }
 })
 export default class MetadataModalV extends Vue {
-    @Prop() metadata!: MetadataContent;
-
     productStore = useProductStore();
+    editorStore = useEditorStore();
 }
 </script>
 

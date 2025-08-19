@@ -144,6 +144,8 @@ export const useStateStore = defineStore('state', {
          * @param origin A string indicating where the change come from. Useful for determining origin of changes for undo/redo functionality
          */
         handlePotentialChange(newConfigs: Save, origin?: string): boolean {
+            console.log(' ');
+            console.log('handePotentialChange()');
             newConfigs.en!.slides = newConfigs.en!.slides.map((slide) => {
                 if (slide && Object.keys(slide)?.length) {
                     return purgeFalses(slide);
@@ -173,6 +175,7 @@ export const useStateStore = defineStore('state', {
 
             // There are no changes whatsoever from the last save. Set stuff accordingly.
             if (this.isDiffEmpty(newDiff)) {
+                console.log('no changes detected');
                 // Add an 'empty diff' to the list, indicating past changes have been erased.
                 // Doing this allows the erasing to be undone too (bring back past changes).
                 this.recordNewChange({
@@ -188,6 +191,7 @@ export const useStateStore = defineStore('state', {
             else if (
                 !Object.keys(diff(combinedPreviousDiffs !== 'external' ? combinedPreviousDiffs : {}, newDiff)).length
             ) {
+                console.log('no changes detected');
                 return false;
             }
 
@@ -202,6 +206,7 @@ export const useStateStore = defineStore('state', {
                 // If anyone disagrees, feel free to @ me.
                 changes: newDiff
             });
+            console.log('changes detected');
             this.isChanged = true;
             return true;
         },
@@ -210,7 +215,7 @@ export const useStateStore = defineStore('state', {
          * Delete all recorded diffs since the last save.
          * @param reconcile Whether to ask the app to 'refresh'.
          */
-        resetAllChanges(reconcile: boolean = true): void {
+        resetAllChanges(reconcile = true): void {
             this.currentLoc = -1;
             this.stateChangesList = [];
             this.isChanged = false;
@@ -280,6 +285,8 @@ export const useStateStore = defineStore('state', {
          * @param savedConfigs Configs with all the changes, to be saved.
          */
         save(savedConfigs: Save): void {
+            console.log(' ');
+            console.log('stateStore save');
             // Clear out any key-value properties with empty values
 
             savedConfigs.en!.slides = savedConfigs.en!.slides.map((slide) => {

@@ -4,15 +4,17 @@
         class="flex gap-2 px-2 rounded-md bg-transparent hover:bg-gray-200"
         :disabled="!element[selectedLang]"
         :class="{
-            'selected-toc-config-item': element[selectedLang] === currentSlide,
+            'selected-toc-config-item': element[selectedLang] === editorStore.currentSlide,
             'py-1': !isMobileSidebar,
             'py-2': isMobileSidebar,
-            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === currentSlide,
-            'cursor-not-allowed border-2 border-red-400': !element[selectedLang]
+            'border-2 border-blue-500': isMobileSidebar && element[selectedLang] === editorStore.currentSlide,
+            'cursor-not-allowed border-2 border-red-400': !element[selectedLang] || !element[selectedLang].panel
         }"
         @click.stop="
-            $emit('select-slide');
-            isMobileSidebar && $emit('close-sidebar');
+            if (element[selectedLang] && element[selectedLang].panel) {
+                $emit('select-slide');
+                isMobileSidebar && $emit('close-sidebar');
+            }
         "
     >
         <!-- ::lang:: text -->
@@ -163,6 +165,7 @@
 import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from './toc-options.vue';
+import { useEditorStore } from '@/stores/editorStore';
 
 import TextEditorIcon from '@/assets/text-editor.svg?raw';
 import ImageEditorIcon from '@/assets/image-editor.svg?raw';
@@ -181,12 +184,13 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
 export default class SlideTocV extends Vue {
     @Prop() selectedLang!: 'en' | 'fr';
     @Prop() element!: MultiLanguageSlide;
-    @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
     @Prop() isActiveSlide!: boolean;
 
     oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
+
+    editorStore = useEditorStore();
 
     textEditorIcon = TextEditorIcon;
     imageEditorIcon = ImageEditorIcon;
