@@ -1,1 +1,0 @@
-import{a as t}from"./projection-m8vi7Cxv-cWEnrV0m.js";function s(r,f,e){if(!e?.features||!e.hasZ)return;const o=t(e.geometryType,f,r.outSpatialReference);if(o!=null)for(const n of e.features)o(n.geometry)}export{s as n};
