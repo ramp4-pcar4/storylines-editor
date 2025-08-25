@@ -1,1 +1,0 @@
-import{fw as t,fD as n,fP as r,fG as o}from"./main-ChKuQKYp.js";const s={},l={xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"};function a(f,e){return n(),r("svg",l,e[0]||(e[0]=[o("path",{d:"M0 0h24v24H0z",fill:"none"},null,-1),o("path",{d:"M5 17l3-3 4 4 8-8","stroke-width":"2",fill:"none",stroke:"currentColor"},null,-1)]))}const w=t(s,[["render",a]]);export{w as default};
