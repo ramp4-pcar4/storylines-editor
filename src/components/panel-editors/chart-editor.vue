@@ -205,18 +205,22 @@ export default class ChartEditorV extends Vue {
     }
 
     fetchChartConfig(chart: ChartPanel | { config?: any; src?: string }, idx: number, chartName?: string) {
-        const chartSrc = chartName
-            ? `charts/${this.lang}/${chartName}.json`
-            : chart.src
-            ? chart.src.substring(chart.src.indexOf('/') + 1)
-            : '';
+        const chartSrc = chart.src.split('/').slice(1).join('/');
+        // chartName
+        //     ? `charts/${this.lang}/${chartName}.json`
+        //     : chart.src
+        //       ? chart.src.substring(chart.src.indexOf('/') + 1)
+        //       : '';
 
         let highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
 
         // If not found, create file from config
         if (!highchartsJson && chartName) {
             const title = chartName;
-            this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(chart.config, null, 4));
+            this.productStore.configFileStructure.charts[this.lang].file(
+                `${title}.json`,
+                JSON.stringify(chart.config, null, 4)
+            );
             highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
         }
 
