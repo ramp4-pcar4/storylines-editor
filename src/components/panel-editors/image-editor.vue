@@ -199,6 +199,13 @@ export default class ImageEditorV extends Vue {
     get isDragging(): boolean {
         return this.dragging;
     }
+    //
+    // @Watch('panel.caption')
+    // onCaptionChange() {
+    //     if (this.panel.caption !== this.slideshowCaption) {
+    //         this.slideshowCaption = this.panel.caption;
+    //     }
+    // }
 
     mounted(): void {
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
@@ -298,11 +305,12 @@ export default class ImageEditorV extends Vue {
         if (idx !== -1) {
             const assetSource = this.imagePreviews[idx].id;
             // Remove the image from the product ZIP file.
-            this.productStore.decrementSourceCount(assetSource);
-            if (!this.productStore.sourceExists(assetSource)) {
-                // Revote the object URL if the image has been fully removed.
-                URL.revokeObjectURL(this.imagePreviews[idx].src);
-            }
+            // TODO: Deleting the image breaks state management! We can't undo the deletion since the image is actually gone, and the config only stores the src!
+            // this.productStore.decrementSourceCount(assetSource);
+            // if (!this.productStore.sourceExists(assetSource)) {
+            //     // Revote the object URL if the image has been fully removed.
+            //     URL.revokeObjectURL(this.imagePreviews[idx].src);
+            // }
             this.imagePreviews.splice(idx, 1);
         }
         this.onImagesEdited();

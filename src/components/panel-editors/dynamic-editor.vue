@@ -200,7 +200,12 @@
                                 <select
                                     v-model="newSlideType"
                                     class="respected-standard-select"
-                                    style="width: 80% !important; text-align-last: left !important; text-align: start !important; justify-self: start !important;"
+                                    style="
+                                        width: 80% !important;
+                                        text-align-last: left !important;
+                                        text-align: start !important;
+                                        justify-self: start !important;
+                                    "
                                 >
                                     <option v-for="thing in Object.keys(editors)" :key="thing">
                                         {{ thing }}

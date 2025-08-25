@@ -44,14 +44,26 @@
                 <button
                     :aria-label="panel?.type"
                     v-for="(panel, panelIndex) in element[selectedLang]?.panel"
-                    :key="(panel as any).id || panelIndex"
+                    :key="(panel as any)?.id || panelIndex"
                     class="flex gap-0.5 border rounded w-min py-0.5 px-0.5 cursor-default"
                     :class="[
                         panel?.type === 'map' && (panel as MapPanel).shared
                             ? 'border-yellow-800 bg-yellow-200 hover:border-yellow-400'
-                            : 'border-transparent hover:border-gray-400 hover:bg-gray-300'
+                            : 'border-transparent hover:border-gray-400 hover:bg-gray-300',
+                        element[selectedLang] === currentSlide && this.productStore.selectedPanelIndex === panelIndex
+                            ? ''
+                            : ''
                     ]"
-                    @click.stop
+                    :style="[
+                        element[selectedLang] === currentSlide && this.productStore.selectedPanelIndex === panelIndex
+                            ? 'background-color: #c1c1c5 !important;'
+                            : ''
+                    ]"
+                    @click.stop="
+                        () => {
+                            $emit('select-slide', panelIndex);
+                        }
+                    "
                     v-tippy="{
                         theme: 'left-align',
                         delay: '200',
@@ -64,7 +76,7 @@
                     <span
                         v-html="determinePanelImage(panel?.type as PanelType)"
                         :style="{
-                            fill: panel?.type === 'map' && (panel as MapPanel).shared ? '#92400e' : 'rgba(0,0,0,0.75)'
+                            fill: panel?.type === 'map' && (panel as MapPanel)?.shared ? '#92400e' : 'rgba(0,0,0,0.75)'
                         }"
                         style="min-height: 11px; max-height: 11px; min-width: 11px; max-width: 11px"
                     ></span>
@@ -160,7 +172,9 @@
 </template>
 
 <script lang="ts">
-import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide } from '@/definitions';
+import { BasePanel, MapPanel, MultiLanguageSlide, PanelType, Slide, SupportedLanguages } from '@/definitions';
+import { useProductStore } from '@/stores/productStore';
+import { useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue } from 'vue-property-decorator';
 import TocOptions from './toc-options.vue';
 
@@ -179,11 +193,13 @@ import DynamicEditorIcon from '@/assets/dynamic-editor.svg?raw';
     }
 })
 export default class SlideTocV extends Vue {
-    @Prop() selectedLang!: 'en' | 'fr';
+    @Prop() selectedLang!: SupportedLanguages;
     @Prop() element!: MultiLanguageSlide;
     @Prop() currentSlide!: Slide | string;
     @Prop({ default: false }) isMobileSidebar!: boolean;
     @Prop() isActiveSlide!: boolean;
+
+    productStore = useProductStore();
 
     oppositeLang: 'en' | 'fr' = 'fr';
     content: string | undefined = '';
@@ -219,10 +235,10 @@ export default class SlideTocV extends Vue {
                 ? this.$t('editor.slides.panelNumber', { num: panelIndex + 1 })
                 : this.$t('editor.slides.fullscreenPanel')
         }: ${this.$t(`editor.slide.panel.type.${panel?.type}`)}</strong><br/>${
-            (panel as any).title
+            (panel as any)?.title
                 ? '"' +
-                  escapeHTML((panel as any).title).substring(0, maxLength) +
-                  (((panel as any).title as string)?.length > maxLength ? '...' : '') +
+                  escapeHTML((panel as any)?.title).substring(0, maxLength) +
+                  (((panel as any)?.title as string)?.length > maxLength ? '...' : '') +
                   '"'
                 : 'No title'
         }</p>`;
