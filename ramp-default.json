@@ -379,63 +379,74 @@
                 "basemaps": [
                     {
                         "id": "baseNrCan",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Canada Base Map - Transportation (CBMT)",
-                        "description": "The Canada Base Map - Transportation (CBMT) web mapping services of the Earth Sciences Sector at Natural Resources Canada, are intended primarily for online mapping application users and developers.",
-                        "altText": "The Canada Base Map - Transportation (CBMT)",
+                        "name": "Transportation (CBMT - Labels)",
+                        "description": "The basic transport map (CBMT - labels) displays topographical features and political boundaries, while focusing primarily on transport routes. Contains topographical labels.",
+                        "altText": "Transportation (CBMT - Labels)",
                         "layers": [
                             {
                                 "id": "CBMT",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT3978/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseSimple",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Canada Base Map - Simple",
-                        "description": "Canada Base Map - Simple",
-                        "altText": "Canada base map - Simple",
+                        "name": "Simple Land-Water Boundaries",
+                        "description": "The Simple Land-Water Boundaries basemap displays basic topographical features, in particular land and water boundaries.",
+                        "altText": "Simple Land-Water Boundaries",
                         "layers": [
                             {
                                 "id": "SMR",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Simple/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Simple/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseCBME_CBCE_HS_RO_3978",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Canada Base Map - Elevation (CBME)",
-                        "description": "The Canada Base Map - Elevation (CBME) web mapping services of the Earth Sciences Sector at Natural Resources Canada, is intended primarily for online mapping application users and developers.",
-                        "altText": "Canada Base Map - Elevation (CBME)",
+                        "name": "Elevation (CBME)",
+                        "description": "The basic elevation map (CBME) illustrates differences in elevation using contour lines and colour gradients.",
+                        "altText": "Elevation (CBME)",
                         "layers": [
                             {
                                 "id": "CBME_CBCE_HS_RO_3978",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBME_CBCE_HS_RO_3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBME_CBCE_HS_RO_3978/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseCBMT_CBCT_GEOM_3978",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Canada Base Map - Transportation (CBMT)",
-                        "description": " The Canada Base Map - Transportation (CBMT) web mapping services of the Earth Sciences Sector at Natural Resources Canada, are intended primarily for online mapping application users and developers.",
-                        "altText": "Canada Base Map - Transportation (CBMT)",
+                        "name": "Transportation (CBMT - No Labels)",
+                        "description": "The basic transport map (CBMT - No labels) displays topographical features and political boundaries, while focusing primarily on transport routes. Omits topographical labels.",
+                        "altText": "Transportation (CBMT - No Labels)",
                         "layers": [
                             {
                                 "id": "CBMT_CBCT_GEOM_3978",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
+                    },
+                    {
+                        "id": "baseProvinces_3978",
+                        "name": "Provincial and Territorial Boundaries",
+                        "description": "A basic outline of Canada's provincial and territorial boundaries.",
+                        "altText": "Canada Base Map - Provincial and Territorial outlines",
+                        "hideThumbnail": true,
+                        "layers": [
+                            {
+                                "id": "provinces_3978",
+                                "layerType": "esri-tile",
+                                "url": "https://maps-cartes.ec.gc.ca/arcgis/rest/services/Overlays/Provinces/MapServer"
+                            }
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseEsriWorld",
@@ -904,22 +915,20 @@
                 "basemaps": [
                     {
                         "id": "baseNrCan",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Carte de base du Canada – transport (CBCT) avec étiquettes",
-                        "description": "La carte de base du Canada – transport (CBCT) du Secteur des sciences de la Terre de Ressources naturelles Canada est un service Internet qui s'adresse principalement aux utilisateurs et développeurs d'applications cartographiques en ligne.",
-                        "altText": "La carte de base du Canada – transport (CBCT)",
+                        "name": "Transport (CBMT - Étiquettes)",
+                        "description": "La carte de base des transports (CBMT - étiquettes) affiche les caractéristiques topographiques et les frontières politiques, tout en se concentrant principalement sur les itinéraires de transport. Contient des étiquettes topographiques.",
+                        "altText": "Transport (CBMT - Étiquettes)",
                         "layers": [
                             {
                                 "id": "CBCT",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBCT3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBCT3978/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseSimple",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
                         "name": "Carte de base du Canada - simple",
                         "description": "La carte de base du Canada - simple",
                         "altText": "La carte de base du Canada - simple",
@@ -927,46 +936,38 @@
                             {
                                 "id": "SMR",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Simple/MapServer",
-                                "opacity": 1
-                            },
-                            {
-                                "id": "SMW",
-                                "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT_TXT_3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/Simple/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseCBME_CBCE_HS_RO_3978",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Carte de base du Canada - élevation (CBCE)",
-                        "description": "La carte de base du Canada - élevation (CBCE) du Secteur des sciences de la Terre de Ressources naturelles Canada est un service Internet qui s'adresse principalement aux utilisateurs et développeurs d'applications cartographiques en ligne.",
-                        "altText": "La carte de base du Canada - élevation (CBCE)",
+                        "name": "Élévation (CBME)",
+                        "description": "La carte de base d'élévation (CBME) illustre les différences d'élévation à l'aide de lignes de contour et de dégradés de couleurs.",
+                        "altText": "Élévation (CBME)",
                         "layers": [
                             {
                                 "id": "CBME_CBCE_HS_RO_3978",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBME_CBCE_HS_RO_3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBME_CBCE_HS_RO_3978/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseCBMT_CBCT_GEOM_3978",
-                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978",
-                        "name": "Carte de base du Canada - transport (CBCT)",
-                        "description": "La carte de base du Canada - transport (CBCT) du Secteur des sciences de la Terre de Ressources naturelles Canada est un service Internet qui s'adresse principalement aux utilisateurs et développeurs d'applications cartographiques en ligne.",
-                        "altText": "La carte de base du Canada - transport (CBCT)",
+                        "name": "Transport (CBMT - Sans étiquette)",
+                        "description": "La carte de base des transports (CBMT - Sans étiquettes) affiche les caractéristiques topographiques et les frontières politiques, tout en se concentrant principalement sur les itinéraires de transport. Omet les étiquettes topographiques.",
+                        "altText": "Transport (CBMT - Sans étiquette)",
                         "layers": [
                             {
                                 "id": "CBMT_CBCT_GEOM_3978",
                                 "layerType": "esri-tile",
-                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer",
-                                "opacity": 1
+                                "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer"
                             }
-                        ]
+                        ],
+                        "tileSchemaId": "EXT_NRCAN_Lambert_3978#LOD_NRCAN_Lambert_3978"
                     },
                     {
                         "id": "baseEsriWorld",
