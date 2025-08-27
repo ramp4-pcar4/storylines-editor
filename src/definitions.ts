@@ -421,3 +421,35 @@ export const BaseStartingConfig: DefaultConfigs = {
         src: ''
     }
 };
+
+/* Helper functions */
+
+function clearObjectDeeply(target: any) {
+    for (const key in target) {
+        if (target.hasOwnProperty(key)) {
+            // Recursively clear nested objects
+            if (typeof target[key] === 'object' && target[key] !== null && !Array.isArray(target[key])) {
+                clearObjectDeeply(target[key]);
+            }
+            // Delete the property
+            delete target[key];
+        }
+    }
+}
+
+/* Merge source into target IN-PLACE. We basically want replacement without swapping the object. */
+export function deepMerge(target: any, source: any) {
+    // Delete everything, start from clean slate
+    clearObjectDeeply(target);
+
+    for (const key in source) {
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            if (!target[key]) {
+                target[key] = {}; // Ensure reactivity by setting each key manually
+            }
+            deepMerge(target[key], source[key]);
+        } else {
+            target[key] = source[key];
+        }
+    }
+}

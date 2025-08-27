@@ -1,4 +1,10 @@
-import { ConfigFileStructure, SourceCounts, StoryRampConfig } from '@/definitions';
+import {
+    ConfigFileStructure,
+    MultiLanguageSlide,
+    SourceCounts,
+    StoryRampConfig,
+    SupportedLanguages
+} from '@/definitions';
 import { defineStore } from 'pinia';
 import JSZip from 'jszip';
 
@@ -23,7 +29,12 @@ import { useStateStore } from './stateStore';
 interface ProductState {
     configFileStructure: ConfigFileStructure;
     configs: { [key: string]: StoryRampConfig | undefined };
-    configLang: string;
+    configLang: SupportedLanguages;
+    currentSlide: Slide | string;
+    selectedPanelIndex: number;
+    selectedSlideIndex: number;
+    selectedSlideLang: SupportedLanguages;
+    slidesWorkingCopy: MultiLanguageSlide[];
     sourceCounts: SourceCounts;
     debounceTimer: ReturnType<typeof setTimeout> | null;
     i18n: any;
@@ -33,8 +44,14 @@ export const useProductStore = defineStore('product', {
     state: (): ProductState => ({
         configFileStructure: {} as ConfigFileStructure,
         configs: { en: undefined, fr: undefined },
-        configLang: 'en',
+        configLang: 'en' as SupportedLanguages,
         sourceCounts: {},
+
+        currentSlide: '' as Slide | '',
+        selectedPanelIndex: 0 as number,
+        selectedSlideIndex: -1 as number,
+        selectedSlideLang: 'en' as SupportedLanguages,
+        slidesWorkingCopy: [] as MultiLanguageSlide[],
 
         // Debounce timer used for updateSaveStatus only.
         // IMPORTANT: Avoid using stateStore's handlePotentialChange() directly, this timer may cause issues with change detection and saving to the configs variable.
@@ -60,7 +77,7 @@ export const useProductStore = defineStore('product', {
     },
 
     actions: {
-        changeLang(lang: string): void {
+        changeLang(lang: SupportedLanguages): void {
             this.configLang = lang;
         },
 
