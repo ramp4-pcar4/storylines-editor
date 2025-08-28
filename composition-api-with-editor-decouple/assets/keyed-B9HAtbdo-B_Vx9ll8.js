@@ -1,0 +1,1 @@
+import{ic as s,id as i,i8 as n}from"./main-X7X5lK3e.js";import{N as o}from"./ref-XMc4F1eh-BnFC989l.js";const u=s(class extends i{constructor(){super(...arguments),this.key=n}render(t,r){return this.key=t,r}update(t,[r,e]){return r!==this.key&&(o(t),this.key=r),e}});export{u as i};
