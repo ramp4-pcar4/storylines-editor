@@ -1,1 +1,0 @@
-import{v as t,n as i,a3 as h,aM as l,a6 as n}from"./main-BCE_pGkN.js";const d=r=>{let e=class extends r{initialize(){this.addHandles(h(()=>this.layer,"refresh",s=>{this.doRefresh(s.dataChanged).catch(a=>{l(a)||n.getLogger(this).error(a)})}),"RefreshableLayerView")}};return e=t([i("esri.views.layers.RefreshableLayerView")],e),e};export{d as o};
