@@ -1,1 +1,0 @@
-import{ca as o,c7 as a}from"./main-X7X5lK3e.js";class t{static{this.instance=new o("Etc/UTC")}}function c(n){return n instanceof a?n===t.instance:n?.toString().toLowerCase()==="unknown"}function e(n){return c(n)?t.instance:n}export{c as a,t as n,e as o};
