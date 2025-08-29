@@ -742,10 +742,10 @@ export default class SlideTocV extends Vue {
         let overlayElement = document.getElementById('overlay');
         let sidebarElement = document.getElementById('sidebar-mobile');
 
-        if (overlayElement?.style.display != 'none' && window.innerWidth >= 768) {
-            overlayElement!.style.display = 'none';
-        } else if (sidebarElement?.style.width === '20rem' && window.innerWidth < 768) {
-            overlayElement!.style.display = 'block';
+        if (overlayElement && overlayElement.style.display != 'none' && window.innerWidth >= 768) {
+            overlayElement.style.display = 'none';
+        } else if (sidebarElement && sidebarElement.style.width === '20rem' && window.innerWidth < 768 && overlayElement) {
+            overlayElement.style.display = 'block';
         }
     }
     mounted() {
