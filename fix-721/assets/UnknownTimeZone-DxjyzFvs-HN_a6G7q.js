@@ -1,1 +1,0 @@
-import{cc as c,c9 as o}from"./main-DHtbAQdA.js";class t{static{this.instance=new c("Etc/UTC")}}function s(n){return n instanceof o?n===t.instance:n?.toString().toLowerCase()==="unknown"}function e(n){return s(n)?t.instance:n}export{s as a,t as n,e as o};
