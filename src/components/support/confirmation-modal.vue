@@ -1,5 +1,5 @@
 <template>
-    <vue-final-modal
+    <VueFinalModal
         :clickToClose="false"
         :escToClose="false"
         :modalId="name"
@@ -21,33 +21,51 @@
                 {{ $t('editor.cancel') }}
             </button>
         </div>
-    </vue-final-modal>
+    </VueFinalModal>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { getCurrentInstance } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
 
-@Options({
-    components: {
-        'vue-final-modal': VueFinalModal
-    }
-})
-export default class MetadataEditorV extends Vue {
-    @Prop() message!: string;
-    @Prop() name!: string;
-    @Prop() messageClass?: string;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    onOk(): void {
-        this.$emit('ok');
-        this.$vfm.close(this.name);
-    }
+const props = defineProps<{
+    name: string;
+    message: string;
+    messageClass?: string;
+}>();
 
-    onCancel(): void {
-        this.$emit('Cancel');
-        this.$vfm.close(this.name);
-    }
+const emit = defineEmits(['ok', 'Cancel']);
+
+// =========================================
+// Definitions
+
+const { $vfm } = getCurrentInstance()!.proxy!;
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+function onOk(): void {
+    emit('ok');
+    $vfm.close(props.name);
 }
+
+function onCancel(): void {
+    emit('Cancel');
+    $vfm.close(props.name);
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style scoped lang="css"></style>

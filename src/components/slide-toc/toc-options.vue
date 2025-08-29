@@ -1,6 +1,6 @@
 <template>
     <div @click.stop @mouseover.stop class="slide-toc-button cursor-auto">
-        <dropdown-menu
+        <DropdownMenu
             class="flex-shrink-0"
             position="bottom-start"
             :tooltip="$t('editor.slides.toc.dropdownTooltip')"
@@ -82,31 +82,50 @@
                     <span>{{ $t('editor.slides.toc.dropdown.clear') }}</span>
                 </span>
             </a>
-        </dropdown-menu>
+        </DropdownMenu>
     </div>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import DropdownMenu from '@/components/support/dropdown-menu.vue';
 
-@Options({
-    components: {
-        'dropdown-menu': DropdownMenu
-    }
-})
-export default class TocOptionsV extends Vue {
-    @Prop({ default: true }) copyAllowed!: boolean;
-    @Prop({ default: true }) deleteAllowed!: boolean;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    copySlide() {
-        this.$emit('copy');
+const props = withDefaults(
+    defineProps<{
+        copyAllowed?: boolean;
+        deleteAllowed?: boolean;
+    }>(),
+    {
+        copyAllowed: true,
+        deleteAllowed: true
     }
+);
+const emit = defineEmits(['copy', 'clear']);
 
-    clearSlide() {
-        this.$emit('clear');
-    }
+// =========================================
+// Definitions
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+function copySlide() {
+    emit('copy');
 }
+function clearSlide() {
+    emit('clear');
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style lang="css" scoped>

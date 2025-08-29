@@ -1,6 +1,7 @@
 import {
     ConfigFileStructure,
     MultiLanguageSlide,
+    Slide,
     SourceCounts,
     StoryRampConfig,
     SupportedLanguages
@@ -16,6 +17,8 @@ import { defineStore } from 'pinia';
 import { vfm } from '../plugins/vfm/index';
 import router from '../router';
 
+import { Slide } from '@/definitions';
+
 interface EditorState {
     loadExisting: boolean;
     reloadExisting: boolean;
@@ -28,7 +31,7 @@ interface EditorState {
     // Debounce timer used for updateSaveStatus only.
     // IMPORTANT: Avoid using stateStore's handlePotentialChange() directly, this timer may cause issues with change detection and saving to the configs variable.
     // Instead, ALWAYS call either updateSaveStatus() (if in metadata-editor) or emit the 'save-status' event instead!
-    debounceTimer: null;
+    debounceTimer: null | ReturnType<typeof setTimeout>;
     editorSaving: boolean;
     configLang: SupportedLanguages;
     selectedPanelIndex: number;
@@ -85,6 +88,7 @@ export const useEditorStore = defineStore('editor', {
         async swapConfigLang(): Promise<void> {
             const productStore = useProductStore();
             await productStore.saveMetadata(false, true);
+            this.configLang = this.oppositeLang;
             if (!productStore.configs[this.configLang]) {
                 await productStore.generateNewConfig(false);
             }
@@ -124,7 +128,7 @@ export const useEditorStore = defineStore('editor', {
             // We prompt the user to extend the session when session warn minutes have passed.
             const warnTime = import.meta.env.VITE_APP_CURR_ENV ? Number(import.meta.env.VITE_SESSION_WARN) : 5;
             const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-            const timeBuffer = isFirefox ? 2000 : 0;
+            const timeBuffer = isFirefox ? 5000 : 0;
             lockStore.confirmationTimeout = setTimeout(
                 () => {
                     // First, remove inactivity event listeners, otherwise moving the mouse will extend the session!.

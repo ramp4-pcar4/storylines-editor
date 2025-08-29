@@ -1,5 +1,5 @@
 <template>
-    <vue-final-modal :modalId="name" :clickToClose="false" content-class="" class="flex justify-center items-center">
+    <VueFinalModal :modalId="name" :clickToClose="false" content-class="" class="flex justify-center items-center">
         <div
             class="action-modal flex flex-col max-h-full overflow-y-auto mx-4 p-4 bg-white border rounded-xl space-y-2"
         >
@@ -24,33 +24,50 @@
                 </div>
             </div>
         </div>
-    </vue-final-modal>
+    </VueFinalModal>
 </template>
 
-<script lang="ts">
-import { Options, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
 import { VueFinalModal } from 'vue-final-modal';
+import { getCurrentInstance } from 'vue';
 
-@Options({
-    components: {
-        'vue-final-modal': VueFinalModal
-    }
-})
-export default class MetadataEditorV extends Vue {
-    @Prop() name!: string;
-    @Prop() title!: string;
-    @Prop() message!: string;
+// =========================================
+// Component props and emits
+// (If any are missing, they don't exist)
 
-    onOk(): void {
-        this.$emit('ok');
-        this.$vfm.close(this.name);
-    }
+const props = defineProps<{
+    name: string;
+    title: string;
+    message: string;
+}>();
+const emit = defineEmits(['ok', 'Cancel']);
 
-    onCancel(): void {
-        this.$emit('Cancel');
-        this.$vfm.close(this.name);
-    }
+// =========================================
+// Definitions
+
+const { $vfm } = getCurrentInstance()!.proxy!;
+
+// =========================================
+// Watchers
+
+// =========================================
+// Lifecycle functions
+
+// =========================================
+// Component functions
+
+function onOk(): void {
+    emit('ok');
+    $vfm.close(props.name);
 }
+
+function onCancel(): void {
+    emit('Cancel');
+    $vfm.close(props.name);
+}
+
+// =========================================
+// Component exposes
 </script>
 
 <style scoped lang="css">
@@ -63,6 +80,6 @@ export default class MetadataEditorV extends Vue {
 
 h2 {
     line-height: 1.3;
-    border-bottom: 0px;
+    border-bottom: 0;
 }
 </style>

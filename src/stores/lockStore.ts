@@ -10,7 +10,7 @@ export const useLockStore = defineStore('lock', {
         connected: false,
         received: false,
         timeInterval: undefined as NodeJS.Timeout | undefined,
-        timeRemaining: 100000000000000, // in seconds
+        timeRemaining: 100000000000000, // in SECONDS!!
         broadcast: undefined as BroadcastChannel | undefined,
         confirmationTimeout: undefined as NodeJS.Timeout | undefined, // the timer to show the session extension confirmation modal
         endTimeout: undefined as NodeJS.Timeout | undefined // the timer to kill the session due to timeout

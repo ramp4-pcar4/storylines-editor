@@ -438,6 +438,9 @@ export const useStateStore = defineStore('state', {
             return this.stateChangesList[loc]?.affectedSlides ?? undefined;
         },
 
+        /**
+         * Returns the slides affected by the change being undone or redone, if any. If neither undoing nor redoing, returns undefined.
+         */
         getAffectedSlidesByUndoRedo(): AffectedSlideInfo[] | undefined {
             if (!this.undoing && !this.redoing) return undefined;
 
