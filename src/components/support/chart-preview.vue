@@ -1,8 +1,8 @@
 <template>
-    <li class="chart-item items-center mt-8 mx-5 overflow-hidden">
+    <li class="items-center mt-8 mx-5 overflow-hidden w-full" :class="itemCount > 1 ? 'chart-item' : 'single-chart'">
         <div class="relative border-solid border-2 items-center justify-center text-center w-full">
             <button
-                class="respected-standard-button respected-transparent-button close-button"
+                class="respected-standard-button respected-transparent-button close-button top-0"
                 style="top: 0.5rem; left: 0.5rem"
                 @click="() => $emit('delete', chart)"
                 :content="$t('editor.chart.delete')"
@@ -16,8 +16,11 @@
                 </svg>
             </button>
             <button
-                style="bottom: 0.5rem; right: 0.5rem"
+                v-if="itemCount > 1"
+                style="top: 2rem; left: 0.5rem"
                 class="respected-standard-button respected-transparent-button close-button handle"
+                :content="$t('editor.chart.drag')"
+                v-tippy="{ placement: 'bottom', hideOnClick: false, animateFill: true }"
                 :aria-label="$t('editor.chart.delete')"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22px" height="22px" viewBox="0 0 24 24">
@@ -27,14 +30,26 @@
                     />
                 </svg>
             </button>
+            <gallery-buttons
+                v-if="itemCount > 1"
+                class="side-buttons mx-3"
+                ref="galleryButtons"
+                :index="index"
+                :itemCount="itemCount"
+                galleryType="chart"
+                @move-left="$emit('move-left', index)"
+                @move-right="$emit('move-right', index)"
+            />
             <!-- chart component -->
-            <storylines-chart
-                class="w-full h-full"
-                :config="chart"
-                :key="chartVersion"
-                :configFileStructure="productStore.configFileStructure"
-                v-if="!loading"
-            ></storylines-chart>
+            <div class="chart-container p-4">
+                <storylines-chart
+                    class="w-full max-h-[300px] chart-interactive"
+                    :config="chart"
+                    :key="chartVersion"
+                    :configFileStructure="productStore.configFileStructure"
+                    v-if="!loading"
+                ></storylines-chart>
+            </div>
         </div>
         <!-- chart description and edit  -->
         <div class="flex flex-col-reverse lg:flex-row mt-4 items-start flex-wrap gap-2 gap-x-2 px-1 pb-1">
@@ -79,9 +94,11 @@
 </template>
 
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ChartConfig } from '@/definitions';
 import { useProductStore } from '@/stores/productStore';
+
+import GalleryButtonsV from '../support/gallery-buttons.vue';
 
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
@@ -92,10 +109,16 @@ dataModule(Highcharts);
 exporting(Highcharts);
 exportData(Highcharts);
 
+@Options({
+    components: {
+        'gallery-buttons': GalleryButtonsV
+    }
+})
 export default class ChartPreviewV extends Vue {
     @Prop() chart!: ChartConfig;
     @Prop() lang!: string;
     @Prop() index!: number;
+    @Prop() itemCount!: number;
     @Prop() chartVersion!: number;
 
     productStore = useProductStore();
@@ -113,7 +136,7 @@ export default class ChartPreviewV extends Vue {
 
 <style lang="scss" scoped>
 .chart-item {
-    width: 46%;
+    width: 43%;
 
     .handle {
         cursor: move; /* fallback if grab cursor is unsupported */
@@ -121,6 +144,10 @@ export default class ChartPreviewV extends Vue {
         cursor: -moz-grab;
         cursor: -webkit-grab;
     }
+}
+
+.single-chart {
+    max-width: 650px;
 }
 
 .close-button {
@@ -134,5 +161,20 @@ export default class ChartPreviewV extends Vue {
     padding: 0;
     z-index: 10;
     cursor: pointer;
+}
+
+@media only screen and (max-width: 1050px) {
+    .chart-item,
+    .single-chart {
+        width: 90%;
+    }
+
+    .chart-container {
+        margin-left: 15px;
+    }
+
+    .side-buttons {
+        @apply left-0 top-1/2 transform -translate-y-1/2 flex-col gap-3 right-auto top-auto;
+    }
 }
 </style>
