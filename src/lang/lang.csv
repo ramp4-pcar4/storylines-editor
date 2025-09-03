@@ -208,9 +208,13 @@ editor.image.label.height,Height,1,Hauteur,1
 editor.image.label.width,Width,1,Largeur,1
 editor.image.label.widthWarning,Maximum width is 2/3 (66%) of screen on desktop and 100% on mobile. Larger widths will be ignored.,1,La largeur maximale est de 2/3 (66 %) de l'écran sur les ordinateurs de bureau et de 100 % sur les téléphones portables. Les largeurs plus importantes seront ignorées.,1
 editor.image.delete,Delete Image,1,Supprimer l'image,1
+editor.image.moveUp,Move image up,1,Déplacer l'image vers le haut,0
+editor.image.moveDown,Move image down,1,Déplacer l'image vers le bas,0
+editor.image.moveLeft,Move image left,1,Déplacer l'image vers la gauche,0
+editor.image.moveRight,Move image right,1,Déplacer l'image vers la droite,0
 editor.image.label.drag,Drag your images here,1,Faites glisser vos images ici,1
 editor.image.label.caption,Caption,1,Légende,1
-editor.image.reorder,Click and drag to reorder images,1,Cliquez sur les images et faites-les glisser pour changer l’ordre.,1
+editor.image.reorder,"Click and drag, or use the arrows, to reorder images.",1,"Cliquez sur les images et faites-les glisser, ou utilisez les flèches, pour changer l’ordre.",0
 editor.image.altTag,Alt tag,1,Texte de remplacement,1
 editor.image.slideshowCaption,Slideshow caption,1,Légende du diaporama,1
 editor.image.loadingError,An error occurred when trying to load image,1,Une erreur est survenue lors du chargement de l’image.,1
@@ -234,6 +238,11 @@ editor.video.label.linkSupport,Supports YouTube links (regular and shortened) as
 editor.video.delete,Delete Video,1,Supprimer la vidéo,1
 editor.video.pasteUrl,Paste the URL to a video,1,Collez l'url d'une vidéo,0
 editor.chart.delete,Delete Chart,1,Supprimer le graphique,1
+editor.chart.drag,Drag Chart,1,Faites glisser le graphique,0
+editor.chart.moveUp,Move chart up,1,Déplacer le graphique vers le haut,0
+editor.chart.moveDown,Move chart down,1,Déplacer le graphique vers le bas,0
+editor.chart.moveLeft,Move chart left,1,Déplacer le graphique vers la gauche,0
+editor.chart.moveRight,Move chart right,1,Déplacer le graphique vers la droite,0
 editor.chart.label.name,Name,1,Nom,1
 editor.chart.label.edit,Edit,1,Éditer,1
 editor.chart.label.empty,Empty,1,Vide,1

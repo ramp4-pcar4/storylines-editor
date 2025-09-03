@@ -1,8 +1,8 @@
 <template>
     <li class="image-item items-center my-8 mx-4 overflow-hidden">
-        <div class="relative items-center justify-center text-center w-full grabbable">
+        <div class="relative items-center justify-center text-center w-full grabbable pt-8">
             <button
-                class="respected-standard-button respected-transparent-button absolute h-6 w-6 leading-5 rounded-full top-0 right-0 p-0 cursor-pointer"
+                class="respected-standard-button respected-transparent-button absolute h-6 w-6 leading-5 rounded-full top-1 left-0 p-0 cursor-pointer"
                 @click="() => $emit('delete', imageFile)"
                 :content="$t('editor.image.delete')"
                 v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true }"
@@ -14,6 +14,16 @@
                     />
                 </svg>
             </button>
+            <gallery-buttons
+                v-if="itemCount > 1"
+                class="side-buttons"
+                ref="galleryButtons"
+                :index="index"
+                :itemCount="itemCount"
+                galleryType="image"
+                @move-left="$emit('move-left', index)"
+                @move-right="$emit('move-right', index)"
+            />
             <div class="flex-grow image-container">
                 <img
                     class="image-file object-cover"
@@ -28,11 +38,19 @@
 </template>
 
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Options, Prop, Vue } from 'vue-property-decorator';
 import { ImageFile } from '@/definitions';
+import GalleryButtonsV from '../support/gallery-buttons.vue';
 
+@Options({
+    components: {
+        'gallery-buttons': GalleryButtonsV
+    }
+})
 export default class ImagePreviewV extends Vue {
     @Prop() imageFile!: ImageFile;
+    @Prop() index!: number;
+    @Prop() itemCount!: number;
 }
 </script>
 
@@ -70,6 +88,15 @@ export default class ImagePreviewV extends Vue {
 @media only screen and (max-width: 900px) {
     .image-item {
         width: 90%;
+    }
+
+    .image-container {
+        padding-left: 1.75rem;
+        padding-right: 1.75rem;
+    }
+
+    .side-buttons {
+        @apply left-0 top-1/2 transform -translate-y-1/2 flex-col gap-3 right-auto top-auto;
     }
 }
 </style>

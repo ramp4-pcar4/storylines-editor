@@ -49,10 +49,12 @@
                 <template #item="{ element, index }">
                     <ChartPreview
                         :key="`${element.name}-${index}`"
+                        :ref="(el: any) => (storylinesChartConfigsRefs[index] = el)"
                         :chart="element"
                         :chartVersion="chartVersions[element.name]"
                         :lang="lang"
                         :index="index"
+                        :itemCount="storylinesChartConfigs.length"
                         @edit="
                             (chart: ChartConfig) => {
                                 openEditor(chart.name as string);
@@ -60,6 +62,8 @@
                         "
                         @delete="$vfm.open(`${element.name}-${index}`)"
                         @captionEdit="onChartsEdited"
+                        @move-left="moveChart(index, true)"
+                        @move-right="moveChart(index, false)"
                     ></ChartPreview>
                 </template>
             </draggable>
@@ -168,6 +172,7 @@ export default class ChartEditorV extends Vue {
     chartVersions: Record<string, number> = {};
     editingConfig: HighchartsConfig | null = null;
     editingName: string | null = null;
+    storylinesChartConfigsRefs = [] as any[];
 
     mounted(): void {
         applyTextAlign(this.panel, this.centerSlide, this.dynamicSelected);
@@ -208,15 +213,18 @@ export default class ChartEditorV extends Vue {
         const chartSrc = chartName
             ? `charts/${this.lang}/${chartName}.json`
             : chart.src
-            ? chart.src.substring(chart.src.indexOf('/') + 1)
-            : '';
+              ? chart.src.substring(chart.src.indexOf('/') + 1)
+              : '';
 
         let highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
 
         // If not found, create file from config
         if (!highchartsJson && chartName) {
             const title = chartName;
-            this.productStore.configFileStructure.charts[this.lang].file(`${title}.json`, JSON.stringify(chart.config, null, 4));
+            this.productStore.configFileStructure.charts[this.lang].file(
+                `${title}.json`,
+                JSON.stringify(chart.config, null, 4)
+            );
             highchartsJson = this.productStore.configFileStructure.zip.file(chartSrc);
         }
 
@@ -360,6 +368,23 @@ export default class ChartEditorV extends Vue {
             this.highchartsChartConfigs.splice(idx, 1);
         }
         this.onChartsEdited();
+    }
+
+    moveChart(index: number, moveLeft: boolean): void {
+        if ((index === 0 && moveLeft) || (index === this.storylinesChartConfigs.length - 1 && !moveLeft)) return;
+
+        const targetIndex = moveLeft ? index - 1 : index + 1;
+
+        const charts = [...this.storylinesChartConfigs];
+        [charts[index], charts[targetIndex]] = [charts[targetIndex], charts[index]];
+        this.storylinesChartConfigs = charts;
+        this.onChartsEdited();
+
+        this.$nextTick(() => {
+            const galleryButtons = this.storylinesChartConfigsRefs[targetIndex]?.$refs.galleryButtons;
+            const focusButton = moveLeft ? galleryButtons?.$refs.moveLeftBtn : galleryButtons?.$refs.moveRightBtn;
+            focusButton?.focus();
+        });
     }
 
     saveChanges(): void {
