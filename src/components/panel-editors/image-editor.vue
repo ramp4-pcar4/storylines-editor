@@ -45,7 +45,7 @@
         </div>
 
         <span
-            v-if="allowMany || (!allowMany && imagePreviews.length === 0)"
+            v-if="(allowMany && imagePreviews.length > 1) || (!allowMany && imagePreviews.length === 0)"
             v-show="!imagePreviewsLoading && imagePreviews.length"
             class="flex justify-center"
         >
@@ -64,7 +64,11 @@
                 <ImagePreview
                     :key="`${element.id}-${index}`"
                     :imageFile="element"
+                    :index="index"
+                    :itemCount="imagePreviews.length"
                     @delete="deleteImage"
+                    @move-left="moveImage(index, true)"
+                    @move-right="moveImage(index, false)"
                     class="border border-gray-200 rounded-md p-3"
                 >
                     <div class="px-2 pb-2">
@@ -95,7 +99,7 @@
                         </div>
 
                         <div class="lg:flex gap-2 mt-4">
-                            <div class="flex flex-col text-left self-center">
+                            <div class="flex flex-col text-left self-center lg:w-1/2">
                                 <label class="respected-standard-label" :for="'imgHeight' + index">{{
                                     $t('editor.image.label.height')
                                 }}</label>
@@ -115,7 +119,7 @@
                                 />
                             </div>
 
-                            <div class="flex flex-col mt-4 lg:mt-0 text-left self-center">
+                            <div class="flex flex-col mt-4 lg:mt-0 text-left self-center lg:w-1/2">
                                 <div class="flex flex-row gap-1.5 justify-start items-center">
                                     <label class="respected-standard-label" :for="'imgWidth' + index">{{
                                         $t('editor.image.label.width')
@@ -305,6 +309,22 @@ export default class ImageEditorV extends Vue {
             }
             this.imagePreviews.splice(idx, 1);
         }
+        this.onImagesEdited();
+    }
+
+    moveImage(index: number, moveLeft: boolean): void {
+        if ((index === 0 && moveLeft) || (index === this.imagePreviews.length - 1 && !moveLeft)) return;
+
+        const swap = (arr: any[], i: number, j: number) => {
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        };
+
+        const newImages = [...this.imagePreviews];
+        const targetIndex = moveLeft ? index - 1 : index + 1;
+
+        swap(newImages, index, targetIndex);
+
+        this.imagePreviews = newImages;
         this.onImagesEdited();
     }
 
