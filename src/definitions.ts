@@ -422,6 +422,15 @@ export const BaseStartingConfig: DefaultConfigs = {
     }
 };
 
+export interface AudioSettings {
+    title: string;
+    transcript: string;
+    source: {
+        name: string;
+        preview: string | null;
+    };
+}
+
 /* Helper functions */
 
 function clearObjectDeeply(target: any) {
