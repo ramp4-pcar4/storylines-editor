@@ -905,6 +905,7 @@ export default class EditorV extends Vue {
             next();
         }
         this.editorStore.loadStatus = 'waiting';
+        this.productStore.clearData();
     }
 
     /**
