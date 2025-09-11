@@ -853,6 +853,9 @@ export default class EditorV extends Vue {
         }
     }
 
+    /**
+     * This only runs when changing UUID under same route.
+     */
     beforeRouteUpdate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: () => void): void {
         this.$i18n.locale = to.params.lang as string;
         document.onmousemove = () => undefined;
@@ -875,6 +878,9 @@ export default class EditorV extends Vue {
         next();
     }
 
+    /**
+     * Runs when navigating away from route.
+     */
     beforeRouteLeave(to: RouteLocationNormalized, from: RouteLocationNormalized, next: (cont?: boolean) => void): void {
         const curEditor = this.$route.name === 'editor';
         const confirmationMessage = this.$t('editor.leaveWarning');
@@ -898,6 +904,7 @@ export default class EditorV extends Vue {
         } else {
             next();
         }
+        this.editorStore.loadStatus = 'waiting';
     }
 
     /**
