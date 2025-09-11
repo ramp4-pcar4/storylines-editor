@@ -40,16 +40,19 @@
                 </li>
             </ul>
         </div>
+
+        <widget-modal @ok="(audioSettings: AudioSettings) => addAudioWidget(audioSettings)" />
     </div>
 </template>
 
 <script lang="ts">
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
-import VueMarkdownEditor, { langMap } from '@/plugins/markdown-editor/index';
-import { TextPanel } from '@/definitions';
+import VueMarkdownEditor, { langMap } from '@/plugins/markdown-editor';
+import type { AudioSettings, TextPanel } from '@/definitions';
 import { applyTextAlign } from '@/utils/styleUtils';
 import WETDashboardItemV from '../support/wet-dashboard-item.vue';
 import WETComponents from '../support/wet-component-templates.json';
+import WidgetModalV from '../support/widget-editor/widget-modal.vue';
 import DOMPurify from 'dompurify';
 import tippy from 'tippy.js';
 
@@ -64,7 +67,8 @@ interface WETComponentsObject {
 
 @Options({
     components: {
-        'wet-item': WETDashboardItemV
+        'wet-item': WETDashboardItemV,
+        'widget-modal': WidgetModalV
     }
 })
 export default class TextEditorV extends Vue {
@@ -474,13 +478,23 @@ export default class TextEditorV extends Vue {
                         this.editor = editor;
                     }
                 }
+            },
+            widgets: {
+                title: 'Widgets',
+                icon: 'v-md-icon-widget',
+                action: (editor: MDEditor): void => {
+                    this.$vfm.open('widget-modal');
+
+                    if (editor !== undefined) {
+                        this.editor = editor;
+                    }
+                }
             }
         };
     }
 
-    toolbarOptions = `undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code ${
-        window.location.href.includes('index-ca') ? '| wetToolbar' : ''
-    } | save`;
+    toolbarOptions = `undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code
+     widgets ${window.location.href.includes('index-ca') ? '| wetToolbar' : ''} | save`;
 
     toolbarTooltipAdjust(toggle: HTMLElement): void {
         const slideEditor = document.querySelector('#slideEditor') as HTMLElement;
@@ -504,9 +518,22 @@ export default class TextEditorV extends Vue {
     saveChanges() {
         this.panel.content = DOMPurify.sanitize(this.panel.content, {
             FORCE_BODY: true,
-            ADD_TAGS: ['AudioPlayer'],
+            ADD_TAGS: ['AudioPlayer', 'Gallery', 'GalleryItem'],
             ADD_ATTR: ['transcript']
-        }).replaceAll('audioplayer', 'AudioPlayer');
+        })
+            .replaceAll('audioplayer', 'AudioPlayer')
+            .replaceAll('gallery', 'Gallery')
+            .replaceAll('galleryitem', 'GalleryItem');
+    }
+
+    addAudioWidget(audioSettings: AudioSettings): void {
+        this.editor.insert((selected: string) => {
+            const content = `<AudioPlayer src='${audioSettings.source.name}' title='${audioSettings.title}' transcript='${audioSettings.transcript}'></AudioPlayer>`;
+            return {
+                text: content,
+                selected: content
+            };
+        });
     }
 
     mounted(): void {
@@ -584,6 +611,10 @@ label {
 
 :deep(.v-md-icon-link::before) {
     content: '\1F517\fe0e';
+}
+
+:deep(.v-md-icon-widget::before) {
+    content: '\1F9E9\fe0e';
 }
 
 :deep(.v-md-editor__tooltip) {

@@ -11,6 +11,12 @@ image.fullscreen,Full Screen,1,Plein Écran,1
 audio.transcript.show,View Transcript,1,Voir la transcription,1
 audio.transcript.hide,Hide Transcript,1,Masquer la transcription,1
 audio.transcript.none,No transcript available,1,Aucune transcription disponible,1
+audio.editor.header,Add Audio Player,1,Ajouter un lecteur audio,0
+audio.editor.title,Audio Player Title,1,Titre du lecteur audio,1
+audio.editor.source,Audio Player Source,1,Source du lecteur audio,1
+audio.editor.source.caption,"You can browse files on your computer (MP3, WAV, or OGG), or paste in a direct link from the internet.",1,"Vous pouvez parcourir les fichiers sur votre ordinateur (MP3, WAV ou OGG), ou coller un lien direct depuis Internet.",0
+audio.editor.transcript,Audio Player Transcript,1,Transcription du lecteur audio,1
+widget.editor.header,Add A Widget,1,Ajouter un widget,0
 dynamic.back,Back,1,Retour,0
 dynamic.textSection,Text Section,1,Section de texte,1
 dynamic.panel.collection,Panel Collection,1,Collection de panneaux,1
