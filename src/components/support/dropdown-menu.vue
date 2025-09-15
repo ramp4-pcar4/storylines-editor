@@ -23,7 +23,7 @@
                 popper.update();
                 open = false;
             "
-            class="rv-dropdown shadow-md border border-gray:200 py-1 bg-white rounded z-10"
+            class="rv-dropdown shadow-md border border-gray:200 py-1 bg-white rounded z-20"
             :class="{ 'text-center': centered }"
             ref="dropdown"
         >
