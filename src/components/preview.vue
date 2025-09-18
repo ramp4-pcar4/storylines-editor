@@ -446,6 +446,41 @@ $font-list: 'Segoe UI', system-ui, ui-sans-serif, Tahoma, Geneva, Verdana, sans-
     }
 }
 
+/**
+ * Styling for ordered and unordered lists
+ */
+
+.prose ul {
+    list-style-type: disc;
+    padding-left: 1.2em;
+}
+
+.prose ol ul,
+.prose ul ul {
+    list-style-type: circle;
+}
+
+.prose :is(ul, ol) :is(ul, ol) ul {
+    list-style-type: square;
+}
+
+.prose ol > li:has(> ul, > ol) {
+    padding-left: 2.5em;
+}
+
+.prose :is(ul, ol) > li:not(:has(:is(ul, ol))),
+.prose ul > li:has(:is(ul, ol)) {
+    padding-left: 1.2em;
+}
+
+.prose ul > li:not(:has(> ul)):not(:has(> ol)) {
+    padding-left: 0;
+}
+
+.prose ul > li::before {
+    display: none;
+}
+
 @media screen and (max-width: 640px) {
     .w-mobile-full {
         width: 100% !important;
