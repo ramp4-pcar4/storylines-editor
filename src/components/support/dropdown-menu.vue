@@ -63,9 +63,12 @@ const props = defineProps({
     ariaLabel: { type: String }
 });
 
+const emit = defineEmits(['dropdownStateChange']);
+
 watchers.push(
     watch(open, () => {
         popper.value.update();
+        emit('dropdownStateChange', open);
     })
 );
 
@@ -73,6 +76,11 @@ const toggleDropdown = () => {
     open.value = !open.value;
     (dropdownTrigger.value as any)._tippy.hide();
 };
+
+const closeDropdown = () => {
+    open.value = false;
+    (dropdownTrigger.value as any)._tippy.hide();
+}
 
 const focusDropdownTrigger = () => {
     (dropdownTrigger.value as any)._tippy.setProps({
@@ -177,6 +185,11 @@ onBeforeUnmount(() => {
     dropdownTrigger.value!.removeEventListener('mouseleave', blurDropdownTrigger);
 
     open.value = false;
+});
+
+
+defineExpose({
+    closeDropdown
 });
 </script>
 
