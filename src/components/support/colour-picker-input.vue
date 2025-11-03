@@ -67,6 +67,16 @@ export default class LoadingPageV extends Vue {
     }
 
     /**
+     * Watches the value prop passed from the parent component. If the prop changes (e.g., from a language swap), and the new value
+     * is different from the internal selectedColour, update the local state.
+     * @param newValue the new colour value
+     */
+    @Watch('value')
+    onValueChanged(newValue: string): void {
+        if (newValue !== this.selectedColour) this.selectedColour = newValue;
+    }
+
+    /**
      * Watches the selectedColour property and emits a change event when it changes. The event emitted mimics an "HTMLInputEvent" so that
      * we don't need to make any modifications to the `metadataChanged` event listener in `metadata-content.vue`.
      * @param evt a string representing the new colour value.
