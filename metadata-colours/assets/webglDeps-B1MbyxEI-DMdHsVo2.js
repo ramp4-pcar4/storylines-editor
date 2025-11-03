@@ -1,7 +1,0 @@
-import{u as F,F as j}from"./VertexArrayObject-CieliEx4-CY4yXe-t.js";import{d as v,O as P}from"./FramebufferObject-D3QloItC-BQvOFXfN.js";import{X as c}from"./ProgramTemplate-C4wmhGXE-DA5NzoZG.js";import{U as A,D as C}from"./ProgramTemplate-C4wmhGXE-DA5NzoZG.js";import"./main-Ce4EWRDg.js";import{u as p}from"./NestedMap-DL9KstBd-DcOmdaty.js";import{_ as q}from"./Texture-D5XWO2GQ-vzxIpmDs.js";import"./enums-wEDHPbCF-Cf76M5_x.js";import"./memoryEstimations-DeWfxwaV-CafCjZsd.js";import"./getDataTypeBytes-DYbftOSj-BNZIboqJ.js";class b{constructor(e){this._rctx=e,this._store=new p}dispose(){this._store.forAll(e=>e.dispose()),this._store.clear()}acquire(e,t,o,i){const r=this._store.get(e,t);if(r!=null)return r.ref(),r;const s=new c(this._rctx,e,t,o,i);return s.ref(),this._store.set(e,t,s),s}get test(){}}function m(f){const{options:e,value:t}=f;return typeof e[t]=="number"}function h(f){let e="";for(const t in f){const o=f[t];if(typeof o=="boolean")o&&(e+=`#define ${t}
-`);else if(typeof o=="number")e+=`#define ${t} ${o.toFixed()}
-`;else if(typeof o=="object")if(m(o)){const{value:i,options:r,namespace:s}=o,n=s?`${s}_`:"";for(const a in r)e+=`#define ${n}${a} ${r[a].toFixed()}
-`;e+=`#define ${t} ${n}${i}
-`}else{const i=o.options;let r=0;for(const s in i)e+=`#define ${i[s]} ${(r++).toFixed()}
-`;e+=`#define ${t} ${i[o.value]}
-`}}return e}export{F as BufferObject,v as FramebufferObject,c as Program,b as ProgramCache,P as Renderbuffer,A as ShaderCompiler,q as Texture,j as VertexArrayObject,C as createProgram,h as glslifyDefineMap};
