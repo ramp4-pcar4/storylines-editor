@@ -1,0 +1,1 @@
+import{cc as c,cb as o}from"./main-D8UjLOIQ.js";class t{static{this.instance=new c("Etc/UTC")}}function s(n){return n instanceof o?n===t.instance:n?.toString().toLowerCase()==="unknown"}function e(n){return s(n)?t.instance:n}export{s as a,t as n,e as o};

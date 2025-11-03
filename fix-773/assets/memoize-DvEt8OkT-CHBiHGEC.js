@@ -1,0 +1,1 @@
+function h(e){let r,t,u=[],f=!1;function l(...n){return f&&r===this&&i(n,u)||(t=e.apply(this,n),r=this,u=n,f=!0),t}return l}function i(e,r){if(e.length!==r.length)return!1;for(let t=0;t<e.length;++t)if(e[t]!==r[t])return!1;return!0}export{h};

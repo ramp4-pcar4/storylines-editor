@@ -1,0 +1,1 @@
+import{e9 as a,bv as c}from"./main-D8UjLOIQ.js";function p(e){return{geometryType:c(e[0]),geometries:e.map(t=>t.toJSON())}}function s(e,t,n){const o=a(t);return e.map(m=>{const r=o.fromJSON(m);return r.spatialReference=n,r})}export{p as c,s as f};

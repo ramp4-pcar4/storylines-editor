@@ -1,0 +1,1 @@
+import{fU as l,fL as n,fM as o,f$ as t}from"./main-D8UjLOIQ.js";const s={},a={xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"};function r(f,e){return o(),n("svg",a,e[0]||(e[0]=[t("path",{d:"M0 0h24v24H0z",fill:"none"},null,-1),t("path",{d:"M3 6l6-3 6 3 6-3v12l-6 3-6-3-6 3z"},null,-1)]))}const d=l(s,[["render",r]]);export{d as default};
