@@ -589,6 +589,8 @@ label {
 :deep(.v-md-editor__tooltip) {
     text-wrap: wrap;
     overflow-wrap: break-word;
+    font-size: 14px;
+    background: #595959;
 }
 
 :deep(.v-md-editor__toolbar-right > .v-md-editor__toolbar-item > .v-md-editor__tooltip) {
