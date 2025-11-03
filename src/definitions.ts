@@ -422,6 +422,35 @@ export const BaseStartingConfig: DefaultConfigs = {
     }
 };
 
+export interface AudioSettings {
+    title: string;
+    transcript: string;
+    source: {
+        name: string;
+        preview: string | null;
+    };
+}
+
+export interface GallerySettings {
+    items: GalleryItem[];
+    caption: string;
+    itemsPerRow: number;
+    width: string;
+}
+
+export interface GalleryItem {
+    alt: string;
+    credit: string;
+    position?: {
+        x: number;
+        y: number;
+    };
+    source: {
+        name: string;
+        preview: string | null;
+    };
+}
+
 /* Helper functions */
 
 function clearObjectDeeply(target: any) {
