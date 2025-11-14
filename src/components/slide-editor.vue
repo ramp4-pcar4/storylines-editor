@@ -641,7 +641,9 @@ export default class SlideEditorV extends Vue {
         dynamic: 'dynamic-editor'
     };
 
-    currentSlide = computed(() => this.editorStore.currentSlide);
+    get currentSlide(): Slide {
+        return this.editorStore.currentSlide as Slide;
+    }
 
     mounted() {
         this.langTranslate = this.$t(`editor.lang.${this.editorStore.selectedSlideLang}`);

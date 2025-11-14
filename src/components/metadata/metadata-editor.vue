@@ -325,54 +325,58 @@
                                     <col class="w-3/5" />
                                     <col span="1" />
                                 </colgroup>
-                                <tr>
-                                    <td
-                                        style="background-color: #e7e7e7"
-                                        class="font-bold border-b border-solid border-black"
-                                    >
-                                        <div class="m-2 mr-0 ml-3">
-                                            {{ $t('editor.editMetadata.versionHistory.saveDate') }}
-                                        </div>
-                                    </td>
-                                    <td
-                                        style="background-color: #e7e7e7"
-                                        class="font-bold border-b border-solid border-black"
-                                    >
-                                        <div class="ml-0">
-                                            {{ $t('editor.editMetadata.versionHistory.actions') }}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr v-for="(historyItem, idx) in storylineHistory" :key="idx">
-                                    <td
-                                        style="background-color: #f9f9f9"
-                                        class="border-b border-solid pl-4"
-                                        :class="
-                                            idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
-                                        "
-                                    >
-                                        {{ formatDate(historyItem.created) }}
-                                    </td>
-                                    <td
-                                        style="background-color: #f9f9f9"
-                                        class="border-b border-solid py-3 pr-3"
-                                        :class="
-                                            idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
-                                        "
-                                    >
-                                        <button
-                                            class="respected-standard-button respected-gray-border-button respected-mainline-button"
-                                            @click="
-                                                () => {
-                                                    selectHistory(historyItem);
-                                                    loadHistory();
-                                                }
+                                <thead>
+                                    <tr>
+                                        <td
+                                            style="background-color: #e7e7e7"
+                                            class="font-bold border-b border-solid border-black"
+                                        >
+                                            <div class="m-2 mr-0 ml-3">
+                                                {{ $t('editor.editMetadata.versionHistory.saveDate') }}
+                                            </div>
+                                        </td>
+                                        <td
+                                            style="background-color: #e7e7e7"
+                                            class="font-bold border-b border-solid border-black"
+                                        >
+                                            <div class="ml-0">
+                                                {{ $t('editor.editMetadata.versionHistory.actions') }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(historyItem, idx) in storylineHistory" :key="idx">
+                                        <td
+                                            style="background-color: #f9f9f9"
+                                            class="border-b border-solid pl-4"
+                                            :class="
+                                                idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
                                             "
                                         >
-                                            <span>{{ $t('editor.editMetadata.versionHistory.load') }}</span>
-                                        </button>
-                                    </td>
-                                </tr>
+                                            {{ formatDate(historyItem.created) }}
+                                        </td>
+                                        <td
+                                            style="background-color: #f9f9f9"
+                                            class="border-b border-solid py-3 pr-3"
+                                            :class="
+                                                idx === storylineHistory.length - 1 ? 'border-black' : 'border-gray-200'
+                                            "
+                                        >
+                                            <button
+                                                class="respected-standard-button respected-gray-border-button respected-mainline-button"
+                                                @click="
+                                                    () => {
+                                                        selectHistory(historyItem);
+                                                        loadHistory();
+                                                    }
+                                                "
+                                            >
+                                                <span>{{ $t('editor.editMetadata.versionHistory.load') }}</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </section>

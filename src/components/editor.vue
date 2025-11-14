@@ -527,6 +527,7 @@
                 <!-- ToC -->
                 <slide-toc
                     class="flex-1"
+                    :slides="slides"
                     @scroll-to-element="scrollToElement"
                     @slide-change="selectSlide"
                     @slides-updated="updateSlides"
