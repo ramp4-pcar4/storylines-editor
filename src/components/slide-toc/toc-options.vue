@@ -7,6 +7,7 @@
             tooltipPlacement="top-start"
             tooltipPlacementAlt="left"
             ref="dropdown"
+            @dropdownStateChange="dropdownStateHandler"
         >
             <template #header>
                 <div class="slide-toc-button flex justify-center items-center">
@@ -99,12 +100,40 @@ export default class TocOptionsV extends Vue {
     @Prop({ default: true }) copyAllowed!: boolean;
     @Prop({ default: true }) deleteAllowed!: boolean;
 
+    listElement: Element | null = null;
+
     copySlide() {
         this.$emit('copy');
     }
 
     clearSlide() {
         this.$emit('clear');
+    }
+
+    dropdownStateHandler(open: boolean) {
+        if (open) {
+            this.listElement?.addEventListener('scroll', this.scrollHandler);
+        } else {
+            this.listElement?.removeEventListener('scroll', this.scrollHandler);
+        }
+    }
+
+    scrollHandler() {
+        const parentRect = this.listElement!.getBoundingClientRect();
+        const elementRect = this.$el.getBoundingClientRect();
+
+        if (elementRect.bottom < parentRect.top ||
+            elementRect.top > parentRect.bottom ) {
+            (this.$refs['dropdown'] as any).closeDropdown();
+        }
+    }
+
+    mounted() {
+        this.listElement = this.$el.closest('.toc-slide-list');        
+    }
+
+    beforeUnmount(): void {
+        this.listElement?.removeEventListener('scroll', this.scrollHandler);
     }
 }
 </script>
