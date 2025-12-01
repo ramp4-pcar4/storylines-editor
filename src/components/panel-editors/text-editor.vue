@@ -12,6 +12,7 @@
                 :include-level="[1, 2, 3, 4]"
                 height="400px"
                 :left-toolbar="toolbarOptions"
+                :right-toolbar="rightToolbarOptions"
                 :toolbar="toolbar"
                 @fullscreen-change="onFullscreenChange"
                 ref="mdEditor"
@@ -48,6 +49,7 @@ import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import VueMarkdownEditor, { langMap } from '@/plugins/markdown-editor/index';
 import { TextPanel } from '@/definitions';
 import { applyTextAlign } from '@/utils/styleUtils';
+import { useUserStore } from '@/stores/userStore';
 import WETDashboardItemV from '../support/wet-dashboard-item.vue';
 import WETComponents from '../support/wet-component-templates.json';
 import DOMPurify from 'dompurify';
@@ -73,10 +75,12 @@ export default class TextEditorV extends Vue {
     @Prop({ default: false }) dynamicSelected!: boolean;
     @Prop() lang!: string;
 
+    userStore = useUserStore();
     wetComponentsVisible = false;
     editor: MDEditor = {} as MDEditor;
     components: WETComponentsObject = WETComponents;
     pageLang = window.location.href.includes('index-ca-en') ? 'en' : 'fr'; // this is only used if `index-ca` is already in the URL.
+    bypassSanitization = false; // An admin-only feature that when enabled will allow the user to bypass sanitization of the text editor content.
 
     @Watch('panel.content', { deep: true, immediate: true })
     onContentChanged() {
@@ -474,6 +478,20 @@ export default class TextEditorV extends Vue {
                         this.editor = editor;
                     }
                 }
+            },
+            sanitization: {
+                title: this.$t('editor.text.sanitize'),
+                text: this.$t('editor.text.sanitize'),
+                icon: 'sanitize-content-button',
+                active: () => !this.bypassSanitization,
+                action: (editor: MDEditor): void => {
+                    if (this.bypassSanitization) {
+                        const confirmChange = confirm(this.$t('editor.text.sanitize.confirm'));
+                        if (!confirmChange) return;
+                    }
+
+                    this.bypassSanitization = !this.bypassSanitization;
+                }
             }
         };
     }
@@ -481,6 +499,11 @@ export default class TextEditorV extends Vue {
     toolbarOptions = `undo redo clear | h bold italic strikethrough quote subsuper fontSize | ul ol table hr | addLink image code ${
         window.location.href.includes('index-ca') ? '| wetToolbar' : ''
     } | save`;
+
+    rightToolbarOptions = `preview toc sync-scroll fullscreen ${
+        // TODO: remove the ! before merging. First one to block gets a cookie
+        this.userStore.userProfile.role !== 'Admin' ? 'sanitization' : ''
+    }`;
 
     toolbarTooltipAdjust(toggle: HTMLElement): void {
         const slideEditor = document.querySelector('#slideEditor') as HTMLElement;
@@ -502,11 +525,13 @@ export default class TextEditorV extends Vue {
     }
 
     saveChanges() {
-        this.panel.content = DOMPurify.sanitize(this.panel.content, {
-            FORCE_BODY: true,
-            ADD_TAGS: ['AudioPlayer'],
-            ADD_ATTR: ['transcript']
-        }).replaceAll('audioplayer', 'AudioPlayer');
+        if (!this.bypassSanitization) {
+            this.panel.content = DOMPurify.sanitize(this.panel.content, {
+                FORCE_BODY: true,
+                ADD_TAGS: ['AudioPlayer'],
+                ADD_ATTR: ['transcript']
+            }).replaceAll('audioplayer', 'AudioPlayer');
+        }
     }
 
     mounted(): void {
@@ -522,6 +547,9 @@ export default class TextEditorV extends Vue {
         });
 
         this.makeTextEditorElementsTabbable();
+
+        // TODO: remove the ! before merging.
+        this.bypassSanitization = this.userStore.userProfile.role !== 'Admin'; // admins will bypass sanitization by default. They can enable it with the 'sanitize' button.
 
         // selects the <textarea> and adds label attribute dynamically
         this.$nextTick(() => {
@@ -553,6 +581,10 @@ export default class TextEditorV extends Vue {
     transition-duration: 0.075s;
 }
 
+:deep(.sanitize-content-button) {
+    font-size: 14px;
+}
+
 :deep(.v-md-editor__toolbar-right-wrapper) {
     background-color: #f3f4f6;
     border-radius: 3px;
@@ -576,6 +608,12 @@ export default class TextEditorV extends Vue {
 
 label {
     text-align: left !important;
+    margin-left: 0.5rem;
+}
+
+input[type='checkbox']:checked {
+    accent-color: black;
+    color: white;
 }
 
 .WETDashboard {
