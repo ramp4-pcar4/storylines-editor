@@ -435,10 +435,10 @@ function createNewSlide(): void {
         id: newSlideName.value,
         panel: JSON.parse(JSON.stringify(startingConfig[newSlideType.value as keyof DefaultConfigs]))
     };
-    editingSlide.value = props.panel.children.length;
     // this.editingMode = false;
     newSlideName.value = '';
     props.panel.children.push(newConfig);
+    switchSlide(props.panel.children.length - 1);
 }
 
 function determineEditorType(panel: BasePanel): string {
