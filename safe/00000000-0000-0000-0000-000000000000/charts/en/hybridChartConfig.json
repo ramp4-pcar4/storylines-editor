@@ -1,0 +1,56 @@
+{
+    "credits": {
+        "enabled": false
+    },
+    "title": {
+        "text": "Total releases of arsenic between 2010 and 2020"
+    },
+    "xAxis": {
+        "categories": [
+            2010,
+            2011,
+            2012,
+            2013,
+            2014,
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2020
+        ],
+        "title": {
+            "text": "Year"
+        }
+    },
+    "yAxis": [
+        {
+            "title": {
+                "text": "Quantity (tonnes)"
+            },
+            "min": 0,
+            "max": 75000
+        },
+        {
+            "title": {
+                "text": "Number of reporting facilities"
+            },
+            "min": 260,
+            "max": 310,
+            "opposite": true
+        }
+    ],
+    "series": [
+        {
+            "name": "Facilities",
+            "type": "column",
+            "yAxis": 1,
+            "data": [280, 283, 287, 283, 289, 274, 277, 285, 288, 300, 296]
+        },
+        {
+            "name": "Quantity",
+            "type": "spline",
+            "data": [17978, 24201, 20795, 20872, 20176, 24441, 23075, 24073, 31752, 55898, 67515]
+        }
+    ]
+}
