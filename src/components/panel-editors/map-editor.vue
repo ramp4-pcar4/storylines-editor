@@ -175,7 +175,8 @@ export default class MapEditorV extends Vue {
 
             if (configFile) {
                 configFile.async('string').then((res: string) => {
-                    const conf = JSON.parse(res);
+                    const cleanRes = res.replace(/^\uFEFF/, ''); // Remove BOM if present.
+                    const conf = JSON.parse(cleanRes);
                     this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
                     this.rampEditorApi.setLanguage(this.currLang);
                 });
@@ -184,7 +185,8 @@ export default class MapEditorV extends Vue {
                 fetch(this.panel.config).then((data) => {
                     data.json().then((res) => {
                         let stringResponse = JSON.stringify(res);
-                        const conf = JSON.parse(stringResponse);
+                        const cleanRes = stringResponse.replace(/^\uFEFF/, ''); // Remove BOM if present.
+                        const conf = JSON.parse(cleanRes);
                         this.rampEditorApi = createRampEditorInstance(this.$refs.editor, conf);
                         this.rampEditorApi.setLanguage(this.currLang);
                     });
