@@ -33,8 +33,8 @@ const LOG_PATH =
         ? process.env.SERVER_LOG_PATH
         : './logfile.txt'; // the path to the logfile
 const ROUTE_PREFIX =
-    process.env.SERVER_CURR_ENV && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
-        ? '/Storylines-Editor-STB-Server'
+    process.env.SERVER_CURR_ENV && process.env.SERVER_DEPLOY_INSTANCE && process.env.SERVER_CURR_ENV !== '#{CURR_ENV}#'
+        ? process.env.SERVER_DEPLOY_INSTANCE
         : '';
 
 // Create express app.
