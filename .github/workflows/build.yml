@@ -11,7 +11,7 @@ jobs:
             - name: Check if contributor is an org member
               id: is_organization_member
               if: github.event_name == 'pull_request_target'
-              uses: JamesSingleton/is-organization-member@1.0.1
+              uses: JamesSingleton/is-organization-member@1.1.0
               with:
                   organization: ramp4-pcar4
                   username: ${{ github.event.pull_request.head.user.login }}
@@ -30,15 +30,15 @@ jobs:
                   fi
 
             - name: Checkout 🛎️
-              uses: actions/checkout@v3
+              uses: actions/checkout@v6
               with:
                   ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
                   repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
             - name: Setup Node version
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v6
               with:
-                  node-version: 22.12.0
+                  node-version: 24.14.0
 
             - name: Install and build
               run: |
@@ -46,7 +46,7 @@ jobs:
                   npm run build
 
             - name: Cache dist files
-              uses: actions/cache@v3
+              uses: actions/cache@v5
               with:
                   path: dist
                   key: dist-${{ github.event.pull_request.head.sha || github.sha }}
