@@ -10,14 +10,11 @@ export default defineConfig({
         dsv(),
         viteStaticCopy({
             targets: [
-                { src: 'scripts/*', dest: './scripts' },
+                { src: 'scripts', dest: './' },
                 { src: 'help', dest: './' }
             ]
         })
     ],
-    define: {
-        'process.env': process.env
-    },
     base: './',
     resolve: {
         alias: {
@@ -26,7 +23,7 @@ export default defineConfig({
         }
     },
     build: {
-        rollupOptions: {
+        rolldownOptions: {
             input: {
                 main: '/index.html',
                 en: '/index-ca-en.html',
