@@ -9,7 +9,7 @@ pr_labels_json = os.environ.get('PR_LABELS_JSON', '[]')
 pr_labels = json.loads(pr_labels_json)
 
 # Summarization (example model, could be adjusted)
-summarizer = pipeline('summarization', model='tuner007/pegasus_summarizer')
+summarizer = pipeline('summarization', model='facebook/bart-large-cnn')
 neutral_summary = summarizer(pr_body, max_length=200, min_length=25, do_sample=False)[0]['summary_text']
 
 # Characters we don’t want treated as part of the URL itself

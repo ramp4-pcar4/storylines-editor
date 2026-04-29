@@ -46,32 +46,21 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v3
         with:
-          channel-id: 'C092GN5MG1H'
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "New *storylines-editor* PR by *${{ github.event.pull_request.user.login }}*"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Title*: ${{ github.event.pull_request.title }}\n*PR Type*: ${{ env.PR_LABEL_STR }}\n*Other labels*: ${{ env.REG_LABEL_STR }}\n*Link*: ${{ github.event.pull_request.html_url }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*PR Summary*:\n${{ env.NEUTRAL_SUMMARY }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            channel: C092GN5MG1H
+            text: "New Storylines-Editor PR"
+            blocks:
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "New *storylines-editor* PR by *${{ github.event.pull_request.user.login }}*"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*Title*: ${{ github.event.pull_request.title }}\n*PR Type*: ${{ env.PR_LABEL_STR }}\n*Other labels*: ${{ env.REG_LABEL_STR }}\n*Link*: ${{ github.event.pull_request.html_url }}"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*PR Summary*:\n${{ env.NEUTRAL_SUMMARY }}"
