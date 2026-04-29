@@ -1,0 +1,1 @@
+import{b as e}from"./Error-ndV5rHvq-_u7Yyvd5.js";import{t}from"./time-CZDdoUVM-_OBNPi3d.js";function n(){let n=e(`mapview-essential-goto-duration`);return n==null?n:t(n)}export{n as t};

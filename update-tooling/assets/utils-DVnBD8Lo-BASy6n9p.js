@@ -1,0 +1,1 @@
+import{o as e}from"./jsonTypeUtils-DkQOCfAl-BHf4Rij8.js";import{n as t}from"./jsonUtils-BbQIRzat-tSQp1eLu.js";function n(t){return{geometryType:e(t[0]),geometries:t.map(e=>e.toJSON())}}function r(e,n,r){let i=t(n);return e.map(e=>{let t=i.fromJSON(e);return t.spatialReference=r,t})}export{r as n,n as t};

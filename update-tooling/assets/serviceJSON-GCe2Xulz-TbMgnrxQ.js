@@ -1,0 +1,1 @@
+import{U as e}from"./request-BHP5wMb6-VJt5TCWa.js";async function t(t,n){return(await e(t,{responseType:`json`,query:{f:`json`,...n?.customParameters,token:n?.apiKey}})).data}export{t};
