@@ -1,0 +1,1 @@
+const l="Ramp-Hilight",t="Ramp-Hilight-Fog-Basemap",i={mode:"glow",options:{haloColor:[0,255,0],haloOpacity:.8}};var a=(o=>(o.NONE="none",o.GLOW="glow",o.LIFT="lift",o.FOG="fog",o))(a||{});export{a,l,t as s,i as t};
