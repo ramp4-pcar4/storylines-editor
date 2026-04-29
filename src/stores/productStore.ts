@@ -35,7 +35,7 @@ import { useEditorStore } from './editorStore';
 
 import router from '../router';
 import { vfm } from '../plugins/vfm/index';
-import cloneDeep from 'clone-deep';
+import { cloneDeep } from 'es-toolkit/object';
 
 interface ProductState {
     configFileStructure: ConfigFileStructure;

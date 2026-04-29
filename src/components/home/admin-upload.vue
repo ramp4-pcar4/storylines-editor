@@ -188,7 +188,7 @@ import { VueFinalModal } from 'vue-final-modal';
 import { VueSpinnerOval } from 'vue3-spinners';
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
-import { throttle } from 'throttle-debounce';
+import { throttle } from 'es-toolkit/function';
 import JSZip from 'jszip';
 import { fromEvent } from 'file-selector';
 import Message from 'vue-m-message';
@@ -348,7 +348,7 @@ export default class AdminUplaodV extends Vue {
         }
     }
 
-    checkUuid = throttle(300, (): void => {
+    checkUuid = throttle((): void => {
         // All reserved characters in URLs. The user can't use these for their UUID
         const illegalChars = [':', '/', '#', '?', '&', '@', '%', '+'];
         const illegalCharsContained = illegalChars.filter((badChar) => this.productUuid.includes(badChar));
@@ -375,7 +375,7 @@ export default class AdminUplaodV extends Vue {
         if (this.error === false) {
             this.warning = 'none';
         }
-    });
+    }, 300);
 
     // TODO: Once the editor decoupling PR is merged, split this up using the helpers in the productStore
     uploadZip(): void {

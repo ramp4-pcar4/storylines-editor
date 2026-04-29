@@ -410,7 +410,7 @@ import {
     TextPanel,
     VideoPanel
 } from '@/definitions';
-import cloneDeep from 'clone-deep';
+import { cloneDeep } from 'es-toolkit/object';
 import { VueFinalModal } from 'vue-final-modal';
 import { useEditorStore } from '@/stores/editorStore';
 import { VueSpinnerOval } from 'vue3-spinners';
@@ -744,7 +744,12 @@ export default class SlideTocV extends Vue {
 
         if (overlayElement && overlayElement.style.display != 'none' && window.innerWidth >= 768) {
             overlayElement.style.display = 'none';
-        } else if (sidebarElement && sidebarElement.style.width === '20rem' && window.innerWidth < 768 && overlayElement) {
+        } else if (
+            sidebarElement &&
+            sidebarElement.style.width === '20rem' &&
+            window.innerWidth < 768 &&
+            overlayElement
+        ) {
             overlayElement.style.display = 'block';
         }
     }

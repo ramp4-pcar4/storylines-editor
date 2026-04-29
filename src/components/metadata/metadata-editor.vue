@@ -609,7 +609,7 @@ import { Save, useStateStore } from '@/stores/stateStore';
 import { Options, Prop, Vue, Watch } from 'vue-property-decorator';
 import { RouteLocationNormalized } from 'vue-router';
 import { AxiosResponse } from 'axios';
-import { debounce } from 'throttle-debounce';
+import { debounce } from 'es-toolkit/function';
 import {
     ConfigFileStructure,
     MetadataContent,
@@ -637,7 +637,6 @@ import MetadataModalV from './metadata-modal.vue';
 import ConfirmationModalV from '../support/confirmation-modal.vue';
 import EditorV from '../editor.vue';
 
-import cloneDeep from 'clone-deep';
 import { useLockStore } from '@/stores/lockStore';
 import { useProductStore } from '@/stores/productStore';
 import { useEditorStore } from '@/stores/editorStore';
@@ -1010,7 +1009,7 @@ export default class MetadataEditorV extends Vue {
     /**
      * Debounce the fetch call to help prevent console spamming.
      */
-    fetchUuidCheck = debounce(600, (rename: boolean) => {
+    fetchUuidCheck = debounce((rename: boolean) => {
         if (this.isUuidInvalid(rename)) {
             return;
         }
@@ -1041,7 +1040,7 @@ export default class MetadataEditorV extends Vue {
                 })
                 .catch((error: any) => console.log(error.response || error));
         });
-    });
+    }, 600);
 
     /**
      * React to param changes in URL.
