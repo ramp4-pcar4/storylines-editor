@@ -1037,7 +1037,10 @@ export default class EditorV extends Vue {
             this.helpMd = r.data.replace(new RegExp(String.fromCharCode(13), 'g'), '');
             let section;
             while ((section = reg.exec(this.helpMd))) {
-                const info_results = marked(section[0].split('\n').splice(2).join('\n'), { renderer }) as string;
+                const info_results = marked(section[0].split('\n').splice(2).join('\n'), {
+                    renderer,
+                    async: false
+                }) as string;
                 this.helpSections.push({
                     header: section[1],
                     info: info_results,
