@@ -1,1 +1,0 @@
-import"./apiConverter-BJkAF8mH-CBtGEau9.js";import{t as e}from"./centroidOperator-BIPxsjt7-Bew2BRBP.js";export{e as execute};

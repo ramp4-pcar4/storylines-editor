@@ -1,1 +1,0 @@
-import{L as e}from"./runtime-CaipCQyx-Co0tACSo.js";import{t}from"./controllers-BB20cB10-HN6qMCEd.js";var n=t(e);export{n as t};

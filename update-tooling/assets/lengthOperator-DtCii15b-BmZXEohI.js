@@ -1,1 +1,0 @@
-import{D as e}from"./units-BC8-piul-Be4lEc0P.js";import{c as t,n}from"./jsonConverter-BRdv0MT_-D55o6Jxl.js";function r(r,i={}){let{unit:a}=i,o=t(r).calculateLength2D(),s=n(r);return o&&a&&s&&(o=e(o,s,a)),o}export{r as execute};

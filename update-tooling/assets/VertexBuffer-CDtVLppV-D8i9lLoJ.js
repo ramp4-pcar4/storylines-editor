@@ -1,1 +1,0 @@
-import{t as e}from"./BufferObject-DBY4n385-BqxjLSYz.js";var t=class extends e{constructor(e,t,n,r=35044){super(e,34962,r,n),this.layout=t}};export{t};

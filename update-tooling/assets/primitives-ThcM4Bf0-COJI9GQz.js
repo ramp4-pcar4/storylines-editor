@@ -1,1 +1,0 @@
-var e=`sphere`;export{e as t};
