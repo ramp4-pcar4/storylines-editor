@@ -1,0 +1,1 @@
+import{t as e}from"./glsl-EDZkDhgF-BmlD_e8i.js";function t(t,n){n.hasVertexColors?(t.attributes.add(`color`,`vec4`),t.varyings.add(`vColor`,`vec4`),t.vertex.code.add(e`void forwardVertexColor() { vColor = color; }`)):t.vertex.code.add(e`void forwardVertexColor() {}`)}export{t};

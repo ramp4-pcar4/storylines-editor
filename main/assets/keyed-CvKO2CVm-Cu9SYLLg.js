@@ -1,0 +1,1 @@
+import{T as e,d as t,p as n,x as r}from"./runtime-CaipCQyx-Co0tACSo.js";var i=r(class extends e{constructor(){super(...arguments),this.key=n}render(e,t){return this.key=e,t}update(e,[n,r]){return n!==this.key&&(t(e),this.key=n),r}});export{i as t};

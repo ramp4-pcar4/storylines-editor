@@ -1,0 +1,1 @@
+import{i as e}from"./enum-hlZhNd4X-B_qIt745.js";function t(t){if(typeof t==`string`)return t.toLowerCase();if(`name`in t)return t.name.toLowerCase();if(typeof t.value!=`string`)throw new e(null,`InvalidIdentifier`,null);return t.value.toLowerCase()}var n=Object.freeze({aborted:!1});export{t as n,n as t};

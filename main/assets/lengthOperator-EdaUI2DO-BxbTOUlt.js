@@ -1,0 +1,1 @@
+import{D as e}from"./units-BC8-piul-Be4lEc0P.js";import{c as t,d as n}from"./apiConverter-BJkAF8mH-CBtGEau9.js";function r(r,i={}){let{unit:a}=i,o=t(r).calculateLength2D();if(o&&a){let t=n(r);o=e(o,t,a)}return o}var i=Object.freeze(Object.defineProperty({__proto__:null,execute:r,supportsCurves:!0},Symbol.toStringTag,{value:`Module`}));export{r as n,i as t};
